@@ -33,7 +33,7 @@ export function PrimaryButton({ label, onClick }: { label: string; onClick?: () 
       onClick={onClick}
       whileTap={{ scale: 0.985 }}
       transition={{ type: "spring", stiffness: 520, damping: 32 }}
-      className="h-11 px-5 rounded-2xl bg-zinc-900 text-white font-semibold shadow-[0_10px_25px_rgba(0,0,0,0.18)] active:shadow-[0_6px_16px_rgba(0,0,0,0.18)]"
+      className="h-11 px-5 rounded-2xl bg-zinc-900 text-white font-semibold shadow-[0_10px_25px_rgba(0,0,0,0.18)]"
     >
       {label}
     </motion.button>
@@ -67,14 +67,18 @@ export function TabButton({
           : "bg-white border-zinc-200 text-zinc-900 shadow-sm",
       ].join(" ")}
     >
-      <span className="w-5 h-5 inline-flex items-center justify-center">{icon}</span>
-      <span className="text-[13px] font-semibold leading-none">{label}</span>
+      <span className="w-5 h-5 inline-flex items-center justify-center">
+        {icon}
+      </span>
+      <span className="text-[13px] font-semibold leading-none">
+        {label}
+      </span>
     </motion.button>
   );
 }
 
 // ===========================
-// ACTION CARD (ОТПРАВИТЬ/ПОЛУЧИТЬ/ОБМЕНЯТЬ/СПИСАТЬ)
+// ACTION CARD
 // ===========================
 
 export type ActionKind = "send" | "receive" | "swap" | "spend";
@@ -96,12 +100,13 @@ export function ActionCard({
   const handleClick = () => {
     if (isAnimating.current) return;
     isAnimating.current = true;
+
     setTrigger((v) => v + 1);
     onClick?.();
 
     setTimeout(() => {
       isAnimating.current = false;
-    }, 300);
+    }, 280);
   };
 
   return (
@@ -112,14 +117,12 @@ export function ActionCard({
       className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 text-left hover:shadow-md"
     >
       <div className="flex items-center justify-between gap-3">
-        {/* Текст слева */}
         <div className="min-w-0">
           <div className="text-[15px] font-semibold truncate">{label}</div>
           <div className="text-[12px] text-zinc-500 truncate">{hint}</div>
         </div>
 
-        {/* Белая таблетка (обводка, тень) — без серой заливки, просто иконка */}
-        <div className="h-10 w-10 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 overflow-hidden bg-white">
+        <div className="h-11 w-11 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
           <AnimatedActionIcon kind={kind} trigger={trigger} />
         </div>
       </div>
@@ -128,7 +131,7 @@ export function ActionCard({
 }
 
 // ===========================
-// АНИМИРОВАННЫЕ ИКОНКИ (ТОЛЬКО ПО КЛИКУ)
+// АНИМАЦИИ
 // ===========================
 
 function Gif({ src, alt }: { src: string; alt: string }) {
@@ -137,7 +140,7 @@ function Gif({ src, alt }: { src: string; alt: string }) {
       src={src}
       alt={alt}
       draggable={false}
-      className="w-[28px] h-[28px] object-contain"
+      className="w-[30px] h-[30px] object-contain"
     />
   );
 }
@@ -149,23 +152,17 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
     return (
       <motion.div
         key={key}
-        initial={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
-        animate={trigger ? {
-          x: [0, 10, 20, 0],
-          y: [0, -6, -16, 0],
-          rotate: [0, -12, -24, 0],
-          opacity: [1, 1, 0, 1],
-        } : {}}
-        transition={{ duration: 0.3, times: [0, 0.4, 0.7, 1], ease: "easeOut" }}
-        className="relative"
+        animate={
+          trigger
+            ? {
+                x: [0, 12, 20, 0],
+                y: [0, -6, -14, 0],
+                rotate: [0, -15, -25, 0],
+              }
+            : {}
+        }
+        transition={{ duration: 0.28, ease: "easeOut" }}
       >
-        <motion.span
-          key={`trail-${trigger}`}
-          initial={{ opacity: 0, scaleX: 0.4 }}
-          animate={trigger ? { opacity: [0, 0.4, 0], scaleX: [0.4, 1, 1] } : {}}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className="absolute -left-3 top-1/2 -translate-y-1/2 h-[2px] w-3 rounded-full bg-zinc-900/30 origin-right"
-        />
         <Gif src="/icons/send.gif" alt="send" />
       </motion.div>
     );
@@ -175,9 +172,8 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
     return (
       <motion.div
         key={key}
-        initial={{ scale: 1 }}
-        animate={trigger ? { scale: [1, 1.1, 1] } : {}}
-        transition={{ duration: 0.2, ease: "easeOut" }}
+        animate={trigger ? { scale: [1, 1.12, 1] } : {}}
+        transition={{ duration: 0.22, ease: "easeOut" }}
       >
         <Gif src="/icons/receive.gif" alt="receive" />
       </motion.div>
@@ -188,8 +184,7 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
     return (
       <motion.div
         key={key}
-        initial={{ rotate: 0, scale: 1 }}
-        animate={trigger ? { rotate: [0, 10, -8, 0], scale: [1, 1.08, 1] } : {}}
+        animate={trigger ? { rotate: [0, 12, -10, 0] } : {}}
         transition={{ duration: 0.24, ease: "easeOut" }}
       >
         <Gif src="/icons/exchange.gif" alt="exchange" />
@@ -197,62 +192,28 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
     );
   }
 
-  // spend
-  return <SpendIcon key={key} trigger={trigger} />;
-}
-
-function SpendIcon({ trigger }: { trigger: number }) {
+  // spend → твой pay.gif
   return (
-    <div className="relative w-[28px] h-[28px] text-zinc-900">
-      {/* галочка статична */}
-      <svg
-        className="absolute inset-0"
-        width="28"
-        height="28"
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M7 12.5 10.2 15.7 17.5 8.4"
-          stroke="currentColor"
-          strokeWidth="1.9"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-
-      {/* стрелка вниз — анимируется только при клике */}
-      <motion.svg
-        className="absolute inset-0"
-        width="28"
-        height="28"
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-hidden="true"
-        initial={{ y: 0, opacity: 0 }}
-        animate={trigger ? { y: [0, 0, 8], opacity: [0, 1, 0] } : {}}
-        transition={{ duration: 0.24, ease: "easeOut", times: [0, 0.2, 1] }}
-      >
-        <path d="M12 6v9" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
-        <path
-          d="M8.5 12.5 12 16l3.5-3.5"
-          stroke="currentColor"
-          strokeWidth="1.9"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </motion.svg>
-    </div>
+    <motion.div
+      key={key}
+      animate={trigger ? { scale: [1, 1.1, 1] } : {}}
+      transition={{ duration: 0.22, ease: "easeOut" }}
+    >
+      <Gif src="/icons/pay.gif" alt="spend" />
+    </motion.div>
   );
 }
 
 // ===========================
-// ВСПОМОГАТЕЛЬНЫЕ КОМПОНЕНТЫ
+// ВСПОМОГАТЕЛЬНЫЕ
 // ===========================
 
 export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`rounded-2xl bg-white border border-zinc-200 shadow-sm ${className}`}>{children}</div>;
+  return (
+    <div className={`rounded-2xl bg-white border border-zinc-200 shadow-sm ${className}`}>
+      {children}
+    </div>
+  );
 }
 
 export function CardContent({ children, className = "" }: { children: React.ReactNode; className?: string }) {
