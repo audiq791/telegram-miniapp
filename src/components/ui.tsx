@@ -1,51 +1,83 @@
 "use client";
 
-import { useEffect } from "react";
-import { motion, useAnimationControls } from "framer-motion";
-import { springTap } from "./motion";
+import React, { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 
-export function IconButton({
-  children,
-  onClick,
-  aria,
-}: {
-  children: React.ReactNode;
+type IconButtonProps = {
+  aria?: string;
   onClick?: () => void;
-  aria: string;
-}) {
+  children: React.ReactNode;
+};
+
+export function IconButton({ aria, onClick, children }: IconButtonProps) {
   return (
     <motion.button
       aria-label={aria}
       onClick={onClick}
       whileTap={{ scale: 0.96 }}
-      transition={springTap}
-      className="h-10 w-10 rounded-2xl bg-white border border-zinc-200 text-zinc-900 grid place-items-center hover:bg-zinc-50"
+      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+      className="h-10 w-10 rounded-2xl bg-white border border-zinc-200 shadow-sm grid place-items-center text-zinc-900"
     >
       {children}
     </motion.button>
   );
 }
 
-export function PrimaryButton({
-  label,
-  onClick,
-}: {
-  label: string;
-  onClick?: () => void;
-}) {
+export function PrimaryButton({ label, onClick }: { label: string; onClick?: () => void }) {
   return (
     <motion.button
       onClick={onClick}
       whileTap={{ scale: 0.985 }}
-      transition={springTap}
-      className="h-11 px-5 rounded-2xl bg-zinc-900 text-white font-semibold hover:bg-zinc-800 shadow-sm"
+      transition={{ type: "spring", stiffness: 520, damping: 32 }}
+      className="h-11 px-5 rounded-2xl bg-zinc-900 text-white font-semibold shadow-[0_10px_25px_rgba(0,0,0,0.18)] active:shadow-[0_6px_16px_rgba(0,0,0,0.18)]"
     >
       {label}
     </motion.button>
   );
 }
 
-type ActionKind = "send" | "receive" | "swap" | "spend";
+/** Нижняя вкладка: активная — чёрная заливка, неактивная — белая */
+export function TabButton({
+  active,
+  onClick,
+  label,
+  icon,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  icon: React.ReactNode;
+}) {
+  // “пружинка” для иконки
+  return (
+    <motion.button
+      onClick={onClick}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 520, damping: 34 }}
+      className={[
+        "h-12 rounded-2xl px-3 flex items-center justify-center gap-2 border",
+        active
+          ? "bg-zinc-900 border-zinc-900 text-white shadow-[0_10px_25px_rgba(0,0,0,0.18)]"
+          : "bg-white border-zinc-200 text-zinc-900 shadow-sm",
+      ].join(" ")}
+    >
+      <motion.span
+        className="inline-flex items-center justify-center shrink-0"
+        // мягкая логичная анимация: “подпрыгнуть” на тап
+        whileTap={{ y: -1 }}
+        transition={{ type: "spring", stiffness: 700, damping: 38 }}
+        style={{ lineHeight: 0 }}
+      >
+        {/* Фикс “сжатых” иконок: задаём контейнеру размер */}
+        <span className="w-5 h-5 inline-flex items-center justify-center">{icon}</span>
+      </motion.span>
+
+      <span className="text-[13px] font-semibold leading-none">{label}</span>
+    </motion.button>
+  );
+}
+
+export type ActionKind = "send" | "receive" | "swap" | "spend";
 
 export function ActionCard({
   label,
@@ -58,238 +90,229 @@ export function ActionCard({
   kind: ActionKind;
   onClick?: () => void;
 }) {
-  const iconControls = useAnimationControls();
+  const [pulseKey, setPulseKey] = useState(0);
 
-  const playIcon = async () => {
-    // сброс, чтобы повторные тапы всегда играли
-    await iconControls.start("idle");
-    await iconControls.start("tap");
+  const trigger = () => {
+    // запускаем анимацию иконки
+    setPulseKey((v) => v + 1);
+    onClick?.();
   };
 
   return (
     <motion.button
-      onClick={onClick}
-      onTap={playIcon} // 🔥 вот это главное: тап по ВСЕЙ кнопке запускает анимацию иконки
+      onClick={trigger}
       whileTap={{ scale: 0.985 }}
-      transition={springTap}
-      className="group rounded-2xl border border-zinc-200 bg-white p-4 flex items-center justify-between shadow-sm hover:shadow-md"
+      transition={{ type: "spring", stiffness: 520, damping: 34 }}
+      className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 text-left hover:shadow-md"
     >
-      <div className="min-w-0">
-        <div className="text-[15px] font-semibold">{label}</div>
-        <div className="text-xs text-zinc-500 mt-0.5">{hint}</div>
-      </div>
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-[15px] font-semibold truncate">{label}</div>
+          <div className="text-[12px] text-zinc-500 truncate">{hint}</div>
+        </div>
 
-      {/* фиксируем квадрат, чтобы иконки НЕ “сжимались” */}
-      <div className="shrink-0 h-11 w-11 rounded-2xl bg-white border border-zinc-200 grid place-items-center text-zinc-900 group-hover:border-zinc-300 group-hover:shadow-sm">
-        <AnimatedActionIcon kind={kind} controls={iconControls} />
+        {/* “пилюля” белая — иконка чёрная */}
+        <div className="h-10 w-10 rounded-2xl bg-white border border-zinc-200 shadow-sm grid place-items-center shrink-0">
+          <AnimatedActionIcon kind={kind} pulseKey={pulseKey} />
+        </div>
       </div>
     </motion.button>
   );
 }
 
-/** Активный таб = чёрная заливка + анимация иконки по тапу */
-export function TabButton({
-  active,
-  onClick,
-  label,
-  icon,
-}: {
-  active: boolean;
-  onClick: () => void;
-  label: string;
-  icon: React.ReactNode;
-}) {
-  const iconControls = useAnimationControls();
+/* ===========================
+   АНИМАЦИИ ИКОНОК (как в финтехах/Telegram: коротко, мягко, “живое”)
+   =========================== */
 
-  // лёгкая "подпрыгивающая" анимация, когда таб становится активным
-  useEffect(() => {
-    if (active) {
-      iconControls.start("active");
-    } else {
-      iconControls.start("idle");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active]);
+function AnimatedActionIcon({ kind, pulseKey }: { kind: ActionKind; pulseKey: number }) {
+  // Каждое нажатие меняет key — Framer Motion заново проигрывает анимацию
+  const key = `${kind}-${pulseKey}`;
 
-  const tapIcon = async () => {
-    await iconControls.start("idle");
-    await iconControls.start("tap");
-  };
-
-  return (
-    <motion.button
-      onClick={onClick}
-      onTap={tapIcon}
-      whileTap={{ scale: 0.985 }}
-      transition={springTap}
-      className={[
-        "w-full rounded-2xl border transition select-none",
-        "px-2 py-2 min-h-[52px]",
-        "flex flex-col items-center justify-center gap-1",
-        active
-          ? "bg-zinc-900 text-white border-zinc-900 shadow-sm"
-          : "bg-white text-zinc-900 border-zinc-200",
-      ].join(" ")}
-    >
-      <motion.span
-        className="grid place-items-center leading-none"
-        variants={{
-          idle: { y: 0, scale: 1, rotate: 0 },
-          active: { y: 0, scale: 1.02 },
-          tap: { y: [0, -2, 0], scale: [1, 1.06, 1], rotate: [0, -2, 0] },
+  if (kind === "send") {
+    // Самолётик “улетает” вверх-вправо, чуть поворачивается и исчезает → возвращается
+    return (
+      <motion.div
+        key={key}
+        initial={{ x: 0, y: 0, rotate: 0, opacity: 1, scale: 1 }}
+        animate={{
+          x: [0, 6, 16, 16, 0],
+          y: [0, -4, -14, -14, 0],
+          rotate: [0, -10, -18, -18, 0],
+          opacity: [1, 1, 0, 0, 1],
+          scale: [1, 1, 0.98, 0.98, 1],
         }}
-        animate={iconControls}
-        transition={{ duration: 0.28, ease: "easeInOut" }}
+        transition={{
+          duration: 0.55,
+          times: [0, 0.35, 0.6, 0.75, 1],
+          ease: ["easeOut", "easeOut", "easeOut", "easeOut", "easeOut"],
+        }}
+        className="relative"
       >
-        <span className={active ? "opacity-100" : "text-zinc-500"}>
-          {icon}
-        </span>
-      </motion.span>
+        {/* небольшой “трейл” */}
+        <motion.span
+          initial={{ opacity: 0, scaleX: 0.4 }}
+          animate={{ opacity: [0, 0.35, 0], scaleX: [0.4, 1, 1] }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+          className="absolute -left-3 top-1/2 -translate-y-1/2 h-[2px] w-3 rounded-full bg-zinc-900/25 origin-right"
+        />
+        <PlaneIcon />
+      </motion.div>
+    );
+  }
 
-      <span className="text-[clamp(11px,2.8vw,12px)] font-semibold leading-none">
-        {label}
-      </span>
-    </motion.button>
+  if (kind === "receive") {
+    // Стрелка “уходит вниз” (мягкое падение + лёгкий отскок)
+    return (
+      <motion.div
+        key={key}
+        initial={{ y: 0, scale: 1 }}
+        animate={{ y: [0, 6, 10, 7, 0], scale: [1, 1, 0.99, 1, 1] }}
+        transition={{ duration: 0.45, ease: "easeOut" }}
+      >
+        <ReceiveIcon />
+      </motion.div>
+    );
+  }
+
+  if (kind === "swap") {
+    // TG-стайл “обмен”: две стрелки, делают оборот (вращение + микро-скейл)
+    return (
+      <motion.div
+        key={key}
+        initial={{ rotate: 0, scale: 1 }}
+        animate={{ rotate: [0, 180, 360], scale: [1, 1.02, 1] }}
+        transition={{ duration: 0.55, ease: "easeInOut" }}
+      >
+        <SwapIcon />
+      </motion.div>
+    );
+  }
+
+  // spend: “галочка проставляется” (прорисовка stroke)
+  return <AnimatedCheck key={key} />;
+}
+
+/* ===========================
+   ИКОНКИ (в одном стиле, “премиальные”, тонкая обводка)
+   =========================== */
+
+function PlaneIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M3.4 11.3 21 3l-8.3 17.6-2.2-6.1L3.4 11.3Z"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M21 3 10.5 14.5"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 
-/* =========================
-   Анимированные action-иконки (по тапу всей кнопки)
-   ========================= */
-
-function AnimatedActionIcon({
-  kind,
-  controls,
-}: {
-  kind: ActionKind;
-  controls: ReturnType<typeof useAnimationControls>;
-}) {
-  if (kind === "send") return <SendPlaneIcon controls={controls} />;
-  if (kind === "receive") return <ReceiveDownIcon controls={controls} />;
-  if (kind === "swap") return <SwapRotateIcon controls={controls} />;
-  return <CheckDrawIcon controls={controls} />;
-}
-
-function SendPlaneIcon({
-  controls,
-}: {
-  controls: ReturnType<typeof useAnimationControls>;
-}) {
+function ReceiveIcon() {
+  // “download” стрелка вниз — ближе к финтех-паттернам, чем обычная “стрелка”
   return (
-    <motion.div
-      className="h-6 w-6 text-zinc-900"
-      variants={{
-        idle: { x: 0, y: 0, rotate: 0, opacity: 1 },
-        tap: { x: [0, 10, 0], y: [0, -6, 0], rotate: [0, -10, 0], opacity: [1, 0.85, 1] },
-      }}
-      animate={controls}
-      transition={{ duration: 0.35, ease: "easeInOut" }}
-    >
-      <svg
-        viewBox="0 0 24 24"
-        className="h-full w-full"
-        fill="none"
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 3v10"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+      />
+      <path
+        d="M8.5 10.5 12 14l3.5-3.5"
         stroke="currentColor"
         strokeWidth="1.9"
         strokeLinecap="round"
         strokeLinejoin="round"
-      >
-        <path d="M22 2L11 13" />
-        <path d="M22 2L15 22L11 13L2 9L22 2Z" />
-      </svg>
-    </motion.div>
+      />
+      <path
+        d="M6 20h12"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 
-function ReceiveDownIcon({
-  controls,
-}: {
-  controls: ReturnType<typeof useAnimationControls>;
-}) {
+function SwapIcon() {
+  // Telegram-подобные “обмен” стрелки: верхняя → вправо, нижняя → влево
   return (
-    <motion.div
-      className="h-6 w-6 text-zinc-900"
-      variants={{
-        idle: { y: 0, opacity: 1 },
-        tap: { y: [0, 6, 0], opacity: [1, 0.85, 1] },
-      }}
-      animate={controls}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-    >
-      <svg
-        viewBox="0 0 24 24"
-        className="h-full w-full"
-        fill="none"
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M7 7h10"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+      />
+      <path
+        d="M15.5 4.5 18 7l-2.5 2.5"
         stroke="currentColor"
         strokeWidth="1.9"
         strokeLinecap="round"
         strokeLinejoin="round"
-      >
-        <path d="M12 3v12" />
-        <path d="M7 10l5 5 5-5" />
-        <path d="M4 21h16" />
-      </svg>
-    </motion.div>
-  );
-}
+      />
 
-function SwapRotateIcon({
-  controls,
-}: {
-  controls: ReturnType<typeof useAnimationControls>;
-}) {
-  return (
-    <motion.div
-      className="h-6 w-6 text-zinc-900"
-      variants={{
-        idle: { rotate: 0 },
-        tap: { rotate: [0, 180, 360] },
-      }}
-      animate={controls}
-      transition={{ duration: 0.45, ease: "easeInOut" }}
-    >
-      <svg
-        viewBox="0 0 24 24"
-        className="h-full w-full"
-        fill="none"
+      <path
+        d="M17 17H7"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+      />
+      <path
+        d="M8.5 14.5 6 17l2.5 2.5"
         stroke="currentColor"
         strokeWidth="1.9"
         strokeLinecap="round"
         strokeLinejoin="round"
-      >
-        <path d="M16 3h5v5" />
-        <path d="M21 3l-7 7" />
-        <path d="M8 21H3v-5" />
-        <path d="M3 21l7-7" />
-      </svg>
-    </motion.div>
+      />
+    </svg>
   );
 }
 
-function CheckDrawIcon({
-  controls,
-}: {
-  controls: ReturnType<typeof useAnimationControls>;
-}) {
+function AnimatedCheck() {
+  // Рисуем галочку “как будто проставили”
+  const length = 40; // примерно для stroke-dash
   return (
     <motion.svg
+      width="18"
+      height="18"
       viewBox="0 0 24 24"
-      className="h-6 w-6 text-zinc-900"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      aria-hidden="true"
+      initial={{ scale: 1 }}
+      animate={{ scale: [1, 1.06, 1] }}
+      transition={{ duration: 0.32, ease: "easeOut" }}
     >
       <motion.path
-        d="M20 6L9 17l-5-5"
-        variants={{
-          idle: { pathLength: 0, opacity: 0.6 },
-          tap: { pathLength: [0, 1], opacity: [0.6, 1] },
-        }}
-        animate={controls}
-        transition={{ duration: 0.28, ease: "easeOut" }}
+        d="M7 12.5 10.2 15.7 17.5 8.4"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray={length}
+        initial={{ strokeDashoffset: length }}
+        animate={{ strokeDashoffset: 0 }}
+        transition={{ duration: 0.38, ease: "easeOut" }}
       />
     </motion.svg>
   );
+}
+
+/* ===========================
+   (Если где-то в проекте используется ещё один компонент — безопасный экспорт)
+   =========================== */
+export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <div className={`rounded-2xl bg-white border border-zinc-200 shadow-sm ${className}`}>{children}</div>;
+}
+
+export function CardContent({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <div className={`p-4 ${className}`}>{children}</div>;
 }
