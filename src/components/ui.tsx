@@ -99,7 +99,6 @@ export function ActionCard({
     setTrigger((v) => v + 1);
     onClick?.();
 
-    // через 300 мс разрешаем снова (длина анимации)
     setTimeout(() => {
       isAnimating.current = false;
     }, 300);
@@ -119,7 +118,7 @@ export function ActionCard({
           <div className="text-[12px] text-zinc-500 truncate">{hint}</div>
         </div>
 
-        {/* БЕЛАЯ ТАБЛЕТКА (обводка, тень) — но без серой заливки */}
+        {/* Белая таблетка (обводка, тень) — без серой заливки, просто иконка */}
         <div className="h-10 w-10 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 overflow-hidden bg-white">
           <AnimatedActionIcon kind={kind} trigger={trigger} />
         </div>
@@ -129,20 +128,17 @@ export function ActionCard({
 }
 
 // ===========================
-// АНИМИРОВАННЫЕ ИКОНКИ (ЧЁРНО-БЕЛЫЕ)
+// АНИМИРОВАННЫЕ ИКОНКИ (ОРИГИНАЛЬНЫЕ ЦВЕТА)
 // ===========================
 
-function MonoGif({ src, alt }: { src: string; alt: string }) {
+function Gif({ src, alt }: { src: string; alt: string }) {
   return (
     <img
       src={src}
       alt={alt}
       draggable={false}
       className="w-[28px] h-[28px] object-contain"
-      style={{
-        // полная десатурация, бирюза → чёрный
-        filter: "grayscale(1) saturate(0) contrast(1.6) brightness(0.7)",
-      }}
+      // БЕЗ ФИЛЬТРОВ — оригинальные цвета
     />
   );
 }
@@ -171,7 +167,7 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="absolute -left-3 top-1/2 -translate-y-1/2 h-[2px] w-3 rounded-full bg-zinc-900/30 origin-right"
         />
-        <MonoGif src="/icons/send.gif" alt="send" />
+        <Gif src="/icons/send.gif" alt="send" />
       </motion.div>
     );
   }
@@ -184,7 +180,7 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
         animate={{ scale: [1, 1.1, 1] }}
         transition={{ duration: 0.2, ease: "easeOut" }}
       >
-        <MonoGif src="/icons/receive.gif" alt="receive" />
+        <Gif src="/icons/receive.gif" alt="receive" />
       </motion.div>
     );
   }
@@ -197,7 +193,7 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
         animate={{ rotate: [0, 10, -8, 0], scale: [1, 1.08, 1] }}
         transition={{ duration: 0.24, ease: "easeOut" }}
       >
-        <MonoGif src="/icons/exchange.gif" alt="exchange" />
+        <Gif src="/icons/exchange.gif" alt="exchange" />
       </motion.div>
     );
   }
