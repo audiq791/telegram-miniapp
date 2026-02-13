@@ -13,7 +13,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-import { springTap } from "../components/motion";
 import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
 import BlackScreen from "./BlackScreen";
 
@@ -48,9 +47,8 @@ export default function MainApp() {
   const [tab, setTab] = useState<"wallet" | "market" | "partners" | "profile">("wallet");
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [query, setQuery] = useState("");
-  
-  // Простой стек истории
-  const [history, setHistory] = useState<string[]>(["home"]);
+  const [currentScreen, setCurrentScreen] = useState<"main" | "blank">("main");
+  const [blankTitle, setBlankTitle] = useState("");
 
   const partners = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -58,80 +56,71 @@ export default function MainApp() {
     return partnersSeed.filter((p) => p.name.toLowerCase().includes(q));
   }, [query]);
 
-  // Прямая работа с Telegram WebApp API
+  // Telegram WebApp API
   useEffect(() => {
-    // Проверяем, запущено ли приложение в Telegram
+    // Проверяем, запущено ли в Telegram
     const tg = (window as any).Telegram?.WebApp;
     
     if (tg) {
-      console.log('Telegram WebApp доступен');
+      console.log("Telegram WebApp доступен");
       
-      // Функция обновления кнопки назад
-      const updateBackButton = () => {
-        if (history.length > 1) {
-          tg.BackButton.show();
-          tg.BackButton.onClick(() => {
-            // Вибрация
-            tg.HapticFeedback.impactOccurred('light');
-            
-            // Возврат на предыдущий экран
-            if (history.length > 1) {
-              const newHistory = [...history];
-              newHistory.pop();
-              setHistory(newHistory);
-              
-              if (newHistory.length === 1) {
-                setRoute({ name: "home" });
-                setTab("wallet");
-              }
-            }
-          });
-        } else {
-          tg.BackButton.hide();
-        }
-      };
+      // Изначально кнопка назад скрыта
+      tg.BackButton.hide();
       
-      updateBackButton();
-      
-      // Очистка при размонтировании
-      return () => {
+      // Обработчик нажатия кнопки назад
+      tg.BackButton.onClick(() => {
+        console.log("Нажата кнопка назад");
+        
+        // Вызываем вибрацию
+        tg.HapticFeedback.impactOccurred("light");
+        
+        // Возвращаемся на главный экран
+        setCurrentScreen("main");
+        setBlankTitle("");
+        
+        // Скрываем кнопку назад
         tg.BackButton.hide();
-      };
+      });
     }
-  }, [history]);
-
-  const goBlank = (title: string) => {
-    setRoute({ name: "blank", title });
-    setHistory(prev => [...prev, title]);
     
-    // Вибрация
-    try {
-      const tg = (window as any).Telegram?.WebApp;
-      tg?.HapticFeedback.impactOccurred('light');
-    } catch (e) {}
+    return () => {
+      // Очищаем обработчик при размонтировании
+      if ((window as any).Telegram?.WebApp) {
+        (window as any).Telegram.WebApp.BackButton.offClick();
+      }
+    };
+  }, []);
+
+  // Отслеживаем текущий экран и показываем/скрываем кнопку назад
+  useEffect(() => {
+    const tg = (window as any).Telegram?.WebApp;
+    
+    if (tg) {
+      if (currentScreen === "blank") {
+        tg.BackButton.show();
+      } else {
+        tg.BackButton.hide();
+      }
+    }
+  }, [currentScreen]);
+
+  const goToBlank = (title: string) => {
+    const tg = (window as any).Telegram?.WebApp;
+    
+    setCurrentScreen("blank");
+    setBlankTitle(title);
+    
+    // Вибрация при нажатии
+    tg?.HapticFeedback.impactOccurred("light");
   };
 
-  const goBack = () => {
-    if (history.length <= 1) {
-      // Если мы на главной, закрываем приложение
-      const tg = (window as any).Telegram?.WebApp;
-      tg?.close();
-      return;
-    }
+  const goToMain = () => {
+    const tg = (window as any).Telegram?.WebApp;
     
-    const newHistory = [...history];
-    newHistory.pop();
-    setHistory(newHistory);
+    setCurrentScreen("main");
+    setBlankTitle("");
     
-    if (newHistory.length === 1) {
-      setRoute({ name: "home" });
-      setTab("wallet");
-    }
-  };
-
-  const goHome = () => {
-    setRoute({ name: "home" });
-    setHistory(["home"]);
+    tg?.HapticFeedback.impactOccurred("light");
   };
 
   return (
@@ -146,15 +135,7 @@ export default function MainApp() {
             <div className="min-w-0">
               <div className="text-[13px] text-zinc-500 leading-none">Биржа бонусов</div>
               <div className="text-[15px] font-semibold leading-tight truncate">
-                {route.name === "blank"
-                  ? route.title
-                  : tab === "wallet"
-                    ? "Кошелёк"
-                    : tab === "market"
-                      ? "Маркет"
-                      : tab === "partners"
-                        ? "Партнёры"
-                        : "Профиль"}
+                {currentScreen === "blank" ? blankTitle : "Кошелёк"}
               </div>
             </div>
           </div>
@@ -173,9 +154,9 @@ export default function MainApp() {
       {/* CONTENT */}
       <div className="mx-auto max-w-md">
         <AnimatePresence mode="wait">
-          {route.name === "home" ? (
+          {currentScreen === "main" ? (
             <motion.main
-              key="home"
+              key="main"
               className="px-4 pt-4 pb-28"
               initial={{ opacity: 0, x: 12 }}
               animate={{ opacity: 1, x: 0 }}
@@ -200,15 +181,15 @@ export default function MainApp() {
                         {formatMoney(0)} <span className="text-base font-medium text-zinc-500">B</span>
                       </div>
                     </div>
-                    <PrimaryButton label="Пополнить" onClick={() => goBlank("Пополнить")} />
+                    <PrimaryButton label="Пополнить" onClick={() => goToBlank("Пополнить")} />
                   </div>
 
                   {/* ACTIONS */}
                   <div className="mt-4 grid grid-cols-2 gap-3">
-                    <ActionCard label="Отправить" hint="перевод" kind="send" onClick={() => goBlank("Отправить")} />
-                    <ActionCard label="Получить" hint="входящие" kind="receive" onClick={() => goBlank("Получить")} />
-                    <ActionCard label="Обменять" hint="курс" kind="swap" onClick={() => goBlank("Обменять")} />
-                    <ActionCard label="Списать" hint="оплата" kind="spend" onClick={() => goBlank("Списать")} />
+                    <ActionCard label="Отправить" hint="перевод" kind="send" onClick={() => goToBlank("Отправить")} />
+                    <ActionCard label="Получить" hint="входящие" kind="receive" onClick={() => goToBlank("Получить")} />
+                    <ActionCard label="Обменять" hint="курс" kind="swap" onClick={() => goToBlank("Обменять")} />
+                    <ActionCard label="Списать" hint="оплата" kind="spend" onClick={() => goToBlank("Списать")} />
                   </div>
                 </div>
 
@@ -234,8 +215,8 @@ export default function MainApp() {
                   <div className="text-sm text-zinc-500">Партнёры</div>
                   <motion.button
                     whileTap={{ scale: 0.98 }}
-                    transition={springTap}
-                    onClick={() => goBlank("Все партнёры")}
+                    transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                    onClick={() => goToBlank("Все партнёры")}
                     className="text-sm font-semibold text-zinc-900"
                   >
                     Все
@@ -245,9 +226,9 @@ export default function MainApp() {
                 {partners.map((p) => (
                   <motion.button
                     key={p.id}
-                    onClick={() => goBlank(p.name)}
+                    onClick={() => goToBlank(p.name)}
                     whileTap={{ scale: 0.985 }}
-                    transition={springTap}
+                    transition={{ type: "spring", stiffness: 700, damping: 40 }}
                     className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-3 flex items-center justify-between gap-3 text-left hover:shadow-md"
                   >
                     <div className="flex items-center gap-3 min-w-0">
@@ -272,15 +253,15 @@ export default function MainApp() {
           ) : (
             <BlackScreen 
               key="blank" 
-              title={route.title} 
-              onBack={goHome}
+              title={blankTitle} 
+              onBack={goToMain}
             />
           )}
         </AnimatePresence>
       </div>
 
-      {/* BOTTOM NAV */}
-      {route.name === "home" && (
+      {/* BOTTOM NAV - показываем только на главном экране */}
+      {currentScreen === "main" && (
         <nav
           className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
@@ -290,7 +271,7 @@ export default function MainApp() {
               active={tab === "wallet"}
               onClick={() => {
                 setTab("wallet");
-                goBlank("Кошелёк");
+                // Не переходим на blank, просто меняем таб
               }}
               label="Кошелёк"
               icon={<WalletCards size={18} strokeWidth={1.9} />}
@@ -299,7 +280,7 @@ export default function MainApp() {
               active={tab === "market"}
               onClick={() => {
                 setTab("market");
-                goBlank("Маркет");
+                goToBlank("Маркет");
               }}
               label="Маркет"
               icon={<ShoppingBag size={18} strokeWidth={1.9} />}
@@ -308,7 +289,7 @@ export default function MainApp() {
               active={tab === "partners"}
               onClick={() => {
                 setTab("partners");
-                goBlank("Партнёры");
+                goToBlank("Партнёры");
               }}
               label="Партнёры"
               icon={<Handshake size={18} strokeWidth={1.9} />}
@@ -317,7 +298,7 @@ export default function MainApp() {
               active={tab === "profile"}
               onClick={() => {
                 setTab("profile");
-                goBlank("Профиль");
+                goToBlank("Профиль");
               }}
               label="Профиль"
               icon={<UserRound size={18} strokeWidth={1.9} />}
