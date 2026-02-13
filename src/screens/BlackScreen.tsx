@@ -6,8 +6,10 @@ import { IconButton } from "../components/ui";
 
 export default function BlackScreen({
   title,
+  onBack,
 }: {
   title: string;
+  onBack: () => void;
 }) {
   return (
     <motion.div
@@ -19,14 +21,7 @@ export default function BlackScreen({
     >
       <div className="mx-auto max-w-md px-4 pt-4">
         <div className="flex items-center gap-3">
-          <IconButton
-            aria="back"
-            onClick={() => {
-              // ВАЖНО: используем history.back()
-              // Тогда и кнопка внутри приложения и Android back работают одинаково
-              window.history.back();
-            }}
-          >
+          <IconButton aria="back" onClick={onBack}>
             <ArrowLeft size={18} />
           </IconButton>
 

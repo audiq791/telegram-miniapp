@@ -17,7 +17,6 @@ import { haptic } from "../components/haptics";
 import { springTap } from "../components/motion";
 import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
 import BlackScreen from "./BlackScreen";
-import { setupTelegramBack, showTelegramBack } from "../components/back";
 
 type Partner = {
   id: string;
@@ -46,36 +45,13 @@ type Route =
   | { name: "home" }
   | { name: "blank"; title: string };
 
-function setHashHome(replace = false) {
-  const url = "#home";
-  if (replace) window.history.replaceState(null, "", url);
-  else window.location.hash = "home";
-}
-
-function setHashBlank(title: string) {
-  const encoded = encodeURIComponent(title);
-  window.location.hash = `blank=${encoded}`;
-}
-
-function parseHash(): Route {
-  const raw = (window.location.hash || "").replace(/^#/, "");
-
-  if (!raw || raw === "home") return { name: "home" };
-
-  if (raw.startsWith("blank=")) {
-    const encoded = raw.slice("blank=".length);
-    const title = decodeURIComponent(encoded || "Экран");
-    return { name: "blank", title };
-  }
-
-  // fallback
-  return { name: "home" };
-}
-
 export default function MainApp() {
   const [tab, setTab] = useState<"wallet" | "market" | "partners" | "profile">("wallet");
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [query, setQuery] = useState("");
+
+  // Стек истории для кнопки назад
+  const [historyStack, setHistoryStack] = useState<Route[]>([{ name: "home" }]);
 
   const partners = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -83,53 +59,50 @@ export default function MainApp() {
     return partnersSeed.filter((p) => p.name.toLowerCase().includes(q));
   }, [query]);
 
-  const syncBackUI = (r: Route) => {
-    const canGoBack = r.name !== "home";
-    showTelegramBack(canGoBack);
-  };
+  // Управление кнопкой назад в Telegram
+  useEffect(() => {
+    const tg = (window as any).Telegram?.WebApp;
+    if (!tg) return;
+
+    const backButton = tg.BackButton;
+
+    if (historyStack.length > 1) {
+      backButton.show();
+      backButton.onClick(() => {
+        haptic("light");
+        // Убираем текущий экран из стека
+        setHistoryStack((prev) => {
+          const newStack = [...prev];
+          newStack.pop(); // убираем текущий
+          const previousRoute = newStack[newStack.length - 1];
+          setRoute(previousRoute);
+          if (previousRoute.name === "home") {
+            setTab("wallet"); // возвращаем на кошелёк
+          }
+          return newStack;
+        });
+      });
+    } else {
+      backButton.hide();
+    }
+
+    return () => {
+      backButton.hide();
+    };
+  }, [historyStack]);
 
   const goBlank = (title: string) => {
     haptic("light");
-    // ключ: меняем hash -> это создаёт реальную историю для Android back
-    setHashBlank(title);
+    const newRoute: Route = { name: "blank", title };
+    setRoute(newRoute);
+    setHistoryStack((prev) => [...prev, newRoute]);
   };
 
   const goHome = () => {
     haptic("light");
-    setHashHome();
+    setRoute({ name: "home" });
+    setHistoryStack([{ name: "home" }]);
   };
-
-  useEffect(() => {
-    // 1) Гарантируем начальный hash, чтобы история работала предсказуемо
-    if (!window.location.hash) {
-      setHashHome(true); // replace, чтобы не плодить лишний шаг
-    }
-
-    // 2) Ставим route из hash
-    const initial = parseHash();
-    setRoute(initial);
-    syncBackUI(initial);
-
-    // 3) Ловим все переходы (включая Android back / swipe back)
-    const onHashChange = () => {
-      const next = parseHash();
-      setRoute(next);
-      syncBackUI(next);
-    };
-
-    window.addEventListener("hashchange", onHashChange);
-
-    // 4) Telegram BackButton (в шапке телеги), если доступен — делаем как Android back
-    const cleanupTg = setupTelegramBack(() => {
-      haptic("light");
-      window.history.back();
-    });
-
-    return () => {
-      window.removeEventListener("hashchange", onHashChange);
-      cleanupTg?.();
-    };
-  }, []);
 
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
@@ -267,7 +240,7 @@ export default function MainApp() {
               </div>
             </motion.main>
           ) : (
-            <BlackScreen key="blank" title={route.title} />
+            <BlackScreen key="blank" title={route.title} onBack={goHome} />
           )}
         </AnimatePresence>
       </div>
