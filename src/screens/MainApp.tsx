@@ -192,10 +192,10 @@ export default function MainApp() {
 
                   {/* ACTIONS */}
                   <div className="mt-4 grid grid-cols-2 gap-3">
-                    <ActionCard label="Отправить" hint="перевод" kind="send" onClick={() => goToBlank("Отправить")} />
-                    <ActionCard label="Получить" hint="входящие" kind="receive" onClick={() => goToBlank("Получить")} />
-                    <ActionCard label="Обменять" hint="курс" kind="swap" onClick={() => goToBlank("Обменять")} />
-                    <ActionCard label="Списать" hint="оплата" kind="spend" onClick={() => goToBlank("Списать")} />
+                    <ActionCard label="Отправить" hint="Перевод" kind="send" onClick={() => goToBlank("Отправить")} />
+                    <ActionCard label="Получить" hint="Входящие" kind="receive" onClick={() => goToBlank("Получить")} />
+                    <ActionCard label="Обменять" hint="Бонусы" kind="swap" onClick={() => goToBlank("Обменять")} />
+                    <ActionCard label="Списать" hint="Оплата" kind="spend" onClick={() => goToBlank("Списать")} />
                   </div>
                 </div>
 
