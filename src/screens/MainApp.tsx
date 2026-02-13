@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   WalletCards,
@@ -17,7 +17,7 @@ import { haptic } from "../components/haptics";
 import { springTap } from "../components/motion";
 import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
 import BlankScreen from "./BlackScreen";
-
+import { setupTelegramBack, showTelegramBack } from "../components/back";
 
 type Partner = {
   id: string;
@@ -36,7 +36,10 @@ const partnersSeed: Partner[] = [
 ];
 
 function formatMoney(n: number) {
-  return new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+  return new Intl.NumberFormat("ru-RU", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(n);
 }
 
 type Route =
@@ -48,21 +51,81 @@ export default function MainApp() {
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [query, setQuery] = useState("");
 
+  // Внутренняя история экранов
+  const stackRef = useRef<Route[]>([{ name: "home" }]);
+
   const partners = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return partnersSeed;
     return partnersSeed.filter((p) => p.name.toLowerCase().includes(q));
   }, [query]);
 
-  const goBlank = (title: string) => {
-    haptic("light");
-    setRoute({ name: "blank", title });
+  const syncBackUI = () => {
+    const canGoBack = stackRef.current.length > 1;
+    showTelegramBack(canGoBack);
   };
 
   const goHome = () => {
-    haptic("light");
+    stackRef.current = [{ name: "home" }];
     setRoute({ name: "home" });
+    syncBackUI();
   };
+
+  const goBlank = (title: string) => {
+    haptic("light");
+
+    const next: Route = { name: "blank", title };
+    stackRef.current.push(next);
+    setRoute(next);
+
+    // Ключ: добавляем запись в window.history, чтобы Android back НЕ закрывал миниапп
+    window.history.pushState({ __app: "route" }, "");
+
+    syncBackUI();
+  };
+
+  const goBack = () => {
+    if (stackRef.current.length <= 1) return;
+    stackRef.current.pop();
+    const prev = stackRef.current[stackRef.current.length - 1];
+    setRoute(prev);
+    syncBackUI();
+  };
+
+  // Перехват Android back / swipe-back + Telegram BackButton
+  useEffect(() => {
+    // Подкладываем базовую запись истории, чтобы первый back не закрывал мгновенно
+    // (особенно если пользователь уже сходил на другие экраны)
+    window.history.replaceState({ __app: "root" }, "");
+    window.history.pushState({ __app: "route" }, "");
+
+    const onPopState = () => {
+      // Если есть куда вернуться внутри приложения — делаем внутренний back
+      if (stackRef.current.length > 1) {
+        goBack();
+        // Важно: снова добавляем запись, чтобы следующий back тоже оставался внутри приложения
+        window.history.pushState({ __app: "route" }, "");
+      } else {
+        // Если мы на home — дальше "назад" пусть закрывает миниапп (нормально)
+      }
+    };
+
+    window.addEventListener("popstate", onPopState);
+
+    const cleanupTg = setupTelegramBack(() => {
+      haptic("light");
+      // Telegram BackButton (если доступен) должен делать тот же внутренний back
+      if (stackRef.current.length > 1) goBack();
+    });
+
+    syncBackUI();
+
+    return () => {
+      window.removeEventListener("popstate", onPopState);
+      cleanupTg?.();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
@@ -100,7 +163,7 @@ export default function MainApp() {
         </div>
       </header>
 
-      {/* CONTENT with transitions */}
+      {/* CONTENT */}
       <div className="mx-auto max-w-md">
         <AnimatePresence mode="wait">
           {route.name === "home" ? (
@@ -112,7 +175,7 @@ export default function MainApp() {
               exit={{ opacity: 0, x: -12 }}
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
             >
-              {/* CARD */}
+              {/* MAIN CARD */}
               <div className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden">
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">
@@ -158,7 +221,7 @@ export default function MainApp() {
                 </div>
               </div>
 
-              {/* PARTNERS LIST */}
+              {/* PARTNERS */}
               <div className="mt-3 space-y-2">
                 <div className="flex items-center justify-between px-1">
                   <div className="text-sm text-zinc-500">Партнёры</div>
@@ -200,7 +263,7 @@ export default function MainApp() {
               </div>
             </motion.main>
           ) : (
-            <BlankScreen key="blank" title={route.title} onBack={goHome} />
+            <BlankScreen key="blank" title={route.title} onBack={goBack} />
           )}
         </AnimatePresence>
       </div>
@@ -217,7 +280,6 @@ export default function MainApp() {
               onClick={() => {
                 haptic("light");
                 setTab("wallet");
-                // тест: уводим на пустой экран
                 goBlank("Кошелёк");
               }}
               label="Кошелёк"
