@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import { motion } from "framer-motion";
 
 type IconButtonProps = {
@@ -36,6 +36,7 @@ export function PrimaryButton({ label, onClick }: { label: string; onClick?: () 
   );
 }
 
+/** Нижняя вкладка: активная — чёрная заливка */
 export function TabButton({
   active,
   onClick,
@@ -78,16 +79,24 @@ export function ActionCard({
   kind: ActionKind;
   onClick?: () => void;
 }) {
-  const [pulse, setPulse] = useState(0);
+  const animating = useRef(false);
+  const [trigger, setTrigger] = React.useState(0);
 
-  const trigger = () => {
-    setPulse((v) => v + 1);
+  const handleClick = () => {
+    if (animating.current) return;
+    animating.current = true;
+    setTrigger((v) => v + 1);
     onClick?.();
+
+    // через 300 мс разрешаем снова (длина анимации)
+    setTimeout(() => {
+      animating.current = false;
+    }, 300);
   };
 
   return (
     <motion.button
-      onClick={trigger}
+      onClick={handleClick}
       whileTap={{ scale: 0.985 }}
       transition={{ type: "spring", stiffness: 520, damping: 34 }}
       className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 text-left hover:shadow-md"
@@ -98,9 +107,9 @@ export function ActionCard({
           <div className="text-[12px] text-zinc-500 truncate">{hint}</div>
         </div>
 
-        {/* УБРАЛИ серую заливку: делаем чистый белый “значок-бэйдж” */}
-        <div className="h-10 w-10 rounded-2xl bg-white border border-zinc-200 shadow-sm grid place-items-center shrink-0 overflow-hidden">
-          <AnimatedActionIcon kind={kind} pulse={pulse} />
+        {/* УБРАЛИ серую заливку: прозрачный фон, только иконка */}
+        <div className="h-10 w-10 grid place-items-center shrink-0 overflow-hidden">
+          <AnimatedActionIcon kind={kind} trigger={trigger} />
         </div>
       </div>
     </motion.button>
@@ -117,48 +126,47 @@ function MonoGif({ src, alt }: { src: string; alt: string }) {
       src={src}
       alt={alt}
       draggable={false}
-      className="w-[28px] h-[28px] object-contain" // УВЕЛИЧИЛИ
+      className="w-[32px] h-[32px] object-contain" // ЕЩЁ КРУПНЕЕ
       style={{
-        // более “жёстко” убиваем цвет, чтобы бирюза стала чёрной
-        filter: "grayscale(1) saturate(0) contrast(1.6) brightness(0.75)",
+        // убиваем цвет полностью
+        filter: "grayscale(1) saturate(0) contrast(1.8) brightness(0.7)",
       }}
     />
   );
 }
 
 /* ===========================
-   АНИМАЦИИ: только по клику, быстрее
+   АНИМАЦИИ: только по клику, однократно
    =========================== */
 
-function AnimatedActionIcon({ kind, pulse }: { kind: ActionKind; pulse: number }) {
-  // Важно: анимация срабатывает только при изменении key (по клику)
-  const key = `${kind}-${pulse}`;
+function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: number }) {
+  // ключ меняется только при клике
+  const key = `${kind}-${trigger}`;
 
   if (kind === "send") {
-    // быстрое “улетание” самолётика
     return (
       <motion.div
         key={key}
         initial={false}
         animate={{
-          x: [0, 10, 18, 0],
-          y: [0, -6, -16, 0],
-          rotate: [0, -12, -22, 0],
+          x: [0, 12, 22, 0],
+          y: [0, -8, -20, 0],
+          rotate: [0, -15, -28, 0],
           opacity: [1, 1, 0, 1],
-          scale: [1, 1, 0.98, 1],
+          scale: [1, 1, 0.96, 1],
         }}
         transition={{
-          duration: 0.32, // быстрее
-          times: [0, 0.45, 0.7, 1],
+          duration: 0.3,
+          times: [0, 0.4, 0.7, 1],
           ease: "easeOut",
         }}
         className="relative"
       >
         <motion.span
-          key={`trail-${pulse}`}
+          key={`trail-${trigger}`}
           initial={{ opacity: 0, scaleX: 0.4 }}
-          animate={{ opacity: [0, 0.45, 0], scaleX: [0.4, 1, 1] }}
-          transition={{ duration: 0.22, ease: "easeOut" }}
+          animate={{ opacity: [0, 0.5, 0], scaleX: [0.4, 1, 1] }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           className="absolute -left-3 top-1/2 -translate-y-1/2 h-[2px] w-3 rounded-full bg-zinc-900/20 origin-right"
         />
         <MonoGif src="/icons/send.gif" alt="send" />
@@ -167,13 +175,12 @@ function AnimatedActionIcon({ kind, pulse }: { kind: ActionKind; pulse: number }
   }
 
   if (kind === "receive") {
-    // рука: быстрый “пульс” (без постоянной анимации)
     return (
       <motion.div
         key={key}
         initial={false}
-        animate={{ scale: [1, 1.08, 1] }}
-        transition={{ duration: 0.22, ease: "easeOut" }}
+        animate={{ scale: [1, 1.12, 1] }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
       >
         <MonoGif src="/icons/receive.gif" alt="receive" />
       </motion.div>
@@ -181,13 +188,12 @@ function AnimatedActionIcon({ kind, pulse }: { kind: ActionKind; pulse: number }
   }
 
   if (kind === "swap") {
-    // человечек: быстрый “клик” с лёгким качом
     return (
       <motion.div
         key={key}
         initial={false}
-        animate={{ rotate: [0, 8, -6, 0], scale: [1, 1.06, 1] }}
-        transition={{ duration: 0.26, ease: "easeOut" }}
+        animate={{ rotate: [0, 10, -8, 0], scale: [1, 1.1, 1] }}
+        transition={{ duration: 0.24, ease: "easeOut" }}
       >
         <MonoGif src="/icons/exchange.gif" alt="exchange" />
       </motion.div>
@@ -199,13 +205,12 @@ function AnimatedActionIcon({ kind, pulse }: { kind: ActionKind; pulse: number }
 }
 
 function SpendIcon() {
-  // Галочка статична, вниз уходит только стрелка (быстро)
   return (
-    <div className="relative w-[28px] h-[28px] text-zinc-900">
+    <div className="relative w-[32px] h-[32px] text-zinc-900">
       <svg
         className="absolute inset-0"
-        width="28"
-        height="28"
+        width="32"
+        height="32"
         viewBox="0 0 24 24"
         fill="none"
         aria-hidden="true"
@@ -221,14 +226,14 @@ function SpendIcon() {
 
       <motion.svg
         className="absolute inset-0"
-        width="28"
-        height="28"
+        width="32"
+        height="32"
         viewBox="0 0 24 24"
         fill="none"
         aria-hidden="true"
         initial={{ y: 0, opacity: 0 }}
-        animate={{ y: [0, 0, 8], opacity: [0, 1, 0] }}
-        transition={{ duration: 0.28, ease: "easeOut", times: [0, 0.15, 1] }}
+        animate={{ y: [0, 0, 10], opacity: [0, 1, 0] }}
+        transition={{ duration: 0.26, ease: "easeOut", times: [0, 0.15, 1] }}
       >
         <path d="M12 6v9" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
         <path
