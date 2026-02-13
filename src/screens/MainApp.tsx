@@ -16,6 +16,19 @@ import {
 import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
 import BlackScreen from "./BlackScreen";
 
+// БЛОКИРУЕМ СВАЙПЫ TELEGRAM
+if (typeof window !== 'undefined') {
+  const tg = (window as any).Telegram?.WebApp;
+  if (tg) {
+    try {
+      tg.disableVerticalSwipes();
+      console.log("Вертикальные свайпы отключены");
+    } catch (e) {
+      console.log("disableVerticalSwipes не поддерживается");
+    }
+  }
+}
+
 type Partner = {
   id: string;
   name: string;
@@ -39,13 +52,8 @@ function formatMoney(n: number) {
   }).format(n);
 }
 
-type Route =
-  | { name: "home" }
-  | { name: "blank"; title: string };
-
 export default function MainApp() {
   const [tab, setTab] = useState<"wallet" | "market" | "partners" | "profile">("wallet");
-  const [route, setRoute] = useState<Route>({ name: "home" });
   const [query, setQuery] = useState("");
   const [currentScreen, setCurrentScreen] = useState<"main" | "blank">("main");
   const [blankTitle, setBlankTitle] = useState("");
@@ -58,11 +66,14 @@ export default function MainApp() {
 
   // Telegram WebApp API
   useEffect(() => {
-    // Проверяем, запущено ли в Telegram
     const tg = (window as any).Telegram?.WebApp;
     
     if (tg) {
       console.log("Telegram WebApp доступен");
+      
+      // Показываем основную кнопку
+      tg.ready();
+      tg.expand();
       
       // Изначально кнопка назад скрыта
       tg.BackButton.hide();
@@ -71,27 +82,23 @@ export default function MainApp() {
       tg.BackButton.onClick(() => {
         console.log("Нажата кнопка назад");
         
-        // Вызываем вибрацию
         tg.HapticFeedback.impactOccurred("light");
         
-        // Возвращаемся на главный экран
         setCurrentScreen("main");
         setBlankTitle("");
         
-        // Скрываем кнопку назад
         tg.BackButton.hide();
       });
     }
     
     return () => {
-      // Очищаем обработчик при размонтировании
       if ((window as any).Telegram?.WebApp) {
         (window as any).Telegram.WebApp.BackButton.offClick();
       }
     };
   }, []);
 
-  // Отслеживаем текущий экран и показываем/скрываем кнопку назад
+  // Отслеживаем текущий экран
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
     
@@ -110,7 +117,6 @@ export default function MainApp() {
     setCurrentScreen("blank");
     setBlankTitle(title);
     
-    // Вибрация при нажатии
     tg?.HapticFeedback.impactOccurred("light");
   };
 
@@ -260,7 +266,7 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* BOTTOM NAV - показываем только на главном экране */}
+      {/* BOTTOM NAV */}
       {currentScreen === "main" && (
         <nav
           className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
@@ -271,7 +277,6 @@ export default function MainApp() {
               active={tab === "wallet"}
               onClick={() => {
                 setTab("wallet");
-                // Не переходим на blank, просто меняем таб
               }}
               label="Кошелёк"
               icon={<WalletCards size={18} strokeWidth={1.9} />}
