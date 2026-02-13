@@ -36,7 +36,6 @@ export function PrimaryButton({ label, onClick }: { label: string; onClick?: () 
   );
 }
 
-/** Нижняя вкладка: активная — чёрная заливка */
 export function TabButton({
   active,
   onClick,
@@ -60,16 +59,7 @@ export function TabButton({
           : "bg-white border-zinc-200 text-zinc-900 shadow-sm",
       ].join(" ")}
     >
-      <motion.span
-        className="inline-flex items-center justify-center shrink-0"
-        whileTap={{ y: -1 }}
-        transition={{ type: "spring", stiffness: 700, damping: 38 }}
-        style={{ lineHeight: 0 }}
-      >
-        {/* фикс “сжатых” иконок: контейнер стабильного размера */}
-        <span className="w-5 h-5 inline-flex items-center justify-center">{icon}</span>
-      </motion.span>
-
+      <span className="w-5 h-5 inline-flex items-center justify-center">{icon}</span>
       <span className="text-[13px] font-semibold leading-none">{label}</span>
     </motion.button>
   );
@@ -88,10 +78,10 @@ export function ActionCard({
   kind: ActionKind;
   onClick?: () => void;
 }) {
-  const [pulseKey, setPulseKey] = useState(0);
+  const [pulse, setPulse] = useState(0);
 
   const trigger = () => {
-    setPulseKey((v) => v + 1);
+    setPulse((v) => v + 1);
     onClick?.();
   };
 
@@ -108,9 +98,9 @@ export function ActionCard({
           <div className="text-[12px] text-zinc-500 truncate">{hint}</div>
         </div>
 
-        {/* Белая таблетка — внутри чёрная иконка */}
+        {/* УБРАЛИ серую заливку: делаем чистый белый “значок-бэйдж” */}
         <div className="h-10 w-10 rounded-2xl bg-white border border-zinc-200 shadow-sm grid place-items-center shrink-0 overflow-hidden">
-          <AnimatedActionIcon kind={kind} pulseKey={pulseKey} />
+          <AnimatedActionIcon kind={kind} pulse={pulse} />
         </div>
       </div>
     </motion.button>
@@ -118,63 +108,58 @@ export function ActionCard({
 }
 
 /* ===========================
-   GIF-иконки: делаем бирюзовый элемент ЧЁРНЫМ (ч/б)
+   GIF: делаем цветной акцент ЧЁРНЫМ → ч/б
    =========================== */
 
-/**
- * Режим "черно-белый": убирает цвет и делает цветные пиксели темнее/чернее.
- * Черный контур останется черным.
- *
- * Если вдруг фон в GIF реально "зашит" белым — он останется белым (ок).
- */
 function MonoGif({ src, alt }: { src: string; alt: string }) {
   return (
     <img
       src={src}
       alt={alt}
-      className="w-[22px] h-[22px] object-contain"
-      style={{
-        // ключ: убиваем цвет -> акцент станет черным/темно-серым, контур останется черным
-        // подобрано мягко, чтобы белый фон (если есть) не становился грязным
-        filter: "grayscale(1) saturate(0) contrast(1.4) brightness(0.85)",
-      }}
       draggable={false}
+      className="w-[28px] h-[28px] object-contain" // УВЕЛИЧИЛИ
+      style={{
+        // более “жёстко” убиваем цвет, чтобы бирюза стала чёрной
+        filter: "grayscale(1) saturate(0) contrast(1.6) brightness(0.75)",
+      }}
     />
   );
 }
 
 /* ===========================
-   АНИМАЦИИ ИКОНКИ ВНУТРИ КНОПКИ
+   АНИМАЦИИ: только по клику, быстрее
    =========================== */
 
-function AnimatedActionIcon({ kind, pulseKey }: { kind: ActionKind; pulseKey: number }) {
-  const key = `${kind}-${pulseKey}`;
+function AnimatedActionIcon({ kind, pulse }: { kind: ActionKind; pulse: number }) {
+  // Важно: анимация срабатывает только при изменении key (по клику)
+  const key = `${kind}-${pulse}`;
 
   if (kind === "send") {
-    // самолетик "улетает" внутри таблетки
+    // быстрое “улетание” самолётика
     return (
       <motion.div
         key={key}
-        initial={{ x: 0, y: 0, rotate: 0, opacity: 1, scale: 1 }}
+        initial={false}
         animate={{
-          x: [0, 6, 16, 16, 0],
-          y: [0, -4, -14, -14, 0],
-          rotate: [0, -10, -18, -18, 0],
-          opacity: [1, 1, 0, 0, 1],
-          scale: [1, 1, 0.98, 0.98, 1],
+          x: [0, 10, 18, 0],
+          y: [0, -6, -16, 0],
+          rotate: [0, -12, -22, 0],
+          opacity: [1, 1, 0, 1],
+          scale: [1, 1, 0.98, 1],
         }}
         transition={{
-          duration: 0.55,
-          times: [0, 0.35, 0.6, 0.75, 1],
-          ease: ["easeOut", "easeOut", "easeOut", "easeOut", "easeOut"],
+          duration: 0.32, // быстрее
+          times: [0, 0.45, 0.7, 1],
+          ease: "easeOut",
         }}
         className="relative"
       >
         <motion.span
+          key={`trail-${pulse}`}
           initial={{ opacity: 0, scaleX: 0.4 }}
-          animate={{ opacity: [0, 0.35, 0], scaleX: [0.4, 1, 1] }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
-          className="absolute -left-3 top-1/2 -translate-y-1/2 h-[2px] w-3 rounded-full bg-zinc-900/25 origin-right"
+          animate={{ opacity: [0, 0.45, 0], scaleX: [0.4, 1, 1] }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
+          className="absolute -left-3 top-1/2 -translate-y-1/2 h-[2px] w-3 rounded-full bg-zinc-900/20 origin-right"
         />
         <MonoGif src="/icons/send.gif" alt="send" />
       </motion.div>
@@ -182,13 +167,13 @@ function AnimatedActionIcon({ kind, pulseKey }: { kind: ActionKind; pulseKey: nu
   }
 
   if (kind === "receive") {
-    // рука: легкий "пульс" и микро-сдвиг вниз (приятное ощущение получения)
+    // рука: быстрый “пульс” (без постоянной анимации)
     return (
       <motion.div
         key={key}
-        initial={{ y: 0, scale: 1 }}
-        animate={{ y: [0, 2, 0], scale: [1, 1.04, 1] }}
-        transition={{ duration: 0.35, ease: "easeOut" }}
+        initial={false}
+        animate={{ scale: [1, 1.08, 1] }}
+        transition={{ duration: 0.22, ease: "easeOut" }}
       >
         <MonoGif src="/icons/receive.gif" alt="receive" />
       </motion.div>
@@ -196,40 +181,31 @@ function AnimatedActionIcon({ kind, pulseKey }: { kind: ActionKind; pulseKey: nu
   }
 
   if (kind === "swap") {
-    // человечек: "подключение/сеть" — мягкий оборот + масштаб
+    // человечек: быстрый “клик” с лёгким качом
     return (
       <motion.div
         key={key}
-        initial={{ rotate: 0, scale: 1 }}
-        animate={{ rotate: [0, 10, -8, 0], scale: [1, 1.03, 1] }}
-        transition={{ duration: 0.42, ease: "easeOut" }}
+        initial={false}
+        animate={{ rotate: [0, 8, -6, 0], scale: [1, 1.06, 1] }}
+        transition={{ duration: 0.26, ease: "easeOut" }}
       >
         <MonoGif src="/icons/exchange.gif" alt="exchange" />
       </motion.div>
     );
   }
 
-  // spend: чек + вниз уходит ТОЛЬКО стрелка
+  // spend
   return <SpendIcon key={key} />;
 }
 
-/* ===========================
-   СПИСАТЬ: чек статичный + стрелка вниз анимируется
-   =========================== */
-
 function SpendIcon() {
+  // Галочка статична, вниз уходит только стрелка (быстро)
   return (
-    <motion.div
-      className="relative w-[22px] h-[22px] text-zinc-900"
-      initial={{ scale: 1 }}
-      animate={{ scale: [1, 1.05, 1] }}
-      transition={{ duration: 0.28, ease: "easeOut" }}
-    >
-      {/* Галочка — НЕ двигается */}
+    <div className="relative w-[28px] h-[28px] text-zinc-900">
       <svg
         className="absolute inset-0"
-        width="22"
-        height="22"
+        width="28"
+        height="28"
         viewBox="0 0 24 24"
         fill="none"
         aria-hidden="true"
@@ -243,24 +219,18 @@ function SpendIcon() {
         />
       </svg>
 
-      {/* Стрелка вниз — двигается вниз и исчезает */}
       <motion.svg
         className="absolute inset-0"
-        width="22"
-        height="22"
+        width="28"
+        height="28"
         viewBox="0 0 24 24"
         fill="none"
         aria-hidden="true"
         initial={{ y: 0, opacity: 0 }}
-        animate={{ y: [0, 0, 7], opacity: [0, 1, 0] }}
-        transition={{ duration: 0.42, ease: "easeOut", times: [0, 0.2, 1] }}
+        animate={{ y: [0, 0, 8], opacity: [0, 1, 0] }}
+        transition={{ duration: 0.28, ease: "easeOut", times: [0, 0.15, 1] }}
       >
-        <path
-          d="M12 6v9"
-          stroke="currentColor"
-          strokeWidth="1.9"
-          strokeLinecap="round"
-        />
+        <path d="M12 6v9" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
         <path
           d="M8.5 12.5 12 16l3.5-3.5"
           stroke="currentColor"
@@ -269,11 +239,11 @@ function SpendIcon() {
           strokeLinejoin="round"
         />
       </motion.svg>
-    </motion.div>
+    </div>
   );
 }
 
-/* Безопасные экспорты, если где-то используются */
+/* Безопасные экспорты */
 export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <div className={`rounded-2xl bg-white border border-zinc-200 shadow-sm ${className}`}>{children}</div>;
 }
