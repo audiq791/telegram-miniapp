@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect } from "react";
+import { motion, useAnimationControls } from "framer-motion";
 import { springTap } from "./motion";
 
 export function IconButton({
@@ -57,9 +58,18 @@ export function ActionCard({
   kind: ActionKind;
   onClick?: () => void;
 }) {
+  const iconControls = useAnimationControls();
+
+  const playIcon = async () => {
+    // сброс, чтобы повторные тапы всегда играли
+    await iconControls.start("idle");
+    await iconControls.start("tap");
+  };
+
   return (
     <motion.button
       onClick={onClick}
+      onTap={playIcon} // 🔥 вот это главное: тап по ВСЕЙ кнопке запускает анимацию иконки
       whileTap={{ scale: 0.985 }}
       transition={springTap}
       className="group rounded-2xl border border-zinc-200 bg-white p-4 flex items-center justify-between shadow-sm hover:shadow-md"
@@ -71,13 +81,13 @@ export function ActionCard({
 
       {/* фиксируем квадрат, чтобы иконки НЕ “сжимались” */}
       <div className="shrink-0 h-11 w-11 rounded-2xl bg-white border border-zinc-200 grid place-items-center text-zinc-900 group-hover:border-zinc-300 group-hover:shadow-sm">
-        <AnimatedActionIcon kind={kind} />
+        <AnimatedActionIcon kind={kind} controls={iconControls} />
       </div>
     </motion.button>
   );
 }
 
-/** Активный таб = чёрная заливка, иконки/текст читаемы на любом экране */
+/** Активный таб = чёрная заливка + анимация иконки по тапу */
 export function TabButton({
   active,
   onClick,
@@ -89,9 +99,27 @@ export function TabButton({
   label: string;
   icon: React.ReactNode;
 }) {
+  const iconControls = useAnimationControls();
+
+  // лёгкая "подпрыгивающая" анимация, когда таб становится активным
+  useEffect(() => {
+    if (active) {
+      iconControls.start("active");
+    } else {
+      iconControls.start("idle");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+
+  const tapIcon = async () => {
+    await iconControls.start("idle");
+    await iconControls.start("tap");
+  };
+
   return (
     <motion.button
       onClick={onClick}
+      onTap={tapIcon}
       whileTap={{ scale: 0.985 }}
       transition={springTap}
       className={[
@@ -105,11 +133,17 @@ export function TabButton({
     >
       <motion.span
         className="grid place-items-center leading-none"
-        animate={active ? { y: [0, -2, 0], scale: [1, 1.03, 1] } : { y: 0, scale: 1 }}
-        transition={{ duration: 0.28 }}
+        variants={{
+          idle: { y: 0, scale: 1, rotate: 0 },
+          active: { y: 0, scale: 1.02 },
+          tap: { y: [0, -2, 0], scale: [1, 1.06, 1], rotate: [0, -2, 0] },
+        }}
+        animate={iconControls}
+        transition={{ duration: 0.28, ease: "easeInOut" }}
       >
-        {/* принудительно нормальный размер, без “сплющивания” */}
-        <span className={active ? "opacity-100" : "text-zinc-500"}>{icon}</span>
+        <span className={active ? "opacity-100" : "text-zinc-500"}>
+          {icon}
+        </span>
       </motion.span>
 
       <span className="text-[clamp(11px,2.8vw,12px)] font-semibold leading-none">
@@ -120,27 +154,46 @@ export function TabButton({
 }
 
 /* =========================
-   Анимированные иконки в action-кнопках
+   Анимированные action-иконки (по тапу всей кнопки)
    ========================= */
 
-function AnimatedActionIcon({ kind }: { kind: ActionKind }) {
-  // onTap срабатывает от родительской motion.button
-  // поэтому используем whileTap на самой иконке как "локальную" анимацию
-  if (kind === "send") return <SendPlaneIcon />;
-  if (kind === "receive") return <ReceiveDownIcon />;
-  if (kind === "swap") return <SwapRotateIcon />;
-  return <CheckDrawIcon />;
+function AnimatedActionIcon({
+  kind,
+  controls,
+}: {
+  kind: ActionKind;
+  controls: ReturnType<typeof useAnimationControls>;
+}) {
+  if (kind === "send") return <SendPlaneIcon controls={controls} />;
+  if (kind === "receive") return <ReceiveDownIcon controls={controls} />;
+  if (kind === "swap") return <SwapRotateIcon controls={controls} />;
+  return <CheckDrawIcon controls={controls} />;
 }
 
-function SendPlaneIcon() {
+function SendPlaneIcon({
+  controls,
+}: {
+  controls: ReturnType<typeof useAnimationControls>;
+}) {
   return (
     <motion.div
       className="h-6 w-6 text-zinc-900"
-      whileTap={{ x: [0, 10, 0], y: [0, -6, 0], rotate: [0, -10, 0], opacity: [1, 0.85, 1] }}
+      variants={{
+        idle: { x: 0, y: 0, rotate: 0, opacity: 1 },
+        tap: { x: [0, 10, 0], y: [0, -6, 0], rotate: [0, -10, 0], opacity: [1, 0.85, 1] },
+      }}
+      animate={controls}
       transition={{ duration: 0.35, ease: "easeInOut" }}
     >
-      {/* самолётик (встроенный SVG, чтобы точно не “жевало” в кнопке) */}
-      <svg viewBox="0 0 24 24" className="h-full w-full" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-full w-full"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M22 2L11 13" />
         <path d="M22 2L15 22L11 13L2 9L22 2Z" />
       </svg>
@@ -148,14 +201,30 @@ function SendPlaneIcon() {
   );
 }
 
-function ReceiveDownIcon() {
+function ReceiveDownIcon({
+  controls,
+}: {
+  controls: ReturnType<typeof useAnimationControls>;
+}) {
   return (
     <motion.div
       className="h-6 w-6 text-zinc-900"
-      whileTap={{ y: [0, 6, 0], opacity: [1, 0.85, 1] }}
+      variants={{
+        idle: { y: 0, opacity: 1 },
+        tap: { y: [0, 6, 0], opacity: [1, 0.85, 1] },
+      }}
+      animate={controls}
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
-      <svg viewBox="0 0 24 24" className="h-full w-full" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-full w-full"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M12 3v12" />
         <path d="M7 10l5 5 5-5" />
         <path d="M4 21h16" />
@@ -164,14 +233,30 @@ function ReceiveDownIcon() {
   );
 }
 
-function SwapRotateIcon() {
+function SwapRotateIcon({
+  controls,
+}: {
+  controls: ReturnType<typeof useAnimationControls>;
+}) {
   return (
     <motion.div
       className="h-6 w-6 text-zinc-900"
-      whileTap={{ rotate: [0, 180, 360] }}
+      variants={{
+        idle: { rotate: 0 },
+        tap: { rotate: [0, 180, 360] },
+      }}
+      animate={controls}
       transition={{ duration: 0.45, ease: "easeInOut" }}
     >
-      <svg viewBox="0 0 24 24" className="h-full w-full" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        viewBox="0 0 24 24"
+        className="h-full w-full"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M16 3h5v5" />
         <path d="M21 3l-7 7" />
         <path d="M8 21H3v-5" />
@@ -181,7 +266,11 @@ function SwapRotateIcon() {
   );
 }
 
-function CheckDrawIcon() {
+function CheckDrawIcon({
+  controls,
+}: {
+  controls: ReturnType<typeof useAnimationControls>;
+}) {
   return (
     <motion.svg
       viewBox="0 0 24 24"
@@ -191,13 +280,14 @@ function CheckDrawIcon() {
       strokeWidth="2.2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      whileTap="tap"
     >
       <motion.path
         d="M20 6L9 17l-5-5"
         variants={{
+          idle: { pathLength: 0, opacity: 0.6 },
           tap: { pathLength: [0, 1], opacity: [0.6, 1] },
         }}
+        animate={controls}
         transition={{ duration: 0.28, ease: "easeOut" }}
       />
     </motion.svg>
