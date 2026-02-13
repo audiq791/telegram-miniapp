@@ -20,7 +20,7 @@ export function IconButton({ aria, onClick, children }: IconButtonProps) {
       onClick={onClick}
       whileTap={{ scale: 0.96 }}
       transition={{ type: "spring", stiffness: 500, damping: 30 }}
-      className="h-10 w-10 rounded-2xl bg-white border border-zinc-200 shadow-sm grid place-items-center text-zinc-900"
+      className="h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm grid place-items-center text-zinc-900"
     >
       {children}
     </motion.button>
@@ -33,7 +33,7 @@ export function PrimaryButton({ label, onClick }: { label: string; onClick?: () 
       onClick={onClick}
       whileTap={{ scale: 0.985 }}
       transition={{ type: "spring", stiffness: 520, damping: 32 }}
-      className="h-11 px-5 rounded-2xl bg-zinc-900 text-white font-semibold shadow-[0_10px_25px_rgba(0,0,0,0.18)]"
+      className="h-11 px-5 sm:h-12 sm:px-6 md:h-14 md:px-8 rounded-2xl bg-zinc-900 text-white font-semibold shadow-[0_10px_25px_rgba(0,0,0,0.18)] text-[clamp(14px,2vw,16px)]"
     >
       {label}
     </motion.button>
@@ -61,16 +61,22 @@ export function TabButton({
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 520, damping: 34 }}
       className={[
-        "h-12 rounded-2xl px-3 flex items-center justify-center gap-2 border",
+        "w-full rounded-2xl px-3 py-2 flex flex-col items-center justify-center gap-1 border",
+        "min-h-[52px] sm:min-h-[60px] md:min-h-[70px]",
         active
           ? "bg-zinc-900 border-zinc-900 text-white shadow-[0_10px_25px_rgba(0,0,0,0.18)]"
           : "bg-white border-zinc-200 text-zinc-900 shadow-sm",
       ].join(" ")}
     >
-      <span className="w-5 h-5 inline-flex items-center justify-center">
+      <span className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 inline-flex items-center justify-center">
         {icon}
       </span>
-      <span className="text-[13px] font-semibold leading-none">
+      <span className={[
+        "font-semibold leading-none",
+        "text-[clamp(11px,2.5vw,14px)]",
+        "sm:text-[clamp(12px,2vw,15px)]",
+        "md:text-[clamp(13px,1.5vw,16px)]"
+      ].join(" ")}>
         {label}
       </span>
     </motion.button>
@@ -114,15 +120,15 @@ export function ActionCard({
       onClick={handleClick}
       whileTap={{ scale: 0.985 }}
       transition={{ type: "spring", stiffness: 520, damping: 34 }}
-      className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 text-left hover:shadow-md"
+      className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 sm:p-5 md:p-6 text-left hover:shadow-md"
     >
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-[15px] font-semibold truncate">{label}</div>
-          <div className="text-[12px] text-zinc-500 truncate">{hint}</div>
+          <div className="text-[clamp(14px,2vw,16px)] font-semibold truncate">{label}</div>
+          <div className="text-[clamp(11px,1.5vw,13px)] text-zinc-500 truncate">{hint}</div>
         </div>
 
-        <div className="h-11 w-11 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
+        <div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
           <AnimatedActionIcon kind={kind} trigger={trigger} />
         </div>
       </div>
@@ -140,7 +146,7 @@ function Gif({ src, alt }: { src: string; alt: string }) {
       src={src}
       alt={alt}
       draggable={false}
-      className="w-[30px] h-[30px] object-contain"
+      className="w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] md:w-[36px] md:h-[36px] object-contain"
     />
   );
 }
@@ -192,7 +198,6 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
     );
   }
 
-  // spend → твой pay.gif
   return (
     <motion.div
       key={key}
@@ -217,5 +222,5 @@ export function Card({ children, className = "" }: { children: React.ReactNode; 
 }
 
 export function CardContent({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`p-4 ${className}`}>{children}</div>;
+  return <div className={`p-4 sm:p-5 md:p-6 ${className}`}>{children}</div>;
 }
