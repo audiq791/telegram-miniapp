@@ -3,6 +3,10 @@
 import React, { useRef } from "react";
 import { motion } from "framer-motion";
 
+// ===========================
+// БАЗОВЫЕ КНОПКИ
+// ===========================
+
 type IconButtonProps = {
   aria?: string;
   onClick?: () => void;
@@ -36,7 +40,10 @@ export function PrimaryButton({ label, onClick }: { label: string; onClick?: () 
   );
 }
 
-/** Нижняя вкладка: активная — чёрная заливка */
+// ===========================
+// НИЖНЕЕ МЕНЮ
+// ===========================
+
 export function TabButton({
   active,
   onClick,
@@ -66,6 +73,10 @@ export function TabButton({
   );
 }
 
+// ===========================
+// ACTION CARD (ОТПРАВИТЬ/ПОЛУЧИТЬ/ОБМЕНЯТЬ/СПИСАТЬ)
+// ===========================
+
 export type ActionKind = "send" | "receive" | "swap" | "spend";
 
 export function ActionCard({
@@ -79,18 +90,18 @@ export function ActionCard({
   kind: ActionKind;
   onClick?: () => void;
 }) {
-  const animating = useRef(false);
   const [trigger, setTrigger] = React.useState(0);
+  const isAnimating = useRef(false);
 
   const handleClick = () => {
-    if (animating.current) return;
-    animating.current = true;
+    if (isAnimating.current) return;
+    isAnimating.current = true;
     setTrigger((v) => v + 1);
     onClick?.();
 
     // через 300 мс разрешаем снова (длина анимации)
     setTimeout(() => {
-      animating.current = false;
+      isAnimating.current = false;
     }, 300);
   };
 
@@ -102,13 +113,14 @@ export function ActionCard({
       className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 text-left hover:shadow-md"
     >
       <div className="flex items-center justify-between gap-3">
+        {/* Текст слева */}
         <div className="min-w-0">
           <div className="text-[15px] font-semibold truncate">{label}</div>
           <div className="text-[12px] text-zinc-500 truncate">{hint}</div>
         </div>
 
-        {/* УБРАЛИ серую заливку: прозрачный фон, только иконка */}
-        <div className="h-10 w-10 grid place-items-center shrink-0 overflow-hidden">
+        {/* БЕЛАЯ ТАБЛЕТКА (обводка, тень) — но без серой заливки */}
+        <div className="h-10 w-10 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 overflow-hidden bg-white">
           <AnimatedActionIcon kind={kind} trigger={trigger} />
         </div>
       </div>
@@ -116,9 +128,9 @@ export function ActionCard({
   );
 }
 
-/* ===========================
-   GIF: делаем цветной акцент ЧЁРНЫМ → ч/б
-   =========================== */
+// ===========================
+// АНИМИРОВАННЫЕ ИКОНКИ (ЧЁРНО-БЕЛЫЕ)
+// ===========================
 
 function MonoGif({ src, alt }: { src: string; alt: string }) {
   return (
@@ -126,21 +138,16 @@ function MonoGif({ src, alt }: { src: string; alt: string }) {
       src={src}
       alt={alt}
       draggable={false}
-      className="w-[32px] h-[32px] object-contain" // ЕЩЁ КРУПНЕЕ
+      className="w-[28px] h-[28px] object-contain"
       style={{
-        // убиваем цвет полностью
-        filter: "grayscale(1) saturate(0) contrast(1.8) brightness(0.7)",
+        // полная десатурация, бирюза → чёрный
+        filter: "grayscale(1) saturate(0) contrast(1.6) brightness(0.7)",
       }}
     />
   );
 }
 
-/* ===========================
-   АНИМАЦИИ: только по клику, однократно
-   =========================== */
-
 function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: number }) {
-  // ключ меняется только при клике
   const key = `${kind}-${trigger}`;
 
   if (kind === "send") {
@@ -149,25 +156,20 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
         key={key}
         initial={false}
         animate={{
-          x: [0, 12, 22, 0],
-          y: [0, -8, -20, 0],
-          rotate: [0, -15, -28, 0],
+          x: [0, 10, 20, 0],
+          y: [0, -6, -16, 0],
+          rotate: [0, -12, -24, 0],
           opacity: [1, 1, 0, 1],
-          scale: [1, 1, 0.96, 1],
         }}
-        transition={{
-          duration: 0.3,
-          times: [0, 0.4, 0.7, 1],
-          ease: "easeOut",
-        }}
+        transition={{ duration: 0.3, times: [0, 0.4, 0.7, 1], ease: "easeOut" }}
         className="relative"
       >
         <motion.span
           key={`trail-${trigger}`}
           initial={{ opacity: 0, scaleX: 0.4 }}
-          animate={{ opacity: [0, 0.5, 0], scaleX: [0.4, 1, 1] }}
+          animate={{ opacity: [0, 0.4, 0], scaleX: [0.4, 1, 1] }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="absolute -left-3 top-1/2 -translate-y-1/2 h-[2px] w-3 rounded-full bg-zinc-900/20 origin-right"
+          className="absolute -left-3 top-1/2 -translate-y-1/2 h-[2px] w-3 rounded-full bg-zinc-900/30 origin-right"
         />
         <MonoGif src="/icons/send.gif" alt="send" />
       </motion.div>
@@ -179,7 +181,7 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
       <motion.div
         key={key}
         initial={false}
-        animate={{ scale: [1, 1.12, 1] }}
+        animate={{ scale: [1, 1.1, 1] }}
         transition={{ duration: 0.2, ease: "easeOut" }}
       >
         <MonoGif src="/icons/receive.gif" alt="receive" />
@@ -192,7 +194,7 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
       <motion.div
         key={key}
         initial={false}
-        animate={{ rotate: [0, 10, -8, 0], scale: [1, 1.1, 1] }}
+        animate={{ rotate: [0, 10, -8, 0], scale: [1, 1.08, 1] }}
         transition={{ duration: 0.24, ease: "easeOut" }}
       >
         <MonoGif src="/icons/exchange.gif" alt="exchange" />
@@ -206,11 +208,12 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
 
 function SpendIcon() {
   return (
-    <div className="relative w-[32px] h-[32px] text-zinc-900">
+    <div className="relative w-[28px] h-[28px] text-zinc-900">
+      {/* галочка статична */}
       <svg
         className="absolute inset-0"
-        width="32"
-        height="32"
+        width="28"
+        height="28"
         viewBox="0 0 24 24"
         fill="none"
         aria-hidden="true"
@@ -224,16 +227,17 @@ function SpendIcon() {
         />
       </svg>
 
+      {/* стрелка вниз — анимируется при клике */}
       <motion.svg
         className="absolute inset-0"
-        width="32"
-        height="32"
+        width="28"
+        height="28"
         viewBox="0 0 24 24"
         fill="none"
         aria-hidden="true"
         initial={{ y: 0, opacity: 0 }}
-        animate={{ y: [0, 0, 10], opacity: [0, 1, 0] }}
-        transition={{ duration: 0.26, ease: "easeOut", times: [0, 0.15, 1] }}
+        animate={{ y: [0, 0, 8], opacity: [0, 1, 0] }}
+        transition={{ duration: 0.24, ease: "easeOut", times: [0, 0.2, 1] }}
       >
         <path d="M12 6v9" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
         <path
@@ -248,7 +252,10 @@ function SpendIcon() {
   );
 }
 
-/* Безопасные экспорты */
+// ===========================
+// ВСПОМОГАТЕЛЬНЫЕ КОМПОНЕНТЫ
+// ===========================
+
 export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <div className={`rounded-2xl bg-white border border-zinc-200 shadow-sm ${className}`}>{children}</div>;
 }
