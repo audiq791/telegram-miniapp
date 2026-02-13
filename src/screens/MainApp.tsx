@@ -13,10 +13,12 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-import { haptic } from "../components/haptics";
 import { springTap } from "../components/motion";
 import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
 import BlackScreen from "./BlackScreen";
+
+// Импортируем Telegram SDK
+import { init, backButton, hapticFeedback } from "@tma.js/sdk";
 
 type Partner = {
   id: string;
@@ -49,9 +51,9 @@ export default function MainApp() {
   const [tab, setTab] = useState<"wallet" | "market" | "partners" | "profile">("wallet");
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [query, setQuery] = useState("");
-
-  // Стек истории для кнопки назад
-  const [historyStack, setHistoryStack] = useState<Route[]>([{ name: "home" }]);
+  
+  // Простой стек истории
+  const [history, setHistory] = useState<string[]>(["home"]);
 
   const partners = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -59,55 +61,72 @@ export default function MainApp() {
     return partnersSeed.filter((p) => p.name.toLowerCase().includes(q));
   }, [query]);
 
-  // Функция возврата на предыдущий экран
-  const goBack = () => {
-    if (historyStack.length <= 1) return;
-    
-    haptic("light");
-    
-    // Убираем текущий экран из стека
-    const newStack = [...historyStack];
-    newStack.pop(); // убираем текущий
-    const previousRoute = newStack[newStack.length - 1];
-    
-    setHistoryStack(newStack);
-    setRoute(previousRoute);
-    
-    if (previousRoute.name === "home") {
-      setTab("wallet");
-    }
-  };
-
-  // Управление кнопкой назад в Telegram
+  // Инициализация Telegram Mini App
   useEffect(() => {
-    const tg = (window as any).Telegram?.WebApp;
-    if (!tg) return;
-
-    const backButton = tg.BackButton;
-
-    if (historyStack.length > 1) {
-      backButton.show();
-      backButton.onClick(goBack);
-    } else {
-      backButton.hide();
+    try {
+      // Инициализируем приложение
+      const app = init();
+      console.log('Telegram Mini App инициализирован');
+      
+      // Получаем компоненты
+      const back = backButton();
+      const haptic = hapticFeedback();
+      
+      // Функция для обновления кнопки назад
+      const updateBackButton = () => {
+        if (history.length > 1) {
+          back.show();
+          back.onClick(() => {
+            haptic.impactOccurred('light');
+            goBack();
+          });
+        } else {
+          back.hide();
+        }
+      };
+      
+      updateBackButton();
+      
+      // Очистка
+      return () => {
+        back.hide();
+      };
+    } catch (e) {
+      console.log('Telegram SDK не доступен (вероятно, запуск вне Telegram)', e);
     }
-
-    return () => {
-      backButton.hide();
-    };
-  }, [historyStack]);
+  }, [history]);
 
   const goBlank = (title: string) => {
-    haptic("light");
-    const newRoute: Route = { name: "blank", title };
-    setRoute(newRoute);
-    setHistoryStack((prev) => [...prev, newRoute]);
+    setRoute({ name: "blank", title });
+    setHistory(prev => [...prev, title]);
+    
+    // Пробуем вызвать хаптик
+    try {
+      const haptic = hapticFeedback();
+      haptic.impactOccurred('light');
+    } catch (e) {}
+  };
+
+  const goBack = () => {
+    if (history.length <= 1) return;
+    
+    const newHistory = [...history];
+    newHistory.pop(); // убираем текущий экран
+    setHistory(newHistory);
+    
+    // Возвращаемся на предыдущий экран
+    if (newHistory.length === 1) {
+      setRoute({ name: "home" });
+      setTab("wallet");
+    } else {
+      // Если были ещё экраны, но мы их пока не используем
+      setRoute({ name: "home" });
+    }
   };
 
   const goHome = () => {
-    haptic("light");
     setRoute({ name: "home" });
-    setHistoryStack([{ name: "home" }]);
+    setHistory(["home"]);
   };
 
   return (
@@ -136,10 +155,10 @@ export default function MainApp() {
           </div>
 
           <div className="flex items-center gap-2">
-            <IconButton aria="help" onClick={() => haptic("light")}>
+            <IconButton aria="help" onClick={() => {}}>
               <HelpCircle size={18} />
             </IconButton>
-            <IconButton aria="more" onClick={() => haptic("light")}>
+            <IconButton aria="more" onClick={() => {}}>
               <MoreHorizontal size={18} />
             </IconButton>
           </div>
@@ -249,7 +268,7 @@ export default function MainApp() {
             <BlackScreen 
               key="blank" 
               title={route.title} 
-              onBack={goBack}  // ВАЖНО: используем goBack, а не goHome
+              onBack={goHome}
             />
           )}
         </AnimatePresence>
@@ -265,7 +284,6 @@ export default function MainApp() {
             <TabButton
               active={tab === "wallet"}
               onClick={() => {
-                haptic("light");
                 setTab("wallet");
                 goBlank("Кошелёк");
               }}
@@ -275,7 +293,6 @@ export default function MainApp() {
             <TabButton
               active={tab === "market"}
               onClick={() => {
-                haptic("light");
                 setTab("market");
                 goBlank("Маркет");
               }}
@@ -285,7 +302,6 @@ export default function MainApp() {
             <TabButton
               active={tab === "partners"}
               onClick={() => {
-                haptic("light");
                 setTab("partners");
                 goBlank("Партнёры");
               }}
@@ -295,7 +311,6 @@ export default function MainApp() {
             <TabButton
               active={tab === "profile"}
               onClick={() => {
-                haptic("light");
                 setTab("profile");
                 goBlank("Профиль");
               }}
