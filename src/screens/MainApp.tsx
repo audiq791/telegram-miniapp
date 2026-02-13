@@ -1,24 +1,22 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   WalletCards,
   ShoppingBag,
   Handshake,
   UserRound,
-  Send,
-  Download,
-  Repeat2,
-  CheckCircle2,
   Search,
   HelpCircle,
   MoreHorizontal,
   ChevronRight,
 } from "lucide-react";
+
 import { haptic } from "../components/haptics";
 import { springTap } from "../components/motion";
 import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
+import BlankScreen from "./BlackScreen";
 
 
 type Partner = {
@@ -35,15 +33,19 @@ const partnersSeed: Partner[] = [
   { id: "magnolia", name: "Магнолия", balance: 158.14, unit: "B", accent: "from-lime-400 to-green-600" },
   { id: "piligrim", name: "Пилигрим", balance: 100, unit: "B", accent: "from-sky-500 to-blue-700" },
   { id: "cafe12", name: "12 Grand Cafe", balance: 0, unit: "B", accent: "from-zinc-700 to-zinc-900" },
-  { id: "airo", name: "AIRO", balance: 0, unit: "B", accent: "from-slate-600 to-slate-900" },
 ];
 
 function formatMoney(n: number) {
   return new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 }
 
+type Route =
+  | { name: "home" }
+  | { name: "blank"; title: string };
+
 export default function MainApp() {
   const [tab, setTab] = useState<"wallet" | "market" | "partners" | "profile">("wallet");
+  const [route, setRoute] = useState<Route>({ name: "home" });
   const [query, setQuery] = useState("");
 
   const partners = useMemo(() => {
@@ -52,18 +54,37 @@ export default function MainApp() {
     return partnersSeed.filter((p) => p.name.toLowerCase().includes(q));
   }, [query]);
 
+  const goBlank = (title: string) => {
+    haptic("light");
+    setRoute({ name: "blank", title });
+  };
+
+  const goHome = () => {
+    haptic("light");
+    setRoute({ name: "home" });
+  };
+
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
+      {/* HEADER */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-zinc-200">
         <div className="mx-auto max-w-md px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-zinc-900 text-white grid place-items-center font-semibold">
+            <div className="h-10 w-10 rounded-2xl bg-zinc-900 text-white grid place-items-center font-semibold shrink-0">
               B
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-[13px] text-zinc-500 leading-none">Биржа бонусов</div>
-              <div className="text-[15px] font-semibold leading-tight">
-                {tab === "wallet" ? "Кошелёк" : tab === "market" ? "Маркет" : tab === "partners" ? "Партнёры" : "Профиль"}
+              <div className="text-[15px] font-semibold leading-tight truncate">
+                {route.name === "blank"
+                  ? route.title
+                  : tab === "wallet"
+                    ? "Кошелёк"
+                    : tab === "market"
+                      ? "Маркет"
+                      : tab === "partners"
+                        ? "Партнёры"
+                        : "Профиль"}
               </div>
             </div>
           </div>
@@ -79,133 +100,162 @@ export default function MainApp() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-md px-4 pt-4 pb-28">
-        {tab === "wallet" && (
-          <>
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-              className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden"
+      {/* CONTENT with transitions */}
+      <div className="mx-auto max-w-md">
+        <AnimatePresence mode="wait">
+          {route.name === "home" ? (
+            <motion.main
+              key="home"
+              className="px-4 pt-4 pb-28"
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ type: "spring", stiffness: 260, damping: 30 }}
             >
-              <div className="p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-xs text-zinc-500">Основной партнёр</div>
-                    <div className="text-xl font-semibold mt-1">ВкусВилл</div>
-                  </div>
-                  <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-sm" />
-                </div>
-
-                <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-4 flex items-end justify-between gap-3">
-                  <div>
-                    <div className="text-xs text-zinc-500">Баланс</div>
-                    <div className="text-3xl font-semibold leading-none mt-1">
-                      {formatMoney(0)} <span className="text-base font-medium text-zinc-500">B</span>
+              {/* CARD */}
+              <div className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden">
+                <div className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-xs text-zinc-500">Основной партнёр</div>
+                      <div className="text-xl font-semibold mt-1 truncate">ВкусВилл</div>
                     </div>
+                    <div className="shrink-0 h-12 w-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-sm" />
                   </div>
-                  <PrimaryButton label="Пополнить" onClick={() => haptic("medium")} />
-                </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  <ActionCard label="Отправить" hint="перевод" icon={<Send size={18} />} onClick={() => haptic("medium")} />
-                  <ActionCard label="Получить" hint="входящие" icon={<Download size={18} />} onClick={() => haptic("medium")} />
-                  <ActionCard label="Обменять" hint="курс" icon={<Repeat2 size={18} />} onClick={() => haptic("medium")} />
-                  <ActionCard label="Списать" hint="оплата" icon={<CheckCircle2 size={18} />} onClick={() => haptic("success")} />
-                </div>
-              </div>
-
-              <div className="h-10 bg-gradient-to-b from-transparent to-zinc-50" />
-            </motion.div>
-
-            <div className="mt-4">
-              <div className="h-12 rounded-2xl bg-white border border-zinc-200 px-3 flex items-center gap-2 focus-within:ring-2 focus-within:ring-zinc-900/10">
-                <Search size={18} className="text-zinc-400" />
-                <input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Поиск партнёра…"
-                  className="w-full h-full outline-none bg-transparent text-[15px]"
-                />
-              </div>
-            </div>
-
-            <div className="mt-3 space-y-2">
-              <div className="flex items-center justify-between px-1">
-                <div className="text-sm text-zinc-500">Партнёры</div>
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  transition={springTap}
-                  onClick={() => haptic("light")}
-                  className="text-sm font-semibold text-zinc-900"
-                >
-                  Все
-                </motion.button>
-              </div>
-
-              {partners.map((p) => (
-                <motion.button
-                  key={p.id}
-                  onClick={() => haptic("light")}
-                  whileTap={{ scale: 0.985 }}
-                  transition={springTap}
-                  className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-3 flex items-center justify-between gap-3 text-left hover:shadow-md"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`h-11 w-11 rounded-2xl bg-gradient-to-br ${p.accent} shadow-sm`} />
+                  <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-4 flex items-end justify-between gap-3">
                     <div>
-                      <div className="font-semibold">{p.name}</div>
-                      <div className="text-xs text-zinc-500">Нажмите, чтобы открыть</div>
+                      <div className="text-xs text-zinc-500">Баланс</div>
+                      <div className="text-3xl font-semibold leading-none mt-1">
+                        {formatMoney(0)} <span className="text-base font-medium text-zinc-500">B</span>
+                      </div>
                     </div>
+                    <PrimaryButton label="Пополнить" onClick={() => goBlank("Пополнить")} />
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <div className="font-semibold">{formatMoney(p.balance)}</div>
-                      <div className="text-xs text-zinc-500">{p.unit}</div>
-                    </div>
-                    <ChevronRight size={18} className="text-zinc-400" />
+                  {/* ACTIONS */}
+                  <div className="mt-4 grid grid-cols-2 gap-3">
+                    <ActionCard label="Отправить" hint="перевод" kind="send" onClick={() => goBlank("Отправить")} />
+                    <ActionCard label="Получить" hint="входящие" kind="receive" onClick={() => goBlank("Получить")} />
+                    <ActionCard label="Обменять" hint="курс" kind="swap" onClick={() => goBlank("Обменять")} />
+                    <ActionCard label="Списать" hint="оплата" kind="spend" onClick={() => goBlank("Списать")} />
                   </div>
-                </motion.button>
-              ))}
-            </div>
-          </>
-        )}
+                </div>
 
-        {tab !== "wallet" && (
-          <motion.div
-            key={tab}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-            className="rounded-[28px] p-4 bg-white border border-zinc-200 shadow-sm"
-          >
-            <div className="text-xl font-semibold">
-              {tab === "market" ? "Маркет" : tab === "partners" ? "Партнёры" : "Профиль"}
-            </div>
-            <div className="text-sm text-zinc-500 mt-1">
-              {tab === "market"
-                ? "Офферы, сертификаты, предложения"
-                : tab === "partners"
-                ? "Список брендов и условия обмена"
-                : "Настройки, история, поддержка"}
-            </div>
+                <div className="h-10 bg-gradient-to-b from-transparent to-zinc-50" />
+              </div>
 
-            <div className="mt-4 rounded-2xl border border-dashed border-zinc-300 bg-zinc-50 p-4 text-sm text-zinc-600">
-              Экран в работе. Скажи, что здесь должно быть — и соберём.
-            </div>
-          </motion.div>
-        )}
-      </main>
+              {/* SEARCH */}
+              <div className="mt-4">
+                <div className="h-12 rounded-2xl bg-white border border-zinc-200 px-3 flex items-center gap-2 focus-within:ring-2 focus-within:ring-zinc-900/10">
+                  <Search size={18} className="text-zinc-400 shrink-0" />
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Поиск партнёра…"
+                    className="w-full h-full outline-none bg-transparent text-[15px]"
+                  />
+                </div>
+              </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
-        <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
-          <TabButton active={tab === "wallet"} onClick={() => (haptic("light"), setTab("wallet"))} label="Кошелёк" icon={<WalletCards size={18} />} />
-          <TabButton active={tab === "market"} onClick={() => (haptic("light"), setTab("market"))} label="Маркет" icon={<ShoppingBag size={18} />} />
-          <TabButton active={tab === "partners"} onClick={() => (haptic("light"), setTab("partners"))} label="Партнёры" icon={<Handshake size={18} />} />
-          <TabButton active={tab === "profile"} onClick={() => (haptic("light"), setTab("profile"))} label="Профиль" icon={<UserRound size={18} />} />
-        </div>
-      </nav>
+              {/* PARTNERS LIST */}
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <div className="text-sm text-zinc-500">Партнёры</div>
+                  <motion.button
+                    whileTap={{ scale: 0.98 }}
+                    transition={springTap}
+                    onClick={() => goBlank("Все партнёры")}
+                    className="text-sm font-semibold text-zinc-900"
+                  >
+                    Все
+                  </motion.button>
+                </div>
+
+                {partners.map((p) => (
+                  <motion.button
+                    key={p.id}
+                    onClick={() => goBlank(p.name)}
+                    whileTap={{ scale: 0.985 }}
+                    transition={springTap}
+                    className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-3 flex items-center justify-between gap-3 text-left hover:shadow-md"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`shrink-0 h-11 w-11 rounded-2xl bg-gradient-to-br ${p.accent} shadow-sm`} />
+                      <div className="min-w-0">
+                        <div className="font-semibold truncate">{p.name}</div>
+                        <div className="text-xs text-zinc-500">Нажмите, чтобы открыть</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="text-right">
+                        <div className="font-semibold">{formatMoney(p.balance)}</div>
+                        <div className="text-xs text-zinc-500">{p.unit}</div>
+                      </div>
+                      <ChevronRight size={18} className="text-zinc-400" />
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.main>
+          ) : (
+            <BlankScreen key="blank" title={route.title} onBack={goHome} />
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* BOTTOM NAV */}
+      {route.name === "home" && (
+        <nav
+          className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        >
+          <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
+            <TabButton
+              active={tab === "wallet"}
+              onClick={() => {
+                haptic("light");
+                setTab("wallet");
+                // тест: уводим на пустой экран
+                goBlank("Кошелёк");
+              }}
+              label="Кошелёк"
+              icon={<WalletCards size={18} strokeWidth={1.9} />}
+            />
+            <TabButton
+              active={tab === "market"}
+              onClick={() => {
+                haptic("light");
+                setTab("market");
+                goBlank("Маркет");
+              }}
+              label="Маркет"
+              icon={<ShoppingBag size={18} strokeWidth={1.9} />}
+            />
+            <TabButton
+              active={tab === "partners"}
+              onClick={() => {
+                haptic("light");
+                setTab("partners");
+                goBlank("Партнёры");
+              }}
+              label="Партнёры"
+              icon={<Handshake size={18} strokeWidth={1.9} />}
+            />
+            <TabButton
+              active={tab === "profile"}
+              onClick={() => {
+                haptic("light");
+                setTab("profile");
+                goBlank("Профиль");
+              }}
+              label="Профиль"
+              icon={<UserRound size={18} strokeWidth={1.9} />}
+            />
+          </div>
+        </nav>
+      )}
     </div>
   );
 }
