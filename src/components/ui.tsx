@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 
 type IconButtonProps = {
@@ -36,7 +36,7 @@ export function PrimaryButton({ label, onClick }: { label: string; onClick?: () 
   );
 }
 
-/** Нижняя вкладка: активная — чёрная заливка, неактивная — белая */
+/** Нижняя вкладка: активная — чёрная заливка */
 export function TabButton({
   active,
   onClick,
@@ -48,7 +48,6 @@ export function TabButton({
   label: string;
   icon: React.ReactNode;
 }) {
-  // “пружинка” для иконки
   return (
     <motion.button
       onClick={onClick}
@@ -63,12 +62,11 @@ export function TabButton({
     >
       <motion.span
         className="inline-flex items-center justify-center shrink-0"
-        // мягкая логичная анимация: “подпрыгнуть” на тап
         whileTap={{ y: -1 }}
         transition={{ type: "spring", stiffness: 700, damping: 38 }}
         style={{ lineHeight: 0 }}
       >
-        {/* Фикс “сжатых” иконок: задаём контейнеру размер */}
+        {/* фикс “сжатых” иконок: контейнер стабильного размера */}
         <span className="w-5 h-5 inline-flex items-center justify-center">{icon}</span>
       </motion.span>
 
@@ -93,7 +91,6 @@ export function ActionCard({
   const [pulseKey, setPulseKey] = useState(0);
 
   const trigger = () => {
-    // запускаем анимацию иконки
     setPulseKey((v) => v + 1);
     onClick?.();
   };
@@ -111,8 +108,8 @@ export function ActionCard({
           <div className="text-[12px] text-zinc-500 truncate">{hint}</div>
         </div>
 
-        {/* “пилюля” белая — иконка чёрная */}
-        <div className="h-10 w-10 rounded-2xl bg-white border border-zinc-200 shadow-sm grid place-items-center shrink-0">
+        {/* Белая таблетка — внутри чёрная иконка */}
+        <div className="h-10 w-10 rounded-2xl bg-white border border-zinc-200 shadow-sm grid place-items-center shrink-0 overflow-hidden">
           <AnimatedActionIcon kind={kind} pulseKey={pulseKey} />
         </div>
       </div>
@@ -121,15 +118,40 @@ export function ActionCard({
 }
 
 /* ===========================
-   АНИМАЦИИ ИКОНОК (как в финтехах/Telegram: коротко, мягко, “живое”)
+   GIF-иконки: делаем бирюзовый элемент ЧЁРНЫМ (ч/б)
+   =========================== */
+
+/**
+ * Режим "черно-белый": убирает цвет и делает цветные пиксели темнее/чернее.
+ * Черный контур останется черным.
+ *
+ * Если вдруг фон в GIF реально "зашит" белым — он останется белым (ок).
+ */
+function MonoGif({ src, alt }: { src: string; alt: string }) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="w-[22px] h-[22px] object-contain"
+      style={{
+        // ключ: убиваем цвет -> акцент станет черным/темно-серым, контур останется черным
+        // подобрано мягко, чтобы белый фон (если есть) не становился грязным
+        filter: "grayscale(1) saturate(0) contrast(1.4) brightness(0.85)",
+      }}
+      draggable={false}
+    />
+  );
+}
+
+/* ===========================
+   АНИМАЦИИ ИКОНКИ ВНУТРИ КНОПКИ
    =========================== */
 
 function AnimatedActionIcon({ kind, pulseKey }: { kind: ActionKind; pulseKey: number }) {
-  // Каждое нажатие меняет key — Framer Motion заново проигрывает анимацию
   const key = `${kind}-${pulseKey}`;
 
   if (kind === "send") {
-    // Самолётик “улетает” вверх-вправо, чуть поворачивается и исчезает → возвращается
+    // самолетик "улетает" внутри таблетки
     return (
       <motion.div
         key={key}
@@ -148,167 +170,110 @@ function AnimatedActionIcon({ kind, pulseKey }: { kind: ActionKind; pulseKey: nu
         }}
         className="relative"
       >
-        {/* небольшой “трейл” */}
         <motion.span
           initial={{ opacity: 0, scaleX: 0.4 }}
           animate={{ opacity: [0, 0.35, 0], scaleX: [0.4, 1, 1] }}
           transition={{ duration: 0.35, ease: "easeOut" }}
           className="absolute -left-3 top-1/2 -translate-y-1/2 h-[2px] w-3 rounded-full bg-zinc-900/25 origin-right"
         />
-        <PlaneIcon />
+        <MonoGif src="/icons/send.gif" alt="send" />
       </motion.div>
     );
   }
 
   if (kind === "receive") {
-    // Стрелка “уходит вниз” (мягкое падение + лёгкий отскок)
+    // рука: легкий "пульс" и микро-сдвиг вниз (приятное ощущение получения)
     return (
       <motion.div
         key={key}
         initial={{ y: 0, scale: 1 }}
-        animate={{ y: [0, 6, 10, 7, 0], scale: [1, 1, 0.99, 1, 1] }}
-        transition={{ duration: 0.45, ease: "easeOut" }}
+        animate={{ y: [0, 2, 0], scale: [1, 1.04, 1] }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
       >
-        <ReceiveIcon />
+        <MonoGif src="/icons/receive.gif" alt="receive" />
       </motion.div>
     );
   }
 
   if (kind === "swap") {
-    // TG-стайл “обмен”: две стрелки, делают оборот (вращение + микро-скейл)
+    // человечек: "подключение/сеть" — мягкий оборот + масштаб
     return (
       <motion.div
         key={key}
         initial={{ rotate: 0, scale: 1 }}
-        animate={{ rotate: [0, 180, 360], scale: [1, 1.02, 1] }}
-        transition={{ duration: 0.55, ease: "easeInOut" }}
+        animate={{ rotate: [0, 10, -8, 0], scale: [1, 1.03, 1] }}
+        transition={{ duration: 0.42, ease: "easeOut" }}
       >
-        <SwapIcon />
+        <MonoGif src="/icons/exchange.gif" alt="exchange" />
       </motion.div>
     );
   }
 
-  // spend: “галочка проставляется” (прорисовка stroke)
-  return <AnimatedCheck key={key} />;
+  // spend: чек + вниз уходит ТОЛЬКО стрелка
+  return <SpendIcon key={key} />;
 }
 
 /* ===========================
-   ИКОНКИ (в одном стиле, “премиальные”, тонкая обводка)
+   СПИСАТЬ: чек статичный + стрелка вниз анимируется
    =========================== */
 
-function PlaneIcon() {
+function SpendIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M3.4 11.3 21 3l-8.3 17.6-2.2-6.1L3.4 11.3Z"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M21 3 10.5 14.5"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function ReceiveIcon() {
-  // “download” стрелка вниз — ближе к финтех-паттернам, чем обычная “стрелка”
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 3v10"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-      />
-      <path
-        d="M8.5 10.5 12 14l3.5-3.5"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M6 20h12"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function SwapIcon() {
-  // Telegram-подобные “обмен” стрелки: верхняя → вправо, нижняя → влево
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M7 7h10"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-      />
-      <path
-        d="M15.5 4.5 18 7l-2.5 2.5"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-
-      <path
-        d="M17 17H7"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-      />
-      <path
-        d="M8.5 14.5 6 17l2.5 2.5"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function AnimatedCheck() {
-  // Рисуем галочку “как будто проставили”
-  const length = 40; // примерно для stroke-dash
-  return (
-    <motion.svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
+    <motion.div
+      className="relative w-[22px] h-[22px] text-zinc-900"
       initial={{ scale: 1 }}
-      animate={{ scale: [1, 1.06, 1] }}
-      transition={{ duration: 0.32, ease: "easeOut" }}
+      animate={{ scale: [1, 1.05, 1] }}
+      transition={{ duration: 0.28, ease: "easeOut" }}
     >
-      <motion.path
-        d="M7 12.5 10.2 15.7 17.5 8.4"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeDasharray={length}
-        initial={{ strokeDashoffset: length }}
-        animate={{ strokeDashoffset: 0 }}
-        transition={{ duration: 0.38, ease: "easeOut" }}
-      />
-    </motion.svg>
+      {/* Галочка — НЕ двигается */}
+      <svg
+        className="absolute inset-0"
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M7 12.5 10.2 15.7 17.5 8.4"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+
+      {/* Стрелка вниз — двигается вниз и исчезает */}
+      <motion.svg
+        className="absolute inset-0"
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+        initial={{ y: 0, opacity: 0 }}
+        animate={{ y: [0, 0, 7], opacity: [0, 1, 0] }}
+        transition={{ duration: 0.42, ease: "easeOut", times: [0, 0.2, 1] }}
+      >
+        <path
+          d="M12 6v9"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinecap="round"
+        />
+        <path
+          d="M8.5 12.5 12 16l3.5-3.5"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </motion.svg>
+    </motion.div>
   );
 }
 
-/* ===========================
-   (Если где-то в проекте используется ещё один компонент — безопасный экспорт)
-   =========================== */
+/* Безопасные экспорты, если где-то используются */
 export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <div className={`rounded-2xl bg-white border border-zinc-200 shadow-sm ${className}`}>{children}</div>;
 }
