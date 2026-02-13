@@ -1,64 +1,117 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   WalletCards,
   ShoppingBag,
   Handshake,
   UserRound,
+  Search,
+  HelpCircle,
+  MoreHorizontal,
+  ChevronRight,
 } from "lucide-react";
 
-import { ActionCard, PrimaryButton, TabButton } from "../components/ui";
+import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
 import BlackScreen from "./BlackScreen";
 
+// БЛОКИРУЕМ СВАЙПЫ TELEGRAM
+if (typeof window !== 'undefined') {
+  const tg = (window as any).Telegram?.WebApp;
+  if (tg) {
+    try {
+      tg.disableVerticalSwipes();
+      console.log("Вертикальные свайпы отключены");
+    } catch (e) {
+      console.log("disableVerticalSwipes не поддерживается");
+    }
+  }
+}
+
+type Partner = {
+  id: string;
+  name: string;
+  balance: number;
+  unit: string;
+  accent: string;
+};
+
+const partnersSeed: Partner[] = [
+  { id: "vv", name: "ВкусВилл", balance: 0, unit: "B", accent: "from-emerald-400 to-emerald-600" },
+  { id: "fuel", name: "FUEL", balance: 2380.29, unit: "B", accent: "from-fuchsia-500 to-indigo-500" },
+  { id: "magnolia", name: "Магнолия", balance: 158.14, unit: "B", accent: "from-lime-400 to-green-600" },
+  { id: "piligrim", name: "Пилигрим", balance: 100, unit: "B", accent: "from-sky-500 to-blue-700" },
+  { id: "cafe12", name: "12 Grand Cafe", balance: 0, unit: "B", accent: "from-zinc-700 to-zinc-900" },
+];
+
+function formatMoney(n: number) {
+  return new Intl.NumberFormat("ru-RU", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(n);
+}
+
 export default function MainApp() {
+  const [tab, setTab] = useState<"wallet" | "market" | "partners" | "profile">("wallet");
+  const [query, setQuery] = useState("");
   const [currentScreen, setCurrentScreen] = useState<"main" | "blank">("main");
   const [blankTitle, setBlankTitle] = useState("");
 
-  // Telegram WebApp API - максимально просто
+  const partners = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return partnersSeed;
+    return partnersSeed.filter((p) => p.name.toLowerCase().includes(q));
+  }, [query]);
+
+  // Telegram WebApp API
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
-    if (!tg) return;
-
-    // Показываем приложение
-    tg.ready();
-    tg.expand();
-
-    // Кнопка назад - всегда скрыта в начале
-    tg.BackButton.hide();
-
-    // Обработчик кнопки назад
-    tg.BackButton.onClick(() => {
-      // Просто возвращаемся на главный экран
-      setCurrentScreen("main");
-      setBlankTitle("");
+    
+    if (tg) {
+      console.log("Telegram WebApp доступен");
       
-      // Скрываем кнопку назад
+      // Показываем основную кнопку
+      tg.ready();
+      tg.expand();
+      
+      // Изначально кнопка назад скрыта
       tg.BackButton.hide();
       
-      // Легкая вибрация
-      tg.HapticFeedback.impactOccurred("light");
-    });
-
+      // Обработчик нажатия кнопки назад
+      tg.BackButton.onClick(() => {
+        console.log("Нажата кнопка назад");
+        
+        tg.HapticFeedback.impactOccurred("light");
+        
+        setCurrentScreen("main");
+        setBlankTitle("");
+        
+        tg.BackButton.hide();
+      });
+    }
+    
     return () => {
-      tg.BackButton.offClick();
+      if ((window as any).Telegram?.WebApp) {
+        (window as any).Telegram.WebApp.BackButton.offClick();
+      }
     };
   }, []);
 
-  // Следим за экраном
+  // Отслеживаем текущий экран
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
-    if (!tg) return;
-
-    if (currentScreen === "blank") {
-      tg.BackButton.show();
-    } else {
-      tg.BackButton.hide();
+    
+    if (tg) {
+      if (currentScreen === "blank") {
+        tg.BackButton.show();
+      } else {
+        tg.BackButton.hide();
+      }
     }
   }, [currentScreen]);
 
-  const openBlank = (title: string) => {
+  const goToBlank = (title: string) => {
     const tg = (window as any).Telegram?.WebApp;
     
     setCurrentScreen("blank");
@@ -67,7 +120,7 @@ export default function MainApp() {
     tg?.HapticFeedback.impactOccurred("light");
   };
 
-  const closeBlank = () => {
+  const goToMain = () => {
     const tg = (window as any).Telegram?.WebApp;
     
     setCurrentScreen("main");
@@ -76,66 +129,188 @@ export default function MainApp() {
     tg?.HapticFeedback.impactOccurred("light");
   };
 
-  // Главный экран
-  if (currentScreen === "main") {
-    return (
-      <div className="min-h-dvh bg-zinc-50">
-        {/* Шапка */}
-        <div className="bg-white/80 backdrop-blur border-b border-zinc-200 px-4 py-3">
+  return (
+    <div className="min-h-dvh bg-zinc-50 text-zinc-900">
+      {/* HEADER */}
+      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-zinc-200">
+        <div className="mx-auto max-w-md px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-zinc-900 text-white grid place-items-center font-semibold">
+            <div className="h-10 w-10 rounded-2xl bg-zinc-900 text-white grid place-items-center font-semibold shrink-0">
               B
             </div>
-            <div>
-              <div className="text-[13px] text-zinc-500">Биржа бонусов</div>
-              <div className="text-[15px] font-semibold">Кошелёк</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Контент */}
-        <div className="p-4 pb-28">
-          {/* Карточка баланса */}
-          <div className="rounded-[28px] bg-white border border-zinc-200 p-4">
-            <div className="flex justify-between items-start">
-              <div>
-                <div className="text-xs text-zinc-500">Основной партнёр</div>
-                <div className="text-xl font-semibold">ВкусВилл</div>
+            <div className="min-w-0">
+              <div className="text-[13px] text-zinc-500 leading-none">Биржа бонусов</div>
+              <div className="text-[15px] font-semibold leading-tight truncate">
+                {currentScreen === "blank" ? blankTitle : "Кошелёк"}
               </div>
-              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600" />
             </div>
+          </div>
 
-            <div className="mt-4 bg-zinc-50 rounded-2xl p-4 flex justify-between items-end">
-              <div>
-                <div className="text-xs text-zinc-500">Баланс</div>
-                <div className="text-3xl font-semibold">0 <span className="text-base text-zinc-500">B</span></div>
+          <div className="flex items-center gap-2">
+            <IconButton aria="help" onClick={() => {}}>
+              <HelpCircle size={18} />
+            </IconButton>
+            <IconButton aria="more" onClick={() => {}}>
+              <MoreHorizontal size={18} />
+            </IconButton>
+          </div>
+        </div>
+      </header>
+
+      {/* CONTENT */}
+      <div className="mx-auto max-w-md">
+        <AnimatePresence mode="wait">
+          {currentScreen === "main" ? (
+            <motion.main
+              key="main"
+              className="px-4 pt-4 pb-28"
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ type: "spring", stiffness: 260, damping: 30 }}
+            >
+              {/* MAIN CARD */}
+              <div className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden">
+                <div className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-xs text-zinc-500">Основной партнёр</div>
+                      <div className="text-xl font-semibold mt-1 truncate">ВкусВилл</div>
+                    </div>
+                    <div className="shrink-0 h-12 w-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-sm" />
+                  </div>
+
+                  <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-4 flex items-end justify-between gap-3">
+                    <div>
+                      <div className="text-xs text-zinc-500">Баланс</div>
+                      <div className="text-3xl font-semibold leading-none mt-1">
+                        {formatMoney(0)} <span className="text-base font-medium text-zinc-500">B</span>
+                      </div>
+                    </div>
+                    <PrimaryButton label="Пополнить" onClick={() => goToBlank("Пополнить")} />
+                  </div>
+
+                  {/* ACTIONS */}
+                  <div className="mt-4 grid grid-cols-2 gap-3">
+                    <ActionCard label="Отправить" hint="Перевод" kind="send" onClick={() => goToBlank("Отправить")} />
+                    <ActionCard label="Получить" hint="Входящие" kind="receive" onClick={() => goToBlank("Получить")} />
+                    <ActionCard label="Обменять" hint="Бонусы" kind="swap" onClick={() => goToBlank("Обменять")} />
+                    <ActionCard label="Списать" hint="Оплата" kind="spend" onClick={() => goToBlank("Списать")} />
+                  </div>
+                </div>
+
+                <div className="h-10 bg-gradient-to-b from-transparent to-zinc-50" />
               </div>
-              <PrimaryButton label="Пополнить" onClick={() => openBlank("Пополнить")} />
-            </div>
 
-            {/* Кнопки действий */}
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <ActionCard label="Отправить" hint="перевод" kind="send" onClick={() => openBlank("Отправить")} />
-              <ActionCard label="Получить" hint="входящие" kind="receive" onClick={() => openBlank("Получить")} />
-              <ActionCard label="Обменять" hint="курс" kind="swap" onClick={() => openBlank("Обменять")} />
-              <ActionCard label="Списать" hint="оплата" kind="spend" onClick={() => openBlank("Списать")} />
-            </div>
-          </div>
-        </div>
+              {/* SEARCH */}
+              <div className="mt-4">
+                <div className="h-12 rounded-2xl bg-white border border-zinc-200 px-3 flex items-center gap-2 focus-within:ring-2 focus-within:ring-zinc-900/10">
+                  <Search size={18} className="text-zinc-400 shrink-0" />
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Поиск партнёра…"
+                    className="w-full h-full outline-none bg-transparent text-[15px]"
+                  />
+                </div>
+              </div>
 
-        {/* Нижнее меню */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur border-t border-zinc-200 px-3 py-2">
-          <div className="grid grid-cols-4 gap-2 max-w-md mx-auto">
-            <TabButton active={true} onClick={() => {}} label="Кошелёк" icon={<WalletCards size={18} />} />
-            <TabButton active={false} onClick={() => openBlank("Маркет")} label="Маркет" icon={<ShoppingBag size={18} />} />
-            <TabButton active={false} onClick={() => openBlank("Партнёры")} label="Партнёры" icon={<Handshake size={18} />} />
-            <TabButton active={false} onClick={() => openBlank("Профиль")} label="Профиль" icon={<UserRound size={18} />} />
-          </div>
-        </div>
+              {/* PARTNERS */}
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <div className="text-sm text-zinc-500">Партнёры</div>
+                  <motion.button
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                    onClick={() => goToBlank("Все партнёры")}
+                    className="text-sm font-semibold text-zinc-900"
+                  >
+                    Все
+                  </motion.button>
+                </div>
+
+                {partners.map((p) => (
+                  <motion.button
+                    key={p.id}
+                    onClick={() => goToBlank(p.name)}
+                    whileTap={{ scale: 0.985 }}
+                    transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                    className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-3 flex items-center justify-between gap-3 text-left hover:shadow-md"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`shrink-0 h-11 w-11 rounded-2xl bg-gradient-to-br ${p.accent} shadow-sm`} />
+                      <div className="min-w-0">
+                        <div className="font-semibold truncate">{p.name}</div>
+                        <div className="text-xs text-zinc-500">Нажмите, чтобы открыть</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="text-right">
+                        <div className="font-semibold">{formatMoney(p.balance)}</div>
+                        <div className="text-xs text-zinc-500">{p.unit}</div>
+                      </div>
+                      <ChevronRight size={18} className="text-zinc-400" />
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.main>
+          ) : (
+            <BlackScreen 
+              key="blank" 
+              title={blankTitle} 
+              onBack={goToMain}
+            />
+          )}
+        </AnimatePresence>
       </div>
-    );
-  }
 
-  // Второй экран
-  return <BlackScreen title={blankTitle} onBack={closeBlank} />;
+      {/* BOTTOM NAV */}
+      {currentScreen === "main" && (
+        <nav
+          className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        >
+          <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
+            <TabButton
+              active={tab === "wallet"}
+              onClick={() => {
+                setTab("wallet");
+              }}
+              label="Кошелёк"
+              icon={<WalletCards size={18} strokeWidth={1.9} />}
+            />
+            <TabButton
+              active={tab === "market"}
+              onClick={() => {
+                setTab("market");
+                goToBlank("Маркет");
+              }}
+              label="Маркет"
+              icon={<ShoppingBag size={18} strokeWidth={1.9} />}
+            />
+            <TabButton
+              active={tab === "partners"}
+              onClick={() => {
+                setTab("partners");
+                goToBlank("Партнёры");
+              }}
+              label="Партнёры"
+              icon={<Handshake size={18} strokeWidth={1.9} />}
+            />
+            <TabButton
+              active={tab === "profile"}
+              onClick={() => {
+                setTab("profile");
+                goToBlank("Профиль");
+              }}
+              label="Профиль"
+              icon={<UserRound size={18} strokeWidth={1.9} />}
+            />
+          </div>
+        </nav>
+      )}
+    </div>
+  );
 }
