@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   WalletCards,
@@ -16,7 +16,7 @@ import {
 import { haptic } from "../components/haptics";
 import { springTap } from "../components/motion";
 import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
-import BlankScreen from "./BlackScreen";
+import BlackScreen from "./BlackScreen";
 import { setupTelegramBack, showTelegramBack } from "../components/back";
 
 type Partner = {
@@ -46,13 +46,36 @@ type Route =
   | { name: "home" }
   | { name: "blank"; title: string };
 
+function setHashHome(replace = false) {
+  const url = "#home";
+  if (replace) window.history.replaceState(null, "", url);
+  else window.location.hash = "home";
+}
+
+function setHashBlank(title: string) {
+  const encoded = encodeURIComponent(title);
+  window.location.hash = `blank=${encoded}`;
+}
+
+function parseHash(): Route {
+  const raw = (window.location.hash || "").replace(/^#/, "");
+
+  if (!raw || raw === "home") return { name: "home" };
+
+  if (raw.startsWith("blank=")) {
+    const encoded = raw.slice("blank=".length);
+    const title = decodeURIComponent(encoded || "Экран");
+    return { name: "blank", title };
+  }
+
+  // fallback
+  return { name: "home" };
+}
+
 export default function MainApp() {
   const [tab, setTab] = useState<"wallet" | "market" | "partners" | "profile">("wallet");
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [query, setQuery] = useState("");
-
-  // Внутренняя история экранов
-  const stackRef = useRef<Route[]>([{ name: "home" }]);
 
   const partners = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -60,71 +83,52 @@ export default function MainApp() {
     return partnersSeed.filter((p) => p.name.toLowerCase().includes(q));
   }, [query]);
 
-  const syncBackUI = () => {
-    const canGoBack = stackRef.current.length > 1;
+  const syncBackUI = (r: Route) => {
+    const canGoBack = r.name !== "home";
     showTelegramBack(canGoBack);
-  };
-
-  const goHome = () => {
-    stackRef.current = [{ name: "home" }];
-    setRoute({ name: "home" });
-    syncBackUI();
   };
 
   const goBlank = (title: string) => {
     haptic("light");
-
-    const next: Route = { name: "blank", title };
-    stackRef.current.push(next);
-    setRoute(next);
-
-    // Ключ: добавляем запись в window.history, чтобы Android back НЕ закрывал миниапп
-    window.history.pushState({ __app: "route" }, "");
-
-    syncBackUI();
+    // ключ: меняем hash -> это создаёт реальную историю для Android back
+    setHashBlank(title);
   };
 
-  const goBack = () => {
-    if (stackRef.current.length <= 1) return;
-    stackRef.current.pop();
-    const prev = stackRef.current[stackRef.current.length - 1];
-    setRoute(prev);
-    syncBackUI();
+  const goHome = () => {
+    haptic("light");
+    setHashHome();
   };
 
-  // Перехват Android back / swipe-back + Telegram BackButton
   useEffect(() => {
-    // Подкладываем базовую запись истории, чтобы первый back не закрывал мгновенно
-    // (особенно если пользователь уже сходил на другие экраны)
-    window.history.replaceState({ __app: "root" }, "");
-    window.history.pushState({ __app: "route" }, "");
+    // 1) Гарантируем начальный hash, чтобы история работала предсказуемо
+    if (!window.location.hash) {
+      setHashHome(true); // replace, чтобы не плодить лишний шаг
+    }
 
-    const onPopState = () => {
-      // Если есть куда вернуться внутри приложения — делаем внутренний back
-      if (stackRef.current.length > 1) {
-        goBack();
-        // Важно: снова добавляем запись, чтобы следующий back тоже оставался внутри приложения
-        window.history.pushState({ __app: "route" }, "");
-      } else {
-        // Если мы на home — дальше "назад" пусть закрывает миниапп (нормально)
-      }
+    // 2) Ставим route из hash
+    const initial = parseHash();
+    setRoute(initial);
+    syncBackUI(initial);
+
+    // 3) Ловим все переходы (включая Android back / swipe back)
+    const onHashChange = () => {
+      const next = parseHash();
+      setRoute(next);
+      syncBackUI(next);
     };
 
-    window.addEventListener("popstate", onPopState);
+    window.addEventListener("hashchange", onHashChange);
 
+    // 4) Telegram BackButton (в шапке телеги), если доступен — делаем как Android back
     const cleanupTg = setupTelegramBack(() => {
       haptic("light");
-      // Telegram BackButton (если доступен) должен делать тот же внутренний back
-      if (stackRef.current.length > 1) goBack();
+      window.history.back();
     });
 
-    syncBackUI();
-
     return () => {
-      window.removeEventListener("popstate", onPopState);
+      window.removeEventListener("hashchange", onHashChange);
       cleanupTg?.();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -263,7 +267,7 @@ export default function MainApp() {
               </div>
             </motion.main>
           ) : (
-            <BlankScreen key="blank" title={route.title} onBack={goBack} />
+            <BlackScreen key="blank" title={route.title} />
           )}
         </AnimatePresence>
       </div>
