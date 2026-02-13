@@ -17,9 +17,6 @@ import { springTap } from "../components/motion";
 import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
 import BlackScreen from "./BlackScreen";
 
-// Импортируем Telegram SDK
-import { init, backButton, hapticFeedback } from "@tma.js/sdk";
-
 type Partner = {
   id: string;
   name: string;
@@ -61,38 +58,45 @@ export default function MainApp() {
     return partnersSeed.filter((p) => p.name.toLowerCase().includes(q));
   }, [query]);
 
-  // Инициализация Telegram Mini App
+  // Прямая работа с Telegram WebApp API
   useEffect(() => {
-    try {
-      // Инициализируем приложение
-      const app = init();
-      console.log('Telegram Mini App инициализирован');
+    // Проверяем, запущено ли приложение в Telegram
+    const tg = (window as any).Telegram?.WebApp;
+    
+    if (tg) {
+      console.log('Telegram WebApp доступен');
       
-      // Получаем компоненты
-      const back = backButton();
-      const haptic = hapticFeedback();
-      
-      // Функция для обновления кнопки назад
+      // Функция обновления кнопки назад
       const updateBackButton = () => {
         if (history.length > 1) {
-          back.show();
-          back.onClick(() => {
-            haptic.impactOccurred('light');
-            goBack();
+          tg.BackButton.show();
+          tg.BackButton.onClick(() => {
+            // Вибрация
+            tg.HapticFeedback.impactOccurred('light');
+            
+            // Возврат на предыдущий экран
+            if (history.length > 1) {
+              const newHistory = [...history];
+              newHistory.pop();
+              setHistory(newHistory);
+              
+              if (newHistory.length === 1) {
+                setRoute({ name: "home" });
+                setTab("wallet");
+              }
+            }
           });
         } else {
-          back.hide();
+          tg.BackButton.hide();
         }
       };
       
       updateBackButton();
       
-      // Очистка
+      // Очистка при размонтировании
       return () => {
-        back.hide();
+        tg.BackButton.hide();
       };
-    } catch (e) {
-      console.log('Telegram SDK не доступен (вероятно, запуск вне Telegram)', e);
     }
   }, [history]);
 
@@ -100,27 +104,28 @@ export default function MainApp() {
     setRoute({ name: "blank", title });
     setHistory(prev => [...prev, title]);
     
-    // Пробуем вызвать хаптик
+    // Вибрация
     try {
-      const haptic = hapticFeedback();
-      haptic.impactOccurred('light');
+      const tg = (window as any).Telegram?.WebApp;
+      tg?.HapticFeedback.impactOccurred('light');
     } catch (e) {}
   };
 
   const goBack = () => {
-    if (history.length <= 1) return;
+    if (history.length <= 1) {
+      // Если мы на главной, закрываем приложение
+      const tg = (window as any).Telegram?.WebApp;
+      tg?.close();
+      return;
+    }
     
     const newHistory = [...history];
-    newHistory.pop(); // убираем текущий экран
+    newHistory.pop();
     setHistory(newHistory);
     
-    // Возвращаемся на предыдущий экран
     if (newHistory.length === 1) {
       setRoute({ name: "home" });
       setTab("wallet");
-    } else {
-      // Если были ещё экраны, но мы их пока не используем
-      setRoute({ name: "home" });
     }
   };
 
