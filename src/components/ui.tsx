@@ -128,7 +128,7 @@ export function ActionCard({
 }
 
 // ===========================
-// АНИМИРОВАННЫЕ ИКОНКИ (ОРИГИНАЛЬНЫЕ ЦВЕТА)
+// АНИМИРОВАННЫЕ ИКОНКИ (ТОЛЬКО ПО КЛИКУ)
 // ===========================
 
 function Gif({ src, alt }: { src: string; alt: string }) {
@@ -138,7 +138,6 @@ function Gif({ src, alt }: { src: string; alt: string }) {
       alt={alt}
       draggable={false}
       className="w-[28px] h-[28px] object-contain"
-      // БЕЗ ФИЛЬТРОВ — оригинальные цвета
     />
   );
 }
@@ -150,20 +149,20 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
     return (
       <motion.div
         key={key}
-        initial={false}
-        animate={{
+        initial={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
+        animate={trigger ? {
           x: [0, 10, 20, 0],
           y: [0, -6, -16, 0],
           rotate: [0, -12, -24, 0],
           opacity: [1, 1, 0, 1],
-        }}
+        } : {}}
         transition={{ duration: 0.3, times: [0, 0.4, 0.7, 1], ease: "easeOut" }}
         className="relative"
       >
         <motion.span
           key={`trail-${trigger}`}
           initial={{ opacity: 0, scaleX: 0.4 }}
-          animate={{ opacity: [0, 0.4, 0], scaleX: [0.4, 1, 1] }}
+          animate={trigger ? { opacity: [0, 0.4, 0], scaleX: [0.4, 1, 1] } : {}}
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="absolute -left-3 top-1/2 -translate-y-1/2 h-[2px] w-3 rounded-full bg-zinc-900/30 origin-right"
         />
@@ -176,8 +175,8 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
     return (
       <motion.div
         key={key}
-        initial={false}
-        animate={{ scale: [1, 1.1, 1] }}
+        initial={{ scale: 1 }}
+        animate={trigger ? { scale: [1, 1.1, 1] } : {}}
         transition={{ duration: 0.2, ease: "easeOut" }}
       >
         <Gif src="/icons/receive.gif" alt="receive" />
@@ -189,8 +188,8 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
     return (
       <motion.div
         key={key}
-        initial={false}
-        animate={{ rotate: [0, 10, -8, 0], scale: [1, 1.08, 1] }}
+        initial={{ rotate: 0, scale: 1 }}
+        animate={trigger ? { rotate: [0, 10, -8, 0], scale: [1, 1.08, 1] } : {}}
         transition={{ duration: 0.24, ease: "easeOut" }}
       >
         <Gif src="/icons/exchange.gif" alt="exchange" />
@@ -199,10 +198,10 @@ function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: numb
   }
 
   // spend
-  return <SpendIcon key={key} />;
+  return <SpendIcon key={key} trigger={trigger} />;
 }
 
-function SpendIcon() {
+function SpendIcon({ trigger }: { trigger: number }) {
   return (
     <div className="relative w-[28px] h-[28px] text-zinc-900">
       {/* галочка статична */}
@@ -223,7 +222,7 @@ function SpendIcon() {
         />
       </svg>
 
-      {/* стрелка вниз — анимируется при клике */}
+      {/* стрелка вниз — анимируется только при клике */}
       <motion.svg
         className="absolute inset-0"
         width="28"
@@ -232,7 +231,7 @@ function SpendIcon() {
         fill="none"
         aria-hidden="true"
         initial={{ y: 0, opacity: 0 }}
-        animate={{ y: [0, 0, 8], opacity: [0, 1, 0] }}
+        animate={trigger ? { y: [0, 0, 8], opacity: [0, 1, 0] } : {}}
         transition={{ duration: 0.24, ease: "easeOut", times: [0, 0.2, 1] }}
       >
         <path d="M12 6v9" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
