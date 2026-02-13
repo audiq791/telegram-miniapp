@@ -59,6 +59,25 @@ export default function MainApp() {
     return partnersSeed.filter((p) => p.name.toLowerCase().includes(q));
   }, [query]);
 
+  // Функция возврата на предыдущий экран
+  const goBack = () => {
+    if (historyStack.length <= 1) return;
+    
+    haptic("light");
+    
+    // Убираем текущий экран из стека
+    const newStack = [...historyStack];
+    newStack.pop(); // убираем текущий
+    const previousRoute = newStack[newStack.length - 1];
+    
+    setHistoryStack(newStack);
+    setRoute(previousRoute);
+    
+    if (previousRoute.name === "home") {
+      setTab("wallet");
+    }
+  };
+
   // Управление кнопкой назад в Telegram
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
@@ -68,20 +87,7 @@ export default function MainApp() {
 
     if (historyStack.length > 1) {
       backButton.show();
-      backButton.onClick(() => {
-        haptic("light");
-        // Убираем текущий экран из стека
-        setHistoryStack((prev) => {
-          const newStack = [...prev];
-          newStack.pop(); // убираем текущий
-          const previousRoute = newStack[newStack.length - 1];
-          setRoute(previousRoute);
-          if (previousRoute.name === "home") {
-            setTab("wallet"); // возвращаем на кошелёк
-          }
-          return newStack;
-        });
-      });
+      backButton.onClick(goBack);
     } else {
       backButton.hide();
     }
@@ -240,7 +246,11 @@ export default function MainApp() {
               </div>
             </motion.main>
           ) : (
-            <BlackScreen key="blank" title={route.title} onBack={goHome} />
+            <BlackScreen 
+              key="blank" 
+              title={route.title} 
+              onBack={goBack}  // ВАЖНО: используем goBack, а не goHome
+            />
           )}
         </AnimatePresence>
       </div>
