@@ -3,12 +3,12 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Wallet,
-  Store,
-  Users,
-  User,
-  ArrowUpRight,
-  ArrowDownLeft,
+  WalletCards,
+  ShoppingBag,
+  Handshake,
+  UserRound,
+  Send,
+  Download,
   Repeat2,
   CheckCircle2,
   Search,
@@ -21,7 +21,7 @@ type Partner = {
   id: string;
   name: string;
   balance: number;
-  unit: string;
+  unit: string; // "B"
   accent: string; // tailwind gradient
 };
 
@@ -38,6 +38,7 @@ function formatMoney(n: number) {
   return new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 }
 
+// Telegram haptics (works only inside Telegram)
 function haptic(type: "light" | "medium" | "success" = "light") {
   const tg = (window as any)?.Telegram?.WebApp;
   const hf = tg?.HapticFeedback;
@@ -45,6 +46,8 @@ function haptic(type: "light" | "medium" | "success" = "light") {
   if (type === "success") hf.notificationOccurred("success");
   else hf.impactOccurred(type);
 }
+
+const springTap = { type: "spring", stiffness: 700, damping: 40 };
 
 export default function Home() {
   const [tab, setTab] = useState<"wallet" | "market" | "partners" | "profile">("wallet");
@@ -61,13 +64,15 @@ export default function Home() {
       {/* Top bar */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-zinc-200">
         <div className="mx-auto max-w-md px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="h-9 w-9 rounded-2xl bg-zinc-900 text-white grid place-items-center font-semibold">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-zinc-900 text-white grid place-items-center font-semibold">
               B
             </div>
             <div>
               <div className="text-[13px] text-zinc-500 leading-none">Биржа бонусов</div>
-              <div className="text-[15px] font-semibold leading-tight">Кошелёк</div>
+              <div className="text-[15px] font-semibold leading-tight">
+                {tab === "wallet" ? "Кошелёк" : tab === "market" ? "Маркет" : tab === "partners" ? "Партнёры" : "Профиль"}
+              </div>
             </div>
           </div>
 
@@ -83,7 +88,7 @@ export default function Home() {
       </header>
 
       {/* Content */}
-      <main className="mx-auto max-w-md px-4 pt-4 pb-24">
+      <main className="mx-auto max-w-md px-4 pt-4 pb-28">
         {tab === "wallet" && (
           <>
             {/* Hero */}
@@ -110,22 +115,18 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <PrimaryButton
-                    onClick={() => haptic("medium")}
-                    label="Пополнить"
-                  />
+                  <PrimaryButton label="Пополнить" onClick={() => haptic("medium")} />
                 </div>
 
                 {/* Actions */}
                 <div className="mt-4 grid grid-cols-2 gap-3">
-                  <ActionCard label="Отправить" hint="перевод" icon={<ArrowUpRight size={18} />} onClick={() => haptic("medium")} />
-                  <ActionCard label="Получить" hint="входящие" icon={<ArrowDownLeft size={18} />} onClick={() => haptic("medium")} />
+                  <ActionCard label="Отправить" hint="перевод" icon={<Send size={18} />} onClick={() => haptic("medium")} />
+                  <ActionCard label="Получить" hint="входящие" icon={<Download size={18} />} onClick={() => haptic("medium")} />
                   <ActionCard label="Обменять" hint="курс" icon={<Repeat2 size={18} />} onClick={() => haptic("medium")} />
                   <ActionCard label="Списать" hint="оплата" icon={<CheckCircle2 size={18} />} onClick={() => haptic("success")} />
                 </div>
               </div>
 
-              {/* subtle bottom gradient */}
               <div className="h-10 bg-gradient-to-b from-transparent to-zinc-50" />
             </motion.div>
 
@@ -146,12 +147,14 @@ export default function Home() {
             <div className="mt-3 space-y-2">
               <div className="flex items-center justify-between px-1">
                 <div className="text-sm text-zinc-500">Партнёры</div>
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  transition={springTap}
                   onClick={() => haptic("light")}
-                  className="text-sm font-semibold text-zinc-900 active:scale-[0.98]"
+                  className="text-sm font-semibold text-zinc-900"
                 >
                   Все
-                </button>
+                </motion.button>
               </div>
 
               {partners.map((p) => (
@@ -159,7 +162,8 @@ export default function Home() {
                   key={p.id}
                   onClick={() => haptic("light")}
                   whileTap={{ scale: 0.985 }}
-                  className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-3 flex items-center justify-between gap-3 text-left"
+                  transition={springTap}
+                  className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-3 flex items-center justify-between gap-3 text-left hover:shadow-md"
                 >
                   <div className="flex items-center gap-3">
                     <div className={`h-11 w-11 rounded-2xl bg-gradient-to-br ${p.accent} shadow-sm`} />
@@ -184,6 +188,7 @@ export default function Home() {
 
         {tab !== "wallet" && (
           <motion.div
+            key={tab}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
@@ -212,11 +217,33 @@ export default function Home() {
         className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
-          <TabButton active={tab === "wallet"} onClick={() => (haptic("light"), setTab("wallet"))} label="Кошелёк" icon={<Wallet size={18} />} />
-          <TabButton active={tab === "market"} onClick={() => (haptic("light"), setTab("market"))} label="Маркет" icon={<Store size={18} />} />
-          <TabButton active={tab === "partners"} onClick={() => (haptic("light"), setTab("partners"))} label="Партнёры" icon={<Users size={18} />} />
-          <TabButton active={tab === "profile"} onClick={() => (haptic("light"), setTab("profile"))} label="Профиль" icon={<User size={18} />} />
+        <div className="mx-auto max-w-md px-3 py-2">
+          <div className="relative grid grid-cols-4 gap-2 rounded-3xl p-2 bg-zinc-50 border border-zinc-200 shadow-sm">
+            <TabButton
+              active={tab === "wallet"}
+              onClick={() => (haptic("light"), setTab("wallet"))}
+              label="Кошелёк"
+              icon={<WalletCards size={18} />}
+            />
+            <TabButton
+              active={tab === "market"}
+              onClick={() => (haptic("light"), setTab("market"))}
+              label="Маркет"
+              icon={<ShoppingBag size={18} />}
+            />
+            <TabButton
+              active={tab === "partners"}
+              onClick={() => (haptic("light"), setTab("partners"))}
+              label="Партнёры"
+              icon={<Handshake size={18} />}
+            />
+            <TabButton
+              active={tab === "profile"}
+              onClick={() => (haptic("light"), setTab("profile"))}
+              label="Профиль"
+              icon={<UserRound size={18} />}
+            />
+          </div>
         </div>
       </nav>
     </div>
@@ -231,6 +258,7 @@ function IconButton({ children, onClick, aria }: { children: React.ReactNode; on
       aria-label={aria}
       onClick={onClick}
       whileTap={{ scale: 0.96 }}
+      transition={springTap}
       className="h-10 w-10 rounded-2xl bg-white border border-zinc-200 text-zinc-700 grid place-items-center hover:bg-zinc-50"
     >
       {children}
@@ -243,6 +271,7 @@ function PrimaryButton({ label, onClick }: { label: string; onClick?: () => void
     <motion.button
       onClick={onClick}
       whileTap={{ scale: 0.98 }}
+      transition={springTap}
       className="h-10 px-4 rounded-2xl bg-zinc-900 text-white font-semibold hover:bg-zinc-800 shadow-sm"
     >
       {label}
@@ -265,14 +294,17 @@ function ActionCard({
     <motion.button
       onClick={onClick}
       whileTap={{ scale: 0.985 }}
-      className="rounded-2xl border border-zinc-200 bg-white hover:bg-zinc-50 p-4 flex items-center justify-between shadow-sm"
+      transition={springTap}
+      className="group rounded-2xl border border-zinc-200 bg-white p-4 flex items-center justify-between shadow-sm hover:shadow-md"
     >
       <div>
         <div className="text-[15px] font-semibold">{label}</div>
         <div className="text-xs text-zinc-500 mt-0.5">{hint}</div>
       </div>
-      <div className="h-11 w-11 rounded-2xl bg-zinc-900 text-white grid place-items-center">
-        {icon}
+
+      {/* premium contour icon button */}
+      <div className="h-11 w-11 rounded-2xl bg-white border border-zinc-200 grid place-items-center text-zinc-900 group-hover:border-zinc-300 group-hover:shadow-sm">
+        <div className="opacity-90">{icon}</div>
       </div>
     </motion.button>
   );
@@ -292,14 +324,22 @@ function TabButton({
   return (
     <motion.button
       onClick={onClick}
-      whileTap={{ scale: 0.985 }}
-      className={[
-        "h-12 rounded-2xl flex items-center justify-center gap-2 border transition",
-        active ? "bg-zinc-900 text-white border-zinc-900 shadow-sm" : "bg-white text-zinc-900 border-zinc-200",
-      ].join(" ")}
+      whileTap={{ scale: 0.98 }}
+      transition={springTap}
+      className="relative h-12 rounded-2xl flex items-center justify-center gap-2 px-2 overflow-hidden"
     >
-      <span className={active ? "opacity-100" : "text-zinc-500"}>{icon}</span>
-      <span className="text-sm font-semibold">{label}</span>
+      {active && (
+        <motion.div
+          layoutId="activeTab"
+          className="absolute inset-0 rounded-2xl bg-white border border-zinc-200 shadow-sm"
+          transition={springTap}
+        />
+      )}
+
+      <span className={`relative ${active ? "text-zinc-900" : "text-zinc-500"}`}>{icon}</span>
+      <span className={`relative text-sm font-semibold ${active ? "text-zinc-900" : "text-zinc-600"}`}>
+        {label}
+      </span>
     </motion.button>
   );
 }
