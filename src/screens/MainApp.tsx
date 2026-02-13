@@ -48,8 +48,8 @@ export default function MainApp() {
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [query, setQuery] = useState("");
   
-  // Стек истории для навигации
-  const [historyStack, setHistoryStack] = useState<Route[]>([{ name: "home" }]);
+  // Стек истории для кнопки назад
+  const [history, setHistory] = useState<Route[]>([{ name: "home" }]);
 
   const partners = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -58,45 +58,47 @@ export default function MainApp() {
   }, [query]);
 
   // ============================================
-  // УПРАВЛЕНИЕ КНОПКОЙ НАЗАД В TELEGRAM
+  // НАСТРОЙКА КНОПКИ НАЗАД TELEGRAM
   // ============================================
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
     if (!tg) return;
 
+    console.log("Telegram WebApp доступен");
+
     // Функция обновления кнопки назад
     const updateBackButton = () => {
-      // Показываем кнопку, если мы не на главном экране (historyStack.length > 1)
-      if (historyStack.length > 1) {
+      if (history.length > 1) {
+        // Показываем кнопку если мы не на главном экране
         tg.BackButton.show();
+        console.log("Кнопка назад показана");
       } else {
+        // Скрываем кнопку на главном экране
         tg.BackButton.hide();
+        console.log("Кнопка назад скрыта");
       }
     };
 
     // Обработчик нажатия кнопки назад
     const handleBackClick = () => {
+      console.log("Нажата кнопка назад");
+      
       // Вибрация
       tg.HapticFeedback.impactOccurred("light");
       
-      if (historyStack.length > 1) {
-        // Убираем текущий экран из стека
-        const newStack = [...historyStack];
-        newStack.pop(); // удаляем текущий экран
-        const previousRoute = newStack[newStack.length - 1];
+      if (history.length > 1) {
+        // Убираем текущий экран
+        const newHistory = [...history];
+        newHistory.pop(); // удаляем текущий экран
+        const previousRoute = newHistory[newHistory.length - 1];
         
         // Обновляем состояние
-        setHistoryStack(newStack);
+        setHistory(newHistory);
         setRoute(previousRoute);
         
         // Если вернулись на главный, сбрасываем таб
         if (previousRoute.name === "home") {
           setTab("wallet");
-        }
-        
-        // Обновляем кнопку назад (скроется если historyStack.length === 1)
-        if (newStack.length === 1) {
-          tg.BackButton.hide();
         }
       }
     };
@@ -104,20 +106,20 @@ export default function MainApp() {
     // Назначаем обработчик
     tg.BackButton.onClick(handleBackClick);
     
-    // Изначально кнопка скрыта
-    tg.BackButton.hide();
+    // Начальное состояние
+    updateBackButton();
 
-    // Очистка при размонтировании
+    // Очистка
     return () => {
       tg.BackButton.offClick(handleBackClick);
     };
-  }, [historyStack]); // Перезапускаем эффект при изменении стека истории
+  }, [history]); // Следим за историей
 
   const goBlank = (title: string) => {
     const newRoute: Route = { name: "blank", title };
     
-    // Добавляем в стек истории
-    setHistoryStack(prev => [...prev, newRoute]);
+    // Добавляем в историю
+    setHistory(prev => [...prev, newRoute]);
     setRoute(newRoute);
     
     // Вибрация
@@ -126,8 +128,8 @@ export default function MainApp() {
   };
 
   const goHome = () => {
-    // Сбрасываем стек на главный экран
-    setHistoryStack([{ name: "home" }]);
+    // Сбрасываем историю
+    setHistory([{ name: "home" }]);
     setRoute({ name: "home" });
     setTab("wallet");
     
