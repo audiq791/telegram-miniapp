@@ -15,57 +15,59 @@ import {
 
 import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
 import BlackScreen from "./BlackScreen";
+import Image from "next/image";
 
 type Partner = {
   id: string;
   name: string;
   balance: number;
   unit: string;
-  accent: string;
+  logo: string; // путь к логотипу
+  fallbackColor: string; // цвет на случай если лого нет
 };
 
 const partnersSeed: Partner[] = [
   // Существующие
-  { id: "vv", name: "ВкусВилл", balance: 0, unit: "B", accent: "from-emerald-400 to-emerald-600" },
-  { id: "fuel", name: "FUEL", balance: 2380.29, unit: "B", accent: "from-fuchsia-500 to-indigo-500" },
-  { id: "magnolia", name: "Магнолия", balance: 158.14, unit: "B", accent: "from-lime-400 to-green-600" },
-  { id: "piligrim", name: "Пилигрим", balance: 100, unit: "B", accent: "from-sky-500 to-blue-700" },
-  { id: "cafe12", name: "12 Grand Cafe", balance: 0, unit: "B", accent: "from-zinc-700 to-zinc-900" },
-  { id: "airo", name: "AIRO", balance: 0, unit: "B", accent: "from-slate-600 to-slate-900" },
+  { id: "vv", name: "ВкусВилл", balance: 0, unit: "B", logo: "/logos/vkusvill.svg", fallbackColor: "from-emerald-400 to-emerald-600" },
+  { id: "fuel", name: "FUEL", balance: 2380.29, unit: "B", logo: "/logos/fuel.svg", fallbackColor: "from-fuchsia-500 to-indigo-500" },
+  { id: "magnolia", name: "Магнолия", balance: 158.14, unit: "B", logo: "/logos/magnolia.svg", fallbackColor: "from-lime-400 to-green-600" },
+  { id: "piligrim", name: "Пилигрим", balance: 100, unit: "B", logo: "/logos/piligrim.svg", fallbackColor: "from-sky-500 to-blue-700" },
+  { id: "cafe12", name: "12 Grand Cafe", balance: 0, unit: "B", logo: "/logos/12grandcafe.svg", fallbackColor: "from-zinc-700 to-zinc-900" },
+  { id: "airo", name: "AIRO", balance: 0, unit: "B", logo: "/logos/airo.svg", fallbackColor: "from-slate-600 to-slate-900" },
   
-  // Новые из списка
-  { id: "baba", name: "Баба Марта", balance: 0, unit: "B", accent: "from-rose-400 to-rose-600" },
-  { id: "shashlyk", name: "Шашлычный Дворик", balance: 0, unit: "B", accent: "from-orange-400 to-orange-600" },
-  { id: "little", name: "Little Caesars Pizza", balance: 0, unit: "B", accent: "from-yellow-400 to-yellow-600" },
-  { id: "cecenco", name: "ČEČENCO", balance: 0, unit: "B", accent: "from-amber-400 to-amber-600" },
-  { id: "coffee", name: "Coffee Bean", balance: 0, unit: "B", accent: "from-brown-400 to-brown-600" },
-  { id: "cofix", name: "Cofix", balance: 0, unit: "B", accent: "from-red-400 to-red-600" },
-  { id: "cska", name: "CSKA", balance: 0, unit: "B", accent: "from-blue-400 to-blue-600" },
-  { id: "dobro", name: "Добро", balance: 0, unit: "B", accent: "from-green-400 to-green-600" },
-  { id: "dodo", name: "DODO PIZZA", balance: 0, unit: "B", accent: "from-red-400 to-red-600" },
-  { id: "ecomarket", name: "Еcomarket", balance: 0, unit: "B", accent: "from-teal-400 to-teal-600" },
-  { id: "everon", name: "Эверон", balance: 0, unit: "B", accent: "from-cyan-400 to-cyan-600" },
-  { id: "fly", name: "FLY", balance: 0, unit: "B", accent: "from-sky-400 to-sky-600" },
-  { id: "gcoin", name: "G-coin", balance: 0, unit: "B", accent: "from-indigo-400 to-indigo-600" },
-  { id: "halal", name: "Halal Guide", balance: 0, unit: "B", accent: "from-emerald-400 to-emerald-600" },
-  { id: "italian", name: "Итальянец", balance: 0, unit: "B", accent: "from-stone-400 to-stone-600" },
-  { id: "ku", name: "[KU:] Ramen", balance: 0, unit: "B", accent: "from-zinc-400 to-zinc-600" },
-  { id: "lpg", name: "LPG", balance: 0, unit: "B", accent: "from-purple-400 to-purple-600" },
-  { id: "moscow", name: "Moscow Coffee & Food", balance: 0, unit: "B", accent: "from-pink-400 to-pink-600" },
-  { id: "mpr", name: "МПР", balance: 0, unit: "B", accent: "from-gray-400 to-gray-600" },
-  { id: "mymy", name: "MY-MY", balance: 0, unit: "B", accent: "from-slate-400 to-slate-600" },
-  { id: "oneprice", name: "OnePriceCoffee", balance: 0, unit: "B", accent: "from-amber-400 to-amber-600" },
-  { id: "papajohns", name: "Папа Джонс", balance: 0, unit: "B", accent: "from-red-400 to-red-600" },
-  { id: "pomidorka", name: "Помидорка", balance: 0, unit: "B", accent: "from-rose-400 to-rose-600" },
-  { id: "promille", name: "0.5 Промилле", balance: 0, unit: "B", accent: "from-blue-400 to-blue-600" },
-  { id: "salvatore", name: "Остерия У Сальваторе", balance: 0, unit: "B", accent: "from-stone-400 to-stone-600" },
-  { id: "sandwich", name: "Sandwich Hunters", balance: 0, unit: "B", accent: "from-yellow-400 to-yellow-600" },
-  { id: "shawarma", name: "Shawarma Bar", balance: 0, unit: "B", accent: "from-orange-400 to-orange-600" },
-  { id: "shuval", name: "Шуваловская", balance: 0, unit: "B", accent: "from-teal-400 to-teal-600" },
-  { id: "sparta", name: "Sparta Gyros", balance: 0, unit: "B", accent: "from-green-400 to-green-600" },
-  { id: "wb", name: "Wildberries", balance: 0, unit: "B", accent: "from-purple-400 to-purple-600" },
-  { id: "yoda", name: "Yoda Thai Food", balance: 0, unit: "B", accent: "from-pink-400 to-pink-600" },
-  { id: "zakyat", name: "Закят", balance: 0, unit: "B", accent: "from-emerald-400 to-emerald-600" },
+  // Новые из списка (для многих пока нет лого, используем заглушки)
+  { id: "baba", name: "Баба Марта", balance: 0, unit: "B", logo: "", fallbackColor: "from-rose-400 to-rose-600" },
+  { id: "shashlyk", name: "Шашлычный Дворик", balance: 0, unit: "B", logo: "", fallbackColor: "from-orange-400 to-orange-600" },
+  { id: "little", name: "Little Caesars Pizza", balance: 0, unit: "B", logo: "/logos/littlecaesars.svg", fallbackColor: "from-yellow-400 to-yellow-600" },
+  { id: "cecenco", name: "ČEČENCO", balance: 0, unit: "B", logo: "", fallbackColor: "from-amber-400 to-amber-600" },
+  { id: "coffee", name: "Coffee Bean", balance: 0, unit: "B", logo: "/logos/coffeebean.svg", fallbackColor: "from-brown-400 to-brown-600" },
+  { id: "cofix", name: "Cofix", balance: 0, unit: "B", logo: "/logos/cofix.svg", fallbackColor: "from-red-400 to-red-600" },
+  { id: "cska", name: "CSKA", balance: 0, unit: "B", logo: "/logos/cska.svg", fallbackColor: "from-blue-400 to-blue-600" },
+  { id: "dobro", name: "Добро", balance: 0, unit: "B", logo: "", fallbackColor: "from-green-400 to-green-600" },
+  { id: "dodo", name: "DODO PIZZA", balance: 0, unit: "B", logo: "/logos/dodo.svg", fallbackColor: "from-red-400 to-red-600" },
+  { id: "ecomarket", name: "Еcomarket", balance: 0, unit: "B", logo: "", fallbackColor: "from-teal-400 to-teal-600" },
+  { id: "everon", name: "Эверон", balance: 0, unit: "B", logo: "", fallbackColor: "from-cyan-400 to-cyan-600" },
+  { id: "fly", name: "FLY", balance: 0, unit: "B", logo: "", fallbackColor: "from-sky-400 to-sky-600" },
+  { id: "gcoin", name: "G-coin", balance: 0, unit: "B", logo: "", fallbackColor: "from-indigo-400 to-indigo-600" },
+  { id: "halal", name: "Halal Guide", balance: 0, unit: "B", logo: "", fallbackColor: "from-emerald-400 to-emerald-600" },
+  { id: "italian", name: "Итальянец", balance: 0, unit: "B", logo: "", fallbackColor: "from-stone-400 to-stone-600" },
+  { id: "ku", name: "[KU:] Ramen", balance: 0, unit: "B", logo: "", fallbackColor: "from-zinc-400 to-zinc-600" },
+  { id: "lpg", name: "LPG", balance: 0, unit: "B", logo: "", fallbackColor: "from-purple-400 to-purple-600" },
+  { id: "moscow", name: "Moscow Coffee & Food", balance: 0, unit: "B", logo: "", fallbackColor: "from-pink-400 to-pink-600" },
+  { id: "mpr", name: "МПР", balance: 0, unit: "B", logo: "", fallbackColor: "from-gray-400 to-gray-600" },
+  { id: "mymy", name: "МУ-МУ", balance: 0, unit: "B", logo: "", fallbackColor: "from-slate-400 to-slate-600" },
+  { id: "oneprice", name: "OnePriceCoffee", balance: 0, unit: "B", logo: "", fallbackColor: "from-amber-400 to-amber-600" },
+  { id: "papajohns", name: "Папа Джонс", balance: 0, unit: "B", logo: "/logos/papajohns.svg", fallbackColor: "from-red-400 to-red-600" },
+  { id: "pomidorka", name: "Помидорка", balance: 0, unit: "B", logo: "", fallbackColor: "from-rose-400 to-rose-600" },
+  { id: "promille", name: "0.5 Промилле", balance: 0, unit: "B", logo: "", fallbackColor: "from-blue-400 to-blue-600" },
+  { id: "salvatore", name: "Остерия У Сальваторе", balance: 0, unit: "B", logo: "", fallbackColor: "from-stone-400 to-stone-600" },
+  { id: "sandwich", name: "Sandwich Hunters", balance: 0, unit: "B", logo: "", fallbackColor: "from-yellow-400 to-yellow-600" },
+  { id: "shawarma", name: "Shawarma Bar", balance: 0, unit: "B", logo: "", fallbackColor: "from-orange-400 to-orange-600" },
+  { id: "shuval", name: "Шуваловская", balance: 0, unit: "B", logo: "", fallbackColor: "from-teal-400 to-teal-600" },
+  { id: "sparta", name: "Sparta Gyros", balance: 0, unit: "B", logo: "", fallbackColor: "from-green-400 to-green-600" },
+  { id: "wb", name: "Wildberries", balance: 0, unit: "B", logo: "/logos/wildberries.svg", fallbackColor: "from-purple-400 to-purple-600" },
+  { id: "yoda", name: "Yoda Thai Food", balance: 0, unit: "B", logo: "", fallbackColor: "from-pink-400 to-pink-600" },
+  { id: "zakyat", name: "Закят", balance: 0, unit: "B", logo: "", fallbackColor: "from-emerald-400 to-emerald-600" },
 ];
 
 function formatMoney(n: number) {
@@ -105,66 +107,52 @@ export default function MainApp() {
     // Функция обновления кнопки назад
     const updateBackButton = () => {
       if (history.length > 1) {
-        // Показываем кнопку если мы не на главном экране
         tg.BackButton.show();
         console.log("Кнопка назад показана");
       } else {
-        // Скрываем кнопку на главном экране
         tg.BackButton.hide();
         console.log("Кнопка назад скрыта");
       }
     };
 
-    // Обработчик нажатия кнопки назад
     const handleBackClick = () => {
       console.log("Нажата кнопка назад");
       
-      // Вибрация
       tg.HapticFeedback.impactOccurred("light");
       
       if (history.length > 1) {
-        // Убираем текущий экран
         const newHistory = [...history];
-        newHistory.pop(); // удаляем текущий экран
+        newHistory.pop();
         const previousRoute = newHistory[newHistory.length - 1];
         
-        // Обновляем состояние
         setHistory(newHistory);
         setRoute(previousRoute);
         
-        // Если вернулись на главный, сбрасываем таб
         if (previousRoute.name === "home") {
           setTab("wallet");
         }
       }
     };
 
-    // Назначаем обработчик
     tg.BackButton.onClick(handleBackClick);
-    
-    // Начальное состояние
     updateBackButton();
 
-    // Очистка
     return () => {
       tg.BackButton.offClick(handleBackClick);
     };
-  }, [history]); // Следим за историей
+  }, [history]);
 
   const goBlank = (title: string) => {
     const newRoute: Route = { name: "blank", title };
     
-    // Добавляем в историю
     setHistory(prev => [...prev, newRoute]);
     setRoute(newRoute);
     
-    // Вибрация
     const tg = (window as any).Telegram?.WebApp;
     tg?.HapticFeedback.impactOccurred("light");
   };
 
   const goHome = () => {
-    // Сбрасываем историю
     setHistory([{ name: "home" }]);
     setRoute({ name: "home" });
     setTab("wallet");
@@ -290,7 +278,19 @@ export default function MainApp() {
                     className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-3 flex items-center justify-between gap-3 text-left hover:shadow-md"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className={`shrink-0 h-11 w-11 rounded-2xl bg-gradient-to-br ${p.accent} shadow-sm`} />
+                      <div className="shrink-0 h-11 w-11 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden">
+                        {p.logo ? (
+                          <Image 
+                            src={p.logo} 
+                            alt={p.name} 
+                            width={44} 
+                            height={44} 
+                            className="object-contain p-1"
+                          />
+                        ) : (
+                          <div className={`h-full w-full bg-gradient-to-br ${p.fallbackColor}`} />
+                        )}
+                      </div>
                       <div className="min-w-0">
                         <div className="font-semibold truncate">{p.name}</div>
                         <div className="text-xs text-zinc-500">Нажмите, чтобы открыть</div>
