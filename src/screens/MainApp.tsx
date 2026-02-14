@@ -29,7 +29,7 @@ type Partner = {
 const generateRandomBalance = () => Math.floor(Math.random() * 5000) + 100;
 
 const partnersSeed: Partner[] = [
-  // ПРИОРИТЕТНЫЕ ПАРТНЕРЫ (В САМОМ ВЕРХУ) - со случайными балансами
+  // ПРИОРИТЕТНЫЕ ПАРТНЕРЫ (со случайными балансами)
   { 
     id: "vv", 
     name: "ВкусВилл", 
@@ -354,9 +354,7 @@ export default function MainApp() {
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [query, setQuery] = useState("");
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
-  const [selectedPartner, setSelectedPartner] = useState<Partner>(partnersSeed[0]); // По умолчанию ВкусВилл
-  const [selectedPartnerId, setSelectedPartnerId] = useState<string>(partnersSeed[0].id);
-  const [prevBalance, setPrevBalance] = useState<number>(partnersSeed[0].balance);
+  const [selectedPartner, setSelectedPartner] = useState<Partner>(partnersSeed[0]);
   
   // Стек истории для кнопки назад
   const [history, setHistory] = useState<Route[]>([{ name: "home" }]);
@@ -373,13 +371,10 @@ export default function MainApp() {
 
   // Функция выбора партнера
   const selectPartner = (partner: Partner) => {
-    if (partner.id === selectedPartner.id) return; // Если тот же партнер - ничего не делаем
+    if (partner.id === selectedPartner.id) return;
     
-    setPrevBalance(selectedPartner.balance); // Запоминаем старый баланс для анимации
     setSelectedPartner(partner);
-    setSelectedPartnerId(partner.id);
     
-    // Вибрация при выборе
     const tg = (window as any).Telegram?.WebApp;
     tg?.HapticFeedback.impactOccurred("light");
   };
@@ -391,21 +386,15 @@ export default function MainApp() {
     const tg = (window as any).Telegram?.WebApp;
     if (!tg) return;
 
-    console.log("Telegram WebApp доступен");
-
     const updateBackButton = () => {
       if (history.length > 1) {
         tg.BackButton.show();
-        console.log("Кнопка назад показана");
       } else {
         tg.BackButton.hide();
-        console.log("Кнопка назад скрыта");
       }
     };
 
     const handleBackClick = () => {
-      console.log("Нажата кнопка назад");
-      
       tg.HapticFeedback.impactOccurred("light");
       
       if (history.length > 1) {
@@ -497,7 +486,7 @@ export default function MainApp() {
               exit={{ opacity: 0, x: -12 }}
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
             >
-              {/* MAIN CARD - динамическая в зависимости от выбранного партнера */}
+              {/* MAIN CARD */}
               <motion.div
                 key={selectedPartner.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -519,7 +508,6 @@ export default function MainApp() {
                       </motion.div>
                     </div>
                     
-                    {/* Логотип или цветной квадратик выбранного партнера */}
                     <motion.div
                       key={selectedPartner.id}
                       initial={{ scale: 0.8, rotate: -5 }}
@@ -540,7 +528,6 @@ export default function MainApp() {
                     </motion.div>
                   </div>
 
-                  {/* Баланс с анимацией изменения */}
                   <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-4 flex items-end justify-between gap-3">
                     <div>
                       <div className="text-xs text-zinc-500">Баланс</div>
@@ -569,69 +556,80 @@ export default function MainApp() {
                 <div className="h-10 bg-gradient-to-b from-transparent to-zinc-50" />
               </motion.div>
 
-              {/* SEARCH */}
-              <div className="mt-4">
-                <div className="h-12 rounded-2xl bg-white border border-zinc-200 px-3 flex items-center gap-2 focus-within:ring-2 focus-within:ring-zinc-900/10">
-                  <Search size={18} className="text-zinc-400 shrink-0" />
-                  <input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Поиск партнёра…"
-                    className="w-full h-full outline-none bg-transparent text-[15px]"
-                  />
-                </div>
-              </div>
-
-              {/* PARTNERS */}
-              <div className="mt-3 space-y-2">
-                <div className="flex items-center justify-between px-1">
-                  <div className="text-sm text-zinc-500">Партнёры</div>
+              {/* PARTNERS - Только 5 видимых, остальные скрыты */}
+              <div className="mt-3">
+                {/* Заголовок и кнопка "Все партнеры" */}
+                <div className="flex items-center justify-between px-1 mb-2">
+                  <div className="text-sm text-zinc-500">Популярные партнёры</div>
                   <motion.button
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: "spring", stiffness: 700, damping: 40 }}
                     onClick={() => goBlank("Все партнёры")}
-                    className="text-sm font-semibold text-zinc-900"
+                    className="text-sm font-semibold text-zinc-900 flex items-center gap-1"
                   >
-                    Все
+                    Все партнеры
+                    <ChevronRight size={16} className="text-zinc-400" />
                   </motion.button>
                 </div>
 
-              {partners.map((p) => (
-  <motion.button
-    key={p.id}
-    onClick={() => selectPartner(p)}
-    whileTap={{ scale: 0.98, backgroundColor: "#f4f4f5" }} // подсветка только при нажатии
-    transition={{ type: "spring", stiffness: 700, damping: 40 }}
-    className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-3 flex items-center justify-between gap-3 text-left hover:shadow-md"
-  >
-    <div className="flex items-center gap-3 min-w-0">
-      <div className="shrink-0 h-11 w-11 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden">
-        {p.logo && !failedImages.has(p.id) ? (
-          <img 
-            src={p.logo} 
-            alt={p.name}
-            className="w-full h-full object-contain p-1"
-            onError={() => handleImageError(p.id)}
-          />
-        ) : (
-          <div className={`w-full h-full bg-gradient-to-br ${p.fallbackColor}`} />
-        )}
-      </div>
-      <div className="min-w-0">
-        <div className="font-semibold truncate">{p.name}</div>
-        <div className="text-xs text-zinc-500">Нажмите, чтобы открыть</div>
-      </div>
-    </div>
+                {/* Только первые 5 партнеров */}
+                <div className="space-y-2">
+                  {partners.slice(0, 5).map((p) => (
+                    <motion.button
+                      key={p.id}
+                      onClick={() => selectPartner(p)}
+                      whileTap={{ scale: 0.98, backgroundColor: "#f4f4f5" }}
+                      transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                      className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-3 flex items-center justify-between gap-3 text-left hover:shadow-md"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="shrink-0 h-11 w-11 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden">
+                          {p.logo && !failedImages.has(p.id) ? (
+                            <img 
+                              src={p.logo} 
+                              alt={p.name}
+                              className="w-full h-full object-contain p-1"
+                              onError={() => handleImageError(p.id)}
+                            />
+                          ) : (
+                            <div className={`w-full h-full bg-gradient-to-br ${p.fallbackColor}`} />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-semibold truncate">{p.name}</div>
+                          <div className="text-xs text-zinc-500">Баланс: {formatMoney(p.balance)} {p.unit}</div>
+                        </div>
+                      </div>
 
-    <div className="flex items-center gap-3 shrink-0">
-      <div className="text-right">
-        <div className="font-semibold">{formatMoney(p.balance)}</div>
-        <div className="text-xs text-zinc-500">{p.unit}</div>
-      </div>
-      <ChevronRight size={18} className="text-zinc-400" />
-    </div>
-  </motion.button>
-))}
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="text-right">
+                          <div className="font-semibold">{formatMoney(p.balance)}</div>
+                          <div className="text-xs text-zinc-500">{p.unit}</div>
+                        </div>
+                        <ChevronRight size={18} className="text-zinc-400" />
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+
+                {/* Кнопка "Показать всех" */}
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                  onClick={() => goBlank("Все партнёры")}
+                  className="w-full mt-3 rounded-2xl bg-zinc-50 border border-zinc-200 shadow-sm p-4 flex items-center justify-between text-left hover:shadow-md"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-2xl bg-zinc-200 text-zinc-600 grid place-items-center">
+                      <Search size={18} />
+                    </div>
+                    <div>
+                      <div className="font-semibold">Все партнеры</div>
+                      <div className="text-xs text-zinc-500">{partners.length - 5} партнеров скрыто</div>
+                    </div>
+                  </div>
+                  <ChevronRight size={20} className="text-zinc-400" />
+                </motion.button>
               </div>
             </motion.main>
           ) : (
