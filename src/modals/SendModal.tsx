@@ -367,7 +367,7 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
                       </AnimatePresence>
                     </div>
 
-                    {/* Сумма перевода */}
+                                       {/* Сумма перевода */}
                     <div>
                       <div className="text-xs text-zinc-500 mb-1">Сумма перевода</div>
                       <div className="relative">
@@ -375,22 +375,18 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
                           type="number"
                           value={amount}
                           onChange={(e) => setAmount(e.target.value)}
-                          placeholder="0"
-                          className="w-full p-3 pr-12 border border-zinc-200 rounded-2xl outline-none focus:ring-2 focus:ring-zinc-900/10 text-[15px]"
+                          placeholder={`0 из ${currentBalance}`}
+                          className="w-full p-3 pr-12 border border-zinc-200 rounded-2xl outline-none focus:ring-2 focus:ring-zinc-900/10 text-[15px] placeholder:text-zinc-300"
                           autoFocus
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">B</span>
                       </div>
                     </div>
 
-                    {/* Баланс */}
-                    <div className="space-y-2 p-3 bg-zinc-50 rounded-2xl">
+                    {/* Баланс после перевода - ОДНА СТРОКА */}
+                    <div className="p-3 bg-zinc-50 rounded-2xl">
                       <div className="flex justify-between items-center text-sm">
-                        <span className="text-zinc-600">Ваш баланс</span>
-                        <span className="font-medium">{currentBalance} B</span>
-                      </div>
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-zinc-600">После перевода</span>
+                        <span className="text-zinc-600">Баланс после перевода</span>
                         <span className={`font-medium ${remainingBalance < 0 ? 'text-red-600' : ''}`}>
                           {remainingBalance} B
                         </span>
