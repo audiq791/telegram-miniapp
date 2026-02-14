@@ -89,13 +89,16 @@ export function TabButton({
 
 export type ActionKind = "send" | "receive" | "swap" | "spend";
 
-// Иконки для кнопок (временные, пока без анимаций)
-const ActionIcons = {
-  send: "✈️",
-  receive: "⬇️",
-  swap: "🔄",
-  spend: "✅",
-};
+function Gif({ src, alt }: { src: string; alt: string }) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      draggable={false}
+      className="w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] md:w-[36px] md:h-[36px] object-contain"
+    />
+  );
+}
 
 export function ActionCard({
   label,
@@ -116,12 +119,19 @@ export function ActionCard({
     isAnimating.current = true;
 
     setTrigger((v) => v + 1);
-    
     onClick?.();
 
     setTimeout(() => {
       isAnimating.current = false;
     }, 280);
+  };
+
+  // Пути к GIF файлам
+  const gifSrc = {
+    send: "/icons/send.gif",
+    receive: "/icons/receive.gif",
+    swap: "/icons/exchange.gif",
+    spend: "/icons/pay.gif",
   };
 
   return (
@@ -137,11 +147,82 @@ export function ActionCard({
           <div className="text-[clamp(11px,1.5vw,13px)] text-zinc-500 truncate">{hint}</div>
         </div>
 
-        <div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden text-2xl">
-          {ActionIcons[kind]}
+        <div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
+          <AnimatedActionIcon kind={kind} trigger={trigger} gifSrc={gifSrc[kind]} />
         </div>
       </div>
     </motion.button>
+  );
+}
+
+// ===========================
+// АНИМАЦИИ (GIF)
+// ===========================
+
+function AnimatedActionIcon({ 
+  kind, 
+  trigger,
+  gifSrc 
+}: { 
+  kind: ActionKind; 
+  trigger: number;
+  gifSrc: string;
+}) {
+  const key = `${kind}-${trigger}`;
+
+  if (kind === "send") {
+    return (
+      <motion.div
+        key={key}
+        animate={
+          trigger
+            ? {
+                x: [0, 12, 20, 0],
+                y: [0, -6, -14, 0],
+                rotate: [0, -15, -25, 0],
+              }
+            : {}
+        }
+        transition={{ duration: 0.28, ease: "easeOut" }}
+      >
+        <Gif src={gifSrc} alt={kind} />
+      </motion.div>
+    );
+  }
+
+  if (kind === "receive") {
+    return (
+      <motion.div
+        key={key}
+        animate={trigger ? { scale: [1, 1.12, 1] } : {}}
+        transition={{ duration: 0.22, ease: "easeOut" }}
+      >
+        <Gif src={gifSrc} alt={kind} />
+      </motion.div>
+    );
+  }
+
+  if (kind === "swap") {
+    return (
+      <motion.div
+        key={key}
+        animate={trigger ? { rotate: [0, 12, -10, 0] } : {}}
+        transition={{ duration: 0.24, ease: "easeOut" }}
+      >
+        <Gif src={gifSrc} alt={kind} />
+      </motion.div>
+    );
+  }
+
+  // spend
+  return (
+    <motion.div
+      key={key}
+      animate={trigger ? { scale: [1, 1.1, 1] } : {}}
+      transition={{ duration: 0.22, ease: "easeOut" }}
+    >
+      <Gif src={gifSrc} alt={kind} />
+    </motion.div>
   );
 }
 
