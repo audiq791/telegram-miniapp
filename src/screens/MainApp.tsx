@@ -355,6 +355,7 @@ export default function MainApp() {
   const [query, setQuery] = useState("");
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [selectedPartner, setSelectedPartner] = useState<Partner>(partnersSeed[0]);
+  const [showAllPartners, setShowAllPartners] = useState(false);
   
   // Стек истории для кнопки назад
   const [history, setHistory] = useState<Route[]>([{ name: "home" }]);
@@ -556,23 +557,27 @@ export default function MainApp() {
                 <div className="h-10 bg-gradient-to-b from-transparent to-zinc-50" />
               </motion.div>
 
-              {/* PARTNERS - Только 5 видимых, остальные скрыты */}
+              {/* SEARCH */}
+              <div className="mt-4">
+                <div className="h-12 rounded-2xl bg-white border border-zinc-200 px-3 flex items-center gap-2 focus-within:ring-2 focus-within:ring-zinc-900/10">
+                  <Search size={18} className="text-zinc-400 shrink-0" />
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Поиск партнёра…"
+                    className="w-full h-full outline-none bg-transparent text-[15px]"
+                  />
+                </div>
+              </div>
+
+              {/* PARTNERS */}
               <div className="mt-3">
-                {/* Заголовок и кнопка "Все партнеры" */}
-                <div className="flex items-center justify-between px-1 mb-2">
-                  <div className="text-sm text-zinc-500">Популярные партнёры</div>
-                  <motion.button
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 700, damping: 40 }}
-                    onClick={() => goBlank("Все партнёры")}
-                    className="text-sm font-semibold text-zinc-900 flex items-center gap-1"
-                  >
-                    Все партнеры
-                    <ChevronRight size={16} className="text-zinc-400" />
-                  </motion.button>
+                {/* Заголовок "Мои Бонусы" */}
+                <div className="text-sm text-zinc-500 px-1 mb-2">
+                  Мои Бонусы
                 </div>
 
-                {/* Только первые 5 партнеров */}
+                {/* Первые 5 партнеров всегда видны */}
                 <div className="space-y-2">
                   {partners.slice(0, 5).map((p) => (
                     <motion.button
@@ -612,24 +617,82 @@ export default function MainApp() {
                   ))}
                 </div>
 
-                {/* Кнопка "Показать всех" */}
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 700, damping: 40 }}
-                  onClick={() => goBlank("Все партнёры")}
-                  className="w-full mt-3 rounded-2xl bg-zinc-50 border border-zinc-200 shadow-sm p-4 flex items-center justify-between text-left hover:shadow-md"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-2xl bg-zinc-200 text-zinc-600 grid place-items-center">
-                      <Search size={18} />
+                {/* Кнопка "Все партнеры" - выпадающий список */}
+                <div className="mt-2">
+                  <motion.button
+                    onClick={() => setShowAllPartners(!showAllPartners)}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 flex items-center justify-between text-left hover:shadow-md"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-2xl bg-zinc-100 text-zinc-600 grid place-items-center">
+                        <Search size={18} />
+                      </div>
+                      <div>
+                        <div className="font-semibold">Все партнеры</div>
+                        <div className="text-xs text-zinc-500">{partners.length - 5} партнеров</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-semibold">Все партнеры</div>
-                      <div className="text-xs text-zinc-500">{partners.length - 5} партнеров скрыто</div>
-                    </div>
-                  </div>
-                  <ChevronRight size={20} className="text-zinc-400" />
-                </motion.button>
+                    <motion.div
+                      animate={{ rotate: showAllPartners ? 270 : 90 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ChevronRight size={20} className="text-zinc-400" />
+                    </motion.div>
+                  </motion.button>
+
+                  {/* Выпадающий список со всеми партнерами */}
+                  <AnimatePresence>
+                    {showAllPartners && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="space-y-2 pt-2">
+                          {partners.slice(5).map((p) => (
+                            <motion.button
+                              key={p.id}
+                              onClick={() => selectPartner(p)}
+                              whileTap={{ scale: 0.98, backgroundColor: "#f4f4f5" }}
+                              transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                              className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-3 flex items-center justify-between gap-3 text-left hover:shadow-md"
+                            >
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className="shrink-0 h-11 w-11 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden">
+                                  {p.logo && !failedImages.has(p.id) ? (
+                                    <img 
+                                      src={p.logo} 
+                                      alt={p.name}
+                                      className="w-full h-full object-contain p-1"
+                                      onError={() => handleImageError(p.id)}
+                                    />
+                                  ) : (
+                                    <div className={`w-full h-full bg-gradient-to-br ${p.fallbackColor}`} />
+                                  )}
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="font-semibold truncate">{p.name}</div>
+                                  <div className="text-xs text-zinc-500">Баланс: {formatMoney(p.balance)} {p.unit}</div>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-3 shrink-0">
+                                <div className="text-right">
+                                  <div className="font-semibold">{formatMoney(p.balance)}</div>
+                                  <div className="text-xs text-zinc-500">{p.unit}</div>
+                                </div>
+                                <ChevronRight size={18} className="text-zinc-400" />
+                              </div>
+                            </motion.button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </motion.main>
           ) : (
