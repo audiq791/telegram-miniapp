@@ -84,7 +84,7 @@ export function TabButton({
 }
 
 // ===========================
-// ACTION CARD (ГИФКИ ЕСТЬ, АНИМАЦИЙ НЕТ)
+// ACTION CARD (ГИФКИ ЕСТЬ, АНИМАЦИЙ НЕТ, НО КРАСИВОЕ НАЖАТИЕ)
 // ===========================
 
 export type ActionKind = "send" | "receive" | "swap" | "spend";
@@ -122,9 +122,9 @@ export function ActionCard({
   return (
     <motion.button
       onClick={onClick}
-      whileTap={{ scale: 0.985 }}
-      transition={{ type: "spring", stiffness: 520, damping: 34 }}
-      className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 sm:p-5 md:p-6 text-left hover:shadow-md"
+      whileTap={{ scale: 0.98, backgroundColor: "#f4f4f5" }}
+      transition={{ type: "spring", stiffness: 700, damping: 40 }}
+      className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 sm:p-5 md:p-6 text-left hover:shadow-md transition-colors"
     >
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
