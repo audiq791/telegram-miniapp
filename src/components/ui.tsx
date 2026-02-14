@@ -2,13 +2,6 @@
 
 import React, { useRef } from "react";
 import { motion } from "framer-motion";
-import Lottie from "lottie-react";
-
-// Импортируем анимации
-import sendAnimation from "../animations/send.json";
-import receiveAnimation from "../animations/receive.json";
-import swapAnimation from "../animations/exchange.json";
-import payAnimation from "../animations/pay.json";
 
 // ===========================
 // БАЗОВЫЕ КНОПКИ
@@ -96,6 +89,14 @@ export function TabButton({
 
 export type ActionKind = "send" | "receive" | "swap" | "spend";
 
+// Иконки для кнопок (временные, пока без анимаций)
+const ActionIcons = {
+  send: "✈️",
+  receive: "⬇️",
+  swap: "🔄",
+  spend: "✅",
+};
+
 export function ActionCard({
   label,
   hint,
@@ -109,18 +110,12 @@ export function ActionCard({
 }) {
   const [trigger, setTrigger] = React.useState(0);
   const isAnimating = useRef(false);
-  const lottieRef = useRef<any>(null);
 
   const handleClick = () => {
     if (isAnimating.current) return;
     isAnimating.current = true;
 
     setTrigger((v) => v + 1);
-    
-    // Запускаем анимацию с начала
-    if (lottieRef.current) {
-      lottieRef.current.goToAndPlay(0);
-    }
     
     onClick?.();
 
@@ -142,43 +137,11 @@ export function ActionCard({
           <div className="text-[clamp(11px,1.5vw,13px)] text-zinc-500 truncate">{hint}</div>
         </div>
 
-        <div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
-          <AnimatedActionIcon kind={kind} trigger={trigger} lottieRef={lottieRef} />
+        <div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden text-2xl">
+          {ActionIcons[kind]}
         </div>
       </div>
     </motion.button>
-  );
-}
-
-// ===========================
-// АНИМАЦИИ (LOTTIE)
-// ===========================
-
-const animationMap = {
-  send: sendAnimation,
-  receive: receiveAnimation,
-  swap: swapAnimation,
-  spend: payAnimation,
-};
-
-function AnimatedActionIcon({ 
-  kind, 
-  trigger,
-  lottieRef 
-}: { 
-  kind: ActionKind; 
-  trigger: number;
-  lottieRef: React.MutableRefObject<any>;
-}) {
-  return (
-    <Lottie
-      lottieRef={lottieRef}
-      animationData={animationMap[kind]}
-      loop={false}
-      autoplay={false}
-      style={{ width: 30, height: 30 }}
-      initialSegment={[0, 0]} // начинаем с первого кадра
-    />
   );
 }
 
