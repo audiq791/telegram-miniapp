@@ -8,9 +8,12 @@ import {
   ChevronDown,
   User,
   Phone,
-  Loader
+  Loader,
+  Camera,
+  X as XIcon
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { Scanner } from '@yudiel/react-qr-scanner';
 import { partnersSeed } from "../data/partners";
 
 type SendModalProps = {
@@ -35,9 +38,6 @@ const DEMO_CONTACTS: DemoContact[] = [
   { id: "3", name: "Елена Смирнова", phone: "+7 (999) 345-67-89" },
   { id: "4", name: "Дмитрий Козлов", phone: "+7 (999) 456-78-90" },
   { id: "5", name: "Ольга Новикова", phone: "+7 (999) 567-89-01", bonAddress: "OLGA_N" },
-  { id: "6", name: "Михаил Иванов", phone: "+7 (999) 678-90-12" },
-  { id: "7", name: "Татьяна Сидорова", phone: "+7 (999) 789-01-23" },
-  { id: "8", name: "Алексей Морозов", phone: "+7 (999) 890-12-34", bonAddress: "ALEX_M" },
 ];
 
 export default function SendModal({ isOpen, onClose, onSend, currentBalance = 1843 }: SendModalProps) {
@@ -50,6 +50,7 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
   const [showPartnerDropdown, setShowPartnerDropdown] = useState(false);
   const [isManualAddress, setIsManualAddress] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showQrScanner, setShowQrScanner] = useState(false);
   
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -63,7 +64,7 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
     }
   }, [isOpen]);
 
-  // Фильтрация контактов по вводу
+  // Фильтрация контактов
   const filteredContacts = DEMO_CONTACTS.filter(contact => {
     if (!recipientInput) return false;
     const searchLower = recipientInput.toLowerCase();
@@ -74,10 +75,27 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
     );
   });
 
+ // Обработка результата сканирования
+const handleScan = (detectedCodes: any[]) => {
+  if (detectedCodes && detectedCodes.length > 0) {
+    const result = detectedCodes[0].rawValue || detectedCodes[0].text;
+    if (result) {
+      setBonAddress(result);
+      setShowQrScanner(false);
+      setStep("amount");
+    }
+  }
+};
+
+  const handleError = (error: unknown) => {
+    console.error('QR Scan error:', error);
+    alert('Не удалось открыть камеру. Проверьте разрешения.');
+    setShowQrScanner(false);
+  };
+
   // Выбор контакта
   const handleSelectContact = (contact: DemoContact) => {
     setSelectedContact(contact);
-    
     if (contact.bonAddress) {
       setBonAddress(contact.bonAddress);
       setIsManualAddress(false);
@@ -85,12 +103,11 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
       setIsManualAddress(true);
       setBonAddress("");
     }
-    
     setStep("amount");
     setRecipientInput("");
   };
 
-  // Ручной ввод адреса
+  // Ручной ввод
   const handleManualAddress = () => {
     setIsManualAddress(true);
     setSelectedContact(null);
@@ -102,16 +119,6 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
     if (bonAddress.trim()) {
       setStep("amount");
     }
-  };
-
-  // Сканирование QR
-  const handleScanQR = () => {
-    alert("📱 Открытие сканера QR-кодов");
-    setTimeout(() => {
-      setBonAddress("QR_CODE_123");
-      setIsManualAddress(false);
-      setStep("amount");
-    }, 1000);
   };
 
   // Выбор партнера
@@ -133,7 +140,7 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
     }
   };
 
-  // Сброс модалки
+  // Сброс
   const resetModal = () => {
     setStep("recipient");
     setRecipientInput("");
@@ -141,6 +148,7 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
     setBonAddress("");
     setAmount("");
     setIsManualAddress(false);
+    setShowQrScanner(false);
   };
 
   // Закрытие
@@ -149,7 +157,8 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
     onClose();
   };
 
-  const remainingBalance = currentBalance - (parseFloat(amount) || 0);
+  const numAmount = parseFloat(amount) || 0;
+  const remainingBalance = currentBalance - numAmount;
 
   return (
     <AnimatePresence>
@@ -185,7 +194,65 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
             {/* Контент */}
             <div className="p-4 max-h-[70vh] overflow-y-auto">
               <AnimatePresence mode="wait">
-                {step === "recipient" ? (
+                {showQrScanner ? (
+                  <motion.div
+                    key="scanner"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="space-y-4"
+                  >
+                    {/* Шапка сканера */}
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium">Сканируйте QR-код</h3>
+                      <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setShowQrScanner(false)}
+                        className="h-8 w-8 rounded-full bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors"
+                      >
+                        <XIcon size={16} />
+                      </motion.button>
+                    </div>
+
+                    {/* Область сканирования */}
+                    <div className="relative aspect-square bg-black rounded-2xl overflow-hidden">
+                      <Scanner
+                        onScan={handleScan}
+                        onError={handleError}
+                        constraints={{ facingMode: 'environment' }}
+                        styles={{ container: { width: '100%', height: '100%' } }}
+                      />
+                      
+                      {/* Анимированная рамка сканирования */}
+                      <motion.div
+                        animate={{
+                          y: ['0%', '100%', '0%'],
+                          opacity: [1, 0.5, 1]
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "linear"
+                        }}
+                        className="absolute left-0 right-0 h-1 bg-green-500 shadow-lg shadow-green-500/50"
+                        style={{ top: '30%' }}
+                      />
+                      
+                      {/* Уголки рамки */}
+                      <div className="absolute inset-0 border-2 border-white/30 rounded-2xl">
+                        <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-green-500 rounded-tl-2xl" />
+                        <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-green-500 rounded-tr-2xl" />
+                        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-green-500 rounded-bl-2xl" />
+                        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-green-500 rounded-br-2xl" />
+                      </div>
+                    </div>
+
+                    {/* Инструкция */}
+                    <p className="text-sm text-zinc-500 text-center">
+                      Наведите камеру на QR-код с BON-адресом
+                    </p>
+                  </motion.div>
+                ) : step === "recipient" ? (
                   <motion.div
                     key="recipient"
                     initial={{ opacity: 0, x: -20 }}
@@ -209,10 +276,22 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
                         />
                         <motion.button
                           whileTap={{ scale: 0.9 }}
-                          onClick={handleScanQR}
-                          className="h-9 w-9 rounded-xl bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors"
+                          onClick={() => setShowQrScanner(true)}
+                          className="h-9 w-9 rounded-xl bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors relative"
                         >
                           <QrCode size={18} />
+                          <motion.div
+                            animate={{
+                              scale: [1, 1.2, 1],
+                              opacity: [1, 0.5, 1]
+                            }}
+                            transition={{
+                              duration: 2,
+                              repeat: Infinity,
+                              repeatDelay: 1
+                            }}
+                            className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full"
+                          />
                         </motion.button>
                       </div>
                     </div>
@@ -229,7 +308,7 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
                     {!loading && recipientInput && filteredContacts.length > 0 && (
                       <div className="space-y-2">
                         <div className="text-xs text-zinc-500 px-1">Контакты</div>
-                        {filteredContacts.slice(0, 10).map(contact => (
+                        {filteredContacts.slice(0, 5).map(contact => (
                           <motion.button
                             key={contact.id}
                             initial={{ opacity: 0, y: 10 }}
@@ -257,11 +336,6 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
                             </div>
                           </motion.button>
                         ))}
-                        {filteredContacts.length > 10 && (
-                          <div className="text-xs text-zinc-400 text-center py-2">
-                            Показаны первые 10 из {filteredContacts.length} контактов
-                          </div>
-                        )}
                       </div>
                     )}
 
@@ -367,28 +441,28 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
                       </AnimatePresence>
                     </div>
 
-                                       {/* Сумма перевода */}
-<div>
-  <div className="text-xs text-zinc-500 mb-1">Сумма перевода</div>
-  <div className="relative">
-    <input
-      type="text"  // Меняем с "number" на "text"
-      inputMode="numeric"  // Добавляем numeric для мобильных
-      pattern="[0-9]*"  // Паттерн только для цифр
-      value={amount}
-      onChange={(e) => {
-        const value = e.target.value.replace(/[^0-9]/g, ''); // Удаляем всё кроме цифр
-        setAmount(value);
-      }}
-      placeholder={`0 из ${currentBalance}`}
-      className="w-full p-4 pr-12 border border-zinc-200 rounded-2xl outline-none focus:ring-2 focus:ring-zinc-900/10 text-[15px] placeholder:text-zinc-300"
-      autoFocus
-    />
-    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">B</span>
-  </div>
-</div>
+                    {/* Сумма перевода */}
+                    <div>
+                      <div className="text-xs text-zinc-500 mb-1">Сумма перевода</div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          value={amount}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            setAmount(value);
+                          }}
+                          placeholder={`0 из ${currentBalance}`}
+                          className="w-full p-4 pr-12 border border-zinc-200 rounded-2xl outline-none focus:ring-2 focus:ring-zinc-900/10 text-[15px] placeholder:text-zinc-300"
+                          autoFocus
+                        />
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">B</span>
+                      </div>
+                    </div>
 
-                    {/* Баланс после перевода - ОДНА СТРОКА */}
+                    {/* Баланс после перевода */}
                     <div className="p-3 bg-zinc-50 rounded-2xl">
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-zinc-600">Баланс после перевода</span>
@@ -402,15 +476,15 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
                     <div className="flex gap-3 pt-2">
                       <motion.button
                         whileTap={{ scale: 0.97 }}
-                        onClick={handleClose}
+                        onClick={() => setStep("recipient")}
                         className="flex-1 py-3 rounded-2xl border border-zinc-200 font-medium hover:bg-zinc-50 transition-colors"
                       >
-                        Отменить
+                        Назад
                       </motion.button>
                       <motion.button
                         whileTap={{ scale: 0.97 }}
                         onClick={handleSend}
-                        disabled={!amount || parseFloat(amount) <= 0 || parseFloat(amount) > currentBalance}
+                        disabled={!amount || numAmount <= 0 || numAmount > currentBalance}
                         className="flex-1 py-3 rounded-2xl bg-zinc-900 text-white font-medium disabled:opacity-50 disabled:bg-zinc-300"
                       >
                         Отправить
