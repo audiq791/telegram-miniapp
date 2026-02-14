@@ -26,6 +26,7 @@ type Partner = {
 };
 
 const partnersSeed: Partner[] = [
+  // ПРИОРИТЕТНЫЕ ПАРТНЕРЫ (В САМОМ ВЕРХУ)
   { 
     id: "vv", 
     name: "ВкусВилл", 
@@ -66,6 +67,8 @@ const partnersSeed: Partner[] = [
     logo: "/logos/cofix.svg",
     fallbackColor: "from-red-400 to-red-600" 
   },
+  
+  // ОСТАЛЬНЫЕ ПАРТНЕРЫ
   { 
     id: "fuel", 
     name: "FUEL", 
@@ -81,6 +84,254 @@ const partnersSeed: Partner[] = [
     unit: "B", 
     logo: "", 
     fallbackColor: "from-lime-400 to-green-600" 
+  },
+  { 
+    id: "piligrim", 
+    name: "Пилигрим", 
+    balance: 100, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-sky-500 to-blue-700" 
+  },
+  { 
+    id: "cafe12", 
+    name: "12 Grand Cafe", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-zinc-700 to-zinc-900" 
+  },
+  { 
+    id: "airo", 
+    name: "AIRO", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-slate-600 to-slate-900" 
+  },
+  { 
+    id: "baba", 
+    name: "Баба Марта", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-rose-400 to-rose-600" 
+  },
+  { 
+    id: "shashlyk", 
+    name: "Шашлычный Дворик", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-orange-400 to-orange-600" 
+  },
+  { 
+    id: "little", 
+    name: "Little Caesars Pizza", 
+    balance: 0, 
+    unit: "B", 
+    logo: "/logos/littlecaesars.svg",
+    fallbackColor: "from-yellow-400 to-yellow-600" 
+  },
+  { 
+    id: "cecenco", 
+    name: "ČEČENCO", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-amber-400 to-amber-600" 
+  },
+  { 
+    id: "coffee", 
+    name: "Coffee Bean", 
+    balance: 0, 
+    unit: "B", 
+    logo: "/logos/coffeebean.svg",
+    fallbackColor: "from-brown-400 to-brown-600" 
+  },
+  { 
+    id: "dobro", 
+    name: "Добро", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-green-400 to-green-600" 
+  },
+  { 
+    id: "ecomarket", 
+    name: "Еcomarket", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-teal-400 to-teal-600" 
+  },
+  { 
+    id: "everon", 
+    name: "Эверон", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-cyan-400 to-cyan-600" 
+  },
+  { 
+    id: "fly", 
+    name: "FLY", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-sky-400 to-sky-600" 
+  },
+  { 
+    id: "gcoin", 
+    name: "G-coin", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-indigo-400 to-indigo-600" 
+  },
+  { 
+    id: "halal", 
+    name: "Halal Guide", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-emerald-400 to-emerald-600" 
+  },
+  { 
+    id: "italian", 
+    name: "Итальянец", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-stone-400 to-stone-600" 
+  },
+  { 
+    id: "ku", 
+    name: "[KU:] Ramen", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-zinc-400 to-zinc-600" 
+  },
+  { 
+    id: "lpg", 
+    name: "LPG", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-purple-400 to-purple-600" 
+  },
+  { 
+    id: "moscow", 
+    name: "Moscow Coffee & Food", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-pink-400 to-pink-600" 
+  },
+  { 
+    id: "mpr", 
+    name: "МПР", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-gray-400 to-gray-600" 
+  },
+  { 
+    id: "mymy", 
+    name: "МУ-МУ", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-slate-400 to-slate-600" 
+  },
+  { 
+    id: "oneprice", 
+    name: "OnePriceCoffee", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-amber-400 to-amber-600" 
+  },
+  { 
+    id: "papajohns", 
+    name: "Папа Джонс", 
+    balance: 0, 
+    unit: "B", 
+    logo: "/logos/papajohns.svg",
+    fallbackColor: "from-red-400 to-red-600" 
+  },
+  { 
+    id: "pomidorka", 
+    name: "Помидорка", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-rose-400 to-rose-600" 
+  },
+  { 
+    id: "promille", 
+    name: "0.5 Промилле", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-blue-400 to-blue-600" 
+  },
+  { 
+    id: "salvatore", 
+    name: "Остерия У Сальваторе", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-stone-400 to-stone-600" 
+  },
+  { 
+    id: "sandwich", 
+    name: "Sandwich Hunters", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-yellow-400 to-yellow-600" 
+  },
+  { 
+    id: "shawarma", 
+    name: "Shawarma Bar", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-orange-400 to-orange-600" 
+  },
+  { 
+    id: "shuval", 
+    name: "Шуваловская", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-teal-400 to-teal-600" 
+  },
+  { 
+    id: "sparta", 
+    name: "Sparta Gyros", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-green-400 to-green-600" 
+  },
+  { 
+    id: "yoda", 
+    name: "Yoda Thai Food", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-pink-400 to-pink-600" 
+  },
+  { 
+    id: "zakyat", 
+    name: "Закят", 
+    balance: 0, 
+    unit: "B", 
+    logo: "", 
+    fallbackColor: "from-emerald-400 to-emerald-600" 
   },
 ];
 
@@ -101,6 +352,7 @@ export default function MainApp() {
   const [query, setQuery] = useState("");
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   
+  // Стек истории для кнопки назад
   const [history, setHistory] = useState<Route[]>([{ name: "home" }]);
 
   const partners = useMemo(() => {
@@ -113,19 +365,28 @@ export default function MainApp() {
     setFailedImages(prev => new Set(prev).add(partnerId));
   };
 
+  // ============================================
+  // НАСТРОЙКА КНОПКИ НАЗАД TELEGRAM
+  // ============================================
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
     if (!tg) return;
 
+    console.log("Telegram WebApp доступен");
+
     const updateBackButton = () => {
       if (history.length > 1) {
         tg.BackButton.show();
+        console.log("Кнопка назад показана");
       } else {
         tg.BackButton.hide();
+        console.log("Кнопка назад скрыта");
       }
     };
 
     const handleBackClick = () => {
+      console.log("Нажата кнопка назад");
+      
       tg.HapticFeedback.impactOccurred("light");
       
       if (history.length > 1) {
@@ -152,6 +413,7 @@ export default function MainApp() {
 
   const goBlank = (title: string) => {
     const newRoute: Route = { name: "blank", title };
+    
     setHistory(prev => [...prev, newRoute]);
     setRoute(newRoute);
     
@@ -163,10 +425,14 @@ export default function MainApp() {
     setHistory([{ name: "home" }]);
     setRoute({ name: "home" });
     setTab("wallet");
+    
+    const tg = (window as any).Telegram?.WebApp;
+    tg?.HapticFeedback.impactOccurred("light");
   };
 
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
+      {/* HEADER */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-zinc-200">
         <div className="mx-auto max-w-md px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -176,7 +442,15 @@ export default function MainApp() {
             <div className="min-w-0">
               <div className="text-[13px] text-zinc-500 leading-none">Биржа бонусов</div>
               <div className="text-[15px] font-semibold leading-tight truncate">
-                {route.name === "blank" ? route.title : "Кошелёк"}
+                {route.name === "blank"
+                  ? route.title
+                  : tab === "wallet"
+                    ? "Кошелёк"
+                    : tab === "market"
+                      ? "Маркет"
+                      : tab === "partners"
+                        ? "Партнёры"
+                        : "Профиль"}
               </div>
             </div>
           </div>
@@ -192,6 +466,7 @@ export default function MainApp() {
         </div>
       </header>
 
+      {/* CONTENT */}
       <div className="mx-auto max-w-md">
         <AnimatePresence mode="wait">
           {route.name === "home" ? (
@@ -203,6 +478,7 @@ export default function MainApp() {
               exit={{ opacity: 0, x: -12 }}
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
             >
+              {/* MAIN CARD */}
               <div className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden">
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">
@@ -223,6 +499,7 @@ export default function MainApp() {
                     <PrimaryButton label="Пополнить" onClick={() => goBlank("Пополнить")} />
                   </div>
 
+                  {/* ACTIONS */}
                   <div className="mt-4 grid grid-cols-2 gap-3">
                     <ActionCard label="Отправить" hint="Перевод" kind="send" onClick={() => goBlank("Отправить")} />
                     <ActionCard label="Получить" hint="Входящие" kind="receive" onClick={() => goBlank("Получить")} />
@@ -234,6 +511,7 @@ export default function MainApp() {
                 <div className="h-10 bg-gradient-to-b from-transparent to-zinc-50" />
               </div>
 
+              {/* SEARCH */}
               <div className="mt-4">
                 <div className="h-12 rounded-2xl bg-white border border-zinc-200 px-3 flex items-center gap-2 focus-within:ring-2 focus-within:ring-zinc-900/10">
                   <Search size={18} className="text-zinc-400 shrink-0" />
@@ -246,6 +524,7 @@ export default function MainApp() {
                 </div>
               </div>
 
+              {/* PARTNERS */}
               <div className="mt-3 space-y-2">
                 <div className="flex items-center justify-between px-1">
                   <div className="text-sm text-zinc-500">Партнёры</div>
@@ -307,6 +586,7 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
+      {/* BOTTOM NAV */}
       {route.name === "home" && (
         <nav
           className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
