@@ -335,21 +335,26 @@ export default function SwapModal({
                       </div>
                     </div>
 
-                    {/* Сумма обмена */}
-                    <div>
-                      <div className="text-xs text-zinc-500 mb-1">Сумма обмена</div>
-                      <div className="relative">
-                        <input
-                          type="number"
-                          value={amount}
-                          onChange={(e) => setAmount(e.target.value)}
-                          placeholder={`0 из ${currentBalance}`}
-                          className="w-full p-4 pr-12 border border-zinc-200 rounded-2xl outline-none focus:ring-2 focus:ring-zinc-900/10 text-[15px] placeholder:text-zinc-300"
-                          autoFocus
-                        />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">B</span>
-                      </div>
-                    </div>
+                   {/* Сумма обмена */}
+<div>
+  <div className="text-xs text-zinc-500 mb-1">Сумма обмена</div>
+  <div className="relative">
+    <input
+      type="text"
+      inputMode="numeric"
+      pattern="[0-9]*"
+      value={amount}
+      onChange={(e) => {
+        const value = e.target.value.replace(/[^0-9]/g, '');
+        setAmount(value);
+      }}
+      placeholder={`0 из ${currentBalance}`}
+      className="w-full p-4 pr-12 border border-zinc-200 rounded-2xl outline-none focus:ring-2 focus:ring-zinc-900/10 text-[15px] placeholder:text-zinc-300"
+      autoFocus
+    />
+    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">B</span>
+  </div>
+</div>
 
                     {/* Детали обмена */}
                     <div className="space-y-3 p-4 bg-zinc-50 rounded-2xl">
