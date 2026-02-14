@@ -28,24 +28,22 @@ type Transaction = {
   status: "completed" | "pending";
 };
 
-// Генерируем 30 операций с разными партнерами (только те, у кого есть логотип)
-const partnersWithLogos = partnersSeed.filter(p => p.logo);
+// Только первые 5 партнеров (с логотипами)
+const topPartners = partnersSeed.slice(0, 5).map(p => p.displayName || p.name);
+
 const operationTypes: Array<"spend" | "receive" | "exchange"> = ["spend", "receive", "exchange"];
 
 const generateTransactions = (count: number): Transaction[] => {
   const transactions: Transaction[] = [];
-  const startDate = new Date(2026, 0, 1); // 1 января 2026
-  const endDate = new Date(2026, 1, 14); // 14 февраля 2026
+  const startDate = new Date(2026, 0, 1);
+  const endDate = new Date(2026, 1, 14);
 
   for (let i = 1; i <= count; i++) {
     const type = operationTypes[Math.floor(Math.random() * operationTypes.length)];
-    const randomPartner = partnersWithLogos[Math.floor(Math.random() * partnersWithLogos.length)];
-    const randomPartner2 = partnersWithLogos[Math.floor(Math.random() * partnersWithLogos.length)];
     
-    // Случайная дата между startDate и endDate
+    // Случайная дата
     const randomTimestamp = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime());
     const date = new Date(randomTimestamp);
-    
     const formattedDate = date.toLocaleDateString('ru-RU', {
       day: 'numeric',
       month: 'short',
@@ -53,22 +51,34 @@ const generateTransactions = (count: number): Transaction[] => {
     }).replace(' г.', '');
 
     if (type === "exchange") {
+      // Для обмена выбираем два разных партнера
+      let fromIndex = Math.floor(Math.random() * topPartners.length);
+      let toIndex = Math.floor(Math.random() * topPartners.length);
+      
+      // Гарантируем что партнеры разные
+      while (toIndex === fromIndex) {
+        toIndex = Math.floor(Math.random() * topPartners.length);
+      }
+
       transactions.push({
         id: `exchange-${i}`,
         type: "exchange",
         amount: Math.floor(Math.random() * 1000) + 100,
-        fromPartner: randomPartner.displayName || randomPartner.name,
-        toPartner: randomPartner2.displayName || randomPartner2.name,
+        fromPartner: topPartners[fromIndex],
+        toPartner: topPartners[toIndex],
         date: formattedDate,
         timestamp: randomTimestamp,
         status: Math.random() > 0.1 ? "completed" : "pending"
       });
     } else {
+      // Для обычных операций выбираем одного партнера
+      const partner = topPartners[Math.floor(Math.random() * topPartners.length)];
+      
       transactions.push({
         id: `${type}-${i}`,
         type: type,
         amount: Math.floor(Math.random() * 2000) + 50,
-        partner: randomPartner.displayName || randomPartner.name,
+        partner: partner,
         date: formattedDate,
         timestamp: randomTimestamp,
         status: Math.random() > 0.1 ? "completed" : "pending"
@@ -76,7 +86,6 @@ const generateTransactions = (count: number): Transaction[] => {
     }
   }
   
-  // Сортируем по дате (сначала новые)
   return transactions.sort((a, b) => b.timestamp - a.timestamp);
 };
 
@@ -127,6 +136,7 @@ const PartnerFilter = ({
   partners: typeof partnersSeed;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const topPartnersWithLogos = partners.slice(0, 5);
 
   return (
     <div className="relative">
@@ -157,7 +167,7 @@ const PartnerFilter = ({
             >
               Все партнеры
             </button>
-            {partnersWithLogos.map(p => (
+            {topPartnersWithLogos.map(p => (
               <button
                 key={p.id}
                 onClick={() => {
