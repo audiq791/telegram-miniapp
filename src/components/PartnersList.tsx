@@ -12,7 +12,6 @@ type PartnersListProps = {
   failedImages: Set<string>;
   onImageError: (partnerId: string) => void;
   formatMoney: (n: number) => string;
-  getBonusWord: (num: number) => string;
   onOpenBlank: (title: string) => void;
 };
 
@@ -23,7 +22,6 @@ export default function PartnersList({
   failedImages,
   onImageError,
   formatMoney,
-  getBonusWord,
 }: PartnersListProps) {
   const [query, setQuery] = useState("");
   const [showAllPartners, setShowAllPartners] = useState(false);
@@ -72,7 +70,6 @@ export default function PartnersList({
               failedImages={failedImages}
               onImageError={onImageError}
               formatMoney={formatMoney}
-              getBonusWord={getBonusWord}
             />
           ))}
         </div>
@@ -121,7 +118,6 @@ export default function PartnersList({
                         failedImages={failedImages}
                         onImageError={onImageError}
                         formatMoney={formatMoney}
-                        getBonusWord={getBonusWord}
                       />
                     ))}
                   </div>
@@ -143,7 +139,6 @@ function PartnerItem({
   failedImages,
   onImageError,
   formatMoney,
-  getBonusWord,
 }: {
   partner: Partner;
   isSelected: boolean;
@@ -151,7 +146,6 @@ function PartnerItem({
   failedImages: Set<string>;
   onImageError: (partnerId: string) => void;
   formatMoney: (n: number) => string;
-  getBonusWord: (num: number) => string;
 }) {
   return (
     <motion.button
@@ -185,8 +179,8 @@ function PartnerItem({
 
       <div className="flex items-center gap-3 shrink-0">
         <div className="text-right">
+          <div className="text-xs text-zinc-500 mb-0.5">Баланс</div>
           <div className="font-semibold">{formatMoney(partner.balance)}</div>
-          <div className="text-xs text-zinc-500">{getBonusWord(partner.balance)}</div>
         </div>
         <ChevronRight size={18} className="text-zinc-400" />
       </div>

@@ -53,27 +53,6 @@ export default function MainApp() {
     }).format(n);
   };
 
-  // Склонение слова "Бонус" в зависимости от числа
-  const getBonusWord = (num: number) => {
-    const lastDigit = num % 10;
-    const lastTwoDigits = num % 100;
-    
-    if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
-      return "Бонусов";
-    }
-    
-    switch (lastDigit) {
-      case 1:
-        return "Бонус";
-      case 2:
-      case 3:
-      case 4:
-        return "Бонуса";
-      default:
-        return "Бонусов";
-    }
-  };
-
   // ============================================
   // НАСТРОЙКА КНОПКИ НАЗАД TELEGRAM
   // ============================================
@@ -304,7 +283,6 @@ export default function MainApp() {
                 failedImages={failedImages}
                 onImageError={handleImageError}
                 formatMoney={formatMoney}
-                getBonusWord={getBonusWord}
                 onOpenBlank={goBlank}
               />
 
