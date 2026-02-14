@@ -55,7 +55,7 @@ export default function MoreMenu({ isOpen, onClose }: MoreMenuProps) {
           >
             {/* Шапка меню */}
             <div className="px-4 py-3 bg-gradient-to-r from-zinc-50 to-white border-b border-zinc-100">
-              <p className="text-xs font-medium text-zinc-500 text-center">Меню</p>
+              <p className="text-xs font-medium text-zinc-500 text-center">Информация</p>
             </div>
 
             {/* Список пунктов */}
