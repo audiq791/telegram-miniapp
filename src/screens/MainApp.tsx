@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   WalletCards,
@@ -152,7 +152,7 @@ export default function MainApp() {
               exit={{ opacity: 0, x: -12 }}
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
             >
-                           {/* MAIN CARD */}
+              {/* MAIN CARD */}
               <motion.div
                 key={selectedPartner.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -162,21 +162,24 @@ export default function MainApp() {
               >
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">
-                    <motion.div
-                      key={selectedPartner.name}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="text-2xl font-bold mt-1 truncate"
-                    >
-                      {selectedPartner.name}
-                    </motion.div>
+                    <div className="min-w-0">
+                      <div className="text-xs text-zinc-500">Основной партнёр</div>
+                      <motion.div
+                        key={selectedPartner.name}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="text-xl font-semibold mt-1 truncate"
+                      >
+                        {selectedPartner.name}
+                      </motion.div>
+                    </div>
                     
                     <motion.div
                       key={selectedPartner.id}
                       initial={{ scale: 0.8, rotate: -5 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                      className="shrink-0 h-14 w-14 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden"
+                      className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden"
                     >
                       {selectedPartner.logo && !failedImages.has(selectedPartner.id) ? (
                         <img 
@@ -204,7 +207,7 @@ export default function MainApp() {
                         {formatMoney(selectedPartner.balance)} <span className="text-base font-medium text-zinc-500">{selectedPartner.unit}</span>
                       </motion.div>
                     </div>
-                    <PrimaryButton label="Пополнить" onClick={() => goBlank("Пополнить")} />
+                    <PrimaryButton label="Активность" onClick={() => goBlank("Активность")} />
                   </div>
 
                   {/* ACTIONS */}
@@ -219,7 +222,7 @@ export default function MainApp() {
                 <div className="h-10 bg-gradient-to-b from-transparent to-zinc-50" />
               </motion.div>
 
-              {/* PARTNERS LIST - вынесли в отдельный компонент */}
+              {/* PARTNERS LIST */}
               <PartnersList
                 partners={partnersSeed}
                 selectedPartner={selectedPartner}
