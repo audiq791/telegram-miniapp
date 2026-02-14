@@ -174,7 +174,7 @@ export default function MainApp() {
                       </motion.div>
                     </div>
                     
-                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП */}
+                                        {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП - открывает сайт партнера */}
                     <motion.div
                       key={selectedPartner.id}
                       initial={{ scale: 0.8, rotate: -5 }}
@@ -182,19 +182,19 @@ export default function MainApp() {
                       transition={{ type: "spring", stiffness: 400, damping: 20 }}
                       className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer"
                       onClick={() => {
-                        // Соответствие id партнера и имени файла
-                        const fileMap: { [key: string]: string } = {
-                          vv: "vkusvill.txt",
-                          dodo: "dodo.txt",
-                          cska: "cska.txt",
-                          wb: "wildberries.txt",
-                          cofix: "cofix.txt",
+                        // Соответствие id партнера и URL сайта
+                        const urlMap: { [key: string]: string } = {
+                          vv: "https://vkusvill.ru",
+                          dodo: "https://dodopizza.ru",
+                          cska: "https://pfc-cska.com",
+                          wb: "https://www.wildberries.ru",
+                          cofix: "https://cofix.ru",
                         };
                         
-                        const fileName = fileMap[selectedPartner.id];
-                        if (fileName) {
-                          // Открываем в новой вкладке
-                          window.open(`/partners/${fileName}`, '_blank');
+                        const url = urlMap[selectedPartner.id];
+                        if (url) {
+                          // Открываем сайт внутри Telegram WebView
+                          window.location.href = url;
                         }
                         
                         const tg = (window as any).Telegram?.WebApp;
