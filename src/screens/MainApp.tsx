@@ -60,7 +60,6 @@ export default function MainApp() {
   // Обработчик отправки
   const handleSend = (data: { recipient: string; partner: string; amount: number }) => {
     console.log("Отправка:", data);
-    // Здесь будет логика отправки
     alert(`Перевод ${data.amount} B для ${data.recipient} (${data.partner})`);
   };
 
@@ -191,37 +190,19 @@ export default function MainApp() {
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
             >
               {/* MAIN CARD */}
-              <motion.div
-                key={selectedPartner.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden"
-              >
+              <div className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden">
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="text-xs text-zinc-500">Основной партнёр</div>
-                      <motion.div
-                        key={selectedPartner.name}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="text-xl font-semibold mt-1 truncate"
-                      >
+                      <div className="text-xl font-semibold mt-1 truncate">
                         {selectedPartner.displayName || selectedPartner.name}
-                      </motion.div>
+                      </div>
                     </div>
                     
-                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП с эффектом нажатия */}
-                    <motion.div
-                      key={selectedPartner.id}
-                      initial={{ scale: 0.8, rotate: -5 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      whileTap={{ scale: 0.9, rotate: 0 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                      className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer active:bg-zinc-50"
+                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП */}
+                    <div
                       onClick={() => {
-                        // Соответствие id партнера и URL сайта
                         const urlMap: { [key: string]: string } = {
                           vv: "https://m.vkusvill.ru",
                           dodo: "https://m.dodopizza.ru",
@@ -243,6 +224,7 @@ export default function MainApp() {
                         const tg = (window as any).Telegram?.WebApp;
                         tg?.HapticFeedback.impactOccurred("light");
                       }}
+                      className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer active:bg-zinc-50"
                     >
                       {selectedPartner.logo && !failedImages.has(selectedPartner.id) ? (
                         <img 
@@ -254,42 +236,73 @@ export default function MainApp() {
                       ) : (
                         <div className={`w-full h-full bg-gradient-to-br ${selectedPartner.fallbackColor}`} />
                       )}
-                    </motion.div>
+                    </div>
                   </div>
 
                   <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-4 flex items-end justify-between gap-3">
                     <div>
                       <div className="text-xs text-zinc-500">Баланс</div>
-                      <motion.div
-                        key={selectedPartner.balance}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, ease: "easeOut" }}
-                        className="text-3xl font-semibold leading-none mt-1"
-                      >
+                      <div className="text-3xl font-semibold leading-none mt-1">
                         {formatMoney(selectedPartner.balance)} <span className="text-base font-medium text-zinc-500">{selectedPartner.unit}</span>
-                      </motion.div>
+                      </div>
                     </div>
-                    <PrimaryButton label="Активность" onClick={() => goBlank("Активность")} />
+                    <PrimaryButton 
+                      label="Активность" 
+                      onClick={() => {
+                        const tg = (window as any).Telegram?.WebApp;
+                        tg?.HapticFeedback.impactOccurred("light");
+                        goBlank("Активность");
+                      }} 
+                    />
                   </div>
 
-                  {/* ACTIONS */}
+                  {/* ACTIONS С ХАПТИКОМ */}
                   <div className="mt-4 grid grid-cols-2 gap-3">
                     <ActionCard 
                       label="Отправить" 
                       hint="Перевод" 
                       kind="send" 
-                      onClick={() => setIsSendModalOpen(true)} 
+                      onClick={() => {
+                        const tg = (window as any).Telegram?.WebApp;
+                        tg?.HapticFeedback.impactOccurred("light");
+                        setIsSendModalOpen(true);
+                      }} 
                     />
-                    <ActionCard label="Получить" hint="Входящие" kind="receive" onClick={() => goBlank("Получить")} />
-                    <ActionCard label="Обменять" hint="Бонусы" kind="swap" onClick={() => goBlank("Обменять")} />
-                    <ActionCard label="Списать" hint="Оплата" kind="spend" onClick={() => goBlank("Списать")} />
+                    <ActionCard 
+                      label="Получить" 
+                      hint="Входящие" 
+                      kind="receive" 
+                      onClick={() => {
+                        const tg = (window as any).Telegram?.WebApp;
+                        tg?.HapticFeedback.impactOccurred("light");
+                        goBlank("Получить");
+                      }} 
+                    />
+                    <ActionCard 
+                      label="Обменять" 
+                      hint="Бонусы" 
+                      kind="swap" 
+                      onClick={() => {
+                        const tg = (window as any).Telegram?.WebApp;
+                        tg?.HapticFeedback.impactOccurred("light");
+                        goBlank("Обменять");
+                      }} 
+                    />
+                    <ActionCard 
+                      label="Списать" 
+                      hint="Оплата" 
+                      kind="spend" 
+                      onClick={() => {
+                        const tg = (window as any).Telegram?.WebApp;
+                        tg?.HapticFeedback.impactOccurred("light");
+                        goBlank("Списать");
+                      }} 
+                    />
                   </div>
                 </div>
 
-                {/* Маленький отступ вместо градиента */}
                 <div className="h-2" />
-              </motion.div>
+              </div>
 
               {/* PARTNERS LIST */}
               <PartnersList
@@ -333,6 +346,8 @@ export default function MainApp() {
             <TabButton
               active={tab === "wallet"}
               onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
                 setTab("wallet");
                 goBlank("Кошелёк");
               }}
@@ -342,6 +357,8 @@ export default function MainApp() {
             <TabButton
               active={tab === "market"}
               onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
                 setTab("market");
                 goBlank("Маркет");
               }}
@@ -351,6 +368,8 @@ export default function MainApp() {
             <TabButton
               active={tab === "partners"}
               onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
                 setTab("partners");
                 goBlank("Партнёры");
               }}
@@ -360,6 +379,8 @@ export default function MainApp() {
             <TabButton
               active={tab === "profile"}
               onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
                 setTab("profile");
                 goBlank("Профиль");
               }}
