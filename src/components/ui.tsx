@@ -84,21 +84,10 @@ export function TabButton({
 }
 
 // ===========================
-// ACTION CARD (ГИФКИ ЕСТЬ, АНИМАЦИЙ НЕТ, НО КРАСИВОЕ НАЖАТИЕ)
+// ACTION CARD (КАК У ПАРТНЕРОВ)
 // ===========================
 
 export type ActionKind = "send" | "receive" | "swap" | "spend";
-
-function Gif({ src, alt }: { src: string; alt: string }) {
-  return (
-    <img
-      src={src}
-      alt={alt}
-      draggable={false}
-      className="w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] md:w-[36px] md:h-[36px] object-contain"
-    />
-  );
-}
 
 export function ActionCard({
   label,
@@ -124,7 +113,7 @@ export function ActionCard({
       onClick={onClick}
       whileTap={{ scale: 0.98, backgroundColor: "#f4f4f5" }}
       transition={{ type: "spring", stiffness: 700, damping: 40 }}
-      className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 sm:p-5 md:p-6 text-left hover:shadow-md transition-colors"
+      className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 sm:p-5 md:p-6 text-left hover:shadow-md"
     >
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
@@ -132,9 +121,14 @@ export function ActionCard({
           <div className="text-[clamp(11px,1.5vw,13px)] text-zinc-500 truncate">{hint}</div>
         </div>
 
-        {/* Просто гифка, без анимаций */}
+        {/* Контейнер для гифки */}
         <div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
-          <Gif src={gifSrc[kind]} alt={kind} />
+          <img
+            src={gifSrc[kind]}
+            alt={kind}
+            draggable={false}
+            className="w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] md:w-[36px] md:h-[36px] object-contain"
+          />
         </div>
       </div>
     </motion.button>
