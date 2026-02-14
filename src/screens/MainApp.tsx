@@ -179,7 +179,7 @@ export default function MainApp() {
               exit={{ opacity: 0, x: -12 }}
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
             >
-              {/* MAIN CARD */}
+                            {/* MAIN CARD */}
               <motion.div
                 key={selectedPartner.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -201,7 +201,7 @@ export default function MainApp() {
                       </motion.div>
                     </div>
                     
-                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП с эффектом нажатия */}
+                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП */}
                     <motion.div
                       key={selectedPartner.id}
                       initial={{ scale: 0.8, rotate: -5 }}
@@ -210,7 +210,6 @@ export default function MainApp() {
                       transition={{ type: "spring", stiffness: 400, damping: 20 }}
                       className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer active:bg-zinc-50"
                       onClick={() => {
-                        // Соответствие id партнера и URL сайта
                         const urlMap: { [key: string]: string } = {
                           vv: "https://m.vkusvill.ru",
                           dodo: "https://m.dodopizza.ru",
@@ -271,7 +270,8 @@ export default function MainApp() {
                   </div>
                 </div>
 
-                <div className="h-10 bg-gradient-to-b from-transparent to-zinc-50" />
+                {/* Вместо большого градиента - маленький отступ или ничего */}
+                <div className="h-2" />
               </motion.div>
 
               {/* PARTNERS LIST */}
