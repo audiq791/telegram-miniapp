@@ -8,9 +8,10 @@ import {
   QrCode,
   Check,
   ChevronDown,
-  Info
+  Info,
+  CheckCircle
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IconButton } from "../components/ui";
 import { partnersSeed } from "../data/partners";
 
@@ -22,13 +23,48 @@ type SpendSettingsScreenProps = {
 };
 
 export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps) {
-  const [selectedMode, setSelectedMode] = useState<"auto" | "selected" | "manual">("manual");
-  const [selectedPartners, setSelectedPartners] = useState<string[]>([]);
+  const [selectedMode, setSelectedMode] = useState<"auto" | "selected" | "manual">(() => {
+    // Загружаем сохраненные настройки при инициализации
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('spendSettings');
+      return saved ? JSON.parse(saved).mode : "manual";
+    }
+    return "manual";
+  });
+  
+  const [selectedPartners, setSelectedPartners] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('spendSettings');
+      return saved ? JSON.parse(saved).selectedPartners : [];
+    }
+    return [];
+  });
+  
   const [showPartnerDropdown, setShowPartnerDropdown] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showSaveNotification, setShowSaveNotification] = useState(false);
 
   // Доступные партнеры (первые 5)
   const availablePartners = partnersSeed.slice(0, 5);
+
+  // Автоматическое сохранение при любых изменениях
+  useEffect(() => {
+    const settings = {
+      mode: selectedMode,
+      selectedPartners: selectedMode === "selected" ? selectedPartners : []
+    };
+    
+    localStorage.setItem('spendSettings', JSON.stringify(settings));
+    
+    // Показываем уведомление о сохранении
+    setShowSaveNotification(true);
+    const timer = setTimeout(() => setShowSaveNotification(false), 2000);
+    
+    // Логируем в консоль для отладки
+    console.log("Настройки сохранены:", settings);
+    
+    return () => clearTimeout(timer);
+  }, [selectedMode, selectedPartners]);
 
   // Выбор/отмена выбора партнера
   const togglePartner = (partnerId: string) => {
@@ -50,14 +86,13 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
     }
   };
 
-  // Сохранение настроек
-  const handleSave = () => {
-    console.log("Сохранение настроек:", {
-      mode: selectedMode,
-      selectedPartners: selectedMode === "selected" ? selectedPartners : []
-    });
-    // Здесь будет логика сохранения
-    onBack();
+  // Смена режима с автоматическим сохранением
+  const handleModeChange = (mode: "auto" | "selected" | "manual") => {
+    setSelectedMode(mode);
+    // Если переключаемся на режим "selected", открываем список партнеров
+    if (mode === "selected") {
+      setShowPartnerDropdown(true);
+    }
   };
 
   return (
@@ -80,6 +115,21 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
           </div>
         </div>
 
+        {/* Уведомление о сохранении */}
+        <AnimatePresence>
+          {showSaveNotification && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mb-4 p-3 bg-green-50 rounded-xl flex items-center gap-2"
+            >
+              <CheckCircle size={16} className="text-green-600" />
+              <span className="text-sm text-green-700">Настройки сохранены</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Основной контент */}
         <div className="space-y-4">
           {/* Режим 1: Автоматическое списание всех */}
@@ -87,7 +137,9 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden"
+            className={`bg-white rounded-2xl border shadow-sm overflow-hidden transition-colors ${
+              selectedMode === "auto" ? "border-zinc-900 ring-1 ring-zinc-900" : "border-zinc-200"
+            }`}
           >
             <div className="p-4">
               <div className="flex items-start justify-between gap-4">
@@ -102,7 +154,7 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                 </div>
                 <motion.button
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => setSelectedMode("auto")}
+                  onClick={() => handleModeChange("auto")}
                   className={`w-12 h-6 rounded-full transition-colors ${
                     selectedMode === "auto" ? "bg-zinc-900" : "bg-zinc-200"
                   }`}
@@ -121,7 +173,9 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden"
+            className={`bg-white rounded-2xl border shadow-sm overflow-hidden transition-colors ${
+              selectedMode === "selected" ? "border-zinc-900 ring-1 ring-zinc-900" : "border-zinc-200"
+            }`}
           >
             <div className="p-4">
               <div className="flex items-start justify-between gap-4">
@@ -136,7 +190,7 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                 </div>
                 <motion.button
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => setSelectedMode("selected")}
+                  onClick={() => handleModeChange("selected")}
                   className={`w-12 h-6 rounded-full transition-colors ${
                     selectedMode === "selected" ? "bg-zinc-900" : "bg-zinc-200"
                   }`}
@@ -171,7 +225,7 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                       <ChevronDown size={16} className={`text-zinc-400 transition-transform ${showPartnerDropdown ? 'rotate-180' : ''}`} />
                     </button>
 
-                    {/* Выпадающий список (absolute позиционирование) */}
+                    {/* Выпадающий список */}
                     <div className="relative">
                       <AnimatePresence>
                         {showPartnerDropdown && (
@@ -236,7 +290,9 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden"
+            className={`bg-white rounded-2xl border shadow-sm overflow-hidden transition-colors ${
+              selectedMode === "manual" ? "border-zinc-900 ring-1 ring-zinc-900" : "border-zinc-200"
+            }`}
           >
             <div className="p-4">
               <div className="flex items-start justify-between gap-4">
@@ -251,7 +307,7 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                 </div>
                 <motion.button
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => setSelectedMode("manual")}
+                  onClick={() => handleModeChange("manual")}
                   className={`w-12 h-6 rounded-full transition-colors ${
                     selectedMode === "manual" ? "bg-zinc-900" : "bg-zinc-200"
                   }`}
@@ -263,7 +319,7 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                 </motion.button>
               </div>
 
-              {/* QR-код и адрес (появляется автоматически) */}
+              {/* QR-код и адрес */}
               <AnimatePresence>
                 {selectedMode === "manual" && (
                   <motion.div
@@ -322,21 +378,9 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
             <Info size={16} className="text-blue-600 shrink-0 mt-0.5" />
             <p className="text-xs text-blue-700">
               Только один режим списания может быть активен одновременно. 
-              Изменения вступят в силу после сохранения.
+              Все изменения сохраняются автоматически.
             </p>
           </motion.div>
-
-          {/* Кнопка сохранения */}
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleSave}
-            className="w-full py-4 bg-zinc-900 text-white rounded-2xl font-semibold shadow-lg hover:bg-zinc-800 transition-colors mt-6"
-          >
-            Сохранить изменения
-          </motion.button>
         </div>
       </div>
     </motion.div>
