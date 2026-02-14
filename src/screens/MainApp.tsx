@@ -15,6 +15,7 @@ import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/
 import PartnersList from "../components/PartnersList";
 import BlackScreen from "./BlackScreen";
 import PartnerSiteScreen from "./PartnerSiteScreen";
+import SendModal from "../modals/SendModal";
 import { partnersSeed, type Partner } from "../data/partners";
 
 type Route =
@@ -30,6 +31,9 @@ export default function MainApp() {
   
   // Стек истории для кнопки назад
   const [history, setHistory] = useState<Route[]>([{ name: "home" }]);
+
+  // Состояние для модального окна отправки
+  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
 
   const handleImageError = (partnerId: string) => {
     setFailedImages(prev => new Set(prev).add(partnerId));
@@ -51,6 +55,13 @@ export default function MainApp() {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(n);
+  };
+
+  // Обработчик отправки
+  const handleSend = (data: { recipient: string; partner: string; amount: number }) => {
+    console.log("Отправка:", data);
+    // Здесь будет логика отправки
+    alert(`Перевод ${data.amount} B для ${data.recipient} (${data.partner})`);
   };
 
   // ============================================
@@ -264,7 +275,12 @@ export default function MainApp() {
 
                   {/* ACTIONS */}
                   <div className="mt-4 grid grid-cols-2 gap-3">
-                    <ActionCard label="Отправить" hint="Перевод" kind="send" onClick={() => goBlank("Отправить")} />
+                    <ActionCard 
+                      label="Отправить" 
+                      hint="Перевод" 
+                      kind="send" 
+                      onClick={() => setIsSendModalOpen(true)} 
+                    />
                     <ActionCard label="Получить" hint="Входящие" kind="receive" onClick={() => goBlank("Получить")} />
                     <ActionCard label="Обменять" hint="Бонусы" kind="swap" onClick={() => goBlank("Обменять")} />
                     <ActionCard label="Списать" hint="Оплата" kind="spend" onClick={() => goBlank("Списать")} />
@@ -353,6 +369,14 @@ export default function MainApp() {
           </div>
         </nav>
       )}
+
+      {/* Модальное окно отправки */}
+      <SendModal
+        isOpen={isSendModalOpen}
+        onClose={() => setIsSendModalOpen(false)}
+        onSend={handleSend}
+        currentBalance={selectedPartner.balance}
+      />
     </div>
   );
 }
