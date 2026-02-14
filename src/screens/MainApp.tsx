@@ -200,18 +200,35 @@ export default function MainApp() {
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
             >
               {/* MAIN CARD */}
-              <div className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden">
+              <motion.div
+                key={selectedPartner.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden"
+              >
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="text-xs text-zinc-500">Основной партнёр</div>
-                      <div className="text-xl font-semibold mt-1 truncate">
+                      <motion.div
+                        key={selectedPartner.name}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="text-xl font-semibold mt-1 truncate"
+                      >
                         {selectedPartner.displayName || selectedPartner.name}
-                      </div>
+                      </motion.div>
                     </div>
                     
-                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП */}
-                    <div
+                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП с анимацией */}
+                    <motion.div
+                      key={selectedPartner.id}
+                      initial={{ scale: 0.8, rotate: -5 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      whileTap={{ scale: 0.9, rotate: 0 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer active:bg-zinc-50"
                       onClick={() => {
                         const urlMap: { [key: string]: string } = {
                           vv: "https://m.vkusvill.ru",
@@ -234,7 +251,6 @@ export default function MainApp() {
                         const tg = (window as any).Telegram?.WebApp;
                         tg?.HapticFeedback.impactOccurred("light");
                       }}
-                      className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer active:bg-zinc-50"
                     >
                       {selectedPartner.logo && !failedImages.has(selectedPartner.id) ? (
                         <img 
@@ -246,15 +262,21 @@ export default function MainApp() {
                       ) : (
                         <div className={`w-full h-full bg-gradient-to-br ${selectedPartner.fallbackColor}`} />
                       )}
-                    </div>
+                    </motion.div>
                   </div>
 
                   <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-4 flex items-end justify-between gap-3">
                     <div>
                       <div className="text-xs text-zinc-500">Баланс</div>
-                      <div className="text-3xl font-semibold leading-none mt-1">
+                      <motion.div
+                        key={selectedPartner.balance}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        className="text-3xl font-semibold leading-none mt-1"
+                      >
                         {formatMoney(selectedPartner.balance)} <span className="text-base font-medium text-zinc-500">{selectedPartner.unit}</span>
-                      </div>
+                      </motion.div>
                     </div>
                     <PrimaryButton 
                       label="Активность" 
@@ -312,7 +334,7 @@ export default function MainApp() {
                 </div>
 
                 <div className="h-2" />
-              </div>
+              </motion.div>
 
               {/* PARTNERS LIST */}
               <PartnersList
