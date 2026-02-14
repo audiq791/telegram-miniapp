@@ -9,8 +9,7 @@ import {
   Check,
   ChevronDown,
   Info,
-  CheckCircle,
-  Circle
+  CheckCircle
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { IconButton } from "../components/ui";
@@ -47,18 +46,22 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
     }
     return [];
   });
+
+  // Временное состояние для выбора в dropdown
+  const [tempSelectedPartners, setTempSelectedPartners] = useState<string[]>([]);
   
   const [showPartnerDropdown, setShowPartnerDropdown] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showSaveNotification, setShowSaveNotification] = useState(false);
   
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
 
   // Доступные партнеры (первые 5) с балансами
   const availablePartners = partnersSeed.slice(0, 5).map(partner => ({
     ...partner,
-    balance: partner.balance // Баланс уже есть в данных
+    balance: partner.balance
   }));
 
   // Автоматическое сохранение
@@ -85,26 +88,54 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
         left: rect.left + window.scrollX,
         width: rect.width
       });
+      
+      // Инициализируем временное состояние текущими выбранными
+      setTempSelectedPartners(selectedPartners);
     }
-  }, [showPartnerDropdown]);
+  }, [showPartnerDropdown, selectedPartners]);
 
-  // Выбор/отмена выбора партнера (мультивыбор)
-  const togglePartner = (partnerId: string) => {
-    setSelectedPartners(prev => 
+  // Закрытие dropdown при клике вне
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) &&
+          buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
+        setShowPartnerDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Выбор/отмена выбора партнера (временный)
+  const toggleTempPartner = (partnerId: string) => {
+    setTempSelectedPartners(prev => 
       prev.includes(partnerId)
         ? prev.filter(id => id !== partnerId)
         : [...prev, partnerId]
     );
   };
 
-  // Выбор всех партнеров
-  const selectAll = () => {
-    setSelectedPartners(availablePartners.map(p => p.id));
+  // Выбор всех
+  const selectAllTemp = () => {
+    setTempSelectedPartners(availablePartners.map(p => p.id));
   };
 
   // Очистка всех
-  const clearAll = () => {
-    setSelectedPartners([]);
+  const clearAllTemp = () => {
+    setTempSelectedPartners([]);
+  };
+
+  // Сохранение выбора
+  const handleSaveSelection = () => {
+    setSelectedPartners(tempSelectedPartners);
+    setShowPartnerDropdown(false);
+  };
+
+  // Отмена выбора
+  const handleCancelSelection = () => {
+    setTempSelectedPartners(selectedPartners);
+    setShowPartnerDropdown(false);
   };
 
   // Копирование адреса
@@ -125,18 +156,6 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
       setShowPartnerDropdown(true);
     }
   };
-
-  // Закрытие dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
-        setShowPartnerDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   return (
     <motion.div
@@ -266,15 +285,16 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                   </motion.div>
                 </button>
 
-                {/* Красивый выпадающий список с анимацией */}
+                {/* Выпадающий список с кнопками Отмена/Сохранить */}
                 <AnimatePresence>
                   {showPartnerDropdown && (
                     <motion.div
+                      ref={dropdownRef}
                       initial={{ opacity: 0, y: -10, scaleY: 0.95 }}
                       animate={{ opacity: 1, y: 0, scaleY: 1 }}
                       exit={{ opacity: 0, y: -10, scaleY: 0.95 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="fixed z-[100] bg-white border border-zinc-200 rounded-xl shadow-xl max-h-80 overflow-y-auto"
+                      className="fixed z-[100] bg-white border border-zinc-200 rounded-xl shadow-xl overflow-hidden"
                       style={{
                         top: dropdownPosition.top,
                         left: dropdownPosition.left,
@@ -282,18 +302,18 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                         transformOrigin: "top"
                       }}
                     >
-                      {/* Заголовок списка с действиями */}
+                      {/* Заголовок списка */}
                       <div className="sticky top-0 bg-white border-b border-zinc-100 p-3 flex items-center justify-between">
                         <span className="text-xs font-medium text-zinc-500">Выберите партнеров</span>
                         <div className="flex gap-2">
                           <button
-                            onClick={selectAll}
+                            onClick={selectAllTemp}
                             className="text-xs text-zinc-600 hover:text-zinc-900 px-2 py-1 hover:bg-zinc-100 rounded-lg transition-colors"
                           >
                             Все
                           </button>
                           <button
-                            onClick={clearAll}
+                            onClick={clearAllTemp}
                             className="text-xs text-zinc-600 hover:text-zinc-900 px-2 py-1 hover:bg-zinc-100 rounded-lg transition-colors"
                           >
                             Очистить
@@ -302,14 +322,14 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                       </div>
 
                       {/* Список партнеров */}
-                      <div className="p-2">
+                      <div className="max-h-60 overflow-y-auto p-2">
                         {availablePartners.map((partner, index) => (
                           <motion.button
                             key={partner.id}
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.03 }}
-                            onClick={() => togglePartner(partner.id)}
+                            onClick={() => toggleTempPartner(partner.id)}
                             className="w-full p-3 rounded-xl flex items-center gap-3 hover:bg-zinc-50 transition-colors group"
                           >
                             {/* Логотип */}
@@ -330,18 +350,18 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                             {/* Кастомный чекбокс */}
                             <div className="relative">
                               <motion.div
-                                animate={selectedPartners.includes(partner.id) ? "selected" : "unselected"}
+                                animate={tempSelectedPartners.includes(partner.id) ? "selected" : "unselected"}
                                 variants={{
                                   selected: { scale: 1, opacity: 1 },
                                   unselected: { scale: 0.8, opacity: 0.6 }
                                 }}
                                 className="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-colors"
                                 style={{
-                                  borderColor: selectedPartners.includes(partner.id) ? "#18181b" : "#e4e4e7",
-                                  backgroundColor: selectedPartners.includes(partner.id) ? "#18181b" : "transparent"
+                                  borderColor: tempSelectedPartners.includes(partner.id) ? "#18181b" : "#e4e4e7",
+                                  backgroundColor: tempSelectedPartners.includes(partner.id) ? "#18181b" : "transparent"
                                 }}
                               >
-                                {selectedPartners.includes(partner.id) && (
+                                {tempSelectedPartners.includes(partner.id) && (
                                   <motion.div
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
@@ -354,6 +374,22 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                             </div>
                           </motion.button>
                         ))}
+                      </div>
+
+                      {/* Кнопки Отмена и Сохранить */}
+                      <div className="sticky bottom-0 bg-white border-t border-zinc-100 p-3 flex gap-2">
+                        <button
+                          onClick={handleCancelSelection}
+                          className="flex-1 py-2.5 border border-zinc-200 rounded-lg text-sm font-medium hover:bg-zinc-50 transition-colors"
+                        >
+                          Отмена
+                        </button>
+                        <button
+                          onClick={handleSaveSelection}
+                          className="flex-1 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors"
+                        >
+                          Сохранить
+                        </button>
                       </div>
                     </motion.div>
                   )}
@@ -379,7 +415,9 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                         >
                           <span>{partner.displayName || partner.name}</span>
                           <button
-                            onClick={() => togglePartner(partner.id)}
+                            onClick={() => {
+                              setSelectedPartners(prev => prev.filter(id => id !== partner.id));
+                            }}
                             className="ml-1 w-4 h-4 rounded-full hover:bg-zinc-200 flex items-center justify-center transition-colors"
                           >
                             ×
