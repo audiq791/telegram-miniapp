@@ -2,6 +2,13 @@
 
 import React, { useRef } from "react";
 import { motion } from "framer-motion";
+import Lottie from "lottie-react";
+
+// Импортируем анимации
+import sendAnimation from "../animations/send.json";
+import receiveAnimation from "../animations/receive.json";
+import swapAnimation from "../animations/exchange.json";
+import payAnimation from "../animations/pay.json";
 
 // ===========================
 // БАЗОВЫЕ КНОПКИ
@@ -102,12 +109,19 @@ export function ActionCard({
 }) {
   const [trigger, setTrigger] = React.useState(0);
   const isAnimating = useRef(false);
+  const lottieRef = useRef<any>(null);
 
   const handleClick = () => {
     if (isAnimating.current) return;
     isAnimating.current = true;
 
     setTrigger((v) => v + 1);
+    
+    // Запускаем анимацию с начала
+    if (lottieRef.current) {
+      lottieRef.current.goToAndPlay(0);
+    }
+    
     onClick?.();
 
     setTimeout(() => {
@@ -129,7 +143,7 @@ export function ActionCard({
         </div>
 
         <div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
-          <AnimatedActionIcon kind={kind} trigger={trigger} />
+          <AnimatedActionIcon kind={kind} trigger={trigger} lottieRef={lottieRef} />
         </div>
       </div>
     </motion.button>
@@ -137,75 +151,34 @@ export function ActionCard({
 }
 
 // ===========================
-// АНИМАЦИИ
+// АНИМАЦИИ (LOTTIE)
 // ===========================
 
-function Gif({ src, alt }: { src: string; alt: string }) {
+const animationMap = {
+  send: sendAnimation,
+  receive: receiveAnimation,
+  swap: swapAnimation,
+  spend: payAnimation,
+};
+
+function AnimatedActionIcon({ 
+  kind, 
+  trigger,
+  lottieRef 
+}: { 
+  kind: ActionKind; 
+  trigger: number;
+  lottieRef: React.MutableRefObject<any>;
+}) {
   return (
-    <img
-      src={src}
-      alt={alt}
-      draggable={false}
-      className="w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] md:w-[36px] md:h-[36px] object-contain"
+    <Lottie
+      lottieRef={lottieRef}
+      animationData={animationMap[kind]}
+      loop={false}
+      autoplay={false}
+      style={{ width: 30, height: 30 }}
+      initialSegment={[0, 0]} // начинаем с первого кадра
     />
-  );
-}
-
-function AnimatedActionIcon({ kind, trigger }: { kind: ActionKind; trigger: number }) {
-  const key = `${kind}-${trigger}`;
-
-  if (kind === "send") {
-    return (
-      <motion.div
-        key={key}
-        animate={
-          trigger
-            ? {
-                x: [0, 12, 20, 0],
-                y: [0, -6, -14, 0],
-                rotate: [0, -15, -25, 0],
-              }
-            : {}
-        }
-        transition={{ duration: 0.28, ease: "easeOut" }}
-      >
-        <Gif src="/icons/send.gif" alt="send" />
-      </motion.div>
-    );
-  }
-
-  if (kind === "receive") {
-    return (
-      <motion.div
-        key={key}
-        animate={trigger ? { scale: [1, 1.12, 1] } : {}}
-        transition={{ duration: 0.22, ease: "easeOut" }}
-      >
-        <Gif src="/icons/receive.gif" alt="receive" />
-      </motion.div>
-    );
-  }
-
-  if (kind === "swap") {
-    return (
-      <motion.div
-        key={key}
-        animate={trigger ? { rotate: [0, 12, -10, 0] } : {}}
-        transition={{ duration: 0.24, ease: "easeOut" }}
-      >
-        <Gif src="/icons/exchange.gif" alt="exchange" />
-      </motion.div>
-    );
-  }
-
-  return (
-    <motion.div
-      key={key}
-      animate={trigger ? { scale: [1, 1.1, 1] } : {}}
-      transition={{ duration: 0.22, ease: "easeOut" }}
-    >
-      <Gif src="/icons/pay.gif" alt="spend" />
-    </motion.div>
   );
 }
 
