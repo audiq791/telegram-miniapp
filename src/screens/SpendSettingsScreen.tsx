@@ -230,7 +230,7 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
             </div>
           </motion.div>
 
-         {/* Режим 2: Автоматическое списание выбранных */}
+        {/* Режим 2: Автоматическое списание выбранных */}
 <motion.div
   initial={{ opacity: 0, y: 20 }}
   animate={{ opacity: 1, y: 0 }}
@@ -241,7 +241,27 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
 >
   <div className="p-4">
     <div className="flex items-start justify-between gap-4">
-      {/* ... содержимое без изменений ... */}
+      <div className="flex-1">
+        <div className="flex items-center gap-2">
+          <Layers size={18} className="text-zinc-600" />
+          <h3 className="font-semibold">Автоматическое списание выбранных бонусов</h3>
+        </div>
+        <p className="text-xs text-zinc-500 mt-1">
+          Если эта функция включена, то при оплате картой будут списывать только бонусы выбранных вами партнеров.
+        </p>
+      </div>
+      <motion.button
+        whileTap={{ scale: 0.9 }}
+        onClick={() => handleModeChange("selected")}
+        className={`w-12 h-6 rounded-full transition-colors ${
+          selectedMode === "selected" ? "bg-zinc-900" : "bg-zinc-200"
+        }`}
+      >
+        <motion.div
+          animate={{ x: selectedMode === "selected" ? 24 : 0 }}
+          className="w-5 h-5 bg-white rounded-full shadow-md"
+        />
+      </motion.button>
     </div>
 
     {/* Контейнер с overflow-visible для dropdown */}
@@ -265,7 +285,7 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
         </motion.div>
       </button>
 
-      {/* Выпадающий список - теперь absolute внутри relative контейнера */}
+      {/* Выпадающий список */}
       <AnimatePresence>
         {showPartnerDropdown && (
           <motion.div
@@ -312,22 +332,17 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                   onClick={() => toggleTempPartner(partner.id)}
                   className="w-full p-3 rounded-xl flex items-center gap-3 hover:bg-zinc-50 transition-colors group"
                 >
-                  {/* Логотип */}
                   <div className="h-10 w-10 rounded-xl bg-white border border-zinc-200 overflow-hidden shadow-sm group-hover:shadow transition-shadow">
                     {partner.logo && (
                       <img src={partner.logo} alt="" className="w-full h-full object-contain p-1.5" />
                     )}
                   </div>
-
-                  {/* Название и баланс */}
                   <div className="flex-1 text-left">
                     <div className="font-medium">{partner.displayName || partner.name}</div>
                     <div className="text-xs text-zinc-500">
                       Баланс: {formatBalance(partner.balance)} B
                     </div>
                   </div>
-
-                  {/* Кастомный чекбокс */}
                   <div className="relative">
                     <motion.div
                       animate={tempSelectedPartners.includes(partner.id) ? "selected" : "unselected"}
