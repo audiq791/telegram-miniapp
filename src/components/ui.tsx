@@ -33,8 +33,6 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
 
 IconButton.displayName = 'IconButton';
 
-// ... остальной код без изменений
-
 export function PrimaryButton({ label, onClick }: { label: string; onClick?: () => void }) {
   return (
     <motion.button
@@ -92,10 +90,21 @@ export function TabButton({
 }
 
 // ===========================
-// ACTION CARD (КАК У ПАРТНЕРОВ)
+// ACTION CARD (ГИФКИ ЕСТЬ, АНИМАЦИЙ НЕТ)
 // ===========================
 
 export type ActionKind = "send" | "receive" | "swap" | "spend";
+
+function Gif({ src, alt }: { src: string; alt: string }) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      draggable={false}
+      className="w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] md:w-[36px] md:h-[36px] object-contain"
+    />
+  );
+}
 
 export function ActionCard({
   label,
