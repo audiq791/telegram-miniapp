@@ -18,6 +18,7 @@ import PartnerSiteScreen from "./PartnerSiteScreen";
 import SendModal from "../modals/SendModal";
 import ReceiveModal from "../modals/ReceiveModal";
 import SwapModal from "../modals/SwapModal";
+import InfoModal from "../modals/InfoModal";
 import { partnersSeed, type Partner } from "../data/partners";
 
 type Route =
@@ -38,6 +39,7 @@ export default function MainApp() {
   const [isSendModalOpen, setIsSendModalOpen] = useState(false);
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 
   const handleImageError = (partnerId: string) => {
     setFailedImages(prev => new Set(prev).add(partnerId));
@@ -177,7 +179,14 @@ export default function MainApp() {
           </div>
 
           <div className="flex items-center gap-2">
-            <IconButton aria="help" onClick={() => {}}>
+            <IconButton 
+              aria="help" 
+              onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
+                setIsInfoModalOpen(true);
+              }}
+            >
               <HelpCircle size={18} />
             </IconButton>
             <IconButton aria="more" onClick={() => {}}>
@@ -442,6 +451,11 @@ export default function MainApp() {
         onSwap={handleSwap}
         currentBalance={selectedPartner.balance}
         selectedPartner={selectedPartner}
+      />
+
+      <InfoModal
+        isOpen={isInfoModalOpen}
+        onClose={() => setIsInfoModalOpen(false)}
       />
     </div>
   );
