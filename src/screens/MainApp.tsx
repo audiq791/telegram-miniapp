@@ -202,12 +202,13 @@ export default function MainApp() {
                     </div>
                     
                     {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП - открывает сайт партнера */}
-                    <motion.div
+                                        <motion.div
                       key={selectedPartner.id}
                       initial={{ scale: 0.8, rotate: -5 }}
                       animate={{ scale: 1, rotate: 0 }}
+                      whileTap={{ scale: 0.9, rotate: 0 }}
                       transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                      className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer"
+                      className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer active:bg-zinc-50"
                       onClick={() => {
                         // Соответствие id партнера и URL сайта (мобильные версии)
                         const urlMap: { [key: string]: string } = {
