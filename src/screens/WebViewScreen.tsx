@@ -5,8 +5,8 @@ import { ArrowLeft, ExternalLink, Home, AlertCircle } from "lucide-react";
 import { IconButton } from "../components/ui";
 import { useState } from "react";
 
-// Список сайтов, которые блокируют iframe
-const BLOCKED_SITES = [
+// Список сайтов, которые МОЖНО открывать в iframe
+const ALLOWED_SITES = [
   "pfc-cska.com",
   "cska.com"
 ];
@@ -25,10 +25,11 @@ export default function WebViewScreen({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   
-  // Проверяем, блокирует ли сайт iframe
-  const isBlocked = BLOCKED_SITES.some(site => url.includes(site));
+  // Проверяем, можно ли открыть сайт в iframe
+  const isAllowed = ALLOWED_SITES.some(site => url.includes(site));
 
-  if (isBlocked) {
+  // Если сайт нельзя открыть в iframe, показываем сообщение
+  if (!isAllowed) {
     return (
       <motion.div
         className="min-h-[100dvh] bg-white flex flex-col"
@@ -76,6 +77,7 @@ export default function WebViewScreen({
     );
   }
 
+  // Для ЦСКА открываем в iframe
   return (
     <motion.div
       className="min-h-[100dvh] bg-white flex flex-col"
@@ -112,7 +114,7 @@ export default function WebViewScreen({
         </div>
       )}
 
-      {/* WebView iframe */}
+      {/* WebView iframe - только для ЦСКА */}
       <iframe
         src={url}
         className="flex-1 w-full"
@@ -132,7 +134,7 @@ export default function WebViewScreen({
           </div>
           <h3 className="text-lg font-semibold mb-2">Не удалось загрузить сайт</h3>
           <p className="text-sm text-zinc-500 mb-6 text-center">
-            Возможно, сайт запрещает открывать себя в iframe.
+            Возможно, сайт временно недоступен.
           </p>
           <button
             onClick={() => window.open(url, '_blank')}
