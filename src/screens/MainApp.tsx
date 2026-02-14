@@ -19,6 +19,7 @@ import SendModal from "../modals/SendModal";
 import ReceiveModal from "../modals/ReceiveModal";
 import SwapModal from "../modals/SwapModal";
 import InfoModal from "../modals/InfoModal";
+import MoreMenu from "../modals/MoreMenu";
 import { partnersSeed, type Partner } from "../data/partners";
 
 type Route =
@@ -40,6 +41,7 @@ export default function MainApp() {
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
 
   const handleImageError = (partnerId: string) => {
     setFailedImages(prev => new Set(prev).add(partnerId));
@@ -189,7 +191,14 @@ export default function MainApp() {
             >
               <HelpCircle size={18} />
             </IconButton>
-            <IconButton aria="more" onClick={() => {}}>
+            <IconButton 
+              aria="more" 
+              onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
+                setIsMoreMenuOpen(!isMoreMenuOpen);
+              }}
+            >
               <MoreHorizontal size={18} />
             </IconButton>
           </div>
@@ -456,6 +465,11 @@ export default function MainApp() {
       <InfoModal
         isOpen={isInfoModalOpen}
         onClose={() => setIsInfoModalOpen(false)}
+      />
+
+      <MoreMenu
+        isOpen={isMoreMenuOpen}
+        onClose={() => setIsMoreMenuOpen(false)}
       />
     </div>
   );
