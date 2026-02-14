@@ -9,7 +9,8 @@ import {
   Check,
   ChevronDown,
   Info,
-  CheckCircle
+  CheckCircle,
+  Circle
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { IconButton } from "../components/ui";
@@ -20,6 +21,14 @@ const WALLET_ADDRESS = "UQA754XVVal-AHWEwK8t8YzSvGttHiDt1XoUzpY-2XFQWaTN";
 
 type SpendSettingsScreenProps = {
   onBack: () => void;
+};
+
+// Функция форматирования баланса
+const formatBalance = (balance: number) => {
+  return new Intl.NumberFormat("ru-RU", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(balance);
 };
 
 export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps) {
@@ -43,14 +52,16 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
   const [copied, setCopied] = useState(false);
   const [showSaveNotification, setShowSaveNotification] = useState(false);
   
-  // Ref для кнопки, чтобы позиционировать выпадающий список
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
 
-  // Доступные партнеры (первые 5)
-  const availablePartners = partnersSeed.slice(0, 5);
+  // Доступные партнеры (первые 5) с балансами
+  const availablePartners = partnersSeed.slice(0, 5).map(partner => ({
+    ...partner,
+    balance: partner.balance // Баланс уже есть в данных
+  }));
 
-  // Автоматическое сохранение при любых изменениях
+  // Автоматическое сохранение
   useEffect(() => {
     const settings = {
       mode: selectedMode,
@@ -62,30 +73,38 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
     setShowSaveNotification(true);
     const timer = setTimeout(() => setShowSaveNotification(false), 2000);
     
-    console.log("Настройки сохранены:", settings);
-    
     return () => clearTimeout(timer);
   }, [selectedMode, selectedPartners]);
 
-  // Обновление позиции dropdown при открытии
+  // Обновление позиции dropdown
   useEffect(() => {
     if (showPartnerDropdown && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setDropdownPosition({
-        top: rect.bottom + window.scrollY,
+        top: rect.bottom + window.scrollY + 4,
         left: rect.left + window.scrollX,
         width: rect.width
       });
     }
   }, [showPartnerDropdown]);
 
-  // Выбор/отмена выбора партнера
+  // Выбор/отмена выбора партнера (мультивыбор)
   const togglePartner = (partnerId: string) => {
     setSelectedPartners(prev => 
       prev.includes(partnerId)
         ? prev.filter(id => id !== partnerId)
         : [...prev, partnerId]
     );
+  };
+
+  // Выбор всех партнеров
+  const selectAll = () => {
+    setSelectedPartners(availablePartners.map(p => p.id));
+  };
+
+  // Очистка всех
+  const clearAll = () => {
+    setSelectedPartners([]);
   };
 
   // Копирование адреса
@@ -107,7 +126,7 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
     }
   };
 
-  // Закрытие dropdown при клике вне
+  // Закрытие dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
@@ -237,66 +256,137 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                   <span className="text-sm text-zinc-600">
                     {selectedPartners.length === 0 
                       ? "Выберите партнеров" 
-                      : `Выбрано ${selectedPartners.length} партнеров`}
+                      : `Выбрано ${selectedPartners.length} из ${availablePartners.length}`}
                   </span>
-                  <ChevronDown size={16} className={`text-zinc-400 transition-transform ${showPartnerDropdown ? 'rotate-180' : ''}`} />
+                  <motion.div
+                    animate={{ rotate: showPartnerDropdown ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronDown size={16} className="text-zinc-400" />
+                  </motion.div>
                 </button>
 
-                {/* Выпадающий список (портальный) */}
+                {/* Красивый выпадающий список с анимацией */}
                 <AnimatePresence>
                   {showPartnerDropdown && (
                     <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="fixed z-[100] bg-white border border-zinc-200 rounded-xl shadow-lg max-h-60 overflow-y-auto"
+                      initial={{ opacity: 0, y: -10, scaleY: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scaleY: 1 }}
+                      exit={{ opacity: 0, y: -10, scaleY: 0.95 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="fixed z-[100] bg-white border border-zinc-200 rounded-xl shadow-xl max-h-80 overflow-y-auto"
                       style={{
                         top: dropdownPosition.top,
                         left: dropdownPosition.left,
-                        width: dropdownPosition.width
+                        width: dropdownPosition.width,
+                        transformOrigin: "top"
                       }}
                     >
-                      {availablePartners.map(partner => (
-                        <button
-                          key={partner.id}
-                          onClick={() => togglePartner(partner.id)}
-                          className="w-full p-3 flex items-center gap-3 hover:bg-zinc-50 transition-colors"
-                        >
-                          <div className="h-8 w-8 rounded-lg bg-white border border-zinc-200 overflow-hidden shrink-0">
-                            {partner.logo && (
-                              <img src={partner.logo} alt="" className="w-full h-full object-contain p-1" />
-                            )}
-                          </div>
-                          <span className="flex-1 text-left font-medium">{partner.displayName || partner.name}</span>
-                          {selectedPartners.includes(partner.id) && (
-                            <Check size={16} className="text-green-500 shrink-0" />
-                          )}
-                        </button>
-                      ))}
+                      {/* Заголовок списка с действиями */}
+                      <div className="sticky top-0 bg-white border-b border-zinc-100 p-3 flex items-center justify-between">
+                        <span className="text-xs font-medium text-zinc-500">Выберите партнеров</span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={selectAll}
+                            className="text-xs text-zinc-600 hover:text-zinc-900 px-2 py-1 hover:bg-zinc-100 rounded-lg transition-colors"
+                          >
+                            Все
+                          </button>
+                          <button
+                            onClick={clearAll}
+                            className="text-xs text-zinc-600 hover:text-zinc-900 px-2 py-1 hover:bg-zinc-100 rounded-lg transition-colors"
+                          >
+                            Очистить
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Список партнеров */}
+                      <div className="p-2">
+                        {availablePartners.map((partner, index) => (
+                          <motion.button
+                            key={partner.id}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.03 }}
+                            onClick={() => togglePartner(partner.id)}
+                            className="w-full p-3 rounded-xl flex items-center gap-3 hover:bg-zinc-50 transition-colors group"
+                          >
+                            {/* Логотип */}
+                            <div className="h-10 w-10 rounded-xl bg-white border border-zinc-200 overflow-hidden shadow-sm group-hover:shadow transition-shadow">
+                              {partner.logo && (
+                                <img src={partner.logo} alt="" className="w-full h-full object-contain p-1.5" />
+                              )}
+                            </div>
+
+                            {/* Название и баланс */}
+                            <div className="flex-1 text-left">
+                              <div className="font-medium">{partner.displayName || partner.name}</div>
+                              <div className="text-xs text-zinc-500">
+                                Баланс: {formatBalance(partner.balance)} B
+                              </div>
+                            </div>
+
+                            {/* Кастомный чекбокс */}
+                            <div className="relative">
+                              <motion.div
+                                animate={selectedPartners.includes(partner.id) ? "selected" : "unselected"}
+                                variants={{
+                                  selected: { scale: 1, opacity: 1 },
+                                  unselected: { scale: 0.8, opacity: 0.6 }
+                                }}
+                                className="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-colors"
+                                style={{
+                                  borderColor: selectedPartners.includes(partner.id) ? "#18181b" : "#e4e4e7",
+                                  backgroundColor: selectedPartners.includes(partner.id) ? "#18181b" : "transparent"
+                                }}
+                              >
+                                {selectedPartners.includes(partner.id) && (
+                                  <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                  >
+                                    <Check size={14} className="text-white" />
+                                  </motion.div>
+                                )}
+                              </motion.div>
+                            </div>
+                          </motion.button>
+                        ))}
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-                {/* Выбранные партнеры */}
+                {/* Выбранные партнеры (чипсы) */}
                 {selectedPartners.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-3">
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-wrap gap-2 mt-3"
+                  >
                     {availablePartners
                       .filter(p => selectedPartners.includes(p.id))
                       .map(partner => (
-                        <div
+                        <motion.div
                           key={partner.id}
+                          layout
+                          initial={{ scale: 0.8 }}
+                          animate={{ scale: 1 }}
+                          exit={{ scale: 0.8 }}
                           className="px-3 py-1.5 bg-zinc-100 rounded-full text-xs flex items-center gap-1"
                         >
                           <span>{partner.displayName || partner.name}</span>
                           <button
                             onClick={() => togglePartner(partner.id)}
-                            className="ml-1 text-zinc-500 hover:text-zinc-700"
+                            className="ml-1 w-4 h-4 rounded-full hover:bg-zinc-200 flex items-center justify-center transition-colors"
                           >
                             ×
                           </button>
-                        </div>
+                        </motion.div>
                       ))}
-                  </div>
+                  </motion.div>
                 )}
               </div>
             </div>
