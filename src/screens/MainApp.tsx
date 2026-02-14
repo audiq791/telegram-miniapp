@@ -596,47 +596,42 @@ export default function MainApp() {
                   </motion.button>
                 </div>
 
-                {partners.map((p) => (
-                  <motion.button
-                    key={p.id}
-                    onClick={() => selectPartner(p)}
-                    whileTap={{ scale: 0.985 }}
-                    transition={{ type: "spring", stiffness: 700, damping: 40 }}
-                    className={[
-                      "w-full rounded-2xl border shadow-sm p-3 flex items-center justify-between gap-3 text-left transition-all",
-                      selectedPartnerId === p.id
-                        ? "bg-zinc-50 border-zinc-300 shadow-md"  // подсветка выбранного партнера
-                        : "bg-white border-zinc-200 shadow-sm hover:shadow-md",
-                    ].join(" ")}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="shrink-0 h-11 w-11 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden">
-                        {p.logo && !failedImages.has(p.id) ? (
-                          <img 
-                            src={p.logo} 
-                            alt={p.name}
-                            className="w-full h-full object-contain p-1"
-                            onError={() => handleImageError(p.id)}
-                          />
-                        ) : (
-                          <div className={`w-full h-full bg-gradient-to-br ${p.fallbackColor}`} />
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="font-semibold truncate">{p.name}</div>
-                        <div className="text-xs text-zinc-500">Нажмите, чтобы открыть</div>
-                      </div>
-                    </div>
+              {partners.map((p) => (
+  <motion.button
+    key={p.id}
+    onClick={() => selectPartner(p)}
+    whileTap={{ scale: 0.98, backgroundColor: "#f4f4f5" }} // подсветка только при нажатии
+    transition={{ type: "spring", stiffness: 700, damping: 40 }}
+    className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-3 flex items-center justify-between gap-3 text-left hover:shadow-md"
+  >
+    <div className="flex items-center gap-3 min-w-0">
+      <div className="shrink-0 h-11 w-11 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden">
+        {p.logo && !failedImages.has(p.id) ? (
+          <img 
+            src={p.logo} 
+            alt={p.name}
+            className="w-full h-full object-contain p-1"
+            onError={() => handleImageError(p.id)}
+          />
+        ) : (
+          <div className={`w-full h-full bg-gradient-to-br ${p.fallbackColor}`} />
+        )}
+      </div>
+      <div className="min-w-0">
+        <div className="font-semibold truncate">{p.name}</div>
+        <div className="text-xs text-zinc-500">Нажмите, чтобы открыть</div>
+      </div>
+    </div>
 
-                    <div className="flex items-center gap-3 shrink-0">
-                      <div className="text-right">
-                        <div className="font-semibold">{formatMoney(p.balance)}</div>
-                        <div className="text-xs text-zinc-500">{p.unit}</div>
-                      </div>
-                      <ChevronRight size={18} className="text-zinc-400" />
-                    </div>
-                  </motion.button>
-                ))}
+    <div className="flex items-center gap-3 shrink-0">
+      <div className="text-right">
+        <div className="font-semibold">{formatMoney(p.balance)}</div>
+        <div className="text-xs text-zinc-500">{p.unit}</div>
+      </div>
+      <ChevronRight size={18} className="text-zinc-400" />
+    </div>
+  </motion.button>
+))}
               </div>
             </motion.main>
           ) : (
