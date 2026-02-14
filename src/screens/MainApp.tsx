@@ -354,9 +354,8 @@ export default function MainApp() {
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [query, setQuery] = useState("");
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
-  const [selectedPartner, setSelectedPartner] = useState<Partner>(partnersSeed[0]); // По умолчанию ВкусВилл
+  const [selectedPartner, setSelectedPartner] = useState<Partner>(partnersSeed[0]);
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>(partnersSeed[0].id);
-  const [prevBalance, setPrevBalance] = useState<number>(partnersSeed[0].balance);
   
   // Стек истории для кнопки назад
   const [history, setHistory] = useState<Route[]>([{ name: "home" }]);
@@ -373,13 +372,11 @@ export default function MainApp() {
 
   // Функция выбора партнера
   const selectPartner = (partner: Partner) => {
-    if (partner.id === selectedPartner.id) return; // Если тот же партнер - ничего не делаем
+    if (partner.id === selectedPartner.id) return;
     
-    setPrevBalance(selectedPartner.balance); // Запоминаем старый баланс для анимации
     setSelectedPartner(partner);
     setSelectedPartnerId(partner.id);
     
-    // Вибрация при выборе
     const tg = (window as any).Telegram?.WebApp;
     tg?.HapticFeedback.impactOccurred("light");
   };
@@ -391,21 +388,15 @@ export default function MainApp() {
     const tg = (window as any).Telegram?.WebApp;
     if (!tg) return;
 
-    console.log("Telegram WebApp доступен");
-
     const updateBackButton = () => {
       if (history.length > 1) {
         tg.BackButton.show();
-        console.log("Кнопка назад показана");
       } else {
         tg.BackButton.hide();
-        console.log("Кнопка назад скрыта");
       }
     };
 
     const handleBackClick = () => {
-      console.log("Нажата кнопка назад");
-      
       tg.HapticFeedback.impactOccurred("light");
       
       if (history.length > 1) {
@@ -497,7 +488,7 @@ export default function MainApp() {
               exit={{ opacity: 0, x: -12 }}
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
             >
-              {/* MAIN CARD - динамическая в зависимости от выбранного партнера */}
+              {/* MAIN CARD */}
               <motion.div
                 key={selectedPartner.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -519,7 +510,6 @@ export default function MainApp() {
                       </motion.div>
                     </div>
                     
-                    {/* Логотип или цветной квадратик выбранного партнера */}
                     <motion.div
                       key={selectedPartner.id}
                       initial={{ scale: 0.8, rotate: -5 }}
@@ -540,7 +530,6 @@ export default function MainApp() {
                     </motion.div>
                   </div>
 
-                  {/* Баланс с анимацией изменения */}
                   <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-4 flex items-end justify-between gap-3">
                     <div>
                       <div className="text-xs text-zinc-500">Баланс</div>
@@ -605,7 +594,7 @@ export default function MainApp() {
                     className={[
                       "w-full rounded-2xl border shadow-sm p-3 flex items-center justify-between gap-3 text-left transition-all",
                       selectedPartnerId === p.id
-                        ? "bg-zinc-50 border-zinc-300 shadow-md"  // подсветка выбранного партнера
+                        ? "bg-zinc-50 border-zinc-300 shadow-md"
                         : "bg-white border-zinc-200 shadow-sm hover:shadow-md",
                     ].join(" ")}
                   >
