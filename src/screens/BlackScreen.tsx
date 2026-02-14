@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { IconButton } from "../components/ui";
+import ActivityScreen from "./ActivityScreen";
 
 export default function BlackScreen({
   title,
@@ -11,6 +12,12 @@ export default function BlackScreen({
   title: string;
   onBack: () => void;
 }) {
+  // Если это экран активности, показываем ActivityScreen
+  if (title.includes("Активность")) {
+    return <ActivityScreen onBack={onBack} />;
+  }
+
+  // Для остальных экранов показываем заглушку
   return (
     <motion.div
       className="min-h-[100dvh] bg-zinc-50"
@@ -33,7 +40,7 @@ export default function BlackScreen({
 
         <div className="mt-6 rounded-[28px] bg-white border border-zinc-200 p-5 shadow-sm">
           <div className="text-sm text-zinc-600">
-            Пока пусто. Здесь позже будет нужный экран.
+            Пока пусто. Здесь позже будет экран &quot;{title}&quot;
           </div>
         </div>
       </div>
