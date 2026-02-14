@@ -53,6 +53,27 @@ export default function MainApp() {
     }).format(n);
   };
 
+  // Склонение слова "Бонус" в зависимости от числа
+  const getBonusWord = (num: number) => {
+    const lastDigit = num % 10;
+    const lastTwoDigits = num % 100;
+    
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+      return "Бонусов";
+    }
+    
+    switch (lastDigit) {
+      case 1:
+        return "Бонус";
+      case 2:
+      case 3:
+      case 4:
+        return "Бонуса";
+      default:
+        return "Бонусов";
+    }
+  };
+
   // ============================================
   // НАСТРОЙКА КНОПКИ НАЗАД TELEGRAM
   // ============================================
@@ -179,7 +200,7 @@ export default function MainApp() {
               exit={{ opacity: 0, x: -12 }}
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
             >
-                            {/* MAIN CARD */}
+              {/* MAIN CARD */}
               <motion.div
                 key={selectedPartner.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -197,11 +218,11 @@ export default function MainApp() {
                         animate={{ opacity: 1, x: 0 }}
                         className="text-xl font-semibold mt-1 truncate"
                       >
-                        {selectedPartner.name}
+                        {selectedPartner.displayName || selectedPartner.name}
                       </motion.div>
                     </div>
                     
-                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП */}
+                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП с эффектом нажатия */}
                     <motion.div
                       key={selectedPartner.id}
                       initial={{ scale: 0.8, rotate: -5 }}
@@ -210,6 +231,7 @@ export default function MainApp() {
                       transition={{ type: "spring", stiffness: 400, damping: 20 }}
                       className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer active:bg-zinc-50"
                       onClick={() => {
+                        // Соответствие id партнера и URL сайта
                         const urlMap: { [key: string]: string } = {
                           vv: "https://m.vkusvill.ru",
                           dodo: "https://m.dodopizza.ru",
@@ -222,7 +244,7 @@ export default function MainApp() {
                         if (url) {
                           goToPartnerSite(
                             url, 
-                            selectedPartner.name, 
+                            selectedPartner.displayName || selectedPartner.name, 
                             selectedPartner.logo, 
                             selectedPartner.fallbackColor
                           );
@@ -235,7 +257,7 @@ export default function MainApp() {
                       {selectedPartner.logo && !failedImages.has(selectedPartner.id) ? (
                         <img 
                           src={selectedPartner.logo} 
-                          alt={selectedPartner.name}
+                          alt={selectedPartner.displayName || selectedPartner.name}
                           className="w-full h-full object-contain p-1"
                           onError={() => handleImageError(selectedPartner.id)}
                         />
@@ -270,7 +292,7 @@ export default function MainApp() {
                   </div>
                 </div>
 
-                {/* Вместо большого градиента - маленький отступ или ничего */}
+                {/* Маленький отступ вместо градиента */}
                 <div className="h-2" />
               </motion.div>
 
@@ -282,6 +304,7 @@ export default function MainApp() {
                 failedImages={failedImages}
                 onImageError={handleImageError}
                 formatMoney={formatMoney}
+                getBonusWord={getBonusWord}
                 onOpenBlank={goBlank}
               />
 
