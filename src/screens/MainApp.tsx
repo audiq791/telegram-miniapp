@@ -14,11 +14,13 @@ import {
 import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
 import PartnersList from "../components/PartnersList";
 import BlackScreen from "./BlackScreen";
+import WebViewScreen from "./WebViewScreen";
 import { partnersSeed, type Partner } from "../data/partners";
 
 type Route =
   | { name: "home" }
-  | { name: "blank"; title: string };
+  | { name: "blank"; title: string }
+  | { name: "webview"; url: string; title: string };
 
 export default function MainApp() {
   const [tab, setTab] = useState<"wallet" | "market" | "partners" | "profile">("wallet");
@@ -101,6 +103,31 @@ export default function MainApp() {
     tg?.HapticFeedback.impactOccurred("light");
   };
 
+  const goToWebView = (url: string, title: string) => {
+    const newRoute: Route = { name: "webview", url, title };
+    
+    setHistory(prev => [...prev, newRoute]);
+    setRoute(newRoute);
+    
+    const tg = (window as any).Telegram?.WebApp;
+    tg?.HapticFeedback.impactOccurred("light");
+  };
+
+  const goBack = () => {
+    if (history.length <= 1) return;
+    
+    const newHistory = [...history];
+    newHistory.pop();
+    const previousRoute = newHistory[newHistory.length - 1];
+    
+    setHistory(newHistory);
+    setRoute(previousRoute);
+    
+    if (previousRoute.name === "home") {
+      setTab("wallet");
+    }
+  };
+
   const goHome = () => {
     setHistory([{ name: "home" }]);
     setRoute({ name: "home" });
@@ -122,7 +149,7 @@ export default function MainApp() {
             <div className="min-w-0">
               <div className="text-[13px] text-zinc-500 leading-none">Биржа бонусов</div>
               <div className="text-[15px] font-semibold leading-tight truncate">
-                {route.name === "blank"
+                {route.name === "blank" || route.name === "webview"
                   ? route.title
                   : "Кошелёк"}
               </div>
@@ -174,7 +201,7 @@ export default function MainApp() {
                       </motion.div>
                     </div>
                     
-                                        {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП - открывает сайт партнера */}
+                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП - открывает сайт партнера */}
                     <motion.div
                       key={selectedPartner.id}
                       initial={{ scale: 0.8, rotate: -5 }}
@@ -182,19 +209,18 @@ export default function MainApp() {
                       transition={{ type: "spring", stiffness: 400, damping: 20 }}
                       className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer"
                       onClick={() => {
-                        // Соответствие id партнера и URL сайта
+                        // Соответствие id партнера и URL сайта (мобильные версии)
                         const urlMap: { [key: string]: string } = {
-                          vv: "https://vkusvill.ru",
-                          dodo: "https://dodopizza.ru",
+                          vv: "https://m.vkusvill.ru",
+                          dodo: "https://m.dodopizza.ru",
                           cska: "https://pfc-cska.com",
-                          wb: "https://www.wildberries.ru",
+                          wb: "https://m.wildberries.ru",
                           cofix: "https://cofix.ru",
                         };
                         
                         const url = urlMap[selectedPartner.id];
                         if (url) {
-                          // Открываем сайт внутри Telegram WebView
-                          window.location.href = url;
+                          goToWebView(url, selectedPartner.name);
                         }
                         
                         const tg = (window as any).Telegram?.WebApp;
@@ -254,11 +280,19 @@ export default function MainApp() {
               />
 
             </motion.main>
-          ) : (
+          ) : route.name === "blank" ? (
             <BlackScreen 
               key="blank" 
               title={route.title} 
               onBack={goHome}
+            />
+          ) : (
+            <WebViewScreen
+              key="webview"
+              url={route.url}
+              title={route.title}
+              onBack={goBack}
+              onHome={goHome}
             />
           )}
         </AnimatePresence>
