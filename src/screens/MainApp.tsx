@@ -14,13 +14,13 @@ import {
 import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
 import PartnersList from "../components/PartnersList";
 import BlackScreen from "./BlackScreen";
-import WebViewScreen from "./WebViewScreen";
+import PartnerSiteScreen from "./PartnerSiteScreen";
 import { partnersSeed, type Partner } from "../data/partners";
 
 type Route =
   | { name: "home" }
   | { name: "blank"; title: string }
-  | { name: "webview"; url: string; title: string };
+  | { name: "partner-site"; url: string; title: string; logo: string; fallbackColor: string };
 
 export default function MainApp() {
   const [tab, setTab] = useState<"wallet" | "market" | "partners" | "profile">("wallet");
@@ -103,8 +103,8 @@ export default function MainApp() {
     tg?.HapticFeedback.impactOccurred("light");
   };
 
-  const goToWebView = (url: string, title: string) => {
-    const newRoute: Route = { name: "webview", url, title };
+  const goToPartnerSite = (url: string, title: string, logo: string, fallbackColor: string) => {
+    const newRoute: Route = { name: "partner-site", url, title, logo, fallbackColor };
     
     setHistory(prev => [...prev, newRoute]);
     setRoute(newRoute);
@@ -149,7 +149,7 @@ export default function MainApp() {
             <div className="min-w-0">
               <div className="text-[13px] text-zinc-500 leading-none">Биржа бонусов</div>
               <div className="text-[15px] font-semibold leading-tight truncate">
-                {route.name === "blank" || route.name === "webview"
+                {route.name === "blank" || route.name === "partner-site"
                   ? route.title
                   : "Кошелёк"}
               </div>
@@ -201,8 +201,8 @@ export default function MainApp() {
                       </motion.div>
                     </div>
                     
-                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП - открывает сайт партнера */}
-                                        <motion.div
+                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП с эффектом нажатия */}
+                    <motion.div
                       key={selectedPartner.id}
                       initial={{ scale: 0.8, rotate: -5 }}
                       animate={{ scale: 1, rotate: 0 }}
@@ -210,7 +210,7 @@ export default function MainApp() {
                       transition={{ type: "spring", stiffness: 400, damping: 20 }}
                       className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer active:bg-zinc-50"
                       onClick={() => {
-                        // Соответствие id партнера и URL сайта (мобильные версии)
+                        // Соответствие id партнера и URL сайта
                         const urlMap: { [key: string]: string } = {
                           vv: "https://m.vkusvill.ru",
                           dodo: "https://m.dodopizza.ru",
@@ -221,7 +221,12 @@ export default function MainApp() {
                         
                         const url = urlMap[selectedPartner.id];
                         if (url) {
-                          goToWebView(url, selectedPartner.name);
+                          goToPartnerSite(
+                            url, 
+                            selectedPartner.name, 
+                            selectedPartner.logo, 
+                            selectedPartner.fallbackColor
+                          );
                         }
                         
                         const tg = (window as any).Telegram?.WebApp;
@@ -288,10 +293,12 @@ export default function MainApp() {
               onBack={goHome}
             />
           ) : (
-            <WebViewScreen
-              key="webview"
+            <PartnerSiteScreen
+              key="partner-site"
               url={route.url}
               title={route.title}
+              logo={route.logo}
+              fallbackColor={route.fallbackColor}
               onBack={goBack}
               onHome={goHome}
             />
