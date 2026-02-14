@@ -37,7 +37,7 @@ export function PrimaryButton({ label, onClick }: { label: string; onClick?: () 
   return (
     <motion.button
       onClick={onClick}
-      whileTap={{ scale: 0.97, backgroundColor: "#27272a" }}
+      whileTap={{ scale: 0.95, backgroundColor: "#18181b" }}
       transition={{ type: "spring", stiffness: 700, damping: 40 }}
       className="h-11 px-5 sm:h-12 sm:px-6 md:h-14 md:px-8 rounded-2xl bg-zinc-900 text-white font-semibold shadow-[0_10px_25px_rgba(0,0,0,0.18)] text-[clamp(14px,2vw,16px)] transition-colors"
     >
