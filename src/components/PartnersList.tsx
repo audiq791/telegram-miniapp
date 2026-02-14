@@ -12,6 +12,7 @@ type PartnersListProps = {
   failedImages: Set<string>;
   onImageError: (partnerId: string) => void;
   formatMoney: (n: number) => string;
+  getBonusWord: (num: number) => string;
   onOpenBlank: (title: string) => void;
 };
 
@@ -22,6 +23,7 @@ export default function PartnersList({
   failedImages,
   onImageError,
   formatMoney,
+  getBonusWord,
 }: PartnersListProps) {
   const [query, setQuery] = useState("");
   const [showAllPartners, setShowAllPartners] = useState(false);
@@ -34,7 +36,7 @@ export default function PartnersList({
   // Первые 5 партнеров (с балансами) - всегда видны
   const topPartners = partners.slice(0, 5);
   
-  // Остальные партнеры (с нулевыми балансами) - все 28 штук
+  // Остальные партнеры (с нулевыми балансами)
   const otherPartners = partners.slice(5);
 
   return (
@@ -70,6 +72,7 @@ export default function PartnersList({
               failedImages={failedImages}
               onImageError={onImageError}
               formatMoney={formatMoney}
+              getBonusWord={getBonusWord}
             />
           ))}
         </div>
@@ -99,7 +102,7 @@ export default function PartnersList({
               </motion.div>
             </motion.button>
 
-            {/* Выпадающий список со ВСЕМИ остальными партнерами (28 штук) */}
+            {/* Выпадающий список со всеми остальными партнерами */}
             <AnimatePresence>
               {showAllPartners && (
                 <motion.div
@@ -118,6 +121,7 @@ export default function PartnersList({
                         failedImages={failedImages}
                         onImageError={onImageError}
                         formatMoney={formatMoney}
+                        getBonusWord={getBonusWord}
                       />
                     ))}
                   </div>
@@ -139,6 +143,7 @@ function PartnerItem({
   failedImages,
   onImageError,
   formatMoney,
+  getBonusWord,
 }: {
   partner: Partner;
   isSelected: boolean;
@@ -146,6 +151,7 @@ function PartnerItem({
   failedImages: Set<string>;
   onImageError: (partnerId: string) => void;
   formatMoney: (n: number) => string;
+  getBonusWord: (num: number) => string;
 }) {
   return (
     <motion.button
@@ -163,7 +169,7 @@ function PartnerItem({
           {partner.logo && !failedImages.has(partner.id) ? (
             <img 
               src={partner.logo} 
-              alt={partner.name}
+              alt={partner.displayName || partner.name}
               className="w-full h-full object-contain p-1"
               onError={() => onImageError(partner.id)}
             />
@@ -172,15 +178,15 @@ function PartnerItem({
           )}
         </div>
         <div className="min-w-0">
-          <div className="font-semibold truncate">{partner.name}</div>
-          <div className="text-xs text-zinc-500">Баланс: {formatMoney(partner.balance)} {partner.unit}</div>
+          <div className="font-semibold truncate">{partner.displayName || partner.name}</div>
+          <div className="text-xs text-zinc-500">{partner.category}</div>
         </div>
       </div>
 
       <div className="flex items-center gap-3 shrink-0">
         <div className="text-right">
           <div className="font-semibold">{formatMoney(partner.balance)}</div>
-          <div className="text-xs text-zinc-500">{partner.unit}</div>
+          <div className="text-xs text-zinc-500">{getBonusWord(partner.balance)}</div>
         </div>
         <ChevronRight size={18} className="text-zinc-400" />
       </div>
