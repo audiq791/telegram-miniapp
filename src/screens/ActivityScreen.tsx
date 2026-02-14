@@ -143,27 +143,26 @@ export default function ActivityScreen({ onBack }: { onBack: () => void }) {
               className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-4"
             >
               {tx.type === "exchange" ? (
-                // Специальный дизайн для обмена - два логотипа
+                // Специальный дизайн для обмена - два логотипа с иконкой между
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     {/* Первый партнер */}
-                    <div className="relative">
-                      <div className="h-10 w-10 rounded-xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden">
-                        {getPartnerLogo(tx.fromPartner || "") && !imageErrors.has(`from-${tx.id}`) ? (
-                          <img 
-                            src={getPartnerLogo(tx.fromPartner || "")} 
-                            alt={tx.fromPartner}
-                            className="w-full h-full object-contain p-1.5"
-                            onError={() => handleImageError(`from-${tx.id}`)}
-                          />
-                        ) : (
-                          <div className={`w-full h-full bg-gradient-to-br ${getPartnerColor(tx.fromPartner || "")}`} />
-                        )}
-                      </div>
-                      {/* Иконка обмена */}
-                      <div className="absolute -right-1 -bottom-1 h-5 w-5 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center">
-                        <Repeat size={10} className="text-blue-600" />
-                      </div>
+                    <div className="h-10 w-10 rounded-xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden">
+                      {getPartnerLogo(tx.fromPartner || "") && !imageErrors.has(`from-${tx.id}`) ? (
+                        <img 
+                          src={getPartnerLogo(tx.fromPartner || "")} 
+                          alt={tx.fromPartner}
+                          className="w-full h-full object-contain p-1.5"
+                          onError={() => handleImageError(`from-${tx.id}`)}
+                        />
+                      ) : (
+                        <div className={`w-full h-full bg-gradient-to-br ${getPartnerColor(tx.fromPartner || "")}`} />
+                      )}
+                    </div>
+
+                    {/* Иконка обмена по середине */}
+                    <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center -mx-1 z-10">
+                      <Repeat size={12} className="text-blue-600" />
                     </div>
 
                     {/* Второй партнер */}
@@ -180,7 +179,7 @@ export default function ActivityScreen({ onBack }: { onBack: () => void }) {
                       )}
                     </div>
 
-                    <div className="ml-1">
+                    <div className="ml-2">
                       <div className="font-semibold flex items-center gap-1">
                         {getTypeText(tx.type)}
                         {getTypeIcon(tx.type)}
