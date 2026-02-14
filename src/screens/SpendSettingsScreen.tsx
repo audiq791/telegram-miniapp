@@ -11,7 +11,7 @@ import {
   Info,
   CheckCircle
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { IconButton } from "../components/ui";
 import { partnersSeed } from "../data/partners";
 
@@ -24,7 +24,6 @@ type SpendSettingsScreenProps = {
 
 export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps) {
   const [selectedMode, setSelectedMode] = useState<"auto" | "selected" | "manual">(() => {
-    // Загружаем сохраненные настройки при инициализации
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('spendSettings');
       return saved ? JSON.parse(saved).mode : "manual";
@@ -43,6 +42,10 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
   const [showPartnerDropdown, setShowPartnerDropdown] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showSaveNotification, setShowSaveNotification] = useState(false);
+  
+  // Ref для кнопки, чтобы позиционировать выпадающий список
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
 
   // Доступные партнеры (первые 5)
   const availablePartners = partnersSeed.slice(0, 5);
@@ -56,15 +59,25 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
     
     localStorage.setItem('spendSettings', JSON.stringify(settings));
     
-    // Показываем уведомление о сохранении
     setShowSaveNotification(true);
     const timer = setTimeout(() => setShowSaveNotification(false), 2000);
     
-    // Логируем в консоль для отладки
     console.log("Настройки сохранены:", settings);
     
     return () => clearTimeout(timer);
   }, [selectedMode, selectedPartners]);
+
+  // Обновление позиции dropdown при открытии
+  useEffect(() => {
+    if (showPartnerDropdown && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width
+      });
+    }
+  }, [showPartnerDropdown]);
 
   // Выбор/отмена выбора партнера
   const togglePartner = (partnerId: string) => {
@@ -86,14 +99,25 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
     }
   };
 
-  // Смена режима с автоматическим сохранением
+  // Смена режима
   const handleModeChange = (mode: "auto" | "selected" | "manual") => {
     setSelectedMode(mode);
-    // Если переключаемся на режим "selected", открываем список партнеров
     if (mode === "selected") {
       setShowPartnerDropdown(true);
     }
   };
+
+  // Закрытие dropdown при клике вне
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
+        setShowPartnerDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <motion.div
@@ -173,7 +197,7 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className={`bg-white rounded-2xl border shadow-sm overflow-hidden transition-colors ${
+            className={`bg-white rounded-2xl border shadow-sm overflow-visible transition-colors ${
               selectedMode === "selected" ? "border-zinc-900 ring-1 ring-zinc-900" : "border-zinc-200"
             }`}
           >
@@ -202,86 +226,79 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                 </motion.button>
               </div>
 
-              {/* Выпадающий список партнеров */}
-              <AnimatePresence>
-                {selectedMode === "selected" && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="mt-4 space-y-3"
-                  >
-                    {/* Кнопка для открытия списка */}
-                    <button
-                      onClick={() => setShowPartnerDropdown(!showPartnerDropdown)}
-                      className="w-full p-3 border border-zinc-200 rounded-xl flex items-center justify-between gap-2 hover:border-zinc-300 transition-colors relative"
+              {/* Контейнер с overflow-visible для dropdown */}
+              <div className="relative">
+                {/* Кнопка для открытия списка */}
+                <button
+                  ref={buttonRef}
+                  onClick={() => setShowPartnerDropdown(!showPartnerDropdown)}
+                  className="w-full mt-4 p-3 border border-zinc-200 rounded-xl flex items-center justify-between gap-2 hover:border-zinc-300 transition-colors"
+                >
+                  <span className="text-sm text-zinc-600">
+                    {selectedPartners.length === 0 
+                      ? "Выберите партнеров" 
+                      : `Выбрано ${selectedPartners.length} партнеров`}
+                  </span>
+                  <ChevronDown size={16} className={`text-zinc-400 transition-transform ${showPartnerDropdown ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Выпадающий список (портальный) */}
+                <AnimatePresence>
+                  {showPartnerDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="fixed z-[100] bg-white border border-zinc-200 rounded-xl shadow-lg max-h-60 overflow-y-auto"
+                      style={{
+                        top: dropdownPosition.top,
+                        left: dropdownPosition.left,
+                        width: dropdownPosition.width
+                      }}
                     >
-                      <span className="text-sm text-zinc-600">
-                        {selectedPartners.length === 0 
-                          ? "Выберите партнеров" 
-                          : `Выбрано ${selectedPartners.length} партнеров`}
-                      </span>
-                      <ChevronDown size={16} className={`text-zinc-400 transition-transform ${showPartnerDropdown ? 'rotate-180' : ''}`} />
-                    </button>
+                      {availablePartners.map(partner => (
+                        <button
+                          key={partner.id}
+                          onClick={() => togglePartner(partner.id)}
+                          className="w-full p-3 flex items-center gap-3 hover:bg-zinc-50 transition-colors"
+                        >
+                          <div className="h-8 w-8 rounded-lg bg-white border border-zinc-200 overflow-hidden shrink-0">
+                            {partner.logo && (
+                              <img src={partner.logo} alt="" className="w-full h-full object-contain p-1" />
+                            )}
+                          </div>
+                          <span className="flex-1 text-left font-medium">{partner.displayName || partner.name}</span>
+                          {selectedPartners.includes(partner.id) && (
+                            <Check size={16} className="text-green-500 shrink-0" />
+                          )}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-                    {/* Выпадающий список */}
-                    <div className="relative">
-                      <AnimatePresence>
-                        {showPartnerDropdown && (
-                          <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            className="absolute z-50 w-full bg-white border border-zinc-200 rounded-xl shadow-lg max-h-60 overflow-y-auto"
-                            style={{ top: 0 }}
+                {/* Выбранные партнеры */}
+                {selectedPartners.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {availablePartners
+                      .filter(p => selectedPartners.includes(p.id))
+                      .map(partner => (
+                        <div
+                          key={partner.id}
+                          className="px-3 py-1.5 bg-zinc-100 rounded-full text-xs flex items-center gap-1"
+                        >
+                          <span>{partner.displayName || partner.name}</span>
+                          <button
+                            onClick={() => togglePartner(partner.id)}
+                            className="ml-1 text-zinc-500 hover:text-zinc-700"
                           >
-                            {availablePartners.map(partner => (
-                              <button
-                                key={partner.id}
-                                onClick={() => togglePartner(partner.id)}
-                                className="w-full p-3 flex items-center gap-3 hover:bg-zinc-50 transition-colors"
-                              >
-                                <div className="h-8 w-8 rounded-lg bg-white border border-zinc-200 overflow-hidden shrink-0">
-                                  {partner.logo && (
-                                    <img src={partner.logo} alt="" className="w-full h-full object-contain p-1" />
-                                  )}
-                                </div>
-                                <span className="flex-1 text-left font-medium">{partner.displayName || partner.name}</span>
-                                {selectedPartners.includes(partner.id) && (
-                                  <Check size={16} className="text-green-500 shrink-0" />
-                                )}
-                              </button>
-                            ))}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-
-                    {/* Выбранные партнеры */}
-                    {selectedPartners.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {availablePartners
-                          .filter(p => selectedPartners.includes(p.id))
-                          .map(partner => (
-                            <div
-                              key={partner.id}
-                              className="px-3 py-1.5 bg-zinc-100 rounded-full text-xs flex items-center gap-1"
-                            >
-                              <span>{partner.displayName || partner.name}</span>
-                              <button
-                                onClick={() => togglePartner(partner.id)}
-                                className="ml-1 text-zinc-500 hover:text-zinc-700"
-                              >
-                                ×
-                              </button>
-                            </div>
-                          ))}
-                      </div>
-                    )}
-                  </motion.div>
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                  </div>
                 )}
-              </AnimatePresence>
+              </div>
             </div>
           </motion.div>
 
