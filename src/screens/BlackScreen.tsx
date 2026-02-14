@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { IconButton } from "../components/ui";
 import ActivityScreen from "./ActivityScreen";
+import SpendSettingsScreen from "./SpendSettingsScreen";
 
 export default function BlackScreen({
   title,
@@ -13,8 +14,13 @@ export default function BlackScreen({
   onBack: () => void;
 }) {
   // Если это экран активности, показываем ActivityScreen
-  if (title.includes("Активность")) {
+  if (title === "Активность") {
     return <ActivityScreen onBack={onBack} />;
+  }
+
+  // Если это экран настроек списания
+  if (title === "Списать") {
+    return <SpendSettingsScreen onBack={onBack} />;
   }
 
   // Для остальных экранов показываем заглушку
