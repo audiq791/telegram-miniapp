@@ -174,12 +174,32 @@ export default function MainApp() {
                       </motion.div>
                     </div>
                     
+                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП */}
                     <motion.div
                       key={selectedPartner.id}
                       initial={{ scale: 0.8, rotate: -5 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                      className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden"
+                      className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer"
+                      onClick={() => {
+                        // Соответствие id партнера и имени файла
+                        const fileMap: { [key: string]: string } = {
+                          vv: "vkusvill.txt",
+                          dodo: "dodo.txt",
+                          cska: "cska.txt",
+                          wb: "wildberries.txt",
+                          cofix: "cofix.txt",
+                        };
+                        
+                        const fileName = fileMap[selectedPartner.id];
+                        if (fileName) {
+                          // Открываем в новой вкладке
+                          window.open(`/partners/${fileName}`, '_blank');
+                        }
+                        
+                        const tg = (window as any).Telegram?.WebApp;
+                        tg?.HapticFeedback.impactOccurred("light");
+                      }}
                     >
                       {selectedPartner.logo && !failedImages.has(selectedPartner.id) ? (
                         <img 
