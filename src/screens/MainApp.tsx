@@ -25,12 +25,15 @@ type Partner = {
   fallbackColor: string;
 };
 
+// Генерируем случайные балансы для первых 5 партнеров
+const generateRandomBalance = () => Math.floor(Math.random() * 5000) + 100;
+
 const partnersSeed: Partner[] = [
-  // ПРИОРИТЕТНЫЕ ПАРТНЕРЫ (В САМОМ ВЕРХУ)
+  // ПРИОРИТЕТНЫЕ ПАРТНЕРЫ (В САМОМ ВЕРХУ) - со случайными балансами
   { 
     id: "vv", 
     name: "ВкусВилл", 
-    balance: 1250.50, 
+    balance: generateRandomBalance(), 
     unit: "B", 
     logo: "/logos/vkusvill.svg",
     fallbackColor: "from-emerald-400 to-emerald-600" 
@@ -38,7 +41,7 @@ const partnersSeed: Partner[] = [
   { 
     id: "dodo", 
     name: "DODO PIZZA", 
-    balance: 0, 
+    balance: generateRandomBalance(), 
     unit: "B", 
     logo: "/logos/dodo.svg",
     fallbackColor: "from-red-400 to-red-600" 
@@ -46,7 +49,7 @@ const partnersSeed: Partner[] = [
   { 
     id: "cska", 
     name: "CSKA", 
-    balance: 0, 
+    balance: generateRandomBalance(), 
     unit: "B", 
     logo: "/logos/cska.svg",
     fallbackColor: "from-blue-400 to-blue-600" 
@@ -54,7 +57,7 @@ const partnersSeed: Partner[] = [
   { 
     id: "wb", 
     name: "Wildberries", 
-    balance: 0, 
+    balance: generateRandomBalance(), 
     unit: "B", 
     logo: "/logos/wildberries.svg",
     fallbackColor: "from-purple-400 to-purple-600" 
@@ -62,17 +65,17 @@ const partnersSeed: Partner[] = [
   { 
     id: "cofix", 
     name: "Cofix", 
-    balance: 0, 
+    balance: generateRandomBalance(), 
     unit: "B", 
     logo: "/logos/cofix.svg",
     fallbackColor: "from-red-400 to-red-600" 
   },
   
-  // ОСТАЛЬНЫЕ ПАРТНЕРЫ
+  // ОСТАЛЬНЫЕ ПАРТНЕРЫ (с нулевыми балансами)
   { 
     id: "fuel", 
     name: "FUEL", 
-    balance: 2380.29, 
+    balance: 0, 
     unit: "B", 
     logo: "", 
     fallbackColor: "from-fuchsia-500 to-indigo-500" 
@@ -80,7 +83,7 @@ const partnersSeed: Partner[] = [
   { 
     id: "magnolia", 
     name: "Магнолия", 
-    balance: 158.14, 
+    balance: 0, 
     unit: "B", 
     logo: "", 
     fallbackColor: "from-lime-400 to-green-600" 
@@ -88,7 +91,7 @@ const partnersSeed: Partner[] = [
   { 
     id: "piligrim", 
     name: "Пилигрим", 
-    balance: 100, 
+    balance: 0, 
     unit: "B", 
     logo: "", 
     fallbackColor: "from-sky-500 to-blue-700" 
@@ -351,6 +354,9 @@ export default function MainApp() {
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [query, setQuery] = useState("");
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const [selectedPartner, setSelectedPartner] = useState<Partner>(partnersSeed[0]); // По умолчанию ВкусВилл
+  const [selectedPartnerId, setSelectedPartnerId] = useState<string>(partnersSeed[0].id);
+  const [prevBalance, setPrevBalance] = useState<number>(partnersSeed[0].balance);
   
   // Стек истории для кнопки назад
   const [history, setHistory] = useState<Route[]>([{ name: "home" }]);
@@ -363,6 +369,19 @@ export default function MainApp() {
 
   const handleImageError = (partnerId: string) => {
     setFailedImages(prev => new Set(prev).add(partnerId));
+  };
+
+  // Функция выбора партнера
+  const selectPartner = (partner: Partner) => {
+    if (partner.id === selectedPartner.id) return; // Если тот же партнер - ничего не делаем
+    
+    setPrevBalance(selectedPartner.balance); // Запоминаем старый баланс для анимации
+    setSelectedPartner(partner);
+    setSelectedPartnerId(partner.id);
+    
+    // Вибрация при выборе
+    const tg = (window as any).Telegram?.WebApp;
+    tg?.HapticFeedback.impactOccurred("light");
   };
 
   // ============================================
@@ -478,23 +497,62 @@ export default function MainApp() {
               exit={{ opacity: 0, x: -12 }}
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
             >
-              {/* MAIN CARD */}
-              <div className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden">
+              {/* MAIN CARD - динамическая в зависимости от выбранного партнера */}
+              <motion.div
+                key={selectedPartner.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden"
+              >
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="text-xs text-zinc-500">Основной партнёр</div>
-                      <div className="text-xl font-semibold mt-1 truncate">ВкусВилл</div>
+                      <motion.div
+                        key={selectedPartner.name}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="text-xl font-semibold mt-1 truncate"
+                      >
+                        {selectedPartner.name}
+                      </motion.div>
                     </div>
-                    <div className="shrink-0 h-12 w-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-sm" />
+                    
+                    {/* Логотип или цветной квадратик выбранного партнера */}
+                    <motion.div
+                      key={selectedPartner.id}
+                      initial={{ scale: 0.8, rotate: -5 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden"
+                    >
+                      {selectedPartner.logo && !failedImages.has(selectedPartner.id) ? (
+                        <img 
+                          src={selectedPartner.logo} 
+                          alt={selectedPartner.name}
+                          className="w-full h-full object-contain p-1"
+                          onError={() => handleImageError(selectedPartner.id)}
+                        />
+                      ) : (
+                        <div className={`w-full h-full bg-gradient-to-br ${selectedPartner.fallbackColor}`} />
+                      )}
+                    </motion.div>
                   </div>
 
+                  {/* Баланс с анимацией изменения */}
                   <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-4 flex items-end justify-between gap-3">
                     <div>
                       <div className="text-xs text-zinc-500">Баланс</div>
-                      <div className="text-3xl font-semibold leading-none mt-1">
-                        {formatMoney(0)} <span className="text-base font-medium text-zinc-500">B</span>
-                      </div>
+                      <motion.div
+                        key={selectedPartner.balance}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        className="text-3xl font-semibold leading-none mt-1"
+                      >
+                        {formatMoney(selectedPartner.balance)} <span className="text-base font-medium text-zinc-500">{selectedPartner.unit}</span>
+                      </motion.div>
                     </div>
                     <PrimaryButton label="Пополнить" onClick={() => goBlank("Пополнить")} />
                   </div>
@@ -509,7 +567,7 @@ export default function MainApp() {
                 </div>
 
                 <div className="h-10 bg-gradient-to-b from-transparent to-zinc-50" />
-              </div>
+              </motion.div>
 
               {/* SEARCH */}
               <div className="mt-4">
@@ -541,10 +599,15 @@ export default function MainApp() {
                 {partners.map((p) => (
                   <motion.button
                     key={p.id}
-                    onClick={() => goBlank(p.name)}
+                    onClick={() => selectPartner(p)}
                     whileTap={{ scale: 0.985 }}
                     transition={{ type: "spring", stiffness: 700, damping: 40 }}
-                    className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-3 flex items-center justify-between gap-3 text-left hover:shadow-md"
+                    className={[
+                      "w-full rounded-2xl border shadow-sm p-3 flex items-center justify-between gap-3 text-left transition-all",
+                      selectedPartnerId === p.id
+                        ? "bg-zinc-50 border-zinc-300 shadow-md"  // подсветка выбранного партнера
+                        : "bg-white border-zinc-200 shadow-sm hover:shadow-md",
+                    ].join(" ")}
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="shrink-0 h-11 w-11 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden">
