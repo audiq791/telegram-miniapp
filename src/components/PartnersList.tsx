@@ -3,15 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronRight } from "lucide-react";
 import { useState } from "react";
-
-export type Partner = {
-  id: string;
-  name: string;
-  balance: number;
-  unit: string;
-  logo: string;
-  fallbackColor: string;
-};
+import { type Partner } from "../data/partners";
 
 type PartnersListProps = {
   partners: Partner[];
@@ -30,7 +22,6 @@ export default function PartnersList({
   failedImages,
   onImageError,
   formatMoney,
-  onOpenBlank,
 }: PartnersListProps) {
   const [query, setQuery] = useState("");
   const [showAllPartners, setShowAllPartners] = useState(false);
@@ -39,6 +30,12 @@ export default function PartnersList({
   const filteredPartners = partners.filter((p) =>
     p.name.toLowerCase().includes(query.toLowerCase())
   );
+
+  // Первые 5 партнеров (с балансами) - всегда видны
+  const topPartners = partners.slice(0, 5);
+  
+  // Остальные партнеры (с нулевыми балансами) - все 28 штук
+  const otherPartners = partners.slice(5);
 
   return (
     <div>
@@ -64,7 +61,7 @@ export default function PartnersList({
 
         {/* Первые 5 партнеров всегда видны */}
         <div className="space-y-2">
-          {filteredPartners.slice(0, 5).map((p) => (
+          {topPartners.map((p) => (
             <PartnerItem
               key={p.id}
               partner={p}
@@ -77,56 +74,58 @@ export default function PartnersList({
           ))}
         </div>
 
-        {/* Кнопка "Все партнеры" - выпадающий список */}
-        <div className="mt-2">
-          <motion.button
-            onClick={() => setShowAllPartners(!showAllPartners)}
-            whileTap={{ scale: 0.98 }}
-            className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 flex items-center justify-between text-left hover:shadow-md"
-          >
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-2xl bg-zinc-100 text-zinc-600 grid place-items-center">
-                <Search size={18} />
-              </div>
-              <div>
-                <div className="font-semibold">Все партнеры</div>
-                <div className="text-xs text-zinc-500">{filteredPartners.length - 5} партнеров</div>
-              </div>
-            </div>
-            <motion.div
-              animate={{ rotate: showAllPartners ? 270 : 90 }}
-              transition={{ duration: 0.2 }}
+        {/* Если есть остальные партнеры, показываем кнопку "Все партнеры" */}
+        {otherPartners.length > 0 && (
+          <div className="mt-2">
+            <motion.button
+              onClick={() => setShowAllPartners(!showAllPartners)}
+              whileTap={{ scale: 0.98 }}
+              className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 flex items-center justify-between text-left hover:shadow-md"
             >
-              <ChevronRight size={20} className="text-zinc-400" />
-            </motion.div>
-          </motion.button>
-
-          {/* Выпадающий список со всеми партнерами */}
-          <AnimatePresence>
-            {showAllPartners && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.15 }}
-              >
-                <div className="space-y-2 pt-2">
-                  {filteredPartners.slice(5).map((p) => (
-                    <PartnerItem
-                      key={p.id}
-                      partner={p}
-                      isSelected={selectedPartner.id === p.id}
-                      onSelect={onSelectPartner}
-                      failedImages={failedImages}
-                      onImageError={onImageError}
-                      formatMoney={formatMoney}
-                    />
-                  ))}
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-2xl bg-zinc-100 text-zinc-600 grid place-items-center">
+                  <Search size={18} />
                 </div>
+                <div>
+                  <div className="font-semibold">Все партнеры</div>
+                  <div className="text-xs text-zinc-500">{otherPartners.length} партнеров</div>
+                </div>
+              </div>
+              <motion.div
+                animate={{ rotate: showAllPartners ? 270 : 90 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronRight size={20} className="text-zinc-400" />
               </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+            </motion.button>
+
+            {/* Выпадающий список со ВСЕМИ остальными партнерами (28 штук) */}
+            <AnimatePresence>
+              {showAllPartners && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <div className="space-y-2 pt-2">
+                    {otherPartners.map((p) => (
+                      <PartnerItem
+                        key={p.id}
+                        partner={p}
+                        isSelected={selectedPartner.id === p.id}
+                        onSelect={onSelectPartner}
+                        failedImages={failedImages}
+                        onImageError={onImageError}
+                        formatMoney={formatMoney}
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
     </div>
   );
