@@ -16,6 +16,7 @@ import PartnersList from "../components/PartnersList";
 import BlackScreen from "./BlackScreen";
 import PartnerSiteScreen from "./PartnerSiteScreen";
 import SendModal from "../modals/SendModal";
+import ReceiveModal from "../modals/ReceiveModal";
 import { partnersSeed, type Partner } from "../data/partners";
 
 type Route =
@@ -32,8 +33,9 @@ export default function MainApp() {
   // Стек истории для кнопки назад
   const [history, setHistory] = useState<Route[]>([{ name: "home" }]);
 
-  // Состояние для модального окна отправки
+  // Состояния для модальных окон
   const [isSendModalOpen, setIsSendModalOpen] = useState(false);
+  const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
 
   const handleImageError = (partnerId: string) => {
     setFailedImages(prev => new Set(prev).add(partnerId));
@@ -256,7 +258,7 @@ export default function MainApp() {
                     />
                   </div>
 
-                  {/* ACTIONS С ХАПТИКОМ */}
+                  {/* ACTIONS */}
                   <div className="mt-4 grid grid-cols-2 gap-3">
                     <ActionCard 
                       label="Отправить" 
@@ -275,7 +277,7 @@ export default function MainApp() {
                       onClick={() => {
                         const tg = (window as any).Telegram?.WebApp;
                         tg?.HapticFeedback.impactOccurred("light");
-                        goBlank("Получить");
+                        setIsReceiveModalOpen(true);
                       }} 
                     />
                     <ActionCard 
@@ -391,12 +393,17 @@ export default function MainApp() {
         </nav>
       )}
 
-      {/* Модальное окно отправки */}
+      {/* Модальные окна */}
       <SendModal
         isOpen={isSendModalOpen}
         onClose={() => setIsSendModalOpen(false)}
         onSend={handleSend}
         currentBalance={selectedPartner.balance}
+      />
+
+      <ReceiveModal
+        isOpen={isReceiveModalOpen}
+        onClose={() => setIsReceiveModalOpen(false)}
       />
     </div>
   );
