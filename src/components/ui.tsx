@@ -84,7 +84,7 @@ export function TabButton({
 }
 
 // ===========================
-// ACTION CARD
+// ACTION CARD (ГИФКИ ЕСТЬ, АНИМАЦИЙ НЕТ)
 // ===========================
 
 export type ActionKind = "send" | "receive" | "swap" | "spend";
@@ -111,21 +111,6 @@ export function ActionCard({
   kind: ActionKind;
   onClick?: () => void;
 }) {
-  const [trigger, setTrigger] = React.useState(0);
-  const isAnimating = useRef(false);
-
-  const handleClick = () => {
-    if (isAnimating.current) return;
-    isAnimating.current = true;
-
-    setTrigger((v) => v + 1);
-    onClick?.();
-
-    setTimeout(() => {
-      isAnimating.current = false;
-    }, 280);
-  };
-
   // Пути к GIF файлам
   const gifSrc = {
     send: "/icons/send.gif",
@@ -136,7 +121,7 @@ export function ActionCard({
 
   return (
     <motion.button
-      onClick={handleClick}
+      onClick={onClick}
       whileTap={{ scale: 0.985 }}
       transition={{ type: "spring", stiffness: 520, damping: 34 }}
       className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 sm:p-5 md:p-6 text-left hover:shadow-md"
@@ -147,82 +132,12 @@ export function ActionCard({
           <div className="text-[clamp(11px,1.5vw,13px)] text-zinc-500 truncate">{hint}</div>
         </div>
 
+        {/* Просто гифка, без анимаций */}
         <div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
-          <AnimatedActionIcon kind={kind} trigger={trigger} gifSrc={gifSrc[kind]} />
+          <Gif src={gifSrc[kind]} alt={kind} />
         </div>
       </div>
     </motion.button>
-  );
-}
-
-// ===========================
-// АНИМАЦИИ (GIF)
-// ===========================
-
-function AnimatedActionIcon({ 
-  kind, 
-  trigger,
-  gifSrc 
-}: { 
-  kind: ActionKind; 
-  trigger: number;
-  gifSrc: string;
-}) {
-  const key = `${kind}-${trigger}`;
-
-  if (kind === "send") {
-    return (
-      <motion.div
-        key={key}
-        animate={
-          trigger
-            ? {
-                x: [0, 12, 20, 0],
-                y: [0, -6, -14, 0],
-                rotate: [0, -15, -25, 0],
-              }
-            : {}
-        }
-        transition={{ duration: 0.28, ease: "easeOut" }}
-      >
-        <Gif src={gifSrc} alt={kind} />
-      </motion.div>
-    );
-  }
-
-  if (kind === "receive") {
-    return (
-      <motion.div
-        key={key}
-        animate={trigger ? { scale: [1, 1.12, 1] } : {}}
-        transition={{ duration: 0.22, ease: "easeOut" }}
-      >
-        <Gif src={gifSrc} alt={kind} />
-      </motion.div>
-    );
-  }
-
-  if (kind === "swap") {
-    return (
-      <motion.div
-        key={key}
-        animate={trigger ? { rotate: [0, 12, -10, 0] } : {}}
-        transition={{ duration: 0.24, ease: "easeOut" }}
-      >
-        <Gif src={gifSrc} alt={kind} />
-      </motion.div>
-    );
-  }
-
-  // spend
-  return (
-    <motion.div
-      key={key}
-      animate={trigger ? { scale: [1, 1.1, 1] } : {}}
-      transition={{ duration: 0.22, ease: "easeOut" }}
-    >
-      <Gif src={gifSrc} alt={kind} />
-    </motion.div>
   );
 }
 
