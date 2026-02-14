@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef, useState } from "react";
+import React, { forwardRef } from "react";
 import { motion } from "framer-motion";
 
 // ===========================
@@ -16,21 +16,13 @@ type IconButtonProps = {
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   ({ aria, onClick, children, className = "" }, ref) => {
-    const [isPressed, setIsPressed] = useState(false);
-
-    const handleClick = () => {
-      setIsPressed(true);
-      setTimeout(() => setIsPressed(false), 200);
-      onClick?.();
-    };
-
     return (
       <motion.button
         ref={ref}
         aria-label={aria}
-        onClick={handleClick}
-        animate={isPressed ? { scale: 0.94, backgroundColor: "#f4f4f5" } : { scale: 1, backgroundColor: "#ffffff" }}
-        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        onClick={onClick}
+        whileTap={{ scale: 0.94, backgroundColor: "#f4f4f5" }}
+        transition={{ type: "spring", stiffness: 700, damping: 40 }}
         className={`h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm grid place-items-center text-zinc-900 ${className}`}
       >
         {children}
@@ -42,19 +34,11 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
 IconButton.displayName = 'IconButton';
 
 export function PrimaryButton({ label, onClick }: { label: string; onClick?: () => void }) {
-  const [isPressed, setIsPressed] = useState(false);
-
-  const handleClick = () => {
-    setIsPressed(true);
-    setTimeout(() => setIsPressed(false), 200);
-    onClick?.();
-  };
-
   return (
     <motion.button
-      onClick={handleClick}
-      animate={isPressed ? { scale: 0.95, backgroundColor: "#27272a" } : { scale: 1, backgroundColor: "#18181b" }}
-      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+      onClick={onClick}
+      whileTap={{ scale: 0.95, backgroundColor: "#27272a" }}
+      transition={{ type: "spring", stiffness: 700, damping: 40 }}
       className="h-11 px-5 sm:h-12 sm:px-6 md:h-14 md:px-8 rounded-2xl bg-zinc-900 text-white font-semibold shadow-[0_10px_25px_rgba(0,0,0,0.18)] text-[clamp(14px,2vw,16px)]"
     >
       {label}
@@ -77,19 +61,11 @@ export function TabButton({
   label: string;
   icon: React.ReactNode;
 }) {
-  const [isPressed, setIsPressed] = useState(false);
-
-  const handleClick = () => {
-    setIsPressed(true);
-    setTimeout(() => setIsPressed(false), 200);
-    onClick();
-  };
-
   return (
     <motion.button
-      onClick={handleClick}
-      animate={isPressed ? { scale: 0.96 } : { scale: 1 }}
-      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+      onClick={onClick}
+      whileTap={{ scale: 0.96, backgroundColor: "#f4f4f5" }}
+      transition={{ type: "spring", stiffness: 700, damping: 40 }}
       className={[
         "w-full rounded-2xl px-3 py-2 flex flex-col items-center justify-center gap-1 border",
         "min-h-[52px] sm:min-h-[60px] md:min-h-[70px]",
@@ -114,7 +90,7 @@ export function TabButton({
 }
 
 // ===========================
-// ACTION CARD (4 КНОПКИ: ОТПРАВИТЬ, ПОЛУЧИТЬ, ОБМЕНЯТЬ, СПИСАТЬ)
+// ACTION CARD (4 КНОПКИ)
 // ===========================
 
 export type ActionKind = "send" | "receive" | "swap" | "spend";
@@ -141,14 +117,6 @@ export function ActionCard({
   kind: ActionKind;
   onClick?: () => void;
 }) {
-  const [isPressed, setIsPressed] = useState(false);
-
-  const handleClick = () => {
-    setIsPressed(true);
-    setTimeout(() => setIsPressed(false), 200);
-    onClick?.();
-  };
-
   // Пути к GIF файлам
   const gifSrc = {
     send: "/icons/send.gif",
@@ -159,9 +127,9 @@ export function ActionCard({
 
   return (
     <motion.button
-      onClick={handleClick}
-      animate={isPressed ? { scale: 0.98, backgroundColor: "#f4f4f5" } : { scale: 1, backgroundColor: "#ffffff" }}
-      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+      onClick={onClick}
+      whileTap={{ scale: 0.98, backgroundColor: "#f4f4f5" }}
+      transition={{ type: "spring", stiffness: 700, damping: 40 }}
       className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 sm:p-5 md:p-6 text-left hover:shadow-md"
     >
       <div className="flex items-center justify-between gap-3">
