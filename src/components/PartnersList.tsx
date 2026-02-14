@@ -180,7 +180,9 @@ function PartnerItem({
       <div className="flex items-center gap-3 shrink-0">
         <div className="text-right">
           <div className="text-xs text-zinc-500 mb-0.5">Баланс</div>
-          <div className="font-semibold">{formatMoney(partner.balance)}</div>
+          <div className="font-semibold">
+            {formatMoney(partner.balance)} <span className="text-sm font-medium text-zinc-500">B</span>
+          </div>
         </div>
         <ChevronRight size={18} className="text-zinc-400" />
       </div>
