@@ -4,8 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Building2,
   Send,
-  Mail,
-  ExternalLink
+  Mail
 } from "lucide-react";
 
 type MoreMenuProps = {
@@ -42,7 +41,7 @@ export default function MoreMenu({ isOpen, onClose }: MoreMenuProps) {
             className="fixed inset-0 bg-black/20 z-[100]"
           />
 
-          {/* Выпадающее меню - позиционируем под кнопкой */}
+          {/* Выпадающее меню */}
           <motion.div
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -67,14 +66,12 @@ export default function MoreMenu({ isOpen, onClose }: MoreMenuProps) {
                 onClick={handleCompanyClick}
                 className="w-full p-3 rounded-xl flex items-center gap-3 hover:bg-zinc-50 transition-colors group"
               >
-                <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                  <Building2 size={16} className="text-blue-600" />
+                <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors shrink-0">
+                  <Building2 size={18} className="text-blue-600" />
                 </div>
                 <div className="flex-1 text-left">
                   <p className="text-sm font-medium text-zinc-900">О Компании</p>
-                  <p className="text-xs text-zinc-500">oemservice.tech</p>
                 </div>
-                <ExternalLink size={14} className="text-zinc-400 group-hover:text-zinc-600" />
               </motion.button>
 
               <motion.button
@@ -83,14 +80,12 @@ export default function MoreMenu({ isOpen, onClose }: MoreMenuProps) {
                 onClick={handleTelegramClick}
                 className="w-full p-3 rounded-xl flex items-center gap-3 hover:bg-zinc-50 transition-colors group"
               >
-                <div className="h-8 w-8 rounded-lg bg-sky-50 flex items-center justify-center group-hover:bg-sky-100 transition-colors">
-                  <Send size={16} className="text-sky-600" />
+                <div className="h-8 w-8 rounded-lg bg-sky-50 flex items-center justify-center group-hover:bg-sky-100 transition-colors shrink-0">
+                  <Send size={18} className="text-sky-600" />
                 </div>
                 <div className="flex-1 text-left">
                   <p className="text-sm font-medium text-zinc-900">Наш Telegram</p>
-                  <p className="text-xs text-zinc-500">@openexchangemarket_news</p>
                 </div>
-                <ExternalLink size={14} className="text-zinc-400 group-hover:text-zinc-600" />
               </motion.button>
 
               <motion.button
@@ -99,14 +94,12 @@ export default function MoreMenu({ isOpen, onClose }: MoreMenuProps) {
                 onClick={handleEmailClick}
                 className="w-full p-3 rounded-xl flex items-center gap-3 hover:bg-zinc-50 transition-colors group"
               >
-                <div className="h-8 w-8 rounded-lg bg-amber-50 flex items-center justify-center group-hover:bg-amber-100 transition-colors">
-                  <Mail size={16} className="text-amber-600" />
+                <div className="h-8 w-8 rounded-lg bg-amber-50 flex items-center justify-center group-hover:bg-amber-100 transition-colors shrink-0">
+                  <Mail size={18} className="text-amber-600" />
                 </div>
                 <div className="flex-1 text-left">
                   <p className="text-sm font-medium text-zinc-900">Связаться с нами</p>
-                  <p className="text-xs text-zinc-500">info@oe-media.ru</p>
                 </div>
-                <ExternalLink size={14} className="text-zinc-400 group-hover:text-zinc-600" />
               </motion.button>
             </div>
 
