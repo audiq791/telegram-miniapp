@@ -6,7 +6,9 @@ import {
   Copy, 
   Share2,
   Check,
-  QrCode
+  MessageCircle,
+  Mail,
+  Link
 } from "lucide-react";
 import { useState } from "react";
 
@@ -15,11 +17,12 @@ type ReceiveModalProps = {
   onClose: () => void;
 };
 
-// Фиксированный адрес кошелька (в реальном приложении будет динамическим)
+// Фиксированный адрес кошелька
 const WALLET_ADDRESS = "UQA754XVVal-AHWEwK8t8YzSvGttHiDt1XoUzpY-2XFQWaTN";
 
 export default function ReceiveModal({ isOpen, onClose }: ReceiveModalProps) {
   const [copied, setCopied] = useState(false);
+  const [showShareMenu, setShowShareMenu] = useState(false);
 
   // Копирование адреса в буфер обмена
   const handleCopy = async () => {
@@ -32,8 +35,27 @@ export default function ReceiveModal({ isOpen, onClose }: ReceiveModalProps) {
     }
   };
 
-  // Поделиться адресом
-  const handleShare = async () => {
+  // Открыть Telegram
+  const handleTelegram = () => {
+    const text = encodeURIComponent(`Мой BON-адрес: ${WALLET_ADDRESS}`);
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(WALLET_ADDRESS)}&text=${text}`, '_blank');
+  };
+
+  // Открыть WhatsApp
+  const handleWhatsApp = () => {
+    const text = encodeURIComponent(`Мой BON-адрес: ${WALLET_ADDRESS}`);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  };
+
+  // Открыть Email
+  const handleEmail = () => {
+    const subject = encodeURIComponent('Мой BON-адрес');
+    const body = encodeURIComponent(`Мой адрес для получения бонусов:\n\n${WALLET_ADDRESS}`);
+    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+  };
+
+  // Нативный шеринг
+  const handleNativeShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
@@ -41,12 +63,10 @@ export default function ReceiveModal({ isOpen, onClose }: ReceiveModalProps) {
           text: WALLET_ADDRESS,
         });
       } catch (err) {
-        console.error("Error sharing:", err);
+        console.log("Share cancelled or failed");
       }
     } else {
-      // Fallback для браузеров без поддержки Web Share API
-      handleCopy();
-      alert("Адрес скопирован в буфер обмена");
+      setShowShareMenu(!showShareMenu);
     }
   };
 
@@ -125,14 +145,64 @@ export default function ReceiveModal({ isOpen, onClose }: ReceiveModalProps) {
               </div>
 
               {/* Кнопка поделиться */}
-              <motion.button
-                whileTap={{ scale: 0.98 }}
-                onClick={handleShare}
-                className="w-full py-4 bg-zinc-900 text-white rounded-2xl font-medium flex items-center justify-center gap-2 shadow-lg hover:bg-zinc-800 transition-colors"
-              >
-                <Share2 size={18} />
-                Поделиться адресом
-              </motion.button>
+              <div className="space-y-3">
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleNativeShare}
+                  className="w-full py-4 bg-zinc-900 text-white rounded-2xl font-medium flex items-center justify-center gap-2 shadow-lg hover:bg-zinc-800 transition-colors"
+                >
+                  <Share2 size={18} />
+                  Поделиться адресом
+                </motion.button>
+
+                {/* Меню быстрого шеринга (показывается если нет нативного) */}
+                <AnimatePresence>
+                  {showShareMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="grid grid-cols-4 gap-2 pt-2"
+                    >
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleTelegram}
+                        className="p-3 bg-sky-50 rounded-xl flex flex-col items-center gap-1 hover:bg-sky-100 transition-colors"
+                      >
+                        <MessageCircle size={20} className="text-sky-600" />
+                        <span className="text-[10px] font-medium text-sky-700">Telegram</span>
+                      </motion.button>
+                      
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleWhatsApp}
+                        className="p-3 bg-green-50 rounded-xl flex flex-col items-center gap-1 hover:bg-green-100 transition-colors"
+                      >
+                        <MessageCircle size={20} className="text-green-600" />
+                        <span className="text-[10px] font-medium text-green-700">WhatsApp</span>
+                      </motion.button>
+                      
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleEmail}
+                        className="p-3 bg-blue-50 rounded-xl flex flex-col items-center gap-1 hover:bg-blue-100 transition-colors"
+                      >
+                        <Mail size={20} className="text-blue-600" />
+                        <span className="text-[10px] font-medium text-blue-700">Email</span>
+                      </motion.button>
+                      
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleCopy}
+                        className="p-3 bg-gray-50 rounded-xl flex flex-col items-center gap-1 hover:bg-gray-100 transition-colors"
+                      >
+                        <Link size={20} className="text-gray-600" />
+                        <span className="text-[10px] font-medium text-gray-700">Копия</span>
+                      </motion.button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
               {/* Примечание */}
               <p className="text-xs text-zinc-400 text-center">
