@@ -17,6 +17,7 @@ import BlackScreen from "./BlackScreen";
 import PartnerSiteScreen from "./PartnerSiteScreen";
 import SendModal from "../modals/SendModal";
 import ReceiveModal from "../modals/ReceiveModal";
+import SwapModal from "../modals/SwapModal";
 import { partnersSeed, type Partner } from "../data/partners";
 
 type Route =
@@ -36,6 +37,7 @@ export default function MainApp() {
   // Состояния для модальных окон
   const [isSendModalOpen, setIsSendModalOpen] = useState(false);
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
+  const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
 
   const handleImageError = (partnerId: string) => {
     setFailedImages(prev => new Set(prev).add(partnerId));
@@ -63,6 +65,12 @@ export default function MainApp() {
   const handleSend = (data: { recipient: string; partner: string; amount: number }) => {
     console.log("Отправка:", data);
     alert(`Перевод ${data.amount} B для ${data.recipient} (${data.partner})`);
+  };
+
+  // Обработчик обмена
+  const handleSwap = (data: { fromPartner: string; toPartner: string; amount: number }) => {
+    console.log("Обмен:", data);
+    alert(`Обмен ${data.amount} B с ${data.fromPartner} на ${data.toPartner}`);
   };
 
   // ============================================
@@ -287,7 +295,7 @@ export default function MainApp() {
                       onClick={() => {
                         const tg = (window as any).Telegram?.WebApp;
                         tg?.HapticFeedback.impactOccurred("light");
-                        goBlank("Обменять");
+                        setIsSwapModalOpen(true);
                       }} 
                     />
                     <ActionCard 
@@ -404,6 +412,14 @@ export default function MainApp() {
       <ReceiveModal
         isOpen={isReceiveModalOpen}
         onClose={() => setIsReceiveModalOpen(false)}
+      />
+
+      <SwapModal
+        isOpen={isSwapModalOpen}
+        onClose={() => setIsSwapModalOpen(false)}
+        onSwap={handleSwap}
+        currentBalance={selectedPartner.balance}
+        selectedPartner={selectedPartner}
       />
     </div>
   );
