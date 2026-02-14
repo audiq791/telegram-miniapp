@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowLeft, 
   CreditCard,
+  Layers,
   QrCode,
   Check,
   ChevronDown,
@@ -25,7 +26,6 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
   const [selectedPartners, setSelectedPartners] = useState<string[]>([]);
   const [showPartnerDropdown, setShowPartnerDropdown] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [showQr, setShowQr] = useState(false);
 
   // Доступные партнеры (первые 5)
   const availablePartners = partnersSeed.slice(0, 5);
@@ -127,7 +127,7 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <CreditCard size={18} className="text-zinc-600" />
+                    <Layers size={18} className="text-zinc-600" />
                     <h3 className="font-semibold">Автоматическое списание выбранных бонусов</h3>
                   </div>
                   <p className="text-xs text-zinc-500 mt-1">
@@ -158,26 +158,29 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                     transition={{ duration: 0.2 }}
                     className="mt-4 space-y-3"
                   >
-                    <div className="relative">
-                      <button
-                        onClick={() => setShowPartnerDropdown(!showPartnerDropdown)}
-                        className="w-full p-3 border border-zinc-200 rounded-xl flex items-center justify-between gap-2 hover:border-zinc-300 transition-colors"
-                      >
-                        <span className="text-sm text-zinc-600">
-                          {selectedPartners.length === 0 
-                            ? "Выберите партнеров" 
-                            : `Выбрано ${selectedPartners.length} партнеров`}
-                        </span>
-                        <ChevronDown size={16} className={`text-zinc-400 transition-transform ${showPartnerDropdown ? 'rotate-180' : ''}`} />
-                      </button>
+                    {/* Кнопка для открытия списка */}
+                    <button
+                      onClick={() => setShowPartnerDropdown(!showPartnerDropdown)}
+                      className="w-full p-3 border border-zinc-200 rounded-xl flex items-center justify-between gap-2 hover:border-zinc-300 transition-colors relative"
+                    >
+                      <span className="text-sm text-zinc-600">
+                        {selectedPartners.length === 0 
+                          ? "Выберите партнеров" 
+                          : `Выбрано ${selectedPartners.length} партнеров`}
+                      </span>
+                      <ChevronDown size={16} className={`text-zinc-400 transition-transform ${showPartnerDropdown ? 'rotate-180' : ''}`} />
+                    </button>
 
+                    {/* Выпадающий список (absolute позиционирование) */}
+                    <div className="relative">
                       <AnimatePresence>
                         {showPartnerDropdown && (
                           <motion.div
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            className="absolute z-20 w-full mt-1 bg-white border border-zinc-200 rounded-xl shadow-lg max-h-60 overflow-y-auto"
+                            className="absolute z-50 w-full bg-white border border-zinc-200 rounded-xl shadow-lg max-h-60 overflow-y-auto"
+                            style={{ top: 0 }}
                           >
                             {availablePartners.map(partner => (
                               <button
@@ -185,14 +188,14 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                                 onClick={() => togglePartner(partner.id)}
                                 className="w-full p-3 flex items-center gap-3 hover:bg-zinc-50 transition-colors"
                               >
-                                <div className="h-8 w-8 rounded-lg bg-white border border-zinc-200 overflow-hidden">
+                                <div className="h-8 w-8 rounded-lg bg-white border border-zinc-200 overflow-hidden shrink-0">
                                   {partner.logo && (
                                     <img src={partner.logo} alt="" className="w-full h-full object-contain p-1" />
                                   )}
                                 </div>
                                 <span className="flex-1 text-left font-medium">{partner.displayName || partner.name}</span>
                                 {selectedPartners.includes(partner.id) && (
-                                  <Check size={16} className="text-green-500" />
+                                  <Check size={16} className="text-green-500 shrink-0" />
                                 )}
                               </button>
                             ))}
@@ -203,7 +206,7 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
 
                     {/* Выбранные партнеры */}
                     {selectedPartners.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 mt-2">
                         {availablePartners
                           .filter(p => selectedPartners.includes(p.id))
                           .map(partner => (
@@ -260,7 +263,7 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                 </motion.button>
               </div>
 
-              {/* QR-код и адрес */}
+              {/* QR-код и адрес (появляется автоматически) */}
               <AnimatePresence>
                 {selectedMode === "manual" && (
                   <motion.div
@@ -270,61 +273,39 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
                     transition={{ duration: 0.2 }}
                     className="mt-4 space-y-4"
                   >
-                    {/* Кнопка показать QR */}
-                    <button
-                      onClick={() => setShowQr(!showQr)}
-                      className="w-full p-3 border border-zinc-200 rounded-xl flex items-center justify-between gap-2 hover:border-zinc-300 transition-colors"
-                    >
-                      <span className="text-sm text-zinc-600">
-                        {showQr ? "Скрыть QR-код" : "Показать QR-код для списания"}
-                      </span>
-                      <ChevronDown size={16} className={`text-zinc-400 transition-transform ${showQr ? 'rotate-180' : ''}`} />
-                    </button>
-
                     {/* QR-код */}
-                    <AnimatePresence>
-                      {showQr && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          className="space-y-4"
-                        >
-                          <div className="flex justify-center">
-                            <div className="p-4 bg-white border border-zinc-200 rounded-2xl shadow-sm">
-                              <img
-                                src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(WALLET_ADDRESS)}`}
-                                alt="QR Code"
-                                className="w-40 h-40"
-                              />
-                            </div>
-                          </div>
+                    <div className="flex justify-center">
+                      <div className="p-4 bg-white border border-zinc-200 rounded-2xl shadow-sm">
+                        <img
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(WALLET_ADDRESS)}`}
+                          alt="QR Code"
+                          className="w-40 h-40"
+                        />
+                      </div>
+                    </div>
 
-                          {/* Адрес кошелька */}
-                          <div className="space-y-2">
-                            <div className="text-xs text-zinc-500 px-1">Адрес кошелька</div>
-                            <div className="flex items-center gap-2 p-3 bg-zinc-50 rounded-xl border border-zinc-200">
-                              <div className="flex-1 font-mono text-xs truncate" title={WALLET_ADDRESS}>
-                                {WALLET_ADDRESS}
-                              </div>
-                              <button
-                                onClick={handleCopy}
-                                className="h-8 px-3 rounded-lg bg-white border border-zinc-200 text-xs font-medium hover:bg-zinc-50 transition-colors flex items-center gap-1"
-                              >
-                                {copied ? (
-                                  <>
-                                    <Check size={14} className="text-green-500" />
-                                    <span>Скопировано</span>
-                                  </>
-                                ) : (
-                                  "Копировать"
-                                )}
-                              </button>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    {/* Адрес кошелька */}
+                    <div className="space-y-2">
+                      <div className="text-xs text-zinc-500 px-1">Адрес кошелька</div>
+                      <div className="flex items-center gap-2 p-3 bg-zinc-50 rounded-xl border border-zinc-200">
+                        <div className="flex-1 font-mono text-xs truncate" title={WALLET_ADDRESS}>
+                          {WALLET_ADDRESS}
+                        </div>
+                        <button
+                          onClick={handleCopy}
+                          className="h-8 px-3 rounded-lg bg-white border border-zinc-200 text-xs font-medium hover:bg-zinc-50 transition-colors flex items-center gap-1"
+                        >
+                          {copied ? (
+                            <>
+                              <Check size={14} className="text-green-500" />
+                              <span>Скопировано</span>
+                            </>
+                          ) : (
+                            "Копировать"
+                          )}
+                        </button>
+                      </div>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
