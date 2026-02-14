@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { forwardRef } from "react";
 import { motion } from "framer-motion";
 
 // ===========================
@@ -11,21 +11,29 @@ type IconButtonProps = {
   aria?: string;
   onClick?: () => void;
   children: React.ReactNode;
+  className?: string;
 };
 
-export function IconButton({ aria, onClick, children }: IconButtonProps) {
-  return (
-    <motion.button
-      aria-label={aria}
-      onClick={onClick}
-      whileTap={{ scale: 0.96 }}
-      transition={{ type: "spring", stiffness: 500, damping: 30 }}
-      className="h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm grid place-items-center text-zinc-900"
-    >
-      {children}
-    </motion.button>
-  );
-}
+export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
+  ({ aria, onClick, children, className = "" }, ref) => {
+    return (
+      <motion.button
+        ref={ref}
+        aria-label={aria}
+        onClick={onClick}
+        whileTap={{ scale: 0.96 }}
+        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        className={`h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm grid place-items-center text-zinc-900 ${className}`}
+      >
+        {children}
+      </motion.button>
+    );
+  }
+);
+
+IconButton.displayName = 'IconButton';
+
+// ... остальной код без изменений
 
 export function PrimaryButton({ label, onClick }: { label: string; onClick?: () => void }) {
   return (
