@@ -239,7 +239,7 @@ const partnersSeed: Partner[] = [
   },
   { 
     id: "mymy", 
-    name: "MY-MY", 
+    name: "МУ-МУ", 
     balance: 0, 
     unit: "B", 
     logo: "", 
@@ -501,10 +501,10 @@ export default function MainApp() {
 
                   {/* ACTIONS */}
                   <div className="mt-4 grid grid-cols-2 gap-3">
-                    <ActionCard label="Отправить" hint="перевод" kind="send" onClick={() => goBlank("Отправить")} />
-                    <ActionCard label="Получить" hint="входящие" kind="receive" onClick={() => goBlank("Получить")} />
-                    <ActionCard label="Обменять" hint="курс" kind="swap" onClick={() => goBlank("Обменять")} />
-                    <ActionCard label="Списать" hint="оплата" kind="spend" onClick={() => goBlank("Списать")} />
+                    <ActionCard label="Отправить" hint="Перевод" kind="send" onClick={() => goBlank("Отправить")} />
+                    <ActionCard label="Получить" hint="Входящие" kind="receive" onClick={() => goBlank("Получить")} />
+                    <ActionCard label="Обменять" hint="Бонусы" kind="swap" onClick={() => goBlank("Обменять")} />
+                    <ActionCard label="Списать" hint="Оплата" kind="spend" onClick={() => goBlank("Списать")} />
                   </div>
                 </div>
 
