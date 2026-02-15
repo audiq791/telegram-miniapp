@@ -26,11 +26,12 @@ export default function PartnersList({
   const [query, setQuery] = useState("");
   const [showAllPartners, setShowAllPartners] = useState(false);
 
-  // Фильтруем партнеров по поиску (только по displayName)
+  // ФИЛЬТРАЦИЯ ПО ОТОБРАЖАЕМОМУ ИМЕНИ
   const filteredPartners = partners.filter((p) => {
     if (!query) return true;
     const searchLower = query.toLowerCase();
-    return p.displayName?.toLowerCase().includes(searchLower) || false;
+    const displayName = p.displayName || p.name;
+    return displayName.toLowerCase().includes(searchLower);
   });
 
   // Первые 5 партнеров (с балансами) - всегда видны
