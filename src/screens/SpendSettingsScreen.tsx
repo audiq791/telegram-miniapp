@@ -511,18 +511,18 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
         </div>
       </div>
 
-      {/* Предупреждение о необходимости хотя бы одного режима */}
+            {/* Предупреждение о необходимости хотя бы одного режима */}
       <AnimatePresence>
         {showWarningToast && (
           <motion.div
-            initial={{ opacity: 0, y: 20, x: "-50%" }}
-            animate={{ opacity: 1, y: 0, x: "-50%" }}
-            exit={{ opacity: 0, y: 20, x: "-50%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 bg-red-500/20 backdrop-blur-md text-white px-8 py-5 rounded-2xl shadow-lg flex items-center gap-4 max-w-md w-[90%] border border-red-400/30"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ type: "spring", damping: 20, stiffness: 300 }}
+            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-red-500 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 w-auto max-w-sm mx-4"
           >
-            <AlertCircle size={24} className="text-red-400 shrink-0" />
-            <p className="text-sm font-medium text-red-50 leading-relaxed">
+            <AlertCircle size={22} className="text-white shrink-0" />
+            <p className="text-sm font-medium">
               Один из способов списания бонусов должен быть активирован
             </p>
           </motion.div>
