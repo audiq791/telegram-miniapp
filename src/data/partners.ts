@@ -26,7 +26,7 @@ export const partnersSeed: Partner[] = [
   },
   { 
     id: "dodo", 
-    name: "DODO PIZZA", 
+    name: "Додо Пицца", 
     displayName: "Додо Пицца",
     balance: generateRandomBalance(), 
     unit: "B",
@@ -36,7 +36,7 @@ export const partnersSeed: Partner[] = [
   },
   { 
     id: "cska", 
-    name: "CSKA", 
+    name: "ЦСКА", 
     displayName: "ЦСКА",
     balance: generateRandomBalance(), 
     unit: "B",
