@@ -386,7 +386,7 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-            {/* BOTTOM NAV */}
+                 {/* BOTTOM NAV */}
       {route.name === "home" && (
         <nav
           className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
@@ -398,11 +398,10 @@ export default function MainApp() {
               onClick={() => {
                 const tg = (window as any).Telegram?.WebApp;
                 tg?.HapticFeedback.impactOccurred("light");
-                // Возвращаемся на главную
-                setTab("wallet");
-                // Если мы не на главной, переходим на главную
-                if (route.name !== "home") {
-                  goHome();
+                // Если уже активна, ничего не делаем, только анимация
+                if (tab !== "wallet") {
+                  setTab("wallet");
+                  goBlank("Кошелёк");
                 }
               }}
               label="Кошелёк"
@@ -413,8 +412,10 @@ export default function MainApp() {
               onClick={() => {
                 const tg = (window as any).Telegram?.WebApp;
                 tg?.HapticFeedback.impactOccurred("light");
-                setTab("market");
-                goBlank("Маркет");
+                if (tab !== "market") {
+                  setTab("market");
+                  goBlank("Маркет");
+                }
               }}
               label="Маркет"
               icon={<ShoppingBag size={18} strokeWidth={1.9} />}
@@ -424,8 +425,10 @@ export default function MainApp() {
               onClick={() => {
                 const tg = (window as any).Telegram?.WebApp;
                 tg?.HapticFeedback.impactOccurred("light");
-                setTab("partners");
-                goBlank("Партнёры");
+                if (tab !== "partners") {
+                  setTab("partners");
+                  goBlank("Партнёры");
+                }
               }}
               label="Партнёры"
               icon={<Handshake size={18} strokeWidth={1.9} />}
@@ -435,8 +438,10 @@ export default function MainApp() {
               onClick={() => {
                 const tg = (window as any).Telegram?.WebApp;
                 tg?.HapticFeedback.impactOccurred("light");
-                setTab("profile");
-                goBlank("Профиль");
+                if (tab !== "profile") {
+                  setTab("profile");
+                  goBlank("Профиль");
+                }
               }}
               label="Профиль"
               icon={<UserRound size={18} strokeWidth={1.9} />}
