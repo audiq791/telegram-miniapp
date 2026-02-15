@@ -24,8 +24,17 @@ export default function MoreMenu({ isOpen, onClose }: MoreMenuProps) {
   };
 
   const handleEmailClick = () => {
-    window.location.href = 'mailto:info@oe-media.ru';
-    onClose();
+    // Создаем ссылку mailto с адресом
+    const email = 'info@oe-media.ru';
+    const mailtoLink = `mailto:${email}`;
+    
+    // Открываем почтовый клиент
+    window.location.href = mailtoLink;
+    
+    // Небольшая задержка перед закрытием меню
+    setTimeout(() => {
+      onClose();
+    }, 100);
   };
 
   return (
@@ -94,8 +103,8 @@ export default function MoreMenu({ isOpen, onClose }: MoreMenuProps) {
                 onClick={handleEmailClick}
                 className="w-full p-3 rounded-xl flex items-center gap-3 hover:bg-zinc-50 transition-colors group"
               >
-                <div className="h-8 w-8 rounded-lg bg-amber-50 flex items-center justify-center group-hover:bg-amber-100 transition-colors shrink-0">
-                  <Mail size={18} className="text-amber-600" />
+                <div className="h-8 w-8 rounded-lg bg-rose-50 flex items-center justify-center group-hover:bg-rose-100 transition-colors shrink-0">
+                  <Mail size={18} className="text-rose-600" />
                 </div>
                 <div className="flex-1 text-left">
                   <p className="text-sm font-medium text-zinc-900">Связаться с нами</p>
