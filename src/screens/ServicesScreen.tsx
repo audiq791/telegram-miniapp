@@ -12,7 +12,6 @@ import {
   Sparkles,
   ArrowRight
 } from "lucide-react";
-import { useEffect } from "react";
 
 type ServiceItem = {
   id: string;
@@ -97,22 +96,6 @@ interface ServicesScreenProps {
 }
 
 export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) {
-  // Запрещаем скролл при монтировании, возвращаем при размонтировании
-  useEffect(() => {
-    // Сохраняем текущий стиль
-    const originalStyle = window.getComputedStyle(document.body).overflow;
-    
-    // Запрещаем скролл
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-    
-    // Возвращаем при размонтировании
-    return () => {
-      document.body.style.overflow = originalStyle;
-      document.documentElement.style.overflow = originalStyle;
-    };
-  }, []);
-
   const handleServiceClick = (service: typeof services[0]) => {
     if (service.id === "gpt") {
       if (onServiceClick) {
@@ -122,9 +105,9 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
   };
 
   return (
-    <div className="h-screen bg-zinc-50 flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-zinc-50 flex flex-col">
       {/* Аккуратная таблетка для шапки */}
-      <div className="max-w-md mx-auto w-full px-4 pt-4 flex-shrink-0">
+      <div className="max-w-md mx-auto w-full px-4 pt-4">
         <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5">
           <h1 className="text-2xl font-bold text-zinc-900">Сервисы</h1>
           <p className="text-sm text-zinc-500 mt-1">
@@ -134,7 +117,7 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
       </div>
 
       {/* Плитки */}
-      <div className="flex-1 max-w-md mx-auto w-full px-4 pt-4 overflow-hidden">
+      <div className="flex-1 max-w-md mx-auto w-full px-4 pt-4">
         <div className="grid grid-cols-2 gap-3">
           {services.map((service) => {
             const Icon = service.icon;
