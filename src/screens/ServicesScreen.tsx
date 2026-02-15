@@ -12,7 +12,6 @@ import {
   Sparkles,
   ArrowRight
 } from "lucide-react";
-import { useEffect, useRef } from "react";
 
 type ServiceItem = {
   id: string;
@@ -97,15 +96,6 @@ interface ServicesScreenProps {
 }
 
 export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // При монтировании скроллим контейнер вверх
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = 0;
-    }
-  }, []);
-
   const handleServiceClick = (service: typeof services[0]) => {
     if (service.id === "gpt") {
       if (onServiceClick) {
@@ -115,10 +105,7 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
   };
 
   return (
-    <div 
-      ref={containerRef}
-      className="h-screen bg-zinc-50 flex flex-col overflow-y-auto"
-    >
+    <div className="h-screen bg-zinc-50 flex flex-col overflow-hidden">
       {/* Аккуратная таблетка для шапки */}
       <div className="max-w-md mx-auto w-full px-4 pt-4 flex-shrink-0">
         <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5">
@@ -129,8 +116,8 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
         </div>
       </div>
 
-      {/* Плитки */}
-      <div className="flex-1 max-w-md mx-auto w-full px-4 pt-4">
+      {/* Плитки - без скролла */}
+      <div className="flex-1 max-w-md mx-auto w-full px-4 pt-4 overflow-hidden">
         <div className="grid grid-cols-2 gap-3">
           {services.map((service) => {
             const Icon = service.icon;
