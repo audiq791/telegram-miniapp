@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { 
   ArrowLeft, 
   Send, 
@@ -28,18 +28,6 @@ const WELCOME_MESSAGE: Message = {
   timestamp: new Date()
 };
 
-// Демо-ответы (пока баланс не пополнен)
-const DEMO_RESPONSES = [
-  "Интересный вопрос! В демо-режиме я отвечаю тестовыми сообщениями.",
-  "Для реальной работы нужно пополнить баланс Deepseek API.",
-  "Это тестовый ответ от GPT Помощника.",
-  "После пополнения баланса я буду отвечать по-настоящему!",
-  "Вы можете пополнить баланс на platform.deepseek.com",
-  "Минимальная сумма пополнения - $2.",
-  "В демо-режиме я просто имитирую ответы.",
-  "Задайте любой вопрос - я обязательно отвечу тестовым сообщением!"
-];
-
 export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
   const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
   const [inputValue, setInputValue] = useState("");
@@ -49,6 +37,13 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Обработчик свайпа вправо
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (info.offset.x > 100) {
+      onBack();
+    }
+  };
 
   // Автоскролл к последнему сообщению
   useEffect(() => {
@@ -60,7 +55,7 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
     inputRef.current?.focus();
   }, []);
 
-  // Отправка сообщения (демо-режим)
+  // Отправка сообщения в Deepseek API
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -76,20 +71,42 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
     setIsLoading(true);
     setError(null);
 
-    // Имитация задержки как у реального API
-    setTimeout(() => {
-      const randomResponse = DEMO_RESPONSES[Math.floor(Math.random() * DEMO_RESPONSES.length)];
-      
+    try {
+      // Подготовка истории сообщений для API
+      const apiMessages = messages.concat(userMessage).map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+
+      // Отправка запроса к нашему API роуту
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages: apiMessages })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to get response');
+      }
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: randomResponse,
+        content: data.choices[0].message.content,
         timestamp: new Date()
       };
-      
+
       setMessages(prev => [...prev, assistantMessage]);
+    } catch (err) {
+      console.error('Chat error:', err);
+      setError('Не удалось получить ответ от Deepseek. Попробуйте позже.');
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
   };
 
   // Обработка нажатия Enter
@@ -117,6 +134,10 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="min-h-[100dvh] bg-zinc-50 flex flex-col"
+      drag="x"
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.2}
+      onDragEnd={handleDragEnd}
     >
       {/* Шапка */}
       <div className="bg-white border-b border-zinc-200 px-4 py-3 flex items-center gap-3 sticky top-0 z-10">
@@ -129,7 +150,7 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
           </div>
           <div>
             <h1 className="font-semibold text-zinc-900">GPT Помощник</h1>
-            <p className="text-xs text-zinc-500">Демо-режим (без API)</p>
+            <p className="text-xs text-zinc-500">Powered by Deepseek</p>
           </div>
         </div>
       </div>
@@ -220,6 +241,20 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
                     <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" />
                   </div>
                 </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Ошибка */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex justify-center"
+            >
+              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-2 flex items-center gap-2">
+                <AlertCircle size={14} className="text-red-500" />
+                <p className="text-xs text-red-600">{error}</p>
               </div>
             </motion.div>
           )}
