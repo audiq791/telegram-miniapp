@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronRight } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { type Partner } from "../data/partners";
 
 type PartnersListProps = {
@@ -26,21 +26,16 @@ export default function PartnersList({
   const [query, setQuery] = useState("");
   const [showAllPartners, setShowAllPartners] = useState(false);
 
-  // Фильтруем партнеров по поиску (применяется ко всем партнерам)
-  const filteredPartners = useMemo(() => {
-    if (!query.trim()) return partners;
-    const searchLower = query.toLowerCase().trim();
-    return partners.filter((p) => 
-      p.name.toLowerCase().includes(searchLower) || 
-      p.displayName?.toLowerCase().includes(searchLower)
-    );
-  }, [partners, query]);
+  // Фильтруем партнеров по поиску
+  const filteredPartners = partners.filter((p) =>
+    p.name.toLowerCase().includes(query.toLowerCase())
+  );
 
-  // Первые 5 партнеров из отфильтрованного списка
-  const topPartners = filteredPartners.slice(0, 5);
+  // Первые 5 партнеров (с балансами) - всегда видны
+  const topPartners = partners.slice(0, 5);
   
-  // Остальные партнеры из отфильтрованного списка
-  const otherPartners = filteredPartners.slice(5);
+  // Остальные партнеры (с нулевыми балансами) - все 28 штук
+  const otherPartners = partners.slice(5);
 
   return (
     <div>
@@ -104,7 +99,7 @@ export default function PartnersList({
               </motion.div>
             </motion.button>
 
-            {/* Выпадающий список со всеми остальными партнерами */}
+            {/* Выпадающий список со ВСЕМИ остальными партнерами */}
             <AnimatePresence>
               {showAllPartners && (
                 <motion.div
