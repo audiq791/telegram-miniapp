@@ -42,7 +42,6 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
 
   // Обработчик свайпа вправо на всем контейнере
   const handleDragStart = (event: MouseEvent | TouchEvent | PointerEvent) => {
-    // Сохраняем начальную позицию
     if (event instanceof TouchEvent) {
       setDragStartX(event.touches[0].clientX);
     } else if (event instanceof MouseEvent) {
@@ -50,12 +49,7 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
     }
   };
 
-  const handleDragMove = (event: MouseEvent | TouchEvent | PointerEvent) => {
-    // Не делаем ничего, просто отслеживаем
-  };
-
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    // Если свайпнули вправо больше чем на 100px
     if (info.offset.x > 100) {
       onBack();
     }
@@ -89,13 +83,11 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
     setError(null);
 
     try {
-      // Подготовка истории сообщений для API
       const apiMessages = messages.concat(userMessage).map(msg => ({
         role: msg.role,
         content: msg.content
       }));
 
-      // Отправка запроса к нашему API роуту
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -153,28 +145,29 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.1}
       onDragStart={handleDragStart}
-      onDrag={handleDragMove}
       onDragEnd={handleDragEnd}
       dragPropagation={false}
       dragMomentum={false}
     >
-      {/* Шапка */}
-      <div className="bg-white border-b border-zinc-200 px-4 py-3 flex items-center gap-3 sticky top-0 z-10">
-        <IconButton aria="back" onClick={onBack}>
-          <ArrowLeft size={18} />
-        </IconButton>
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-            <Sparkles size={16} className="text-emerald-600" />
-          </div>
-          <div>
-            <h1 className="font-semibold text-zinc-900">GPT Помощник</h1>
-            <p className="text-xs text-zinc-500">Powered by Deepseek</p>
+      {/* Шапка - всегда видна, прилипает к верху */}
+      <div className="sticky top-0 z-20 bg-white border-b border-zinc-200">
+        <div className="px-4 py-3 flex items-center gap-3">
+          <IconButton aria="back" onClick={onBack}>
+            <ArrowLeft size={18} />
+          </IconButton>
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+              <Sparkles size={16} className="text-emerald-600" />
+            </div>
+            <div>
+              <h1 className="font-semibold text-zinc-900">GPT Помощник</h1>
+              <p className="text-xs text-zinc-500">Powered by Deepseek</p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Сообщения - теперь они тоже часть draggable области */}
+      {/* Сообщения */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
         <div className="max-w-2xl mx-auto space-y-4">
           <AnimatePresence initial={false}>
@@ -282,7 +275,7 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
         </div>
       </div>
 
-      {/* Поле ввода - тоже часть draggable области, но с отключенным drag для input */}
+      {/* Поле ввода */}
       <div className="bg-white border-t border-zinc-200 px-4 py-3 sticky bottom-0">
         <div className="max-w-2xl mx-auto flex gap-2">
           <input
@@ -294,7 +287,6 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
             placeholder="Спросите у Deepseek..."
             className="flex-1 h-11 px-4 bg-zinc-100 rounded-xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
             disabled={isLoading}
-            // Отключаем drag для input, чтобы можно было нормально вводить текст
             onDragStart={(e) => e.preventDefault()}
           />
           <motion.button
