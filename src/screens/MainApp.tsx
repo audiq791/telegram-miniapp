@@ -235,12 +235,12 @@ export default function MainApp() {
         <AnimatePresence mode="wait">
           {route.name === "home" ? (
             <motion.main
-              key="home"
+              key={tab}
               className="px-4 pt-4 pb-28"
-              initial={{ opacity: 0, x: 12 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -12 }}
-              transition={{ type: "spring", stiffness: 260, damping: 30 }}
+              initial={{ y: 10, opacity: 0.5 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -10, opacity: 0.5 }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
             >
               {/* Кошелек */}
               {tab === "wallet" && (
