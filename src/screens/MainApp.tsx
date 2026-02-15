@@ -161,8 +161,10 @@ export default function MainApp() {
     tg?.HapticFeedback.impactOccurred("light");
   };
 
-  // Проверяем, показывать ли нижнее меню
-  const shouldShowNav = route.name === "home";
+  // Список экранов, где нужно показывать нижнее меню
+  const mainScreens = ["home", "Кошелёк", "Маркет", "Партнёры", "Профиль"];
+  const shouldShowNav = route.name === "home" || 
+    (route.name === "blank" && mainScreens.includes(route.title));
 
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
@@ -396,121 +398,66 @@ export default function MainApp() {
       </div>
 
       {/* BOTTOM NAV - всегда на главных экранах, уезжает только на глубокие */}
-      {shouldShowNav ? (
-        <motion.nav
-          key="nav"
-          initial={{ y: 0 }}
-          animate={{ y: 0 }}
-          exit={{ y: 100 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
-          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-        >
-          <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
-            <TabButton
-              active={tab === "wallet"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                setTab("wallet");
-                goBlank("Кошелёк");
-              }}
-              label="Кошелёк"
-              icon={<WalletCards size={18} strokeWidth={1.9} />}
-            />
-            <TabButton
-              active={tab === "market"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                setTab("market");
-                goBlank("Маркет");
-              }}
-              label="Маркет"
-              icon={<ShoppingBag size={18} strokeWidth={1.9} />}
-            />
-            <TabButton
-              active={tab === "partners"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                setTab("partners");
-                goBlank("Партнёры");
-              }}
-              label="Партнёры"
-              icon={<Handshake size={18} strokeWidth={1.9} />}
-            />
-            <TabButton
-              active={tab === "profile"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                setTab("profile");
-                goBlank("Профиль");
-              }}
-              label="Профиль"
-              icon={<UserRound size={18} strokeWidth={1.9} />}
-            />
-          </div>
-        </motion.nav>
-      ) : (
-        <motion.nav
-          key="nav-hidden"
-          initial={{ y: 0 }}
-          animate={{ y: 100 }}
-          exit={{ y: 100 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
-          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-        >
-          <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
-            <TabButton
-              active={tab === "wallet"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                setTab("wallet");
-                goBlank("Кошелёк");
-              }}
-              label="Кошелёк"
-              icon={<WalletCards size={18} strokeWidth={1.9} />}
-            />
-            <TabButton
-              active={tab === "market"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                setTab("market");
-                goBlank("Маркет");
-              }}
-              label="Маркет"
-              icon={<ShoppingBag size={18} strokeWidth={1.9} />}
-            />
-            <TabButton
-              active={tab === "partners"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                setTab("partners");
-                goBlank("Партнёры");
-              }}
-              label="Партнёры"
-              icon={<Handshake size={18} strokeWidth={1.9} />}
-            />
-            <TabButton
-              active={tab === "profile"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                setTab("profile");
-                goBlank("Профиль");
-              }}
-              label="Профиль"
-              icon={<UserRound size={18} strokeWidth={1.9} />}
-            />
-          </div>
-        </motion.nav>
-      )}
+      <AnimatePresence>
+        {shouldShowNav && (
+          <motion.nav
+            key="nav"
+            initial={{ y: 0 }}
+            animate={{ y: 0 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
+            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+          >
+            <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
+              <TabButton
+                active={tab === "wallet"}
+                onClick={() => {
+                  const tg = (window as any).Telegram?.WebApp;
+                  tg?.HapticFeedback.impactOccurred("light");
+                  setTab("wallet");
+                  goBlank("Кошелёк");
+                }}
+                label="Кошелёк"
+                icon={<WalletCards size={18} strokeWidth={1.9} />}
+              />
+              <TabButton
+                active={tab === "market"}
+                onClick={() => {
+                  const tg = (window as any).Telegram?.WebApp;
+                  tg?.HapticFeedback.impactOccurred("light");
+                  setTab("market");
+                  goBlank("Маркет");
+                }}
+                label="Маркет"
+                icon={<ShoppingBag size={18} strokeWidth={1.9} />}
+              />
+              <TabButton
+                active={tab === "partners"}
+                onClick={() => {
+                  const tg = (window as any).Telegram?.WebApp;
+                  tg?.HapticFeedback.impactOccurred("light");
+                  setTab("partners");
+                  goBlank("Партнёры");
+                }}
+                label="Партнёры"
+                icon={<Handshake size={18} strokeWidth={1.9} />}
+              />
+              <TabButton
+                active={tab === "profile"}
+                onClick={() => {
+                  const tg = (window as any).Telegram?.WebApp;
+                  tg?.HapticFeedback.impactOccurred("light");
+                  setTab("profile");
+                  goBlank("Профиль");
+                }}
+                label="Профиль"
+                icon={<UserRound size={18} strokeWidth={1.9} />}
+              />
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
 
       {/* Модальные окна */}
       <SendModal
