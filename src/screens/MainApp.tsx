@@ -386,7 +386,7 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* BOTTOM NAV */}
+            {/* BOTTOM NAV */}
       {route.name === "home" && (
         <nav
           className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
@@ -398,8 +398,12 @@ export default function MainApp() {
               onClick={() => {
                 const tg = (window as any).Telegram?.WebApp;
                 tg?.HapticFeedback.impactOccurred("light");
+                // Возвращаемся на главную
                 setTab("wallet");
-                goBlank("Кошелёк");
+                // Если мы не на главной, переходим на главную
+                if (route.name !== "home") {
+                  goHome();
+                }
               }}
               label="Кошелёк"
               icon={<WalletCards size={18} strokeWidth={1.9} />}
