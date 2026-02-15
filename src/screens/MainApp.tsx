@@ -32,7 +32,6 @@ export default function MainApp() {
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [selectedPartner, setSelectedPartner] = useState<Partner>(partnersSeed[0]);
-  const [navigationLevel, setNavigationLevel] = useState(0);
   
   // Стек истории для кнопки назад
   const [history, setHistory] = useState<Route[]>([{ name: "home" }]);
@@ -104,7 +103,6 @@ export default function MainApp() {
         
         setHistory(newHistory);
         setRoute(previousRoute);
-        setNavigationLevel(prev => prev - 1);
         
         if (previousRoute.name === "home") {
           setTab("wallet");
@@ -125,7 +123,6 @@ export default function MainApp() {
     
     setHistory(prev => [...prev, newRoute]);
     setRoute(newRoute);
-    setNavigationLevel(prev => prev + 1);
     
     const tg = (window as any).Telegram?.WebApp;
     tg?.HapticFeedback.impactOccurred("light");
@@ -136,7 +133,6 @@ export default function MainApp() {
     
     setHistory(prev => [...prev, newRoute]);
     setRoute(newRoute);
-    setNavigationLevel(prev => prev + 1);
     
     const tg = (window as any).Telegram?.WebApp;
     tg?.HapticFeedback.impactOccurred("light");
@@ -151,7 +147,6 @@ export default function MainApp() {
     
     setHistory(newHistory);
     setRoute(previousRoute);
-    setNavigationLevel(prev => prev - 1);
     
     if (previousRoute.name === "home") {
       setTab("wallet");
@@ -162,11 +157,13 @@ export default function MainApp() {
     setHistory([{ name: "home" }]);
     setRoute({ name: "home" });
     setTab("wallet");
-    setNavigationLevel(0);
     
     const tg = (window as any).Telegram?.WebApp;
     tg?.HapticFeedback.impactOccurred("light");
   };
+
+  // Определяем, показывать ли нижнее меню
+  const shouldShowBottomNav = route.name === "home" || route.name === "blank";
 
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
@@ -180,9 +177,15 @@ export default function MainApp() {
             <div className="min-w-0">
               <div className="text-[13px] text-zinc-500 leading-none">Биржа бонусов</div>
               <div className="text-[15px] font-semibold leading-tight truncate">
-                {route.name === "blank" || route.name === "partner-site"
+                {route.name === "partner-site"
                   ? route.title
-                  : "Кошелёк"}
+                  : tab === "wallet"
+                    ? "Кошелёк"
+                    : tab === "market"
+                      ? "Маркет"
+                      : tab === "services"
+                        ? "Сервисы"
+                        : "Профиль"}
               </div>
             </div>
           </div>
@@ -396,8 +399,8 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* BOTTOM NAV - показываем только на первом уровне навигации */}
-      {navigationLevel === 0 && route.name === "home" && (
+      {/* BOTTOM NAV - показываем на главных экранах */}
+      {shouldShowBottomNav && (
         <nav
           className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
