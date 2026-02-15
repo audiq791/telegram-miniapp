@@ -47,9 +47,6 @@ export default function MainApp() {
   // Состояние для отслеживания клавиатуры
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
-  // Ref для главного контейнера
-  const mainRef = useRef<HTMLDivElement>(null);
-
   // Отслеживаем появление клавиатуры
   useEffect(() => {
     const handleResize = () => {
@@ -60,13 +57,6 @@ export default function MainApp() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  // При смене таба скроллим вверх
-  useEffect(() => {
-    if (mainRef.current) {
-      mainRef.current.scrollTop = 0;
-    }
-  }, [tab]);
 
   const handleImageError = (partnerId: string) => {
     setFailedImages(prev => new Set(prev).add(partnerId));
@@ -232,13 +222,12 @@ export default function MainApp() {
       </header>
 
       {/* CONTENT */}
-      <div className="mx-auto max-w-md h-[calc(100dvh-120px)] overflow-hidden">
+      <div className="mx-auto max-w-md">
         <AnimatePresence mode="wait">
           {route.name === "home" ? (
             <motion.main
-              ref={mainRef}
               key={tab}
-              className="px-4 pt-4 pb-28 h-full overflow-y-auto"
+              className="px-4 pt-4 pb-28"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
