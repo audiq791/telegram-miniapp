@@ -3,16 +3,13 @@
 import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  WalletCards,
-  ShoppingBag,
-  Layers,
-  UserRound,
   HelpCircle,
   MoreHorizontal,
 } from "lucide-react";
 
-import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
+import { ActionCard, IconButton, PrimaryButton } from "../components/ui";
 import PartnersList from "../components/PartnersList";
+import BottomNav from "../components/BottomNav";
 import BlackScreen from "./BlackScreen";
 import PartnerSiteScreen from "./PartnerSiteScreen";
 import SendModal from "../modals/SendModal";
@@ -407,72 +404,16 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* BOTTOM NAV - фиксированное меню */}
-      {isMainScreen() && (
-        <nav
-          className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200 transform-gpu"
-          style={{ 
-            paddingBottom: "env(safe-area-inset-bottom)",
-            willChange: "transform",
-            backfaceVisibility: "hidden"
-          }}
-        >
-          <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
-            <TabButton
-              active={tab === "wallet"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                if (tab !== "wallet") {
-                  setTab("wallet");
-                  goHome();
-                }
-              }}
-              label="Кошелёк"
-              icon={<WalletCards size={18} strokeWidth={1.9} />}
-            />
-            <TabButton
-              active={tab === "market"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                if (tab !== "market") {
-                  setTab("market");
-                  goBlank("Маркет");
-                }
-              }}
-              label="Маркет"
-              icon={<ShoppingBag size={18} strokeWidth={1.9} />}
-            />
-            <TabButton
-              active={tab === "services"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                if (tab !== "services") {
-                  setTab("services");
-                  goBlank("Сервисы");
-                }
-              }}
-              label="Сервисы"
-              icon={<Layers size={18} strokeWidth={1.9} />}
-            />
-            <TabButton
-              active={tab === "profile"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                if (tab !== "profile") {
-                  setTab("profile");
-                  goBlank("Профиль");
-                }
-              }}
-              label="Профиль"
-              icon={<UserRound size={18} strokeWidth={1.9} />}
-            />
-          </div>
-        </nav>
-      )}
+      {/* BOTTOM NAV - вынесенный компонент */}
+      <BottomNav
+        tab={tab}
+        onTabChange={setTab}
+        onWalletClick={goHome}
+        onMarketClick={() => goBlank("Маркет")}
+        onServicesClick={() => goBlank("Сервисы")}
+        onProfileClick={() => goBlank("Профиль")}
+        isVisible={isMainScreen()}
+      />
 
       {/* Модальные окна */}
       <SendModal
