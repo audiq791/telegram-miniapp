@@ -27,10 +27,10 @@ export default function BlackScreen({
   return (
     <motion.div
       className="min-h-[100dvh] bg-zinc-50"
-      initial={{ opacity: 0, x: 24 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -24 }}
-      transition={{ type: "spring", stiffness: 260, damping: 30 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
     >
       <div className="mx-auto max-w-md px-4 pt-4">
         <div className="flex items-center gap-3">
