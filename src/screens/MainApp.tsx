@@ -7,35 +7,34 @@ import {
   ShoppingBag,
   Handshake,
   UserRound,
+  HelpCircle,
+  MoreHorizontal,
 } from "lucide-react";
 
-import { TabButton } from "../components/ui";
-import WalletScreen from "./WalletScreen";
-import MarketScreen from "./MarketScreen";
-import ServicesScreen from "./ServicesScreen";
-import ProfileScreen from "./ProfileScreen";
+import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
+import PartnersList from "../components/PartnersList";
 import BlackScreen from "./BlackScreen";
 import PartnerSiteScreen from "./PartnerSiteScreen";
+import SendModal from "../modals/SendModal";
+import ReceiveModal from "../modals/ReceiveModal";
+import SwapModal from "../modals/SwapModal";
 import InfoModal from "../modals/InfoModal";
 import MoreMenu from "../modals/MoreMenu";
 import { partnersSeed, type Partner } from "../data/partners";
 
 type Route =
-  | { name: "wallet" }
-  | { name: "market" }
-  | { name: "services" }
-  | { name: "profile" }
+  | { name: "home" }
   | { name: "blank"; title: string }
   | { name: "partner-site"; url: string; title: string; logo: string; fallbackColor: string };
 
 export default function MainApp() {
-  const [currentTab, setCurrentTab] = useState<"wallet" | "market" | "services" | "profile">("wallet");
-  const [route, setRoute] = useState<Route>({ name: "wallet" });
+  const [tab, setTab] = useState<"wallet" | "market" | "partners" | "profile">("wallet");
+  const [route, setRoute] = useState<Route>({ name: "home" });
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [selectedPartner, setSelectedPartner] = useState<Partner>(partnersSeed[0]);
   
   // Стек истории для кнопки назад
-  const [history, setHistory] = useState<Route[]>([{ name: "wallet" }]);
+  const [history, setHistory] = useState<Route[]>([{ name: "home" }]);
 
   // Состояния для модальных окон
   const [isSendModalOpen, setIsSendModalOpen] = useState(false);
@@ -51,7 +50,11 @@ export default function MainApp() {
   // Функция выбора партнера
   const selectPartner = (partner: Partner) => {
     if (partner.id === selectedPartner.id) return;
+    
     setSelectedPartner(partner);
+    
+    const tg = (window as any).Telegram?.WebApp;
+    tg?.HapticFeedback.impactOccurred("light");
   };
 
   // Форматирование денег
@@ -62,16 +65,21 @@ export default function MainApp() {
     }).format(n);
   };
 
-  // Обработчики
+  // Обработчик отправки
   const handleSend = (data: { recipient: string; partner: string; amount: number }) => {
+    console.log("Отправка:", data);
     alert(`Перевод ${data.amount} B для ${data.recipient} (${data.partner})`);
   };
 
+  // Обработчик обмена
   const handleSwap = (data: { fromPartner: string; toPartner: string; amount: number }) => {
+    console.log("Обмен:", data);
     alert(`Обмен ${data.amount} B с ${data.fromPartner} на ${data.toPartner}`);
   };
 
-  // Настройка кнопки назад Telegram
+  // ============================================
+  // НАСТРОЙКА КНОПКИ НАЗАД TELEGRAM
+  // ============================================
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
     if (!tg) return;
@@ -85,6 +93,8 @@ export default function MainApp() {
     };
 
     const handleBackClick = () => {
+      tg.HapticFeedback.impactOccurred("light");
+      
       if (history.length > 1) {
         const newHistory = [...history];
         newHistory.pop();
@@ -93,11 +103,9 @@ export default function MainApp() {
         setHistory(newHistory);
         setRoute(previousRoute);
         
-        // Обновляем текущий таб если вернулись на главный экран
-        if (previousRoute.name === "wallet") setCurrentTab("wallet");
-        if (previousRoute.name === "market") setCurrentTab("market");
-        if (previousRoute.name === "services") setCurrentTab("services");
-        if (previousRoute.name === "profile") setCurrentTab("profile");
+        if (previousRoute.name === "home") {
+          setTab("wallet");
+        }
       }
     };
 
@@ -109,97 +117,262 @@ export default function MainApp() {
     };
   }, [history]);
 
-  // Переходы
-  const goToTab = (tab: "wallet" | "market" | "services" | "profile") => {
-    const newRoute: Route = { name: tab };
-    setHistory(prev => [...prev, newRoute]);
-    setRoute(newRoute);
-    setCurrentTab(tab);
-  };
-
   const goBlank = (title: string) => {
     const newRoute: Route = { name: "blank", title };
+    
     setHistory(prev => [...prev, newRoute]);
     setRoute(newRoute);
+    
+    const tg = (window as any).Telegram?.WebApp;
+    tg?.HapticFeedback.impactOccurred("light");
   };
 
   const goToPartnerSite = (url: string, title: string, logo: string, fallbackColor: string) => {
     const newRoute: Route = { name: "partner-site", url, title, logo, fallbackColor };
+    
     setHistory(prev => [...prev, newRoute]);
     setRoute(newRoute);
+    
+    const tg = (window as any).Telegram?.WebApp;
+    tg?.HapticFeedback.impactOccurred("light");
   };
 
   const goBack = () => {
     if (history.length <= 1) return;
+    
     const newHistory = [...history];
     newHistory.pop();
     const previousRoute = newHistory[newHistory.length - 1];
+    
     setHistory(newHistory);
     setRoute(previousRoute);
-    if (previousRoute.name === "wallet") setCurrentTab("wallet");
-    if (previousRoute.name === "market") setCurrentTab("market");
-    if (previousRoute.name === "services") setCurrentTab("services");
-    if (previousRoute.name === "profile") setCurrentTab("profile");
+    
+    if (previousRoute.name === "home") {
+      setTab("wallet");
+    }
   };
 
   const goHome = () => {
-    setHistory([{ name: "wallet" }]);
-    setRoute({ name: "wallet" });
-    setCurrentTab("wallet");
+    setHistory([{ name: "home" }]);
+    setRoute({ name: "home" });
+    setTab("wallet");
+    
+    const tg = (window as any).Telegram?.WebApp;
+    tg?.HapticFeedback.impactOccurred("light");
   };
 
-  // Определяем, показывать ли нижнее меню (только на главных экранах)
-  const showBottomNav = route.name === "wallet" || route.name === "market" || route.name === "services" || route.name === "profile";
-
   return (
-    <div className="min-h-dvh bg-zinc-50">
-      {/* Контент с AnimatePresence */}
-      <div className={showBottomNav ? "pb-28" : ""}>
+    <div className="min-h-dvh bg-zinc-50 text-zinc-900">
+      {/* HEADER */}
+      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-zinc-200">
+        <div className="mx-auto max-w-md px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-zinc-900 text-white grid place-items-center font-semibold shrink-0">
+              B
+            </div>
+            <div className="min-w-0">
+              <div className="text-[13px] text-zinc-500 leading-none">Биржа бонусов</div>
+              <div className="text-[15px] font-semibold leading-tight truncate">
+                {route.name === "blank" || route.name === "partner-site"
+                  ? route.title
+                  : "Кошелёк"}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <IconButton 
+              aria="help" 
+              onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
+                setIsInfoModalOpen(true);
+              }}
+            >
+              <HelpCircle size={18} />
+            </IconButton>
+            <IconButton 
+              aria="more" 
+              onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
+                setIsMoreMenuOpen(!isMoreMenuOpen);
+              }}
+            >
+              <MoreHorizontal size={18} />
+            </IconButton>
+          </div>
+        </div>
+      </header>
+
+      {/* CONTENT */}
+      <div className="mx-auto max-w-md">
         <AnimatePresence mode="wait">
-          {route.name === "wallet" && (
-            <WalletScreen
-              key="wallet"
-              onOpenInfo={() => setIsInfoModalOpen(true)}
-              onOpenMore={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
-              onOpenBlank={goBlank}
-              onOpenPartnerSite={goToPartnerSite}
-              selectedPartner={selectedPartner}
-              onSelectPartner={selectPartner}
-              failedImages={failedImages}
-              onImageError={handleImageError}
-              formatMoney={formatMoney}
-              isSendModalOpen={isSendModalOpen}
-              setIsSendModalOpen={setIsSendModalOpen}
-              isReceiveModalOpen={isReceiveModalOpen}
-              setIsReceiveModalOpen={setIsReceiveModalOpen}
-              isSwapModalOpen={isSwapModalOpen}
-              setIsSwapModalOpen={setIsSwapModalOpen}
-              handleSend={handleSend}
-              handleSwap={handleSwap}
-            />
-          )}
+          {route.name === "home" ? (
+            <motion.main
+              key="home"
+              className="px-4 pt-4"
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ type: "spring", stiffness: 260, damping: 30 }}
+            >
+              {/* MAIN CARD */}
+              <motion.div
+                key={selectedPartner.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden"
+              >
+                <div className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-xs text-zinc-500">Основной партнёр</div>
+                      <motion.div
+                        key={selectedPartner.name}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="text-xl font-semibold mt-1 truncate"
+                      >
+                        {selectedPartner.displayName || selectedPartner.name}
+                      </motion.div>
+                    </div>
+                    
+                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП с анимацией */}
+                    <motion.div
+                      key={selectedPartner.id}
+                      initial={{ scale: 0.8, rotate: -5 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      whileTap={{ scale: 0.9, rotate: 0 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer active:bg-zinc-50"
+                      onClick={() => {
+                        const urlMap: { [key: string]: string } = {
+                          vv: "https://m.vkusvill.ru",
+                          dodo: "https://m.dodopizza.ru",
+                          cska: "https://pfc-cska.com",
+                          wb: "https://m.wildberries.ru",
+                          cofix: "https://cofix.ru",
+                        };
+                        
+                        const url = urlMap[selectedPartner.id];
+                        if (url) {
+                          goToPartnerSite(
+                            url, 
+                            selectedPartner.displayName || selectedPartner.name, 
+                            selectedPartner.logo, 
+                            selectedPartner.fallbackColor
+                          );
+                        }
+                        
+                        const tg = (window as any).Telegram?.WebApp;
+                        tg?.HapticFeedback.impactOccurred("light");
+                      }}
+                    >
+                      {selectedPartner.logo && !failedImages.has(selectedPartner.id) ? (
+                        <img 
+                          src={selectedPartner.logo} 
+                          alt={selectedPartner.displayName || selectedPartner.name}
+                          className="w-full h-full object-contain p-1"
+                          onError={() => handleImageError(selectedPartner.id)}
+                        />
+                      ) : (
+                        <div className={`w-full h-full bg-gradient-to-br ${selectedPartner.fallbackColor}`} />
+                      )}
+                    </motion.div>
+                  </div>
 
-          {route.name === "market" && (
-            <MarketScreen key="market" onBack={goBack} />
-          )}
+                  <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-4 flex items-end justify-between gap-3">
+                    <div>
+                      <div className="text-xs text-zinc-500">Баланс</div>
+                      <motion.div
+                        key={selectedPartner.balance}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        className="text-3xl font-semibold leading-none mt-1"
+                      >
+                        {formatMoney(selectedPartner.balance)} <span className="text-base font-medium text-zinc-500">{selectedPartner.unit}</span>
+                      </motion.div>
+                    </div>
+                    <PrimaryButton 
+                      label="Активность" 
+                      onClick={() => {
+                        const tg = (window as any).Telegram?.WebApp;
+                        tg?.HapticFeedback.impactOccurred("light");
+                        goBlank("Активность");
+                      }} 
+                    />
+                  </div>
 
-          {route.name === "services" && (
-            <ServicesScreen key="services" onBack={goBack} />
-          )}
+                  {/* ACTIONS */}
+                  <div className="mt-4 grid grid-cols-2 gap-3">
+                    <ActionCard 
+                      label="Отправить" 
+                      hint="Перевод" 
+                      kind="send" 
+                      onClick={() => {
+                        const tg = (window as any).Telegram?.WebApp;
+                        tg?.HapticFeedback.impactOccurred("light");
+                        setIsSendModalOpen(true);
+                      }} 
+                    />
+                    <ActionCard 
+                      label="Получить" 
+                      hint="Входящие" 
+                      kind="receive" 
+                      onClick={() => {
+                        const tg = (window as any).Telegram?.WebApp;
+                        tg?.HapticFeedback.impactOccurred("light");
+                        setIsReceiveModalOpen(true);
+                      }} 
+                    />
+                    <ActionCard 
+                      label="Обменять" 
+                      hint="Бонусы" 
+                      kind="swap" 
+                      onClick={() => {
+                        const tg = (window as any).Telegram?.WebApp;
+                        tg?.HapticFeedback.impactOccurred("light");
+                        setIsSwapModalOpen(true);
+                      }} 
+                    />
+                    <ActionCard 
+                      label="Списать" 
+                      hint="Оплата" 
+                      kind="spend" 
+                      onClick={() => {
+                        const tg = (window as any).Telegram?.WebApp;
+                        tg?.HapticFeedback.impactOccurred("light");
+                        goBlank("Списать");
+                      }} 
+                    />
+                  </div>
+                </div>
+              </motion.div>
 
-          {route.name === "profile" && (
-            <ProfileScreen key="profile" onBack={goBack} />
-          )}
+              {/* PARTNERS LIST */}
+              <div className="pb-24">
+                <PartnersList
+                  partners={partnersSeed}
+                  selectedPartner={selectedPartner}
+                  onSelectPartner={selectPartner}
+                  failedImages={failedImages}
+                  onImageError={handleImageError}
+                  formatMoney={formatMoney}
+                  onOpenBlank={goBlank}
+                />
+              </div>
 
-          {route.name === "blank" && (
+            </motion.main>
+          ) : route.name === "blank" ? (
             <BlackScreen 
               key="blank" 
               title={route.title} 
-              onBack={goBack}
+              onBack={goHome}
             />
-          )}
-
-          {route.name === "partner-site" && (
+          ) : (
             <PartnerSiteScreen
               key="partner-site"
               url={route.url}
@@ -213,48 +386,82 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* Нижнее меню - показываем только на главных экранах */}
-      <AnimatePresence>
-        {showBottomNav && (
-          <motion.nav
-            initial={{ y: 100 }}
-            animate={{ y: 0 }}
-            exit={{ y: 100 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
-            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-          >
-            <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
-              <TabButton
-                active={currentTab === "wallet"}
-                onClick={() => goToTab("wallet")}
-                label="Кошелёк"
-                icon={<WalletCards size={18} strokeWidth={1.9} />}
-              />
-              <TabButton
-                active={currentTab === "market"}
-                onClick={() => goToTab("market")}
-                label="Маркет"
-                icon={<ShoppingBag size={18} strokeWidth={1.9} />}
-              />
-              <TabButton
-                active={currentTab === "services"}
-                onClick={() => goToTab("services")}
-                label="Сервисы"
-                icon={<Handshake size={18} strokeWidth={1.9} />}
-              />
-              <TabButton
-                active={currentTab === "profile"}
-                onClick={() => goToTab("profile")}
-                label="Профиль"
-                icon={<UserRound size={18} strokeWidth={1.9} />}
-              />
-            </div>
-          </motion.nav>
-        )}
-      </AnimatePresence>
+      {/* BOTTOM NAV */}
+      {route.name === "home" && (
+        <nav
+          className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        >
+          <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
+            <TabButton
+              active={tab === "wallet"}
+              onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
+                setTab("wallet");
+                goBlank("Кошелёк");
+              }}
+              label="Кошелёк"
+              icon={<WalletCards size={18} strokeWidth={1.9} />}
+            />
+            <TabButton
+              active={tab === "market"}
+              onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
+                setTab("market");
+                goBlank("Маркет");
+              }}
+              label="Маркет"
+              icon={<ShoppingBag size={18} strokeWidth={1.9} />}
+            />
+            <TabButton
+              active={tab === "partners"}
+              onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
+                setTab("partners");
+                goBlank("Партнёры");
+              }}
+              label="Партнёры"
+              icon={<Handshake size={18} strokeWidth={1.9} />}
+            />
+            <TabButton
+              active={tab === "profile"}
+              onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
+                setTab("profile");
+                goBlank("Профиль");
+              }}
+              label="Профиль"
+              icon={<UserRound size={18} strokeWidth={1.9} />}
+            />
+          </div>
+        </nav>
+      )}
 
-      {/* Модальные окна (всегда поверх) */}
+      {/* Модальные окна */}
+      <SendModal
+        isOpen={isSendModalOpen}
+        onClose={() => setIsSendModalOpen(false)}
+        onSend={handleSend}
+        currentBalance={selectedPartner.balance}
+      />
+
+      <ReceiveModal
+        isOpen={isReceiveModalOpen}
+        onClose={() => setIsReceiveModalOpen(false)}
+      />
+
+      <SwapModal
+        isOpen={isSwapModalOpen}
+        onClose={() => setIsSwapModalOpen(false)}
+        onSwap={handleSwap}
+        currentBalance={selectedPartner.balance}
+        selectedPartner={selectedPartner}
+      />
+
       <InfoModal
         isOpen={isInfoModalOpen}
         onClose={() => setIsInfoModalOpen(false)}
