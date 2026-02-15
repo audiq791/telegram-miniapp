@@ -124,9 +124,9 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
             return (
               <motion.button
                 key={service.id}
-                whileTap={{ scale: 0.97 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 onClick={() => handleServiceClick(service)}
+                whileTap={{ scale: 0.98, backgroundColor: "#f4f4f5" }}
+                transition={{ type: "spring", stiffness: 700, damping: 40 }}
                 className="bg-white rounded-xl border border-zinc-200 shadow-sm p-3.5 text-left relative flex flex-col"
               >
                 {/* Бейдж для GPT */}
