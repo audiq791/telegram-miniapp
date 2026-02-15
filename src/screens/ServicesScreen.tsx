@@ -120,7 +120,7 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
         </div>
       </div>
 
-      {/* Плитки - уменьшенные */}
+      {/* Плитки - сильно уменьшенные */}
       <div className="max-w-md mx-auto w-full px-4 pt-3 flex-1 overflow-hidden">
         <div className="grid grid-cols-2 gap-2 h-full">
           {services.map((service) => {
@@ -131,32 +131,32 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 onClick={() => handleServiceClick(service)}
-                className="bg-white rounded-xl border border-zinc-200 shadow-sm p-3 text-left relative flex flex-col h-full"
+                className="bg-white rounded-lg border border-zinc-200 shadow-sm p-2.5 text-left relative flex flex-col h-full"
               >
                 {/* Бейдж для GPT */}
                 {service.badge && (
-                  <div className="absolute top-1.5 right-1.5">
-                    <span className="text-[7px] text-zinc-400">
+                  <div className="absolute top-1 right-1">
+                    <span className="text-[6px] text-zinc-400">
                       {service.badge}
                     </span>
                   </div>
                 )}
 
-                {/* Иконка - меньше */}
-                <div className={`h-10 w-10 rounded-lg ${service.bgColor} flex items-center justify-center mb-2`}>
-                  <Icon size={20} className={service.iconColor} />
+                {/* Иконка - сильно меньше */}
+                <div className={`h-8 w-8 rounded-lg ${service.bgColor} flex items-center justify-center mb-1.5`}>
+                  <Icon size={16} className={service.iconColor} />
                 </div>
 
-                {/* Текст - меньше */}
+                {/* Текст - сильно меньше */}
                 <div className="flex-1">
-                  <h3 className="font-semibold text-zinc-900 text-sm">{service.title}</h3>
-                  <p className="text-[10px] text-zinc-500 mt-0.5 leading-tight">{service.description}</p>
+                  <h3 className="font-semibold text-zinc-900 text-xs">{service.title}</h3>
+                  <p className="text-[9px] text-zinc-500 mt-0.5 leading-tight line-clamp-2">{service.description}</p>
                 </div>
 
-                {/* Стрелка - меньше */}
-                <div className="flex items-center gap-0.5 mt-2 text-[9px] text-zinc-400">
+                {/* Стрелка - сильно меньше */}
+                <div className="flex items-center gap-0.5 mt-1.5 text-[8px] text-zinc-400">
                   <span>Подробнее</span>
-                  <ArrowRight size={9} />
+                  <ArrowRight size={8} />
                 </div>
               </motion.button>
             );
