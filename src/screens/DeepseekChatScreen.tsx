@@ -34,27 +34,9 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [dragStartX, setDragStartX] = useState<number | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Обработчик свайпа вправо на всем контейнере
-  const handleDragStart = (event: MouseEvent | TouchEvent | PointerEvent) => {
-    if (event instanceof TouchEvent) {
-      setDragStartX(event.touches[0].clientX);
-    } else if (event instanceof MouseEvent) {
-      setDragStartX(event.clientX);
-    }
-  };
-
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (info.offset.x > 100) {
-      onBack();
-    }
-    setDragStartX(null);
-  };
 
   // Автоскролл к последнему сообщению
   useEffect(() => {
@@ -65,6 +47,17 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  // Обработчик свайпа вправо
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    // Проверяем, что свайп был преимущественно горизонтальным
+    const isHorizontalSwipe = Math.abs(info.offset.x) > Math.abs(info.offset.y) * 2;
+    
+    // Если свайпнули вправо больше чем на 100px и это был горизонтальный свайп
+    if (isHorizontalSwipe && info.offset.x > 100) {
+      onBack();
+    }
+  };
 
   // Отправка сообщения в Deepseek API
   const handleSendMessage = async () => {
@@ -138,18 +131,8 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <motion.div
-      ref={containerRef}
-      className="min-h-[100dvh] bg-zinc-50 flex flex-col"
-      drag="x"
-      dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.1}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      dragPropagation={false}
-      dragMomentum={false}
-    >
-      {/* Шапка - всегда видна, прилипает к верху */}
+    <div className="min-h-[100dvh] bg-zinc-50 flex flex-col">
+      {/* Шапка - всегда видна */}
       <div className="sticky top-0 z-20 bg-white border-b border-zinc-200">
         <div className="px-4 py-3 flex items-center gap-3">
           <IconButton aria="back" onClick={onBack}>
@@ -167,113 +150,124 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
         </div>
       </div>
 
-      {/* Сообщения */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
-        <div className="max-w-2xl mx-auto space-y-4">
-          <AnimatePresence initial={false}>
-            {messages.map((message) => (
-              <motion.div
-                key={message.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`flex gap-2 max-w-[80%] ${
-                    message.role === "user" ? "flex-row-reverse" : "flex-row"
-                  }`}
+      {/* Контейнер для свайпа и сообщений */}
+      <motion.div 
+        className="flex-1 overflow-hidden"
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.1}
+        onDragEnd={handleDragEnd}
+        dragPropagation={false}
+        dragMomentum={false}
+      >
+        {/* Сообщения с вертикальным скроллом */}
+        <div className="h-full overflow-y-auto px-4 py-4">
+          <div className="max-w-2xl mx-auto space-y-4">
+            <AnimatePresence initial={false}>
+              {messages.map((message) => (
+                <motion.div
+                  key={message.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  {/* Аватар */}
                   <div
-                    className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
-                      message.role === "user"
-                        ? "bg-zinc-200"
-                        : "bg-emerald-100"
+                    className={`flex gap-2 max-w-[80%] ${
+                      message.role === "user" ? "flex-row-reverse" : "flex-row"
                     }`}
                   >
-                    {message.role === "user" ? (
-                      <User size={14} className="text-zinc-600" />
-                    ) : (
-                      <Sparkles size={14} className="text-emerald-600" />
-                    )}
-                  </div>
-
-                  {/* Сообщение */}
-                  <div className="relative group">
+                    {/* Аватар */}
                     <div
-                      className={`rounded-2xl px-4 py-2.5 text-sm ${
+                      className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
                         message.role === "user"
-                          ? "bg-zinc-900 text-white"
-                          : "bg-white border border-zinc-200 text-zinc-900"
+                          ? "bg-zinc-200"
+                          : "bg-emerald-100"
                       }`}
                     >
-                      <p className="whitespace-pre-wrap break-words">{message.content}</p>
-                      
-                      {/* Время и кнопка копирования */}
-                      <div className="flex items-center justify-end gap-2 mt-1">
-                        <span className={`text-[10px] ${message.role === "user" ? "text-zinc-400" : "text-zinc-400"}`}>
-                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                        <button
-                          onClick={() => handleCopy(message.content, message.id)}
-                          className={`opacity-0 group-hover:opacity-100 transition-opacity ${
-                            message.role === "user" ? "text-zinc-400 hover:text-zinc-300" : "text-zinc-400 hover:text-zinc-600"
-                          }`}
-                        >
-                          {copiedId === message.id ? (
-                            <Check size={12} className="text-green-500" />
-                          ) : (
-                            <Copy size={12} />
-                          )}
-                        </button>
+                      {message.role === "user" ? (
+                        <User size={14} className="text-zinc-600" />
+                      ) : (
+                        <Sparkles size={14} className="text-emerald-600" />
+                      )}
+                    </div>
+
+                    {/* Сообщение */}
+                    <div className="relative group">
+                      <div
+                        className={`rounded-2xl px-4 py-2.5 text-sm ${
+                          message.role === "user"
+                            ? "bg-zinc-900 text-white"
+                            : "bg-white border border-zinc-200 text-zinc-900"
+                        }`}
+                      >
+                        <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                        
+                        {/* Время и кнопка копирования */}
+                        <div className="flex items-center justify-end gap-2 mt-1">
+                          <span className={`text-[10px] ${message.role === "user" ? "text-zinc-400" : "text-zinc-400"}`}>
+                            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          <button
+                            onClick={() => handleCopy(message.content, message.id)}
+                            className={`opacity-0 group-hover:opacity-100 transition-opacity ${
+                              message.role === "user" ? "text-zinc-400 hover:text-zinc-300" : "text-zinc-400 hover:text-zinc-600"
+                            }`}
+                          >
+                            {copiedId === message.id ? (
+                              <Check size={12} className="text-green-500" />
+                            ) : (
+                              <Copy size={12} />
+                            )}
+                          </button>
+                        </div>
                       </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+
+            {/* Индикатор печатания */}
+            {isLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex justify-start"
+              >
+                <div className="flex gap-2 max-w-[80%]">
+                  <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                    <Sparkles size={14} className="text-emerald-600" />
+                  </div>
+                  <div className="bg-white border border-zinc-200 rounded-2xl px-4 py-3">
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" />
                     </div>
                   </div>
                 </div>
               </motion.div>
-            ))}
-          </AnimatePresence>
+            )}
 
-          {/* Индикатор печатания */}
-          {isLoading && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex justify-start"
-            >
-              <div className="flex gap-2 max-w-[80%]">
-                <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                  <Sparkles size={14} className="text-emerald-600" />
+            {/* Ошибка */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex justify-center"
+              >
+                <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-2 flex items-center gap-2">
+                  <AlertCircle size={14} className="text-red-500" />
+                  <p className="text-xs text-red-600">{error}</p>
                 </div>
-                <div className="bg-white border border-zinc-200 rounded-2xl px-4 py-3">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            )}
 
-          {/* Ошибка */}
-          {error && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex justify-center"
-            >
-              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-2 flex items-center gap-2">
-                <AlertCircle size={14} className="text-red-500" />
-                <p className="text-xs text-red-600">{error}</p>
-              </div>
-            </motion.div>
-          )}
-
-          <div ref={messagesEndRef} />
+            <div ref={messagesEndRef} />
+          </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Поле ввода */}
       <div className="bg-white border-t border-zinc-200 px-4 py-3 sticky bottom-0">
@@ -287,7 +281,6 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
             placeholder="Спросите у Deepseek..."
             className="flex-1 h-11 px-4 bg-zinc-100 rounded-xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
             disabled={isLoading}
-            onDragStart={(e) => e.preventDefault()}
           />
           <motion.button
             whileTap={{ scale: 0.95 }}
@@ -299,6 +292,6 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
           </motion.button>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
