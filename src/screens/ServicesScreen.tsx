@@ -12,6 +12,7 @@ import {
   Sparkles,
   ArrowRight
 } from "lucide-react";
+import { useEffect } from "react";
 
 type ServiceItem = {
   id: string;
@@ -96,6 +97,22 @@ interface ServicesScreenProps {
 }
 
 export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) {
+  // Запрещаем скролл при монтировании, возвращаем при размонтировании
+  useEffect(() => {
+    // Сохраняем текущий стиль
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    
+    // Запрещаем скролл
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    
+    // Возвращаем при размонтировании
+    return () => {
+      document.body.style.overflow = originalStyle;
+      document.documentElement.style.overflow = originalStyle;
+    };
+  }, []);
+
   const handleServiceClick = (service: typeof services[0]) => {
     if (service.id === "gpt") {
       if (onServiceClick) {
@@ -116,7 +133,7 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
         </div>
       </div>
 
-      {/* Плитки - без скролла */}
+      {/* Плитки */}
       <div className="flex-1 max-w-md mx-auto w-full px-4 pt-4 overflow-hidden">
         <div className="grid grid-cols-2 gap-3">
           {services.map((service) => {
