@@ -510,19 +510,35 @@ export default function SpendSettingsScreen({ onBack }: SpendSettingsScreenProps
           </motion.div>
         </div>
       </div>
-
-            {/* Предупреждение о необходимости хотя бы одного режима */}
+      {/* Предупреждение о необходимости хотя бы одного режима */}
       <AnimatePresence>
         {showWarningToast && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ type: "spring", damping: 20, stiffness: 300 }}
-            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-red-500 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 w-auto max-w-sm mx-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="fixed bottom-32 left-1/2 transform -translate-x-1/2 z-50 bg-red-500/90 backdrop-blur-sm text-white px-8 py-5 rounded-2xl shadow-2xl flex items-center gap-4 w-[90%] max-w-md border border-red-400/50"
           >
-            <AlertCircle size={22} className="text-white shrink-0" />
-            <p className="text-sm font-medium">
+            <div className="bg-white/20 rounded-full p-1.5 shrink-0">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2.5" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                className="text-white"
+              >
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            </div>
+            <p className="text-sm font-medium leading-relaxed flex-1">
               Один из способов списания бонусов должен быть активирован
             </p>
           </motion.div>
