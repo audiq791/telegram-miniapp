@@ -12,6 +12,7 @@ import {
   Sparkles,
   ArrowRight
 } from "lucide-react";
+import { useState } from "react";
 
 type ServiceItem = {
   id: string;
@@ -92,15 +93,23 @@ const services: ServiceItem[] = [
 ];
 
 export default function ServicesScreen() {
+  const [clickedId, setClickedId] = useState<string | null>(null);
+
+  const handleClick = (id: string) => {
+    setClickedId(id);
+    setTimeout(() => setClickedId(null), 200);
+    console.log(`Clicked: ${id}`);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-[100dvh] bg-zinc-50"
+      className="min-h-[100dvh] bg-zinc-50 flex flex-col"
     >
       {/* Шапка на всю ширину */}
-      <div className="bg-white border-b border-zinc-200">
+      <div className="bg-white border-b border-zinc-200 flex-shrink-0">
         <div className="mx-auto max-w-md px-4 py-6">
           <h1 className="text-2xl font-bold text-zinc-900">Сервисы</h1>
           <p className="text-sm text-zinc-500 mt-1">
@@ -109,42 +118,53 @@ export default function ServicesScreen() {
         </div>
       </div>
 
-      {/* Сетка сервисов с отступами от краев */}
-      <div className="px-3 py-6">
+      {/* Сетка сервисов с фиксированной высотой */}
+      <div className="flex-1 px-3 py-6">
         <div className="grid grid-cols-2 gap-2.5 max-w-md mx-auto">
-          {services.map((service, index) => (
-            <motion.button
-              key={service.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              whileTap={{ scale: 0.98, backgroundColor: "#f4f4f5" }}
-              className="bg-white rounded-xl border border-zinc-200 shadow-sm p-3.5 text-left hover:shadow-md group relative"
-            >
-              {/* Badge для GPT Помощника */}
-              {service.badge && (
-                <div className="absolute top-1.5 right-2 text-[7px] text-zinc-400 font-medium">
-                  {service.badge}
-                </div>
-              )}
+          {services.map((service, index) => {
+            const isClicked = clickedId === service.id;
+            
+            return (
+              <motion.button
+                key={service.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ 
+                  opacity: 1, 
+                  y: 0,
+                  scale: isClicked ? 0.96 : 1
+                }}
+                transition={{ 
+                  delay: index * 0.05,
+                  duration: isClicked ? 0.15 : 0.3
+                }}
+                onClick={() => handleClick(service.id)}
+                className="bg-white rounded-xl border border-zinc-200 shadow-sm p-3.5 text-left hover:shadow-md group relative"
+              >
+                {/* Badge для GPT Помощника */}
+                {service.badge && (
+                  <div className="absolute top-1.5 right-2 text-[7px] text-zinc-400 font-medium">
+                    {service.badge}
+                  </div>
+                )}
 
-              <div className={`h-11 w-11 rounded-xl ${service.bgColor} flex items-center justify-center mb-2.5`}>
-                <div className={service.color}>
-                  {service.icon}
+                <div className={`h-11 w-11 rounded-xl ${service.bgColor} flex items-center justify-center mb-2.5`}>
+                  <div className={service.color}>
+                    {service.icon}
+                  </div>
                 </div>
-              </div>
-              <h3 className="font-semibold text-zinc-900 text-[15px]">{service.title}</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">{service.description}</p>
-              
-              {/* Индикатор для остальных */}
-              {!service.badge && (
-                <div className="flex items-center gap-1 mt-2 text-xs text-zinc-400">
-                  <span>Подробнее</span>
-                  <ArrowRight size={12} />
-                </div>
-              )}
-            </motion.button>
-          ))}
+                <h3 className="font-semibold text-zinc-900 text-[15px]">{service.title}</h3>
+                <p className="text-xs text-zinc-500 mt-0.5">{service.description}</p>
+                
+                {/* Индикатор для остальных */}
+                {!service.badge && (
+                  <div className="flex items-center gap-1 mt-2 text-xs text-zinc-400">
+                    <span>Подробнее</span>
+                    <ArrowRight size={12} />
+                  </div>
+                )}
+              </motion.button>
+            );
+          })}
         </div>
       </div>
     </motion.div>
