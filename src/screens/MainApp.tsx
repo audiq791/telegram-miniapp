@@ -43,6 +43,21 @@ export default function MainApp() {
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
 
+  // Состояние для отслеживания клавиатуры
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  // Отслеживаем появление клавиатуры
+  useEffect(() => {
+    const handleResize = () => {
+      // На мобильных устройствах при появлении клавиатуры высота окна уменьшается
+      const isKeyboard = window.innerHeight < 500;
+      setKeyboardVisible(isKeyboard);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleImageError = (partnerId: string) => {
     setFailedImages(prev => new Set(prev).add(partnerId));
   };
@@ -423,7 +438,7 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* НАВБАР - всегда на home, никогда не поднимается над клавиатурой */}
+      {/* НАВБАР - всегда на home, не двигается при клавиатуре */}
       <AnimatePresence>
         {showNavbar && (
           <motion.nav
@@ -434,8 +449,8 @@ export default function MainApp() {
             className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
             style={{ 
               paddingBottom: "env(safe-area-inset-bottom)",
-              transform: "translateZ(0)",
-              willChange: "transform"
+              transform: keyboardVisible ? "translateY(0)" : "translateY(0)",
+              transition: keyboardVisible ? "none" : undefined
             }}
           >
             <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
@@ -484,7 +499,7 @@ export default function MainApp() {
         )}
       </AnimatePresence>
 
-      {/* МОДАЛЬНЫЕ ОКНА - z-index выше навбара */}
+      {/* МОДАЛЬНЫЕ ОКНА */}
       <SendModal
         isOpen={isSendModalOpen}
         onClose={() => setIsSendModalOpen(false)}
