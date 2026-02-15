@@ -1,15 +1,18 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  WalletCards,
+  ShoppingBag,
+  Handshake,
+  UserRound,
   HelpCircle,
   MoreHorizontal,
 } from "lucide-react";
 
-import { ActionCard, IconButton, PrimaryButton } from "../components/ui";
+import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
 import PartnersList from "../components/PartnersList";
-import BottomNav from "../components/BottomNav";
 import BlackScreen from "./BlackScreen";
 import PartnerSiteScreen from "./PartnerSiteScreen";
 import SendModal from "../modals/SendModal";
@@ -25,7 +28,7 @@ type Route =
   | { name: "partner-site"; url: string; title: string; logo: string; fallbackColor: string };
 
 export default function MainApp() {
-  const [tab, setTab] = useState<"wallet" | "market" | "services" | "profile">("wallet");
+  const [tab, setTab] = useState<"wallet" | "market" | "partners" | "profile">("wallet");
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [selectedPartner, setSelectedPartner] = useState<Partner>(partnersSeed[0]);
@@ -39,7 +42,6 @@ export default function MainApp() {
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
-  const moreButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleImageError = (partnerId: string) => {
     setFailedImages(prev => new Set(prev).add(partnerId));
@@ -159,22 +161,26 @@ export default function MainApp() {
     tg?.HapticFeedback.impactOccurred("light");
   };
 
-  // Проверяем, находимся ли мы на главном экране одной из кнопок
-  const isMainScreen = () => {
-    if (route.name === "home") return true;
-    if (route.name === "blank") {
-      // Главные экраны кнопок
-      return route.title === "Маркет" || 
-             route.title === "Сервисы" || 
-             route.title === "Профиль" ||
-             route.title === "Кошелёк";
+  // Анимации для контента и нижнего меню
+  const pageTransition = {
+    initial: { opacity: 0, y: 10 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -10 },
+    transition: { 
+      duration: 0.25,
+      ease: "easeInOut" 
     }
-    return false;
+  };
+
+  const navVariants = {
+    hidden: { y: 100, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+    exit: { y: 100, opacity: 0 }
   };
 
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
-      {/* HEADER - фиксированная шапка */}
+      {/* HEADER (всегда виден) */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-zinc-200">
         <div className="mx-auto max-w-md px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -184,11 +190,15 @@ export default function MainApp() {
             <div className="min-w-0">
               <div className="text-[13px] text-zinc-500 leading-none">Биржа бонусов</div>
               <div className="text-[15px] font-semibold leading-tight truncate">
-                {route.name === "partner-site"
+                {route.name === "blank" || route.name === "partner-site"
                   ? route.title
-                  : route.name === "home" 
+                  : tab === "wallet"
                     ? "Кошелёк"
-                    : route.title}
+                    : tab === "market"
+                      ? "Маркет"
+                      : tab === "partners"
+                        ? "Партнёры"
+                        : "Профиль"}
               </div>
             </div>
           </div>
@@ -201,19 +211,16 @@ export default function MainApp() {
                 tg?.HapticFeedback.impactOccurred("light");
                 setIsInfoModalOpen(true);
               }}
-              className="active:scale-95 active:bg-zinc-100 transition-transform"
             >
               <HelpCircle size={18} />
             </IconButton>
             <IconButton 
-              ref={moreButtonRef}
               aria="more" 
               onClick={() => {
                 const tg = (window as any).Telegram?.WebApp;
                 tg?.HapticFeedback.impactOccurred("light");
                 setIsMoreMenuOpen(!isMoreMenuOpen);
               }}
-              className="active:scale-95 active:bg-zinc-100 transition-transform"
             >
               <MoreHorizontal size={18} />
             </IconButton>
@@ -221,19 +228,19 @@ export default function MainApp() {
         </div>
       </header>
 
-      {/* CONTENT с отступом для фиксированного меню */}
+      {/* CONTENT с анимацией */}
       <div className="mx-auto max-w-md">
         <AnimatePresence mode="wait">
           {route.name === "home" ? (
             <motion.main
               key="home"
               className="px-4 pt-4"
-              initial={{ opacity: 0, x: 12 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -12 }}
-              transition={{ type: "spring", stiffness: 260, damping: 30 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
             >
-              {/* MAIN CARD - ГЛАВНЫЙ ЭКРАН КОШЕЛЬКА */}
+              {/* MAIN CARD */}
               <motion.div
                 key={selectedPartner.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -255,7 +262,7 @@ export default function MainApp() {
                       </motion.div>
                     </div>
                     
-                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП с анимацией */}
+                    {/* КЛИКАБЕЛЬНЫЙ ЛОГОТИП */}
                     <motion.div
                       key={selectedPartner.id}
                       initial={{ scale: 0.8, rotate: -5 }}
@@ -381,8 +388,6 @@ export default function MainApp() {
                 onOpenBlank={goBlank}
               />
 
-              {/* Пустой блок для отступа под меню */}
-              <div className="h-24" />
             </motion.main>
           ) : route.name === "blank" ? (
             <BlackScreen 
@@ -404,16 +409,72 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* BOTTOM NAV - вынесенный компонент */}
-      <BottomNav
-        tab={tab}
-        onTabChange={setTab}
-        onWalletClick={goHome}
-        onMarketClick={() => goBlank("Маркет")}
-        onServicesClick={() => goBlank("Сервисы")}
-        onProfileClick={() => goBlank("Профиль")}
-        isVisible={isMainScreen()}
-      />
+      {/* BOTTOM NAV с анимацией появления/исчезновения */}
+      <AnimatePresence mode="wait">
+        {route.name === "home" && (
+          <motion.nav
+            key="nav"
+            variants={{
+              hidden: { y: 100, opacity: 0 },
+              visible: { y: 0, opacity: 1 },
+              exit: { y: 100, opacity: 0 }
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
+            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+          >
+            <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
+              <TabButton
+                active={tab === "wallet"}
+                onClick={() => {
+                  const tg = (window as any).Telegram?.WebApp;
+                  tg?.HapticFeedback.impactOccurred("light");
+                  setTab("wallet");
+                  goBlank("Кошелёк");
+                }}
+                label="Кошелёк"
+                icon={<WalletCards size={18} strokeWidth={1.9} />}
+              />
+              <TabButton
+                active={tab === "market"}
+                onClick={() => {
+                  const tg = (window as any).Telegram?.WebApp;
+                  tg?.HapticFeedback.impactOccurred("light");
+                  setTab("market");
+                  goBlank("Маркет");
+                }}
+                label="Маркет"
+                icon={<ShoppingBag size={18} strokeWidth={1.9} />}
+              />
+              <TabButton
+                active={tab === "partners"}
+                onClick={() => {
+                  const tg = (window as any).Telegram?.WebApp;
+                  tg?.HapticFeedback.impactOccurred("light");
+                  setTab("partners");
+                  goBlank("Партнёры");
+                }}
+                label="Партнёры"
+                icon={<Handshake size={18} strokeWidth={1.9} />}
+              />
+              <TabButton
+                active={tab === "profile"}
+                onClick={() => {
+                  const tg = (window as any).Telegram?.WebApp;
+                  tg?.HapticFeedback.impactOccurred("light");
+                  setTab("profile");
+                  goBlank("Профиль");
+                }}
+                label="Профиль"
+                icon={<UserRound size={18} strokeWidth={1.9} />}
+              />
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
 
       {/* Модальные окна */}
       <SendModal
