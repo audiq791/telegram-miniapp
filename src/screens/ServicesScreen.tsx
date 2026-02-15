@@ -98,7 +98,6 @@ interface ServicesScreenProps {
 export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) {
   const handleServiceClick = (service: typeof services[0]) => {
     if (service.id === "gpt") {
-      // Для GPT открываем чат
       if (onServiceClick) {
         onServiceClick(service.title);
       } else {
@@ -111,9 +110,9 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
 
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
-      {/* Шапка */}
-      <div className="bg-white border-b border-zinc-200 w-full flex-shrink-0">
-        <div className="px-4 py-5">
+      {/* Аккуратная таблетка для шапки */}
+      <div className="max-w-md mx-auto w-full px-4 pt-4">
+        <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5">
           <h1 className="text-2xl font-bold text-zinc-900">Сервисы</h1>
           <p className="text-sm text-zinc-500 mt-1">
             Услуги и преимущества для держателей бонусов
@@ -122,7 +121,7 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
       </div>
 
       {/* Плитки */}
-      <div className="flex-1 px-4 pt-4 pb-0">
+      <div className="max-w-md mx-auto w-full px-4 pt-4 pb-0">
         <div className="grid grid-cols-2 gap-3">
           {services.map((service) => {
             const Icon = service.icon;
