@@ -109,10 +109,10 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
   };
 
   return (
-    <div className="min-h-[100dvh] bg-zinc-50 flex flex-col">
-      {/* Шапка фиксированная */}
-      <div className="bg-white border-b border-zinc-200 w-full flex-shrink-0">
-        <div className="px-4 py-5">
+    <div className="h-[calc(100dvh-180px)] bg-zinc-50 flex flex-col overflow-hidden">
+      {/* Шапка - таблетка */}
+      <div className="max-w-md mx-auto w-full px-4 pt-4 flex-shrink-0">
+        <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5">
           <h1 className="text-2xl font-bold text-zinc-900">Сервисы</h1>
           <p className="text-sm text-zinc-500 mt-1">
             Услуги и преимущества для держателей бонусов
@@ -120,8 +120,8 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
         </div>
       </div>
 
-      {/* Плитки занимают оставшееся место */}
-      <div className="flex-1 px-4 py-4">
+      {/* Плитки - фиксированная сетка без скролла */}
+      <div className="max-w-md mx-auto w-full px-4 pt-4 flex-1 overflow-hidden">
         <div className="grid grid-cols-2 gap-3 h-full">
           {services.map((service) => {
             const Icon = service.icon;
