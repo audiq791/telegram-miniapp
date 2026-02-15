@@ -13,24 +13,24 @@ export default function BlackScreen({
   title: string;
   onBack: () => void;
 }) {
-  // Если это экран активности, показываем ActivityScreen
+  // Активность
   if (title === "Активность") {
     return <ActivityScreen onBack={onBack} />;
   }
 
-  // Если это экран настроек списания
+  // Списать (настройки)
   if (title === "Списать") {
     return <SpendSettingsScreen onBack={onBack} />;
   }
 
-  // Для остальных экранов показываем заглушку
+  // Для остальных второстепенных экранов
   return (
     <motion.div
       className="min-h-[100dvh] bg-zinc-50"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
+      initial={{ opacity: 0, x: 24 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -24 }}
+      transition={{ type: "spring", stiffness: 260, damping: 30 }}
     >
       <div className="mx-auto max-w-md px-4 pt-4">
         <div className="flex items-center gap-3">
