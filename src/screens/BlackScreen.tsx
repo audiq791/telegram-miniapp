@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { IconButton } from "../components/ui";
 import ActivityScreen from "./ActivityScreen";
 import SpendSettingsScreen from "./SpendSettingsScreen";
+import DeepseekChatScreen from "./DeepseekChatScreen";
 
 export default function BlackScreen({
   title,
@@ -21,6 +22,11 @@ export default function BlackScreen({
   // Списать (настройки)
   if (title === "Списать") {
     return <SpendSettingsScreen onBack={onBack} />;
+  }
+
+  // Deepseek чат
+  if (title === "GPT Помощник") {
+    return <DeepseekChatScreen onBack={onBack} />;
   }
 
   // Для остальных второстепенных экранов

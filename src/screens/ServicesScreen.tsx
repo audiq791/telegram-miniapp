@@ -13,7 +13,17 @@ import {
   ArrowRight
 } from "lucide-react";
 
-const services = [
+type ServiceItem = {
+  id: string;
+  icon: React.ElementType;
+  title: string;
+  description: string;
+  iconColor: string;
+  bgColor: string;
+  badge?: string;
+};
+
+const services: ServiceItem[] = [
   {
     id: "fuel",
     icon: Fuel,
@@ -81,12 +91,29 @@ const services = [
   }
 ];
 
-export default function ServicesScreen() {
+interface ServicesScreenProps {
+  onServiceClick?: (serviceTitle: string) => void;
+}
+
+export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) {
+  const handleServiceClick = (service: typeof services[0]) => {
+    if (service.id === "gpt") {
+      // Для GPT открываем чат
+      if (onServiceClick) {
+        onServiceClick(service.title);
+      } else {
+        console.log(`Open ${service.title} chat`);
+      }
+    } else {
+      console.log(`${service.title} clicked`);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
-      {/* Аккуратная таблетка для шапки */}
-      <div className="max-w-md mx-auto w-full px-4 pt-4">
-        <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5">
+      {/* Шапка */}
+      <div className="bg-white border-b border-zinc-200 w-full flex-shrink-0">
+        <div className="px-4 py-5">
           <h1 className="text-2xl font-bold text-zinc-900">Сервисы</h1>
           <p className="text-sm text-zinc-500 mt-1">
             Услуги и преимущества для держателей бонусов
@@ -94,8 +121,8 @@ export default function ServicesScreen() {
         </div>
       </div>
 
-      {/* Плитки - занимают всё оставшееся место, но не больше */}
-      <div className="flex-1 max-w-md mx-auto w-full px-4 pt-4 pb-0">
+      {/* Плитки */}
+      <div className="flex-1 px-4 pt-4 pb-0">
         <div className="grid grid-cols-2 gap-3">
           {services.map((service) => {
             const Icon = service.icon;
@@ -104,8 +131,18 @@ export default function ServicesScreen() {
                 key={service.id}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                onClick={() => handleServiceClick(service)}
                 className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-4 text-left relative flex flex-col h-full"
               >
+                {/* Бейдж для GPT */}
+                {service.badge && (
+                  <div className="absolute top-2 right-2">
+                    <span className="text-[8px] text-zinc-400">
+                      {service.badge}
+                    </span>
+                  </div>
+                )}
+
                 {/* Иконка */}
                 <div className={`h-12 w-12 rounded-xl ${service.bgColor} flex items-center justify-center mb-3`}>
                   <Icon size={24} className={service.iconColor} />
@@ -115,13 +152,6 @@ export default function ServicesScreen() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-zinc-900">{service.title}</h3>
                   <p className="text-xs text-zinc-500 mt-1">{service.description}</p>
-                  
-                  {/* Powered by Deepseek под описанием */}
-                  {service.badge && (
-                    <p className="text-[8px] text-zinc-400 mt-2">
-                      {service.badge}
-                    </p>
-                  )}
                 </div>
 
                 {/* Стрелка для всех сервисов */}

@@ -392,7 +392,7 @@ export default function MainApp() {
 
               {/* Сервисы */}
               {tab === "services" && (
-                <ServicesScreen />
+                <ServicesScreen onServiceClick={(title) => goBlank(title)} />
               )}
 
               {/* Профиль */}
