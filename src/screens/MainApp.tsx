@@ -162,8 +162,18 @@ export default function MainApp() {
     tg?.HapticFeedback.impactOccurred("light");
   };
 
-  // Определяем, показывать ли нижнее меню (скрываем только при переходе на сайт)
-  const shouldShowBottomNav = route.name !== "partner-site";
+  // Проверяем, находимся ли мы на главном экране одной из кнопок
+  const isMainScreen = () => {
+    if (route.name === "home") return true;
+    if (route.name === "blank") {
+      // Главные экраны кнопок
+      return route.title === "Маркет" || 
+             route.title === "Сервисы" || 
+             route.title === "Профиль" ||
+             route.title === "Кошелёк";
+    }
+    return false;
+  };
 
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
@@ -395,8 +405,8 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* BOTTOM NAV - видно всегда, кроме экрана с сайтом партнера */}
-      {shouldShowBottomNav && (
+      {/* BOTTOM NAV - показываем только на главных экранах */}
+      {isMainScreen() && (
         <nav
           className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
@@ -409,9 +419,7 @@ export default function MainApp() {
                 tg?.HapticFeedback.impactOccurred("light");
                 if (tab !== "wallet") {
                   setTab("wallet");
-                  goHome(); // Возвращаемся на главный экран
-                } else {
-                  // Если уже на главном, просто анимация (уже есть в TabButton)
+                  goHome();
                 }
               }}
               label="Кошелёк"
