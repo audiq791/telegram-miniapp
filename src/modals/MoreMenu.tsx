@@ -24,17 +24,31 @@ export default function MoreMenu({ isOpen, onClose }: MoreMenuProps) {
   };
 
   const handleEmailClick = () => {
-    // Создаем ссылку mailto с адресом
     const email = 'info@oe-media.ru';
-    const mailtoLink = `mailto:${email}`;
     
-    // Открываем почтовый клиент
-    window.location.href = mailtoLink;
+    // Пробуем разные способы открытия почтового клиента
+    try {
+      // Способ 1: mailto ссылка
+      window.location.href = `mailto:${email}`;
+      
+      // Если не сработало, копируем в буфер обмена
+      setTimeout(() => {
+        if (!document.hasFocus()) return;
+        
+        // Копируем email в буфер обмена
+        navigator.clipboard.writeText(email).then(() => {
+          alert(`Email ${email} скопирован в буфер обмена`);
+        }).catch(() => {
+          // Если копирование не удалось, показываем email
+          alert(`Наш email: ${email}`);
+        });
+      }, 500);
+    } catch (error) {
+      // В случае ошибки просто показываем email
+      alert(`Наш email: ${email}`);
+    }
     
-    // Небольшая задержка перед закрытием меню
-    setTimeout(() => {
-      onClose();
-    }, 100);
+    onClose();
   };
 
   return (
