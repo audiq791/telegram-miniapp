@@ -50,10 +50,8 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
 
   // Обработчик свайпа вправо
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    // Проверяем, что свайп был преимущественно горизонтальным
     const isHorizontalSwipe = Math.abs(info.offset.x) > Math.abs(info.offset.y) * 2;
     
-    // Если свайпнули вправо больше чем на 100px и это был горизонтальный свайп
     if (isHorizontalSwipe && info.offset.x > 100) {
       onBack();
     }
@@ -131,10 +129,10 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-zinc-50 flex flex-col">
-      {/* Шапка - всегда видна */}
-      <div className="sticky top-0 z-20 bg-white border-b border-zinc-200">
-        <div className="px-4 py-3 flex items-center gap-3">
+    <div className="min-h-[100dvh] bg-zinc-50 flex flex-col relative">
+      {/* Фиксированная шапка - всегда видна */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-zinc-200">
+        <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
           <IconButton aria="back" onClick={onBack}>
             <ArrowLeft size={18} />
           </IconButton>
@@ -150,9 +148,9 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
         </div>
       </div>
 
-      {/* Контейнер для свайпа и сообщений */}
+      {/* Контейнер для свайпа и сообщений с отступом сверху под шапку */}
       <motion.div 
-        className="flex-1 overflow-hidden"
+        className="flex-1 overflow-hidden mt-[60px]"
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.1}
@@ -269,9 +267,9 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
         </div>
       </motion.div>
 
-      {/* Поле ввода */}
-      <div className="bg-white border-t border-zinc-200 px-4 py-3 sticky bottom-0">
-        <div className="max-w-2xl mx-auto flex gap-2">
+      {/* Поле ввода - фиксированное снизу */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-200 px-4 py-3">
+        <div className="max-w-md mx-auto flex gap-2">
           <input
             ref={inputRef}
             type="text"
@@ -292,6 +290,10 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
           </motion.button>
         </div>
       </div>
+
+      {/* Отступы для контента, чтобы не перекрывался шапкой и полем ввода */}
+      <div className="h-[60px] w-full flex-shrink-0" />
+      <div className="h-[70px] w-full flex-shrink-0" />
     </div>
   );
 }
