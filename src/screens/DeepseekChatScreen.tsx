@@ -34,15 +34,32 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dragStartX, setDragStartX] = useState<number | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Обработчик свайпа вправо
+  // Обработчик свайпа вправо на всем контейнере
+  const handleDragStart = (event: MouseEvent | TouchEvent | PointerEvent) => {
+    // Сохраняем начальную позицию
+    if (event instanceof TouchEvent) {
+      setDragStartX(event.touches[0].clientX);
+    } else if (event instanceof MouseEvent) {
+      setDragStartX(event.clientX);
+    }
+  };
+
+  const handleDragMove = (event: MouseEvent | TouchEvent | PointerEvent) => {
+    // Не делаем ничего, просто отслеживаем
+  };
+
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    // Если свайпнули вправо больше чем на 100px
     if (info.offset.x > 100) {
       onBack();
     }
+    setDragStartX(null);
   };
 
   // Автоскролл к последнему сообщению
@@ -130,14 +147,16 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      ref={containerRef}
       className="min-h-[100dvh] bg-zinc-50 flex flex-col"
       drag="x"
       dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.2}
+      dragElastic={0.1}
+      onDragStart={handleDragStart}
+      onDrag={handleDragMove}
       onDragEnd={handleDragEnd}
+      dragPropagation={false}
+      dragMomentum={false}
     >
       {/* Шапка */}
       <div className="bg-white border-b border-zinc-200 px-4 py-3 flex items-center gap-3 sticky top-0 z-10">
@@ -155,7 +174,7 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
         </div>
       </div>
 
-      {/* Сообщения */}
+      {/* Сообщения - теперь они тоже часть draggable области */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
         <div className="max-w-2xl mx-auto space-y-4">
           <AnimatePresence initial={false}>
@@ -263,7 +282,7 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
         </div>
       </div>
 
-      {/* Поле ввода */}
+      {/* Поле ввода - тоже часть draggable области, но с отключенным drag для input */}
       <div className="bg-white border-t border-zinc-200 px-4 py-3 sticky bottom-0">
         <div className="max-w-2xl mx-auto flex gap-2">
           <input
@@ -275,6 +294,8 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
             placeholder="Спросите у Deepseek..."
             className="flex-1 h-11 px-4 bg-zinc-100 rounded-xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
             disabled={isLoading}
+            // Отключаем drag для input, чтобы можно было нормально вводить текст
+            onDragStart={(e) => e.preventDefault()}
           />
           <motion.button
             whileTap={{ scale: 0.95 }}
