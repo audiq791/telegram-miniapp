@@ -116,10 +116,10 @@ export default function ServicesScreen() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              whileTap={{ scale: 0.94, backgroundColor: "#f4f4f5" }}
+              whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
               className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-4 text-left hover:shadow-md transition-all group"
             >
-              <div className={`h-12 w-12 rounded-xl ${service.bgColor} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+              <div className={`h-12 w-12 rounded-xl ${service.bgColor} flex items-center justify-center mb-3`}>
                 <div className={service.color}>
                   {service.icon}
                 </div>
@@ -127,15 +127,10 @@ export default function ServicesScreen() {
               <h3 className="font-semibold text-zinc-900">{service.title}</h3>
               <p className="text-xs text-zinc-500 mt-1">{service.description}</p>
               
-              {/* Индикатор с анимацией */}
+              {/* Индикатор */}
               <div className="flex items-center gap-1 mt-3 text-xs text-zinc-400">
                 <span>Подробнее</span>
-                <motion.div
-                  animate={{ x: [0, 3, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <ArrowRight size={12} />
-                </motion.div>
+                <ArrowRight size={12} />
               </div>
             </motion.button>
           ))}
