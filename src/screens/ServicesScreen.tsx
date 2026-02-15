@@ -117,10 +117,17 @@ export default function ServicesScreen() {
               key={service.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
+              transition={{ delay: index * 0.05, type: "spring", stiffness: 300, damping: 30 }}
+              whileTap={{ scale: 0.95 }}
               className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-4 text-left hover:shadow-md transition-all group relative"
             >
+              {/* Badge для GPT Помощника - в правом верхнем углу */}
+              {service.badge && (
+                <div className="absolute top-2 right-3 text-[8px] text-zinc-400 font-medium">
+                  {service.badge}
+                </div>
+              )}
+
               <div className={`h-12 w-12 rounded-xl ${service.bgColor} flex items-center justify-center mb-3`}>
                 <div className={service.color}>
                   {service.icon}
@@ -129,13 +136,6 @@ export default function ServicesScreen() {
               <h3 className="font-semibold text-zinc-900">{service.title}</h3>
               <p className="text-xs text-zinc-500 mt-1">{service.description}</p>
               
-              {/* Badge для GPT Помощника */}
-              {service.badge && (
-                <div className="absolute bottom-2 right-3 text-[8px] text-zinc-400 font-medium">
-                  {service.badge}
-                </div>
-              )}
-
               {/* Индикатор для остальных */}
               {!service.badge && (
                 <div className="flex items-center gap-1 mt-3 text-xs text-zinc-400">
