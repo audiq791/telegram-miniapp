@@ -228,10 +228,10 @@ export default function MainApp() {
             <motion.main
               key={tab}
               className="px-4 pt-4 pb-28"
-              initial={{ y: 8, opacity: 0.8 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -8, opacity: 0.8 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
             >
               {/* Кошелек */}
               {tab === "wallet" && (
