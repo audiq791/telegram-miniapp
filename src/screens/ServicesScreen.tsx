@@ -9,7 +9,7 @@ import {
   ShieldCheck,
   Briefcase,
   Smartphone,
-  Wifi,
+  Sparkles,
   ArrowRight
 } from "lucide-react";
 
@@ -20,6 +20,7 @@ type ServiceItem = {
   description: string;
   color: string;
   bgColor: string;
+  badge?: string;
 };
 
 const services: ServiceItem[] = [
@@ -80,12 +81,13 @@ const services: ServiceItem[] = [
     bgColor: "bg-indigo-50"
   },
   {
-    id: "internet",
-    icon: <Wifi size={24} />,
-    title: "Интернет",
-    description: "Домашний интернет",
-    color: "text-cyan-600",
-    bgColor: "bg-cyan-50"
+    id: "gpt",
+    icon: <Sparkles size={24} />,
+    title: "GPT Помощник",
+    description: "ИИ-ассистент для задач",
+    color: "text-emerald-600",
+    bgColor: "bg-emerald-50",
+    badge: "Powered by Deepseek"
   }
 ];
 
@@ -117,7 +119,7 @@ export default function ServicesScreen() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
               whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
-              className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-4 text-left hover:shadow-md transition-all group"
+              className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-4 text-left hover:shadow-md transition-all group relative"
             >
               <div className={`h-12 w-12 rounded-xl ${service.bgColor} flex items-center justify-center mb-3`}>
                 <div className={service.color}>
@@ -127,11 +129,20 @@ export default function ServicesScreen() {
               <h3 className="font-semibold text-zinc-900">{service.title}</h3>
               <p className="text-xs text-zinc-500 mt-1">{service.description}</p>
               
-              {/* Индикатор */}
-              <div className="flex items-center gap-1 mt-3 text-xs text-zinc-400">
-                <span>Подробнее</span>
-                <ArrowRight size={12} />
-              </div>
+              {/* Badge для GPT Помощника */}
+              {service.badge && (
+                <div className="absolute bottom-2 right-3 text-[8px] text-zinc-400 font-medium">
+                  {service.badge}
+                </div>
+              )}
+
+              {/* Индикатор для остальных */}
+              {!service.badge && (
+                <div className="flex items-center gap-1 mt-3 text-xs text-zinc-400">
+                  <span>Подробнее</span>
+                  <ArrowRight size={12} />
+                </div>
+              )}
             </motion.button>
           ))}
         </div>
