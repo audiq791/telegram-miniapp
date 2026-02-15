@@ -83,20 +83,20 @@ const services = [
 
 export default function ServicesScreen() {
   return (
-    <div className="min-h-screen bg-zinc-50">
-      {/* Шапка от края до края - без отступа сверху */}
-      <div className="bg-white border-b border-zinc-200 w-full">
-        <div className="px-4 py-5">
+    <div className="min-h-screen bg-zinc-50 flex flex-col">
+      {/* Шапка прикреплена к верху */}
+      <div className="bg-white border-b border-zinc-200 w-full flex-shrink-0">
+        <div className="px-3 py-4">
           <h1 className="text-2xl font-bold text-zinc-900">Сервисы</h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-sm text-zinc-500 mt-0.5">
             Услуги и преимущества для держателей бонусов
           </p>
         </div>
       </div>
 
-      {/* Плитки вплотную к краям */}
-      <div className="px-2 py-4">
-        <div className="grid grid-cols-2 gap-2">
+      {/* Плитки вплотную к шапке и краям */}
+      <div className="flex-1 px-1.5 pt-1.5">
+        <div className="grid grid-cols-2 gap-1.5">
           {services.map((service) => {
             const Icon = service.icon;
             return (
@@ -104,35 +104,31 @@ export default function ServicesScreen() {
                 key={service.id}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                className="bg-white rounded-xl border border-zinc-200 shadow-sm p-3 text-left relative flex flex-col h-full"
+                className="bg-white rounded-lg border border-zinc-200 shadow-sm p-3 text-left relative flex flex-col h-full"
               >
-                {/* Верхняя часть с иконкой */}
-                <div className="flex items-start justify-between">
-                  <div className={`h-12 w-12 rounded-xl ${service.bgColor} flex items-center justify-center`}>
-                    <Icon size={24} className={service.iconColor} />
-                  </div>
+                {/* Иконка */}
+                <div className={`h-11 w-11 rounded-lg ${service.bgColor} flex items-center justify-center`}>
+                  <Icon size={22} className={service.iconColor} />
                 </div>
 
                 {/* Текст */}
-                <div className="mt-3 flex-1">
-                  <h3 className="font-semibold text-zinc-900">{service.title}</h3>
-                  <p className="text-xs text-zinc-500 mt-1">{service.description}</p>
+                <div className="mt-2.5 flex-1">
+                  <h3 className="font-semibold text-zinc-900 text-sm">{service.title}</h3>
+                  <p className="text-[11px] text-zinc-500 mt-0.5 leading-tight">{service.description}</p>
                   
-                  {/* Powered by Deepseek под описанием для GPT */}
+                  {/* Powered by Deepseek под описанием */}
                   {service.badge && (
-                    <p className="text-[8px] text-zinc-400 mt-2">
+                    <p className="text-[7px] text-zinc-400 mt-1.5">
                       {service.badge}
                     </p>
                   )}
                 </div>
 
-                {/* Стрелка для обычных сервисов */}
-                {!service.badge && (
-                  <div className="flex items-center gap-1 mt-3 text-xs text-zinc-400">
-                    <span>Подробнее</span>
-                    <ArrowRight size={12} />
-                  </div>
-                )}
+                {/* Стрелка для всех сервисов */}
+                <div className="flex items-center gap-0.5 mt-2 text-[10px] text-zinc-400">
+                  <span>Подробнее</span>
+                  <ArrowRight size={10} />
+                </div>
               </motion.button>
             );
           })}
