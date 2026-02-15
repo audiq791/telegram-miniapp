@@ -105,7 +105,7 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
   };
 
   return (
-    <div className="h-[calc(100dvh-120px)] bg-zinc-50 flex flex-col overflow-hidden">
+    <div className="h-screen bg-zinc-50 flex flex-col overflow-hidden">
       {/* Аккуратная таблетка для шапки */}
       <div className="max-w-md mx-auto w-full px-4 pt-4 flex-shrink-0">
         <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5">
@@ -116,9 +116,9 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
         </div>
       </div>
 
-      {/* Плитки - фиксированная высота, без скролла */}
-      <div className="flex-1 max-w-md mx-auto w-full px-4 pt-4 pb-0 overflow-hidden">
-        <div className="grid grid-cols-2 gap-3 h-full content-start">
+      {/* Плитки */}
+      <div className="flex-1 max-w-md mx-auto w-full px-4 pt-4 overflow-hidden">
+        <div className="grid grid-cols-2 gap-3">
           {services.map((service) => {
             const Icon = service.icon;
             return (
