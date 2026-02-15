@@ -5,7 +5,8 @@ import {
   Building2,
   Send,
   Mail,
-  Check
+  Check,
+  AlertCircle
 } from "lucide-react";
 import { useState } from "react";
 
@@ -138,18 +139,20 @@ export default function MoreMenu({ isOpen, onClose }: MoreMenuProps) {
             </div>
           </motion.div>
 
-          {/* Всплывающее уведомление - ПО ЦЕНТРУ */}
+          {/* Всплывающее уведомление о копировании email */}
           <AnimatePresence>
             {showToast && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: "-50%", x: "-50%" }}
-                animate={{ opacity: 1, scale: 1, y: "-50%", x: "-50%" }}
-                exit={{ opacity: 0, scale: 0.9, y: "-50%", x: "-50%" }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
                 transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[200] bg-black/80 text-white px-6 py-4 rounded-2xl shadow-lg backdrop-blur-sm flex items-center gap-3"
+                className="fixed bottom-32 left-1/2 transform -translate-x-1/2 z-[200] bg-green-500/90 backdrop-blur-sm text-white px-8 py-5 rounded-2xl shadow-2xl flex items-center gap-4 w-[90%] max-w-md border border-green-400/50"
               >
-                <Check size={20} className="text-green-400" />
-                <span className="text-sm font-medium">Адрес электронной почты скопирован</span>
+                <Check size={24} className="text-white shrink-0" />
+                <p className="text-sm font-medium leading-relaxed flex-1">
+                  Адрес электронной почты скопирован
+                </p>
               </motion.div>
             )}
           </AnimatePresence>
