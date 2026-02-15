@@ -5,10 +5,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   WalletCards,
   ShoppingBag,
-  Handshake,
   UserRound,
   HelpCircle,
   MoreHorizontal,
+  Layers, // ← добавили Layers
 } from "lucide-react";
 
 import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
@@ -467,7 +467,7 @@ export default function MainApp() {
                   setTab("services");
                 }}
                 label="Сервисы"
-                icon={<Handshake size={18} strokeWidth={1.9} />}
+                icon={<Layers size={18} strokeWidth={1.9} />} // ← новая иконка
               />
               <TabButton
                 active={tab === "profile"}
