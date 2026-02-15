@@ -155,7 +155,7 @@ export default function ReceiveModal({ isOpen, onClose }: ReceiveModalProps) {
                   Поделиться адресом
                 </motion.button>
 
-                {/* Меню быстрого шеринга (показывается если нет нативного) */}
+                {/* Меню быстрого шеринга */}
                 <AnimatePresence>
                   {showShareMenu && (
                     <motion.div
@@ -185,10 +185,10 @@ export default function ReceiveModal({ isOpen, onClose }: ReceiveModalProps) {
                       <motion.button
                         whileTap={{ scale: 0.95 }}
                         onClick={handleEmail}
-                        className="p-3 bg-blue-50 rounded-xl flex flex-col items-center gap-1 hover:bg-blue-100 transition-colors"
+                        className="p-3 bg-rose-50 rounded-xl flex flex-col items-center gap-1 hover:bg-rose-100 transition-colors"
                       >
-                        <Mail size={20} className="text-blue-600" />
-                        <span className="text-[10px] font-medium text-blue-700">Email</span>
+                        <Mail size={20} className="text-rose-600" />
+                        <span className="text-[10px] font-medium text-rose-700">Email</span>
                       </motion.button>
                       
                       <motion.button
