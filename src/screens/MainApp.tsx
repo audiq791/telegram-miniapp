@@ -181,8 +181,8 @@ export default function MainApp() {
     return false;
   };
 
-  // Определяем направление анимации для меню
-  const wasMainScreen = () => {
+  // Проверяем, был ли предыдущий экран тоже главным (чтобы избежать дерганья)
+  const wasAlsoMainScreen = () => {
     if (prevRoute.name === "home") return true;
     if (prevRoute.name === "blank") {
       return prevRoute.title === "Маркет" || 
@@ -193,18 +193,28 @@ export default function MainApp() {
     return false;
   };
 
+  // Анимируем меню только при переходе между главным и неглавным экраном
+  const shouldAnimateMenu = () => {
+    const currentIsMain = isMainScreen();
+    const prevIsMain = wasAlsoMainScreen();
+    
+    // Если оба главные или оба неглавные - не анимируем
+    // Если меняется статус - анимируем
+    return currentIsMain !== prevIsMain;
+  };
+
   const menuAnimation = {
     initial: { 
-      y: isMainScreen() && !wasMainScreen() ? 100 : 0,
-      opacity: isMainScreen() && !wasMainScreen() ? 0 : 1
+      y: shouldAnimateMenu() && isMainScreen() && !wasAlsoMainScreen() ? 100 : 0,
+      opacity: shouldAnimateMenu() && isMainScreen() && !wasAlsoMainScreen() ? 0 : 1
     },
     animate: { 
       y: 0,
       opacity: 1
     },
     exit: { 
-      y: 100,
-      opacity: 0
+      y: shouldAnimateMenu() && !isMainScreen() && wasAlsoMainScreen() ? 100 : 0,
+      opacity: shouldAnimateMenu() && !isMainScreen() && wasAlsoMainScreen() ? 0 : 1
     }
   };
 
@@ -438,15 +448,15 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* BOTTOM NAV - с красивой анимацией */}
-      <AnimatePresence>
+      {/* BOTTOM NAV - без анимации при переключении между главными экранами */}
+      <AnimatePresence mode="wait">
         {isMainScreen() && (
           <motion.nav
             key="bottom-nav"
             initial={menuAnimation.initial}
             animate={menuAnimation.animate}
             exit={menuAnimation.exit}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            transition={shouldAnimateMenu() ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
             className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
             style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
           >
