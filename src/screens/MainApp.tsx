@@ -32,6 +32,7 @@ export default function MainApp() {
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [selectedPartner, setSelectedPartner] = useState<Partner>(partnersSeed[0]);
+  const [prevRoute, setPrevRoute] = useState<Route>({ name: "home" });
   
   // Стек истории для кнопки назад
   const [history, setHistory] = useState<Route[]>([{ name: "home" }]);
@@ -102,6 +103,7 @@ export default function MainApp() {
         const previousRoute = newHistory[newHistory.length - 1];
         
         setHistory(newHistory);
+        setPrevRoute(route);
         setRoute(previousRoute);
         
         if (previousRoute.name === "home") {
@@ -116,12 +118,13 @@ export default function MainApp() {
     return () => {
       tg.BackButton.offClick(handleBackClick);
     };
-  }, [history]);
+  }, [history, route]);
 
   const goBlank = (title: string) => {
     const newRoute: Route = { name: "blank", title };
     
     setHistory(prev => [...prev, newRoute]);
+    setPrevRoute(route);
     setRoute(newRoute);
     
     const tg = (window as any).Telegram?.WebApp;
@@ -132,6 +135,7 @@ export default function MainApp() {
     const newRoute: Route = { name: "partner-site", url, title, logo, fallbackColor };
     
     setHistory(prev => [...prev, newRoute]);
+    setPrevRoute(route);
     setRoute(newRoute);
     
     const tg = (window as any).Telegram?.WebApp;
@@ -146,6 +150,7 @@ export default function MainApp() {
     const previousRoute = newHistory[newHistory.length - 1];
     
     setHistory(newHistory);
+    setPrevRoute(route);
     setRoute(previousRoute);
     
     if (previousRoute.name === "home") {
@@ -155,6 +160,7 @@ export default function MainApp() {
 
   const goHome = () => {
     setHistory([{ name: "home" }]);
+    setPrevRoute(route);
     setRoute({ name: "home" });
     setTab("wallet");
     
@@ -173,6 +179,33 @@ export default function MainApp() {
              route.title === "Кошелёк";
     }
     return false;
+  };
+
+  // Определяем направление анимации для меню
+  const wasMainScreen = () => {
+    if (prevRoute.name === "home") return true;
+    if (prevRoute.name === "blank") {
+      return prevRoute.title === "Маркет" || 
+             prevRoute.title === "Сервисы" || 
+             prevRoute.title === "Профиль" ||
+             prevRoute.title === "Кошелёк";
+    }
+    return false;
+  };
+
+  const menuAnimation = {
+    initial: { 
+      y: isMainScreen() && !wasMainScreen() ? 100 : 0,
+      opacity: isMainScreen() && !wasMainScreen() ? 0 : 1
+    },
+    animate: { 
+      y: 0,
+      opacity: 1
+    },
+    exit: { 
+      y: 100,
+      opacity: 0
+    }
   };
 
   return (
@@ -405,68 +438,75 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* BOTTOM NAV - показываем только на главных экранах */}
-      {isMainScreen() && (
-        <nav
-          className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
-          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-        >
-          <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
-            <TabButton
-              active={tab === "wallet"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                if (tab !== "wallet") {
-                  setTab("wallet");
-                  goHome();
-                }
-              }}
-              label="Кошелёк"
-              icon={<WalletCards size={18} strokeWidth={1.9} />}
-            />
-            <TabButton
-              active={tab === "market"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                if (tab !== "market") {
-                  setTab("market");
-                  goBlank("Маркет");
-                }
-              }}
-              label="Маркет"
-              icon={<ShoppingBag size={18} strokeWidth={1.9} />}
-            />
-            <TabButton
-              active={tab === "services"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                if (tab !== "services") {
-                  setTab("services");
-                  goBlank("Сервисы");
-                }
-              }}
-              label="Сервисы"
-              icon={<Layers size={18} strokeWidth={1.9} />}
-            />
-            <TabButton
-              active={tab === "profile"}
-              onClick={() => {
-                const tg = (window as any).Telegram?.WebApp;
-                tg?.HapticFeedback.impactOccurred("light");
-                if (tab !== "profile") {
-                  setTab("profile");
-                  goBlank("Профиль");
-                }
-              }}
-              label="Профиль"
-              icon={<UserRound size={18} strokeWidth={1.9} />}
-            />
-          </div>
-        </nav>
-      )}
+      {/* BOTTOM NAV - с красивой анимацией */}
+      <AnimatePresence>
+        {isMainScreen() && (
+          <motion.nav
+            key="bottom-nav"
+            initial={menuAnimation.initial}
+            animate={menuAnimation.animate}
+            exit={menuAnimation.exit}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
+            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+          >
+            <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
+              <TabButton
+                active={tab === "wallet"}
+                onClick={() => {
+                  const tg = (window as any).Telegram?.WebApp;
+                  tg?.HapticFeedback.impactOccurred("light");
+                  if (tab !== "wallet") {
+                    setTab("wallet");
+                    goHome();
+                  }
+                }}
+                label="Кошелёк"
+                icon={<WalletCards size={18} strokeWidth={1.9} />}
+              />
+              <TabButton
+                active={tab === "market"}
+                onClick={() => {
+                  const tg = (window as any).Telegram?.WebApp;
+                  tg?.HapticFeedback.impactOccurred("light");
+                  if (tab !== "market") {
+                    setTab("market");
+                    goBlank("Маркет");
+                  }
+                }}
+                label="Маркет"
+                icon={<ShoppingBag size={18} strokeWidth={1.9} />}
+              />
+              <TabButton
+                active={tab === "services"}
+                onClick={() => {
+                  const tg = (window as any).Telegram?.WebApp;
+                  tg?.HapticFeedback.impactOccurred("light");
+                  if (tab !== "services") {
+                    setTab("services");
+                    goBlank("Сервисы");
+                  }
+                }}
+                label="Сервисы"
+                icon={<Layers size={18} strokeWidth={1.9} />}
+              />
+              <TabButton
+                active={tab === "profile"}
+                onClick={() => {
+                  const tg = (window as any).Telegram?.WebApp;
+                  tg?.HapticFeedback.impactOccurred("light");
+                  if (tab !== "profile") {
+                    setTab("profile");
+                    goBlank("Профиль");
+                  }
+                }}
+                label="Профиль"
+                icon={<UserRound size={18} strokeWidth={1.9} />}
+              />
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
 
       {/* Модальные окна */}
       <SendModal
