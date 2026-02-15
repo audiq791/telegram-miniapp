@@ -32,7 +32,6 @@ export default function MainApp() {
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [selectedPartner, setSelectedPartner] = useState<Partner>(partnersSeed[0]);
-  const [prevRoute, setPrevRoute] = useState<Route>({ name: "home" });
   
   // Стек истории для кнопки назад
   const [history, setHistory] = useState<Route[]>([{ name: "home" }]);
@@ -103,7 +102,6 @@ export default function MainApp() {
         const previousRoute = newHistory[newHistory.length - 1];
         
         setHistory(newHistory);
-        setPrevRoute(route);
         setRoute(previousRoute);
         
         if (previousRoute.name === "home") {
@@ -118,13 +116,12 @@ export default function MainApp() {
     return () => {
       tg.BackButton.offClick(handleBackClick);
     };
-  }, [history, route]);
+  }, [history]);
 
   const goBlank = (title: string) => {
     const newRoute: Route = { name: "blank", title };
     
     setHistory(prev => [...prev, newRoute]);
-    setPrevRoute(route);
     setRoute(newRoute);
     
     const tg = (window as any).Telegram?.WebApp;
@@ -135,7 +132,6 @@ export default function MainApp() {
     const newRoute: Route = { name: "partner-site", url, title, logo, fallbackColor };
     
     setHistory(prev => [...prev, newRoute]);
-    setPrevRoute(route);
     setRoute(newRoute);
     
     const tg = (window as any).Telegram?.WebApp;
@@ -150,7 +146,6 @@ export default function MainApp() {
     const previousRoute = newHistory[newHistory.length - 1];
     
     setHistory(newHistory);
-    setPrevRoute(route);
     setRoute(previousRoute);
     
     if (previousRoute.name === "home") {
@@ -160,7 +155,6 @@ export default function MainApp() {
 
   const goHome = () => {
     setHistory([{ name: "home" }]);
-    setPrevRoute(route);
     setRoute({ name: "home" });
     setTab("wallet");
     
@@ -181,46 +175,9 @@ export default function MainApp() {
     return false;
   };
 
-  // Проверяем, был ли предыдущий экран тоже главным (чтобы избежать дерганья)
-  const wasAlsoMainScreen = () => {
-    if (prevRoute.name === "home") return true;
-    if (prevRoute.name === "blank") {
-      return prevRoute.title === "Маркет" || 
-             prevRoute.title === "Сервисы" || 
-             prevRoute.title === "Профиль" ||
-             prevRoute.title === "Кошелёк";
-    }
-    return false;
-  };
-
-  // Анимируем меню только при переходе между главным и неглавным экраном
-  const shouldAnimateMenu = () => {
-    const currentIsMain = isMainScreen();
-    const prevIsMain = wasAlsoMainScreen();
-    
-    // Если оба главные или оба неглавные - не анимируем
-    // Если меняется статус - анимируем
-    return currentIsMain !== prevIsMain;
-  };
-
-  const menuAnimation = {
-    initial: { 
-      y: shouldAnimateMenu() && isMainScreen() && !wasAlsoMainScreen() ? 100 : 0,
-      opacity: shouldAnimateMenu() && isMainScreen() && !wasAlsoMainScreen() ? 0 : 1
-    },
-    animate: { 
-      y: 0,
-      opacity: 1
-    },
-    exit: { 
-      y: shouldAnimateMenu() && !isMainScreen() && wasAlsoMainScreen() ? 100 : 0,
-      opacity: shouldAnimateMenu() && !isMainScreen() && wasAlsoMainScreen() ? 0 : 1
-    }
-  };
-
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
-      {/* HEADER */}
+      {/* HEADER - фиксированная шапка */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-zinc-200">
         <div className="mx-auto max-w-md px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -267,13 +224,13 @@ export default function MainApp() {
         </div>
       </header>
 
-      {/* CONTENT */}
+      {/* CONTENT с отступом для фиксированного меню */}
       <div className="mx-auto max-w-md">
         <AnimatePresence mode="wait">
           {route.name === "home" ? (
             <motion.main
               key="home"
-              className="px-4 pt-4 pb-28"
+              className="px-4 pt-4"
               initial={{ opacity: 0, x: 12 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -12 }}
@@ -427,6 +384,8 @@ export default function MainApp() {
                 onOpenBlank={goBlank}
               />
 
+              {/* Пустой блок для отступа под меню */}
+              <div className="h-24" />
             </motion.main>
           ) : route.name === "blank" ? (
             <BlackScreen 
@@ -448,75 +407,72 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* BOTTOM NAV - без анимации при переключении между главными экранами */}
-      <AnimatePresence mode="wait">
-        {isMainScreen() && (
-          <motion.nav
-            key="bottom-nav"
-            initial={menuAnimation.initial}
-            animate={menuAnimation.animate}
-            exit={menuAnimation.exit}
-            transition={shouldAnimateMenu() ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
-            className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
-            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-          >
-            <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
-              <TabButton
-                active={tab === "wallet"}
-                onClick={() => {
-                  const tg = (window as any).Telegram?.WebApp;
-                  tg?.HapticFeedback.impactOccurred("light");
-                  if (tab !== "wallet") {
-                    setTab("wallet");
-                    goHome();
-                  }
-                }}
-                label="Кошелёк"
-                icon={<WalletCards size={18} strokeWidth={1.9} />}
-              />
-              <TabButton
-                active={tab === "market"}
-                onClick={() => {
-                  const tg = (window as any).Telegram?.WebApp;
-                  tg?.HapticFeedback.impactOccurred("light");
-                  if (tab !== "market") {
-                    setTab("market");
-                    goBlank("Маркет");
-                  }
-                }}
-                label="Маркет"
-                icon={<ShoppingBag size={18} strokeWidth={1.9} />}
-              />
-              <TabButton
-                active={tab === "services"}
-                onClick={() => {
-                  const tg = (window as any).Telegram?.WebApp;
-                  tg?.HapticFeedback.impactOccurred("light");
-                  if (tab !== "services") {
-                    setTab("services");
-                    goBlank("Сервисы");
-                  }
-                }}
-                label="Сервисы"
-                icon={<Layers size={18} strokeWidth={1.9} />}
-              />
-              <TabButton
-                active={tab === "profile"}
-                onClick={() => {
-                  const tg = (window as any).Telegram?.WebApp;
-                  tg?.HapticFeedback.impactOccurred("light");
-                  if (tab !== "profile") {
-                    setTab("profile");
-                    goBlank("Профиль");
-                  }
-                }}
-                label="Профиль"
-                icon={<UserRound size={18} strokeWidth={1.9} />}
-              />
-            </div>
-          </motion.nav>
-        )}
-      </AnimatePresence>
+      {/* BOTTOM NAV - фиксированное меню */}
+      {isMainScreen() && (
+        <nav
+          className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200 transform-gpu"
+          style={{ 
+            paddingBottom: "env(safe-area-inset-bottom)",
+            willChange: "transform",
+            backfaceVisibility: "hidden"
+          }}
+        >
+          <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
+            <TabButton
+              active={tab === "wallet"}
+              onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
+                if (tab !== "wallet") {
+                  setTab("wallet");
+                  goHome();
+                }
+              }}
+              label="Кошелёк"
+              icon={<WalletCards size={18} strokeWidth={1.9} />}
+            />
+            <TabButton
+              active={tab === "market"}
+              onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
+                if (tab !== "market") {
+                  setTab("market");
+                  goBlank("Маркет");
+                }
+              }}
+              label="Маркет"
+              icon={<ShoppingBag size={18} strokeWidth={1.9} />}
+            />
+            <TabButton
+              active={tab === "services"}
+              onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
+                if (tab !== "services") {
+                  setTab("services");
+                  goBlank("Сервисы");
+                }
+              }}
+              label="Сервисы"
+              icon={<Layers size={18} strokeWidth={1.9} />}
+            />
+            <TabButton
+              active={tab === "profile"}
+              onClick={() => {
+                const tg = (window as any).Telegram?.WebApp;
+                tg?.HapticFeedback.impactOccurred("light");
+                if (tab !== "profile") {
+                  setTab("profile");
+                  goBlank("Профиль");
+                }
+              }}
+              label="Профиль"
+              icon={<UserRound size={18} strokeWidth={1.9} />}
+            />
+          </div>
+        </nav>
+      )}
 
       {/* Модальные окна */}
       <SendModal
