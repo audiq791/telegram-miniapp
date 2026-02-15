@@ -7,9 +7,9 @@ import {
   Send, 
   Sparkles,
   User,
-  Bot,
   Copy,
-  Check
+  Check,
+  AlertCircle
 } from "lucide-react";
 import { IconButton } from "../components/ui";
 
@@ -33,6 +33,7 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -47,7 +48,7 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
     inputRef.current?.focus();
   }, []);
 
-  // Отправка сообщения
+  // Отправка сообщения в Deepseek API
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -61,18 +62,44 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
     setMessages(prev => [...prev, userMessage]);
     setInputValue("");
     setIsLoading(true);
+    setError(null);
 
-    // Имитация ответа от Deepseek (в реальном приложении здесь будет API запрос)
-    setTimeout(() => {
+    try {
+      // Подготовка истории сообщений для API
+      const apiMessages = messages.concat(userMessage).map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+
+      // Отправка запроса к нашему API роуту
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages: apiMessages })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to get response');
+      }
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "Спасибо за ваш вопрос! В демо-версии я отвечаю тестовыми сообщениями. В реальном приложении здесь будет интеграция с API Deepseek.",
+        content: data.choices[0].message.content,
         timestamp: new Date()
       };
+
       setMessages(prev => [...prev, assistantMessage]);
+    } catch (err) {
+      console.error('Chat error:', err);
+      setError('Не удалось получить ответ от Deepseek. Попробуйте позже.');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   // Обработка нажатия Enter
@@ -206,6 +233,21 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
               </div>
             </motion.div>
           )}
+
+          {/* Ошибка */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex justify-center"
+            >
+              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-2 flex items-center gap-2">
+                <AlertCircle size={14} className="text-red-500" />
+                <p className="text-xs text-red-600">{error}</p>
+              </div>
+            </motion.div>
+          )}
+
           <div ref={messagesEndRef} />
         </div>
       </div>
