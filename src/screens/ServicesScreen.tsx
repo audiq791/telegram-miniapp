@@ -106,19 +106,19 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
 
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
-      {/* Шапка */}
-      <div className="bg-white border-b border-zinc-200 w-full flex-shrink-0">
-        <div className="px-4 py-4">
-          <h1 className="text-xl font-bold text-zinc-900">Сервисы</h1>
-          <p className="text-xs text-zinc-500 mt-0.5">
-            Услуги и преимущества
+      {/* Аккуратная таблетка для шапки - ВОЗВРАЩЕНА */}
+      <div className="max-w-md mx-auto w-full px-4 pt-4">
+        <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5">
+          <h1 className="text-2xl font-bold text-zinc-900">Сервисы</h1>
+          <p className="text-sm text-zinc-500 mt-1">
+            Услуги и преимущества для держателей бонусов
           </p>
         </div>
       </div>
 
-      {/* Плитки */}
-      <div className="flex-1 px-3 pt-3 pb-0">
-        <div className="grid grid-cols-2 gap-2">
+      {/* Плитки - чуть больше, чтобы заполнить экран */}
+      <div className="flex-1 max-w-md mx-auto w-full px-4 pt-4 pb-0">
+        <div className="grid grid-cols-2 gap-3">
           {services.map((service) => {
             const Icon = service.icon;
             return (
@@ -127,32 +127,32 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 onClick={() => handleServiceClick(service)}
-                className="bg-white rounded-xl border border-zinc-200 shadow-sm p-3 text-left relative flex flex-col h-auto"
+                className="bg-white rounded-xl border border-zinc-200 shadow-sm p-3.5 text-left relative flex flex-col h-full"
               >
                 {/* Бейдж для GPT */}
                 {service.badge && (
-                  <div className="absolute top-1 right-2">
-                    <span className="text-[6px] text-zinc-400">
+                  <div className="absolute top-1.5 right-2">
+                    <span className="text-[7px] text-zinc-400">
                       {service.badge}
                     </span>
                   </div>
                 )}
 
-                {/* Иконка */}
-                <div className={`h-9 w-9 rounded-lg ${service.bgColor} flex items-center justify-center mb-1.5`}>
-                  <Icon size={18} className={service.iconColor} />
+                {/* Иконка - чуть больше */}
+                <div className={`h-10 w-10 rounded-lg ${service.bgColor} flex items-center justify-center mb-2`}>
+                  <Icon size={20} className={service.iconColor} />
                 </div>
 
                 {/* Текст */}
                 <div className="flex-1">
                   <h3 className="font-semibold text-zinc-900 text-sm">{service.title}</h3>
-                  <p className="text-[10px] text-zinc-500 mt-0.5 leading-tight">{service.description}</p>
+                  <p className="text-[11px] text-zinc-500 mt-0.5 leading-tight">{service.description}</p>
                 </div>
 
                 {/* Стрелка */}
-                <div className="flex items-center gap-0.5 mt-1.5 text-[9px] text-zinc-400">
+                <div className="flex items-center gap-1 mt-2 text-[10px] text-zinc-400">
                   <span>Подробнее</span>
-                  <ArrowRight size={9} />
+                  <ArrowRight size={10} />
                 </div>
               </motion.button>
             );
