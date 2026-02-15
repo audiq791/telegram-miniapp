@@ -138,15 +138,15 @@ export default function MoreMenu({ isOpen, onClose }: MoreMenuProps) {
             </div>
           </motion.div>
 
-          {/* Всплывающее уведомление */}
+          {/* Всплывающее уведомление - ПО ЦЕНТРУ */}
           <AnimatePresence>
             {showToast && (
               <motion.div
-                initial={{ opacity: 0, y: 50, x: "-50%" }}
-                animate={{ opacity: 1, y: 0, x: "-50%" }}
-                exit={{ opacity: 0, y: 20, x: "-50%" }}
+                initial={{ opacity: 0, scale: 0.9, y: "-50%", x: "-50%" }}
+                animate={{ opacity: 1, scale: 1, y: "-50%", x: "-50%" }}
+                exit={{ opacity: 0, scale: 0.9, y: "-50%", x: "-50%" }}
                 transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-[200] bg-black/80 text-white px-6 py-3 rounded-2xl shadow-lg backdrop-blur-sm flex items-center gap-3"
+                className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[200] bg-black/80 text-white px-6 py-4 rounded-2xl shadow-lg backdrop-blur-sm flex items-center gap-3"
               >
                 <Check size={20} className="text-green-400" />
                 <span className="text-sm font-medium">Адрес электронной почты скопирован</span>
