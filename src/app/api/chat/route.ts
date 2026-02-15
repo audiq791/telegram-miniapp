@@ -2,18 +2,29 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
+    const apiKey = process.env.DEEPSEEK_API_KEY;
+    
+    if (!apiKey) {
+      console.error('DEEPSEEK_API_KEY not found');
+      return NextResponse.json(
+        { error: 'API key not configured' },
+        { status: 500 }
+      );
+    }
+
     const { messages } = await req.json();
 
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
         model: 'deepseek-chat',
         messages: messages,
         temperature: 0.7,
+        max_tokens: 2000,
         stream: false
       })
     });
@@ -21,9 +32,8 @@ export async function POST(req: Request) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Deepseek API error:', data);
       return NextResponse.json(
-        { error: 'Failed to get response from Deepseek' },
+        { error: 'Deepseek API error', details: data },
         { status: response.status }
       );
     }

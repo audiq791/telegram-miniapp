@@ -7,6 +7,7 @@ import {
   Send, 
   Sparkles,
   User,
+  Bot,
   Copy,
   Check,
   AlertCircle
@@ -20,7 +21,6 @@ type Message = {
   timestamp: Date;
 };
 
-// Приветственное сообщение от Deepseek
 const WELCOME_MESSAGE: Message = {
   id: "welcome",
   role: "assistant",
@@ -38,17 +38,14 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Автоскролл к последнему сообщению
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Фокус на поле ввода при загрузке
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  // Отправка сообщения в Deepseek API
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -65,13 +62,11 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
     setError(null);
 
     try {
-      // Подготовка истории сообщений для API
       const apiMessages = messages.concat(userMessage).map(msg => ({
         role: msg.role,
         content: msg.content
       }));
 
-      // Отправка запроса к нашему API роуту
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -102,7 +97,6 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
     }
   };
 
-  // Обработка нажатия Enter
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -110,7 +104,6 @@ export default function DeepseekChatScreen({ onBack }: { onBack: () => void }) {
     }
   };
 
-  // Копирование текста сообщения
   const handleCopy = async (text: string, id: string) => {
     try {
       await navigator.clipboard.writeText(text);
