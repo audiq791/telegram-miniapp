@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, PanInfo } from "framer-motion";
 import { ArrowLeft, ExternalLink, Home } from "lucide-react";
 import { IconButton } from "../components/ui";
 import { useState } from "react";
@@ -32,6 +32,15 @@ export default function PartnerSiteScreen({
   // Проверяем, можно ли открыть в iframe
   const canUseIframe = IFRAME_ALLOWED.some(site => url.includes(site));
 
+  // Обработчик свайпа вправо
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const isHorizontalSwipe = Math.abs(info.offset.x) > Math.abs(info.offset.y) * 2;
+    
+    if (isHorizontalSwipe && info.offset.x > 100) {
+      onBack();
+    }
+  };
+
   // Если можно открыть в iframe (только ЦСКА)
   if (canUseIframe) {
     return (
@@ -41,6 +50,12 @@ export default function PartnerSiteScreen({
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -24 }}
         transition={{ type: "spring", stiffness: 260, damping: 30 }}
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.1}
+        onDragEnd={handleDragEnd}
+        dragPropagation={false}
+        dragMomentum={false}
       >
         {/* Шапка с кнопками */}
         <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-zinc-200 px-4 py-3">
@@ -89,6 +104,12 @@ export default function PartnerSiteScreen({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ type: "spring", stiffness: 260, damping: 30 }}
+      drag="x"
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.1}
+      onDragEnd={handleDragEnd}
+      dragPropagation={false}
+      dragMomentum={false}
     >
       {/* Шапка с кнопками */}
       <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-zinc-200 px-4 py-3">
