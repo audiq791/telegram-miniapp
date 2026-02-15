@@ -26,16 +26,18 @@ export default function PartnersList({
   const [query, setQuery] = useState("");
   const [showAllPartners, setShowAllPartners] = useState(false);
 
-  // Фильтруем партнеров по поиску
-  const filteredPartners = partners.filter((p) =>
-    p.name.toLowerCase().includes(query.toLowerCase())
-  );
+  // Фильтруем партнеров по поиску (только по displayName)
+  const filteredPartners = partners.filter((p) => {
+    if (!query) return true;
+    const searchLower = query.toLowerCase();
+    return p.displayName?.toLowerCase().includes(searchLower) || false;
+  });
 
-  // Первые 5 партнеров из отфильтрованного списка
-  const filteredTop = filteredPartners.slice(0, 5);
+  // Первые 5 партнеров (с балансами) - всегда видны
+  const topPartners = partners.slice(0, 5);
   
-  // Остальные партнеры из отфильтрованного списка
-  const filteredOther = filteredPartners.slice(5);
+  // Остальные партнеры (с нулевыми балансами)
+  const otherPartners = partners.slice(5);
 
   return (
     <div>
@@ -61,7 +63,7 @@ export default function PartnersList({
 
         {/* Первые 5 партнеров всегда видны */}
         <div className="space-y-2">
-          {filteredTop.map((p) => (
+          {topPartners.map((p) => (
             <PartnerItem
               key={p.id}
               partner={p}
@@ -75,7 +77,7 @@ export default function PartnersList({
         </div>
 
         {/* Если есть остальные партнеры, показываем кнопку "Все партнеры" */}
-        {filteredOther.length > 0 && (
+        {otherPartners.length > 0 && (
           <div className="mt-2">
             <motion.button
               onClick={() => setShowAllPartners(!showAllPartners)}
@@ -88,7 +90,7 @@ export default function PartnersList({
                 </div>
                 <div>
                   <div className="font-semibold">Все партнеры</div>
-                  <div className="text-xs text-zinc-500">{filteredOther.length} партнеров</div>
+                  <div className="text-xs text-zinc-500">{otherPartners.length} партнеров</div>
                 </div>
               </div>
               <motion.div
@@ -99,7 +101,7 @@ export default function PartnersList({
               </motion.div>
             </motion.button>
 
-            {/* Выпадающий список со ВСЕМИ остальными партнерами */}
+            {/* Выпадающий список со всеми остальными партнерами */}
             <AnimatePresence>
               {showAllPartners && (
                 <motion.div
@@ -109,7 +111,7 @@ export default function PartnersList({
                   transition={{ duration: 0.15 }}
                 >
                   <div className="space-y-2 pt-2">
-                    {filteredOther.map((p) => (
+                    {otherPartners.map((p) => (
                       <PartnerItem
                         key={p.id}
                         partner={p}
