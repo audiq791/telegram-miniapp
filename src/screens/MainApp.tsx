@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   WalletCards,
   ShoppingBag,
-  Handshake,
+  Layers,
   UserRound,
   HelpCircle,
   MoreHorizontal,
@@ -28,10 +28,11 @@ type Route =
   | { name: "partner-site"; url: string; title: string; logo: string; fallbackColor: string };
 
 export default function MainApp() {
-  const [tab, setTab] = useState<"wallet" | "market" | "partners" | "profile">("wallet");
+  const [tab, setTab] = useState<"wallet" | "market" | "services" | "profile">("wallet");
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [selectedPartner, setSelectedPartner] = useState<Partner>(partnersSeed[0]);
+  const [navigationLevel, setNavigationLevel] = useState(0);
   
   // Стек истории для кнопки назад
   const [history, setHistory] = useState<Route[]>([{ name: "home" }]);
@@ -42,6 +43,7 @@ export default function MainApp() {
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
+  const moreButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleImageError = (partnerId: string) => {
     setFailedImages(prev => new Set(prev).add(partnerId));
@@ -102,6 +104,7 @@ export default function MainApp() {
         
         setHistory(newHistory);
         setRoute(previousRoute);
+        setNavigationLevel(prev => prev - 1);
         
         if (previousRoute.name === "home") {
           setTab("wallet");
@@ -122,6 +125,7 @@ export default function MainApp() {
     
     setHistory(prev => [...prev, newRoute]);
     setRoute(newRoute);
+    setNavigationLevel(prev => prev + 1);
     
     const tg = (window as any).Telegram?.WebApp;
     tg?.HapticFeedback.impactOccurred("light");
@@ -132,6 +136,7 @@ export default function MainApp() {
     
     setHistory(prev => [...prev, newRoute]);
     setRoute(newRoute);
+    setNavigationLevel(prev => prev + 1);
     
     const tg = (window as any).Telegram?.WebApp;
     tg?.HapticFeedback.impactOccurred("light");
@@ -146,6 +151,7 @@ export default function MainApp() {
     
     setHistory(newHistory);
     setRoute(previousRoute);
+    setNavigationLevel(prev => prev - 1);
     
     if (previousRoute.name === "home") {
       setTab("wallet");
@@ -156,6 +162,7 @@ export default function MainApp() {
     setHistory([{ name: "home" }]);
     setRoute({ name: "home" });
     setTab("wallet");
+    setNavigationLevel(0);
     
     const tg = (window as any).Telegram?.WebApp;
     tg?.HapticFeedback.impactOccurred("light");
@@ -188,16 +195,19 @@ export default function MainApp() {
                 tg?.HapticFeedback.impactOccurred("light");
                 setIsInfoModalOpen(true);
               }}
+              className="active:scale-95 active:bg-zinc-100 transition-transform"
             >
               <HelpCircle size={18} />
             </IconButton>
             <IconButton 
+              ref={moreButtonRef}
               aria="more" 
               onClick={() => {
                 const tg = (window as any).Telegram?.WebApp;
                 tg?.HapticFeedback.impactOccurred("light");
                 setIsMoreMenuOpen(!isMoreMenuOpen);
               }}
+              className="active:scale-95 active:bg-zinc-100 transition-transform"
             >
               <MoreHorizontal size={18} />
             </IconButton>
@@ -386,8 +396,8 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-                 {/* BOTTOM NAV */}
-      {route.name === "home" && (
+      {/* BOTTOM NAV - показываем только на первом уровне навигации */}
+      {navigationLevel === 0 && route.name === "home" && (
         <nav
           className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
@@ -398,7 +408,6 @@ export default function MainApp() {
               onClick={() => {
                 const tg = (window as any).Telegram?.WebApp;
                 tg?.HapticFeedback.impactOccurred("light");
-                // Если уже активна, ничего не делаем, только анимация
                 if (tab !== "wallet") {
                   setTab("wallet");
                   goBlank("Кошелёк");
@@ -421,17 +430,17 @@ export default function MainApp() {
               icon={<ShoppingBag size={18} strokeWidth={1.9} />}
             />
             <TabButton
-              active={tab === "partners"}
+              active={tab === "services"}
               onClick={() => {
                 const tg = (window as any).Telegram?.WebApp;
                 tg?.HapticFeedback.impactOccurred("light");
-                if (tab !== "partners") {
-                  setTab("partners");
-                  goBlank("Партнёры");
+                if (tab !== "services") {
+                  setTab("services");
+                  goBlank("Сервисы");
                 }
               }}
-              label="Партнёры"
-              icon={<Handshake size={18} strokeWidth={1.9} />}
+              label="Сервисы"
+              icon={<Layers size={18} strokeWidth={1.9} />}
             />
             <TabButton
               active={tab === "profile"}

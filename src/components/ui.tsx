@@ -64,14 +64,14 @@ export function TabButton({
   return (
     <motion.button
       onClick={onClick}
-      whileTap={{ scale: 0.96, backgroundColor: "#f4f4f5" }}
+      whileTap={{ scale: 0.96 }}
       transition={{ type: "spring", stiffness: 700, damping: 40 }}
       className={[
         "w-full rounded-2xl px-3 py-2 flex flex-col items-center justify-center gap-1 border",
         "min-h-[52px] sm:min-h-[60px] md:min-h-[70px]",
         active
           ? "bg-zinc-900 border-zinc-900 text-white shadow-[0_10px_25px_rgba(0,0,0,0.18)]"
-          : "bg-white border-zinc-200 text-zinc-900 shadow-sm",
+          : "bg-white border-zinc-200 text-zinc-900 shadow-sm hover:bg-zinc-50",
       ].join(" ")}
     >
       <span className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 inline-flex items-center justify-center">
