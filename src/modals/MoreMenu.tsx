@@ -4,8 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Building2,
   Send,
-  Mail
+  Mail,
+  Check
 } from "lucide-react";
+import { useState } from "react";
 
 type MoreMenuProps = {
   isOpen: boolean;
@@ -13,6 +15,9 @@ type MoreMenuProps = {
 };
 
 export default function MoreMenu({ isOpen, onClose }: MoreMenuProps) {
+  const [copied, setCopied] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+
   const handleCompanyClick = () => {
     window.open('https://oemservice.tech/', '_blank');
     onClose();
@@ -23,32 +28,25 @@ export default function MoreMenu({ isOpen, onClose }: MoreMenuProps) {
     onClose();
   };
 
-  const handleEmailClick = () => {
+  const handleEmailClick = async () => {
     const email = 'info@oe-media.ru';
     
-    // Пробуем разные способы открытия почтового клиента
     try {
-      // Способ 1: mailto ссылка
-      window.location.href = `mailto:${email}`;
+      await navigator.clipboard.writeText(email);
+      setCopied(true);
+      setShowToast(true);
       
-      // Если не сработало, копируем в буфер обмена
+      // Показываем уведомление и закрываем меню
       setTimeout(() => {
-        if (!document.hasFocus()) return;
-        
-        // Копируем email в буфер обмена
-        navigator.clipboard.writeText(email).then(() => {
-          alert(`Email ${email} скопирован в буфер обмена`);
-        }).catch(() => {
-          // Если копирование не удалось, показываем email
-          alert(`Наш email: ${email}`);
-        });
-      }, 500);
-    } catch (error) {
-      // В случае ошибки просто показываем email
+        setShowToast(false);
+        setCopied(false);
+        onClose();
+      }, 2000);
+      
+    } catch (err) {
       alert(`Наш email: ${email}`);
+      onClose();
     }
-    
-    onClose();
   };
 
   return (
@@ -118,10 +116,16 @@ export default function MoreMenu({ isOpen, onClose }: MoreMenuProps) {
                 className="w-full p-3 rounded-xl flex items-center gap-3 hover:bg-zinc-50 transition-colors group"
               >
                 <div className="h-8 w-8 rounded-lg bg-rose-50 flex items-center justify-center group-hover:bg-rose-100 transition-colors shrink-0">
-                  <Mail size={18} className="text-rose-600" />
+                  {copied ? (
+                    <Check size={18} className="text-green-600" />
+                  ) : (
+                    <Mail size={18} className="text-rose-600" />
+                  )}
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-medium text-zinc-900">Связаться с нами</p>
+                  <p className="text-sm font-medium text-zinc-900">
+                    {copied ? "Email скопирован!" : "Связаться с нами"}
+                  </p>
                 </div>
               </motion.button>
             </div>
@@ -133,6 +137,22 @@ export default function MoreMenu({ isOpen, onClose }: MoreMenuProps) {
               </p>
             </div>
           </motion.div>
+
+          {/* Всплывающее уведомление */}
+          <AnimatePresence>
+            {showToast && (
+              <motion.div
+                initial={{ opacity: 0, y: 50, x: "-50%" }}
+                animate={{ opacity: 1, y: 0, x: "-50%" }}
+                exit={{ opacity: 0, y: 20, x: "-50%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-[200] bg-black/80 text-white px-6 py-3 rounded-2xl shadow-lg backdrop-blur-sm flex items-center gap-3"
+              >
+                <Check size={20} className="text-green-400" />
+                <span className="text-sm font-medium">Адрес электронной почты скопирован</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </>
       )}
     </AnimatePresence>
