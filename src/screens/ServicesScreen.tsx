@@ -12,7 +12,7 @@ import {
   Sparkles,
   ArrowRight
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 type ServiceItem = {
   id: string;
@@ -97,20 +97,13 @@ interface ServicesScreenProps {
 }
 
 export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) {
-  // Запрещаем скролл при монтировании, возвращаем при размонтировании
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // При монтировании скроллим контейнер вверх
   useEffect(() => {
-    // Сохраняем текущий стиль
-    const originalStyle = window.getComputedStyle(document.body).overflow;
-    
-    // Запрещаем скролл
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-    
-    // Возвращаем при размонтировании
-    return () => {
-      document.body.style.overflow = originalStyle;
-      document.documentElement.style.overflow = originalStyle;
-    };
+    if (containerRef.current) {
+      containerRef.current.scrollTop = 0;
+    }
   }, []);
 
   const handleServiceClick = (service: typeof services[0]) => {
@@ -122,7 +115,10 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
   };
 
   return (
-    <div className="h-screen bg-zinc-50 flex flex-col overflow-hidden">
+    <div 
+      ref={containerRef}
+      className="h-screen bg-zinc-50 flex flex-col overflow-y-auto"
+    >
       {/* Аккуратная таблетка для шапки */}
       <div className="max-w-md mx-auto w-full px-4 pt-4 flex-shrink-0">
         <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5">
@@ -134,7 +130,7 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
       </div>
 
       {/* Плитки */}
-      <div className="flex-1 max-w-md mx-auto w-full px-4 pt-4 overflow-hidden">
+      <div className="flex-1 max-w-md mx-auto w-full px-4 pt-4">
         <div className="grid grid-cols-2 gap-3">
           {services.map((service) => {
             const Icon = service.icon;
