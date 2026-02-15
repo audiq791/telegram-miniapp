@@ -99,9 +99,9 @@ export default function ServicesScreen() {
       exit={{ opacity: 0 }}
       className="min-h-[100dvh] bg-zinc-50"
     >
-      {/* Шапка */}
-      <div className="bg-white border-b border-zinc-200 px-4 py-6">
-        <div className="mx-auto max-w-md">
+      {/* Шапка на всю ширину */}
+      <div className="bg-white border-b border-zinc-200">
+        <div className="mx-auto max-w-md px-4 py-6">
           <h1 className="text-2xl font-bold text-zinc-900">Сервисы</h1>
           <p className="text-sm text-zinc-500 mt-1">
             Услуги и преимущества для держателей бонусов
@@ -109,9 +109,9 @@ export default function ServicesScreen() {
         </div>
       </div>
 
-      {/* Сетка сервисов */}
-      <div className="mx-auto max-w-md px-4 py-6">
-        <div className="grid grid-cols-2 gap-3">
+      {/* Сетка сервисов с отступами от краев */}
+      <div className="px-3 py-6">
+        <div className="grid grid-cols-2 gap-2.5 max-w-md mx-auto">
           {services.map((service, index) => (
             <motion.button
               key={service.id}
@@ -119,26 +119,26 @@ export default function ServicesScreen() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
               whileTap={{ scale: 0.98, backgroundColor: "#f4f4f5" }}
-              className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-4 text-left hover:shadow-md group relative"
+              className="bg-white rounded-xl border border-zinc-200 shadow-sm p-3.5 text-left hover:shadow-md group relative"
             >
               {/* Badge для GPT Помощника */}
               {service.badge && (
-                <div className="absolute top-2 right-3 text-[8px] text-zinc-400 font-medium">
+                <div className="absolute top-1.5 right-2 text-[7px] text-zinc-400 font-medium">
                   {service.badge}
                 </div>
               )}
 
-              <div className={`h-12 w-12 rounded-xl ${service.bgColor} flex items-center justify-center mb-3`}>
+              <div className={`h-11 w-11 rounded-xl ${service.bgColor} flex items-center justify-center mb-2.5`}>
                 <div className={service.color}>
                   {service.icon}
                 </div>
               </div>
-              <h3 className="font-semibold text-zinc-900">{service.title}</h3>
-              <p className="text-xs text-zinc-500 mt-1">{service.description}</p>
+              <h3 className="font-semibold text-zinc-900 text-[15px]">{service.title}</h3>
+              <p className="text-xs text-zinc-500 mt-0.5">{service.description}</p>
               
               {/* Индикатор для остальных */}
               {!service.badge && (
-                <div className="flex items-center gap-1 mt-3 text-xs text-zinc-400">
+                <div className="flex items-center gap-1 mt-2 text-xs text-zinc-400">
                   <span>Подробнее</span>
                   <ArrowRight size={12} />
                 </div>
