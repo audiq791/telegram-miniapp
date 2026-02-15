@@ -179,13 +179,9 @@ export default function MainApp() {
               <div className="text-[15px] font-semibold leading-tight truncate">
                 {route.name === "partner-site"
                   ? route.title
-                  : tab === "wallet"
+                  : route.name === "home" 
                     ? "Кошелёк"
-                    : tab === "market"
-                      ? "Маркет"
-                      : tab === "services"
-                        ? "Сервисы"
-                        : "Профиль"}
+                    : route.title}
               </div>
             </div>
           </div>
@@ -230,7 +226,7 @@ export default function MainApp() {
               exit={{ opacity: 0, x: -12 }}
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
             >
-              {/* MAIN CARD - экран Кошелька с партнерами */}
+              {/* MAIN CARD - ГЛАВНЫЙ ЭКРАН КОШЕЛЬКА */}
               <motion.div
                 key={selectedPartner.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -413,7 +409,9 @@ export default function MainApp() {
                 tg?.HapticFeedback.impactOccurred("light");
                 if (tab !== "wallet") {
                   setTab("wallet");
-                  goBlank("Кошелёк");
+                  goHome(); // Возвращаемся на главный экран
+                } else {
+                  // Если уже на главном, просто анимация (уже есть в TabButton)
                 }
               }}
               label="Кошелёк"
