@@ -50,7 +50,7 @@ const services = [
     id: "insurance",
     icon: ShieldCheck,
     title: "Страхование",
-    description: "Страховка бонусами",
+    description: "Страховые полисы",
     iconColor: "text-blue-600",
     bgColor: "bg-blue-50"
   },
