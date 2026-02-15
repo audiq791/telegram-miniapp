@@ -15,6 +15,7 @@ import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/
 import PartnersList from "../components/PartnersList";
 import BlackScreen from "./BlackScreen";
 import PartnerSiteScreen from "./PartnerSiteScreen";
+import ServicesScreen from "./ServicesScreen";
 import SendModal from "../modals/SendModal";
 import ReceiveModal from "../modals/ReceiveModal";
 import SwapModal from "../modals/SwapModal";
@@ -404,10 +405,7 @@ export default function MainApp() {
 
               {/* Сервисы */}
               {tab === "services" && (
-                <div className="rounded-[28px] bg-white border border-zinc-200 p-6 text-center">
-                  <p className="text-zinc-500">Сервисы</p>
-                  <p className="text-sm text-zinc-400 mt-2">Здесь будут сервисы</p>
-                </div>
+                <ServicesScreen />
               )}
 
               {/* Профиль */}
