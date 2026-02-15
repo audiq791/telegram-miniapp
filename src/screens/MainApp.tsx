@@ -423,7 +423,7 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* НАВБАР - всегда на home, не двигается, анимация только при скрытии/показе */}
+      {/* НАВБАР - всегда на home, никогда не поднимается над клавиатурой */}
       <AnimatePresence>
         {showNavbar && (
           <motion.nav
@@ -434,7 +434,8 @@ export default function MainApp() {
             className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
             style={{ 
               paddingBottom: "env(safe-area-inset-bottom)",
-              transform: "translateY(0)",
+              transform: "translateZ(0)",
+              willChange: "transform"
             }}
           >
             <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
@@ -483,7 +484,7 @@ export default function MainApp() {
         )}
       </AnimatePresence>
 
-      {/* МОДАЛЬНЫЕ ОКНА - поверх всего, навбар под ними */}
+      {/* МОДАЛЬНЫЕ ОКНА - z-index выше навбара */}
       <SendModal
         isOpen={isSendModalOpen}
         onClose={() => setIsSendModalOpen(false)}
