@@ -31,11 +31,11 @@ export default function PartnersList({
     p.name.toLowerCase().includes(query.toLowerCase())
   );
 
-  // Первые 5 партнеров (с балансами) - всегда видны
-  const topPartners = partners.slice(0, 5);
+  // Первые 5 партнеров из отфильтрованного списка
+  const filteredTop = filteredPartners.slice(0, 5);
   
-  // Остальные партнеры (с нулевыми балансами) - все 28 штук
-  const otherPartners = partners.slice(5);
+  // Остальные партнеры из отфильтрованного списка
+  const filteredOther = filteredPartners.slice(5);
 
   return (
     <div>
@@ -61,7 +61,7 @@ export default function PartnersList({
 
         {/* Первые 5 партнеров всегда видны */}
         <div className="space-y-2">
-          {topPartners.map((p) => (
+          {filteredTop.map((p) => (
             <PartnerItem
               key={p.id}
               partner={p}
@@ -75,7 +75,7 @@ export default function PartnersList({
         </div>
 
         {/* Если есть остальные партнеры, показываем кнопку "Все партнеры" */}
-        {otherPartners.length > 0 && (
+        {filteredOther.length > 0 && (
           <div className="mt-2">
             <motion.button
               onClick={() => setShowAllPartners(!showAllPartners)}
@@ -88,7 +88,7 @@ export default function PartnersList({
                 </div>
                 <div>
                   <div className="font-semibold">Все партнеры</div>
-                  <div className="text-xs text-zinc-500">{otherPartners.length} партнеров</div>
+                  <div className="text-xs text-zinc-500">{filteredOther.length} партнеров</div>
                 </div>
               </div>
               <motion.div
@@ -109,7 +109,7 @@ export default function PartnersList({
                   transition={{ duration: 0.15 }}
                 >
                   <div className="space-y-2 pt-2">
-                    {otherPartners.map((p) => (
+                    {filteredOther.map((p) => (
                       <PartnerItem
                         key={p.id}
                         partner={p}
