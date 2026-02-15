@@ -115,11 +115,11 @@ export default function ServicesScreen() {
           {services.map((service, index) => (
             <motion.button
               key={service.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
               whileTap={{ scale: 0.98, backgroundColor: "#f4f4f5" }}
-              className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-4 text-left hover:shadow-md transition-all group relative"
+              className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-4 text-left hover:shadow-md group relative"
             >
               {/* Badge для GPT Помощника */}
               {service.badge && (
