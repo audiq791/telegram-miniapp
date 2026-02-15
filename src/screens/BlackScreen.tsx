@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, PanInfo } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { IconButton } from "../components/ui";
 import ActivityScreen from "./ActivityScreen";
@@ -14,6 +14,14 @@ export default function BlackScreen({
   title: string;
   onBack: () => void;
 }) {
+  // Обработчик свайпа вправо
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    // Если свайпнули вправо больше чем на 100px
+    if (info.offset.x > 100) {
+      onBack();
+    }
+  };
+
   // Активность
   if (title === "Активность") {
     return <ActivityScreen onBack={onBack} />;
@@ -37,6 +45,10 @@ export default function BlackScreen({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -24 }}
       transition={{ type: "spring", stiffness: 260, damping: 30 }}
+      drag="x"
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.2}
+      onDragEnd={handleDragEnd}
     >
       <div className="mx-auto max-w-md px-4 pt-4">
         <div className="flex items-center gap-3">
