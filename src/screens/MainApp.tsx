@@ -50,7 +50,6 @@ export default function MainApp() {
   // Отслеживаем появление клавиатуры
   useEffect(() => {
     const handleResize = () => {
-      // На мобильных устройствах при появлении клавиатуры высота окна уменьшается
       const isKeyboard = window.innerHeight < 500;
       setKeyboardVisible(isKeyboard);
     };
@@ -63,7 +62,6 @@ export default function MainApp() {
     setFailedImages(prev => new Set(prev).add(partnerId));
   };
 
-  // Функция выбора партнера
   const selectPartner = (partner: Partner) => {
     if (partner.id === selectedPartner.id) return;
     
@@ -73,7 +71,6 @@ export default function MainApp() {
     tg?.HapticFeedback.impactOccurred("light");
   };
 
-  // Форматирование денег
   const formatMoney = (n: number) => {
     return new Intl.NumberFormat("ru-RU", {
       minimumFractionDigits: 2,
@@ -81,21 +78,16 @@ export default function MainApp() {
     }).format(n);
   };
 
-  // Обработчик отправки
   const handleSend = (data: { recipient: string; partner: string; amount: number }) => {
     console.log("Отправка:", data);
     alert(`Перевод ${data.amount} B для ${data.recipient} (${data.partner})`);
   };
 
-  // Обработчик обмена
   const handleSwap = (data: { fromPartner: string; toPartner: string; amount: number }) => {
     console.log("Обмен:", data);
     alert(`Обмен ${data.amount} B с ${data.fromPartner} на ${data.toPartner}`);
   };
 
-  // ============================================
-  // НАСТРОЙКА КНОПКИ НАЗАД TELEGRAM
-  // ============================================
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
     if (!tg) return;
@@ -177,7 +169,6 @@ export default function MainApp() {
     tg?.HapticFeedback.impactOccurred("light");
   };
 
-  // Определяем, показывать ли навбар
   const showNavbar = route.name === "home";
 
   return (
@@ -237,15 +228,14 @@ export default function MainApp() {
             <motion.main
               key={tab}
               className="px-4 pt-4 pb-28"
-              initial={{ y: 10, opacity: 0.5 }}
+              initial={{ y: 8, opacity: 0.8 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -10, opacity: 0.5 }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              exit={{ y: -8, opacity: 0.8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
             >
               {/* Кошелек */}
               {tab === "wallet" && (
                 <>
-                  {/* MAIN CARD */}
                   <motion.div
                     key={selectedPartner.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -267,7 +257,6 @@ export default function MainApp() {
                           </motion.div>
                         </div>
                         
-                        {/* ЛОГОТИП */}
                         <motion.div
                           key={selectedPartner.id}
                           initial={{ scale: 0.8, rotate: -5 }}
@@ -334,7 +323,6 @@ export default function MainApp() {
                         />
                       </div>
 
-                      {/* ACTIONS */}
                       <div className="mt-4 grid grid-cols-2 gap-3">
                         <ActionCard 
                           label="Отправить" 
@@ -382,7 +370,6 @@ export default function MainApp() {
                     <div className="h-2" />
                   </motion.div>
 
-                  {/* PARTNERS LIST */}
                   <PartnersList
                     partners={partnersSeed}
                     selectedPartner={selectedPartner}
@@ -436,7 +423,7 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* НАВБАР - всегда на home, не двигается при клавиатуре */}
+      {/* НАВБАР */}
       <AnimatePresence>
         {showNavbar && (
           <motion.nav
