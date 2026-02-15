@@ -162,8 +162,8 @@ export default function MainApp() {
     tg?.HapticFeedback.impactOccurred("light");
   };
 
-  // Определяем, показывать ли нижнее меню
-  const shouldShowBottomNav = route.name === "home" || route.name === "blank";
+  // Определяем, показывать ли нижнее меню (скрываем только при переходе на сайт)
+  const shouldShowBottomNav = route.name !== "partner-site";
 
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
@@ -230,7 +230,7 @@ export default function MainApp() {
               exit={{ opacity: 0, x: -12 }}
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
             >
-              {/* MAIN CARD */}
+              {/* MAIN CARD - экран Кошелька с партнерами */}
               <motion.div
                 key={selectedPartner.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -399,7 +399,7 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* BOTTOM NAV - показываем на главных экранах */}
+      {/* BOTTOM NAV - видно всегда, кроме экрана с сайтом партнера */}
       {shouldShowBottomNav && (
         <nav
           className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
