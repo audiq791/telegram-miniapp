@@ -211,7 +211,7 @@ export default function MainApp() {
           {route.name === "home" ? (
             <motion.main
               key="home"
-              className="px-4 pt-4"
+              className="px-4 pt-4 pb-28"
               initial={{ opacity: 0, x: 12 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -12 }}
@@ -353,17 +353,15 @@ export default function MainApp() {
               </motion.div>
 
               {/* PARTNERS LIST */}
-              <div className="pb-24">
-                <PartnersList
-                  partners={partnersSeed}
-                  selectedPartner={selectedPartner}
-                  onSelectPartner={selectPartner}
-                  failedImages={failedImages}
-                  onImageError={handleImageError}
-                  formatMoney={formatMoney}
-                  onOpenBlank={goBlank}
-                />
-              </div>
+              <PartnersList
+                partners={partnersSeed}
+                selectedPartner={selectedPartner}
+                onSelectPartner={selectPartner}
+                failedImages={failedImages}
+                onImageError={handleImageError}
+                formatMoney={formatMoney}
+                onOpenBlank={goBlank}
+              />
 
             </motion.main>
           ) : route.name === "blank" ? (
@@ -386,8 +384,8 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* BOTTOM NAV */}
-      {route.name === "home" && (
+      {/* BOTTOM NAV - показываем на всех экранах, кроме partner-site */}
+      {route.name !== "partner-site" && (
         <nav
           className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
