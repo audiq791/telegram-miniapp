@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { type Partner } from "../data/partners";
 
 type PartnersListProps = {
@@ -26,19 +26,21 @@ export default function PartnersList({
   const [query, setQuery] = useState("");
   const [showAllPartners, setShowAllPartners] = useState(false);
 
-  // ФИЛЬТРАЦИЯ ПО ОТОБРАЖАЕМОМУ ИМЕНИ
-  const filteredPartners = partners.filter((p) => {
-    if (!query) return true;
-    const searchLower = query.toLowerCase();
-    const displayName = p.displayName || p.name;
-    return displayName.toLowerCase().includes(searchLower);
-  });
+  // Фильтруем всех партнеров по поиску
+  const filteredPartners = useMemo(() => {
+    if (!query.trim()) return partners;
+    const searchLower = query.toLowerCase().trim();
+    return partners.filter((p) => {
+      const searchName = p.displayName || p.name;
+      return searchName.toLowerCase().includes(searchLower);
+    });
+  }, [partners, query]);
 
-  // Первые 5 партнеров (с балансами) - всегда видны
-  const topPartners = partners.slice(0, 5);
+  // Первые 5 из отфильтрованных
+  const topPartners = filteredPartners.slice(0, 5);
   
-  // Остальные партнеры (с нулевыми балансами)
-  const otherPartners = partners.slice(5);
+  // Остальные из отфильтрованных
+  const otherPartners = filteredPartners.slice(5);
 
   return (
     <div>
@@ -62,20 +64,26 @@ export default function PartnersList({
           Мои Бонусы
         </div>
 
-        {/* Первые 5 партнеров всегда видны */}
-        <div className="space-y-2">
-          {topPartners.map((p) => (
-            <PartnerItem
-              key={p.id}
-              partner={p}
-              isSelected={selectedPartner.id === p.id}
-              onSelect={onSelectPartner}
-              failedImages={failedImages}
-              onImageError={onImageError}
-              formatMoney={formatMoney}
-            />
-          ))}
-        </div>
+        {/* Первые 5 партнеров из отфильтрованных */}
+        {topPartners.length > 0 ? (
+          <div className="space-y-2">
+            {topPartners.map((p) => (
+              <PartnerItem
+                key={p.id}
+                partner={p}
+                isSelected={selectedPartner.id === p.id}
+                onSelect={onSelectPartner}
+                failedImages={failedImages}
+                onImageError={onImageError}
+                formatMoney={formatMoney}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-zinc-400 text-sm">
+            Ничего не найдено
+          </div>
+        )}
 
         {/* Если есть остальные партнеры, показываем кнопку "Все партнеры" */}
         {otherPartners.length > 0 && (
@@ -134,7 +142,7 @@ export default function PartnersList({
   );
 }
 
-// Отдельный компонент для элемента партнера
+// Отдельный компонент для элемента партнера (без изменений)
 function PartnerItem({
   partner,
   isSelected,
