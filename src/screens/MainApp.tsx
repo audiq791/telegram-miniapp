@@ -8,7 +8,7 @@ import {
   UserRound,
   HelpCircle,
   MoreHorizontal,
-  Layers, // ← добавили Layers
+  Layers,
 } from "lucide-react";
 
 import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
@@ -25,7 +25,7 @@ import { partnersSeed, type Partner } from "../data/partners";
 
 type Route =
   | { name: "home" }
-  | { name: "blank"; title: string }
+  | { name: "blank"; title: string; fromTab: "wallet" | "market" | "services" | "profile" }
   | { name: "partner-site"; url: string; title: string; logo: string; fallbackColor: string };
 
 export default function MainApp() {
@@ -105,13 +105,15 @@ export default function MainApp() {
       
       if (history.length > 1) {
         const newHistory = [...history];
-        newHistory.pop();
+        newHistory.pop(); // убираем текущий экран
         const previousRoute = newHistory[newHistory.length - 1];
         
         setHistory(newHistory);
         setRoute(previousRoute);
         
+        // Если вернулись на главный экран, восстанавливаем правильный таб
         if (previousRoute.name === "home") {
+          // По умолчанию ставим кошелек, но это временно
           setTab("wallet");
         }
       }
@@ -126,7 +128,11 @@ export default function MainApp() {
   }, [history]);
 
   const goBlank = (title: string) => {
-    const newRoute: Route = { name: "blank", title };
+    const newRoute: Route = { 
+      name: "blank", 
+      title, 
+      fromTab: tab // сохраняем текущий таб
+    };
     
     setHistory(prev => [...prev, newRoute]);
     setRoute(newRoute);
@@ -155,8 +161,19 @@ export default function MainApp() {
     setHistory(newHistory);
     setRoute(previousRoute);
     
+    // Если вернулись на главный экран, но мы знаем fromTab из последнего blank?
+    // Восстанавливаем таб из сохраненного значения
     if (previousRoute.name === "home") {
-      setTab("wallet");
+      // Получаем последний blank из истории, который был перед этим
+      const lastBlank = [...history].reverse().find(r => r.name === "blank") as 
+        | { name: "blank"; fromTab: "wallet" | "market" | "services" | "profile" }
+        | undefined;
+      
+      if (lastBlank) {
+        setTab(lastBlank.fromTab);
+      } else {
+        setTab("wallet");
+      }
     }
   };
 
@@ -407,7 +424,7 @@ export default function MainApp() {
             <BlackScreen 
               key="blank" 
               title={route.title} 
-              onBack={goHome}
+              onBack={goBack}
             />
           ) : (
             <PartnerSiteScreen
@@ -467,7 +484,7 @@ export default function MainApp() {
                   setTab("services");
                 }}
                 label="Сервисы"
-                icon={<Layers size={18} strokeWidth={1.9} />} // ← новая иконка
+                icon={<Layers size={18} strokeWidth={1.9} />}
               />
               <TabButton
                 active={tab === "profile"}
