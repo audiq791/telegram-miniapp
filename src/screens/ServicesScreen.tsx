@@ -97,7 +97,7 @@ export default function ServicesScreen() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-[100dvh] bg-zinc-50 pb-8"
+      className="min-h-[100dvh] bg-zinc-50"
     >
       {/* Шапка */}
       <div className="bg-white border-b border-zinc-200 px-4 py-6">
@@ -117,11 +117,11 @@ export default function ServicesScreen() {
               key={service.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05, type: "spring", stiffness: 300, damping: 30 }}
-              whileTap={{ scale: 0.95 }}
+              transition={{ delay: index * 0.05 }}
+              whileTap={{ scale: 0.98, backgroundColor: "#f4f4f5" }}
               className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-4 text-left hover:shadow-md transition-all group relative"
             >
-              {/* Badge для GPT Помощника - в правом верхнем углу */}
+              {/* Badge для GPT Помощника */}
               {service.badge && (
                 <div className="absolute top-2 right-3 text-[8px] text-zinc-400 font-medium">
                   {service.badge}
