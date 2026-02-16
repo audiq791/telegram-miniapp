@@ -19,6 +19,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="ru" className={manrope.variable}>
+      <head>
+        {/* Запрещаем масштабирование на iPhone */}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      </head>
       <body className={`font-sans ${isLargeScale ? 'large-scale' : ''}`}>
         {children}
       </body>
