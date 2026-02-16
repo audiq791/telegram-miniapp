@@ -47,7 +47,7 @@ export function PrimaryButton({ label, onClick }: { label: string; onClick?: () 
 }
 
 // ===========================
-// НИЖНЕЕ МЕНЮ - с анимацией как в профиле
+// НИЖНЕЕ МЕНЮ - старая анимация
 // ===========================
 
 export function TabButton({
@@ -64,10 +64,10 @@ export function TabButton({
   return (
     <motion.button
       onClick={onClick}
-      whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
-      transition={{ type: "spring", stiffness: 800, damping: 20 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 520, damping: 34 }}
       className={[
-        "w-full rounded-2xl px-3 py-2 flex flex-col items-center justify-center gap-1 border transition-colors",
+        "w-full rounded-2xl px-3 py-2 flex flex-col items-center justify-center gap-1 border",
         "min-h-[52px] sm:min-h-[60px] md:min-h-[70px]",
         active
           ? "bg-zinc-900 border-zinc-900 text-white shadow-[0_10px_25px_rgba(0,0,0,0.18)]"
