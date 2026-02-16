@@ -1,18 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { haptic } from "../components/haptics";
 import SceneDigitize from "./SceneDigitize";
 import SceneSwap from "./SceneSwap";
 
 export default function Onboarding({ onDone }: { onDone: () => void }) {
-  console.log("🟢 Онбординг смонтирован");
-  
   const [index, setIndex] = useState(0);
+  const isDoneRef = useRef(false); // 🛡️ защита от двойного вызова
 
   const handleDone = () => {
-    console.log("✅ onDone вызван");
+    if (isDoneRef.current) return; // уже вызвали — выходим
+    isDoneRef.current = true;
     haptic("success");
     onDone();
   };
@@ -77,7 +77,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 haptic("light");
                 setIndex(1);
               } else {
-                handleDone();
+                handleDone(); // 🛡️ защищено useRef
               }
             }}
             className="w-full h-12 rounded-2xl bg-zinc-900 text-white font-semibold shadow-sm"
