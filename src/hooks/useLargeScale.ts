@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from 'react';
 
 export function useLargeScale() {
@@ -5,7 +7,7 @@ export function useLargeScale() {
 
   useEffect(() => {
     const checkScale = () => {
-      // Проверяем, что это iPhone (iOS)
+      // Проверяем, что это iPhone
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
       
       if (!isIOS) {
@@ -13,18 +15,36 @@ export function useLargeScale() {
         return;
       }
 
-      // Определяем крупный масштаб через matchMedia
-      // В iOS крупный масштаб = min-width: 414px и font-scale > 1
+      // Несколько способов определения масштаба
       const isLargeDisplay = window.matchMedia('(min-width: 414px)').matches;
+      
+      // Проверяем размер шрифта (увеличен при масштабировании)
       const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      const isLargeFont = fontSize > 16; // базовый 16px, если больше — масштаб увеличен
+      const isZoomed = fontSize > 16; // базовый 16px
+      
+      // Проверяем соотношение окна к экрану
+      const screenWidth = window.screen.width;
+      const windowWidth = window.innerWidth;
+      const scaleRatio = screenWidth / windowWidth;
+      const isScaled = scaleRatio > 1.1; // если масштаб больше 1.1
+      
+      // Проверяем viewport
+      const viewportWidth = window.innerWidth;
+      const isNarrowViewport = viewportWidth < 380;
 
-      setIsLargeScale(isLargeDisplay && isLargeFont);
+      setIsLargeScale(isLargeDisplay && (isZoomed || isNarrowViewport || isScaled));
     };
 
     checkScale();
+    
+    // Слушаем изменения
     window.addEventListener('resize', checkScale);
-    return () => window.removeEventListener('resize', checkScale);
+    window.addEventListener('orientationchange', checkScale);
+    
+    return () => {
+      window.removeEventListener('resize', checkScale);
+      window.removeEventListener('orientationchange', checkScale);
+    };
   }, []);
 
   return isLargeScale;
