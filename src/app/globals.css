@@ -51,162 +51,58 @@ input[type=number] {
   }
 }
 
-/* ========== АДАПТАЦИЯ ДЛЯ КРУПНОГО МАСШТАБА ========== */
-.large-scale {
-  --scale-container-padding: 0.5rem;
-  --scale-grid-gap: 0.3rem;
-  --scale-font-reduction: 0.85;
-}
-
-.large-scale .max-w-md {
-  max-width: 360px !important;
-  padding-left: 0.5rem !important;
-  padding-right: 0.5rem !important;
-}
-
-/* Уменьшаем текст в 4 кнопках */
-.large-scale .ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
-  font-size: 12px !important;
-}
-
-.large-scale .ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
-  font-size: 9px !important;
-}
-
-/* Уменьшаем сами кнопки */
-.large-scale .ActionCard {
-  padding: 0.6rem !important;
-}
-
-/* Уменьшаем текст в табах */
-.large-scale .TabButton span {
-  font-size: 0.65rem !important;
-}
-
-/* Уменьшаем отступы */
-.large-scale .gap-3 {
-  gap: 0.4rem !important;
-}
-
-.large-scale .p-4 {
-  padding: 0.6rem !important;
-}
-
-/* Уменьшаем размеры иконок */
-.large-scale .h-10,
-.large-scale .w-10 {
-  height: 1.8rem !important;
-  width: 1.8rem !important;
-}
-
-/* Уменьшаем текст в списке партнеров */
-.large-scale .font-semibold {
-  font-size: 0.8rem !important;
-}
-
-.large-scale .text-xs {
-  font-size: 0.6rem !important;
-}
-
-/* ========== УМЕНЬШЕНИЕ ДЛЯ iPhone НЕ-Max НА 8px ========== */
-.iphone-non-max-scale .ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
-  font-size: 8px !important;
-  line-height: 1.2 !important;
-}
-
-.iphone-non-max-scale .ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
-  font-size: 5px !important;
-  line-height: 1.2 !important;
-}
-
-.iphone-non-max-scale .ActionCard {
-  padding: 0.5rem !important;
-}
-
-.iphone-non-max-scale .ActionCard .h-11.w-11,
-.iphone-non-max-scale .ActionCard .h-12.w-12,
-.iphone-non-max-scale .ActionCard .h-14.w-14 {
-  height: 1.8rem !important;
-  width: 1.8rem !important;
-}
-
-.iphone-non-max-scale .ActionCard img.w-\[30px\] {
-  width: 18px !important;
-  height: 18px !important;
-}
-
 /* ========== АВТОМАТИЧЕСКОЕ УМЕНЬШЕНИЕ ТЕКСТА В 4 КНОПКАХ ========== */
-@media (max-width: 430px) {
-  .ActionCard {
-    min-width: 0;
-  }
-  
-  .ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
-    font-size: clamp(8px, 3.5vw, 16px) !important;
-    word-break: break-word;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
-    font-size: clamp(6px, 2.8vw, 13px) !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .ActionCard .min-w-0 {
-    min-width: 0;
-    max-width: 100%;
-  }
-  
-  .ActionCard .flex.items-center.justify-between.gap-3 {
-    gap: clamp(0.25rem, 1vw, 0.75rem);
-  }
-}
-/* ========== ГАРАНТИЯ ВИДИМОСТИ ТЕКСТА В 4 КНОПКАХ ========== */
 .ActionCard {
-  /* Минимальная ширина, чтобы текст не сжимался */
-  min-width: fit-content;
+  /* Фиксированная ширина для точного расчета */
+  width: 100%;
+}
+
+.ActionCard .min-w-0 {
+  /* Текстовый блок занимает все свободное место */
+  flex: 1;
+  min-width: 0;
 }
 
 .ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
-  /* Запрещаем перенос и обрезание */
-  white-space: nowrap !important;
+  /* Убираем truncate */
+  white-space: normal !important;
   overflow: visible !important;
   text-overflow: clip !important;
   
-  /* Размер текста подстраивается, но не меньше 12px */
-  font-size: clamp(12px, 3.5vw, 16px) !important;
+  /* Размер текста подстраивается от 8px до 16px */
+  font-size: clamp(8px, 4vw, 16px) !important;
+  
+  /* Высота строки тоже подстраивается */
+  line-height: 1.2 !important;
 }
 
 .ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
-  white-space: nowrap !important;
+  white-space: normal !important;
   overflow: visible !important;
   text-overflow: clip !important;
   
-  /* Подпись тоже не меньше 10px */
-  font-size: clamp(10px, 2.8vw, 13px) !important;
+  /* Подпись от 6px до 13px */
+  font-size: clamp(6px, 3vw, 13px) !important;
+  line-height: 1.2 !important;
 }
 
-/* Контейнер для текста */
-.ActionCard .min-w-0 {
-  min-width: auto !important;
-  max-width: none !important;
-  flex-shrink: 0 !important;
-}
-
-/* Если совсем не влезает - уменьшаем иконку */
-@media (max-width: 360px) {
-  .ActionCard .h-11.w-11,
-  .ActionCard .h-12.w-12 {
-    height: 2rem !important;
-    width: 2rem !important;
+/* Если текст все еще не влезает - уменьшаем еще сильнее */
+@media (max-width: 380px) {
+  .ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
+    font-size: clamp(7px, 3.5vw, 14px) !important;
   }
   
-  .ActionCard img.w-\[30px\] {
-    width: 16px !important;
-    height: 16px !important;
+  .ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
+    font-size: clamp(5px, 2.5vw, 11px) !important;
+  }
+}
+
+@media (max-width: 340px) {
+  .ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
+    font-size: clamp(6px, 3vw, 12px) !important;
+  }
+  
+  .ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
+    font-size: clamp(4px, 2vw, 9px) !important;
   }
 }

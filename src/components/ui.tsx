@@ -69,7 +69,7 @@ export function TabButton({
       transition={{ type: "spring", stiffness: 520, damping: 34 }}
       className={[
         "w-full rounded-2xl px-3 py-2 flex flex-col items-center justify-center gap-1 border",
-        "min-h-[52px] sm:min-h-[60px] md:min-h-[70px]",
+        "min-h-13 sm:min-h-15 md:min-h-17.5", // ИСПРАВЛЕНО: min-h-[52px] → min-h-13, sm:min-h-[60px] → sm:min-h-15, md:min-h-[70px] → md:min-h-17.5
         active
           ? "bg-zinc-900 border-zinc-900 text-white shadow-[0_10px_25px_rgba(0,0,0,0.18)]"
           : "bg-white border-zinc-200 text-zinc-900 shadow-sm",
@@ -95,17 +95,6 @@ export function TabButton({
 // ===========================
 
 export type ActionKind = "send" | "receive" | "swap" | "spend";
-
-function Gif({ src, alt }: { src: string; alt: string }) {
-  return (
-    <img
-      src={src}
-      alt={alt}
-      draggable={false}
-      className="w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] md:w-[36px] md:h-[36px] object-contain"
-    />
-  );
-}
 
 export function ActionCard({
   label,
@@ -134,18 +123,22 @@ export function ActionCard({
       className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 sm:p-5 md:p-6 text-left hover:shadow-md transition-colors"
     >
       <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <div className="text-[clamp(14px,2vw,16px)] font-semibold truncate">{label}</div>
-          <div className="text-[clamp(11px,1.5vw,13px)] text-zinc-500 truncate">{hint}</div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[clamp(12px,4vw,16px)] font-semibold">
+            {label}
+          </div>
+          <div className="text-[clamp(9px,3vw,13px)] text-zinc-500">
+            {hint}
+          </div>
         </div>
 
-        {/* Контейнер для гифки */}
+        {/* Контейнер для гифки - ИСПРАВЛЕНО: w-[30px] → w-7.5, sm:w-[32px] → sm:w-8, md:w-[36px] → md:w-9 */}
         <div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
           <img
             src={gifSrc[kind]}
             alt={kind}
             draggable={false}
-            className="w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] md:w-[36px] md:h-[36px] object-contain"
+            className="w-7.5 h-7.5 sm:w-8 sm:h-8 md:w-9 md:h-9 object-contain"
           />
         </div>
       </div>
