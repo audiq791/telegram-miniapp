@@ -15,107 +15,41 @@ import {
 export default function ProfileScreen() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [cursorPosition, setCursorPosition] = useState(0);
   
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Форматирование для отображения: +7 (123) 456-78-90
-  const formatPhoneNumber = (raw: string) => {
-    if (!raw) return "";
+  // Просто оставляем только цифры, максимум 10
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ''); // только цифры
+    if (value.length <= 10) {
+      setPhoneNumber(value);
+    }
+  };
+
+  // Форматируем для отображения с +7 и скобками/тире
+  const getDisplayNumber = () => {
+    if (!phoneNumber) return "";
     
     let formatted = "";
-    for (let i = 0; i < raw.length; i++) {
+    for (let i = 0; i < phoneNumber.length; i++) {
       if (i === 0) {
-        formatted += `(${raw[i]}`;
+        formatted += `(${phoneNumber[i]}`;
       } else if (i === 2) {
-        formatted += `${raw[i]}) `;
+        formatted += `${phoneNumber[i]}) `;
       } else if (i === 5) {
-        formatted += `${raw[i]}-`;
+        formatted += `${phoneNumber[i]}-`;
       } else if (i === 7) {
-        formatted += `${raw[i]}-`;
+        formatted += `${phoneNumber[i]}-`;
       } else {
-        formatted += raw[i];
+        formatted += phoneNumber[i];
       }
     }
     return formatted;
   };
 
-  // Обработчик изменения поля
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target;
-    const cursorPos = input.selectionStart || 0;
-    
-    // Получаем введенное значение
-    let value = e.target.value;
-    
-    // Если пытаются удалить +7 - игнорируем
-    if (value.length < 2) {
-      setPhoneNumber("");
-      return;
-    }
-    
-    // Убираем всё кроме цифр из введенного значения
-    let cleaned = value.replace(/\D/g, '');
-    
-    // Если очищенное значение короче - значит удаляли
-    if (cleaned.length < phoneNumber.length) {
-      // Просто обновляем состояние на очищенное
-      setPhoneNumber(cleaned);
-      return;
-    }
-    
-    // Если добавляли - ограничиваем 10 цифрами
-    if (cleaned.length > 10) {
-      cleaned = cleaned.slice(0, 10);
-    }
-    
-    setPhoneNumber(cleaned);
-    
-    // Восстанавливаем позицию курсора после форматирования
-    setTimeout(() => {
-      if (inputRef.current) {
-        const newPosition = cursorPos;
-        inputRef.current.setSelectionRange(newPosition, newPosition);
-      }
-    }, 0);
-  };
-
-  // Обработчик клавиш для удаления
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace') {
-      const input = e.currentTarget;
-      const cursorPos = input.selectionStart || 0;
-      const rawLength = phoneNumber.length;
-      
-      // Если курсор в начале или после +7 - ничего не делаем
-      if (cursorPos <= 2) {
-        e.preventDefault();
-        return;
-      }
-      
-      // Вычисляем позицию в сырых цифрах
-      let rawPos = 0;
-      if (cursorPos <= 4) rawPos = 0;
-      else if (cursorPos <= 7) rawPos = 1;
-      else if (cursorPos <= 11) rawPos = 2;
-      else if (cursorPos <= 14) rawPos = 3;
-      else if (cursorPos <= 17) rawPos = 4;
-      else rawPos = 5;
-      
-      // Удаляем соответствующую цифру
-      const newRaw = phoneNumber.split('');
-      if (rawPos < newRaw.length) {
-        newRaw.splice(rawPos, 1);
-        setPhoneNumber(newRaw.join(''));
-      }
-      e.preventDefault();
-    }
-  };
-
-  // Полный номер для отображения
   const getFullPhoneNumber = () => {
     if (!phoneNumber) return "+7";
-    return `+7 ${formatPhoneNumber(phoneNumber)}`;
+    return `+7 ${getDisplayNumber()}`;
   };
 
   const handleLogin = () => {
@@ -228,27 +162,20 @@ export default function ProfileScreen() {
         <div className="mb-4">
           <div className="relative">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
-              <span className={`text-base ${phoneNumber ? 'text-zinc-900' : 'text-zinc-400'}`}>
-                +7
-              </span>
+              <span className="text-base text-zinc-400">+7</span>
             </div>
             <input
               ref={inputRef}
               type="text"
-              value={formatPhoneNumber(phoneNumber)}
+              value={phoneNumber}
               onChange={handlePhoneChange}
-              onKeyDown={handleKeyDown}
-              placeholder=" (___) ___-__-__"
+              placeholder=" 10 цифр"
               className="w-full h-12 pl-12 pr-4 bg-white border border-zinc-200 rounded-xl text-base outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900"
               inputMode="numeric"
-              pattern="[0-9]*"
             />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2">
-              <Phone size={16} className="text-zinc-400" />
-            </div>
           </div>
 
-          {/* Кнопка Войти (черная) - с улучшенной анимацией */}
+          {/* Кнопка Войти (черная) */}
           <motion.button
             whileTap={{ scale: 0.95, backgroundColor: "#18181b" }}
             transition={{ type: "spring", stiffness: 800, damping: 20 }}
@@ -267,7 +194,7 @@ export default function ProfileScreen() {
           <div className="flex-1 h-px bg-zinc-200" />
         </div>
 
-        {/* Кнопка Войти через Telegram - с улучшенной анимацией */}
+        {/* Кнопка Войти через Telegram */}
         <motion.button
           whileTap={{ scale: 0.95, backgroundColor: "#3390EC" }}
           transition={{ type: "spring", stiffness: 800, damping: 20 }}
@@ -277,7 +204,7 @@ export default function ProfileScreen() {
           Войти через Telegram
         </motion.button>
 
-        {/* Кнопки внизу - с улучшенной анимацией */}
+        {/* Кнопки внизу */}
         <div className="space-y-2">
           <motion.button
             whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
