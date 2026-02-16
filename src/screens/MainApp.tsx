@@ -17,6 +17,7 @@ import BlackScreen from "./BlackScreen";
 import PartnerSiteScreen from "./PartnerSiteScreen";
 import ServicesScreen from "./ServicesScreen";
 import ProfileScreen from "./ProfileScreen";
+import Onboarding from "../onboarding/Onboarding";
 import OnboardingProfileScreen from "./OnboardingProfileScreen";
 import SendModal from "../modals/SendModal";
 import ReceiveModal from "../modals/ReceiveModal";
@@ -31,7 +32,7 @@ type Route =
   | { name: "partner-site"; url: string; title: string; logo: string; fallbackColor: string };
 
 export default function MainApp() {
-  const [isOnboarded, setIsOnboarded] = useState(false);
+  const [onboardingStage, setOnboardingStage] = useState<"onboarding" | "login" | "app">("onboarding");
   const [tab, setTab] = useState<"wallet" | "market" | "services" | "profile">("wallet");
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
@@ -200,13 +201,17 @@ export default function MainApp() {
 
   const showNavbar = route.name === "home";
 
-  // Если не прошли онбординг, показываем экран входа
-  if (!isOnboarded) {
-    return (
-      <OnboardingProfileScreen onComplete={() => setIsOnboarded(true)} />
-    );
+  // Если проходим онбординг
+  if (onboardingStage === "onboarding") {
+    return <Onboarding onDone={() => setOnboardingStage("login")} />;
   }
 
+  // Если экран входа
+  if (onboardingStage === "login") {
+    return <OnboardingProfileScreen onComplete={() => setOnboardingStage("app")} />;
+  }
+
+  // Основное приложение
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
       {/* HEADER */}
