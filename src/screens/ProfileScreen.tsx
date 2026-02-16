@@ -7,9 +7,9 @@ import {
   Headphones,
   Building2,
   LogIn,
-  UserPlus,
   ChevronRight,
-  LogOut
+  LogOut,
+  Send
 } from "lucide-react";
 
 export default function ProfileScreen() {
@@ -24,7 +24,7 @@ export default function ProfileScreen() {
     }
   };
 
-  // Форматирование для отображения
+  // Форматирование для отображения с маской
   const formatPhoneNumber = () => {
     if (!phoneNumber) return "";
     
@@ -52,7 +52,7 @@ export default function ProfileScreen() {
   // Обработчик выхода
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setPhoneNumber(""); // очищаем номер при выходе
+    setPhoneNumber("");
   };
 
   // Для зарегистрированного пользователя
@@ -85,7 +85,7 @@ export default function ProfileScreen() {
             </div>
           </div>
 
-          {/* Секции профиля (заглушки) */}
+          {/* Секции профиля */}
           <div className="space-y-2">
             <button className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 text-left flex items-center justify-between hover:shadow-md transition-shadow">
               <span className="font-medium text-zinc-900">Мои бонусы</span>
@@ -124,27 +124,20 @@ export default function ProfileScreen() {
       exit={{ opacity: 0 }}
       className="bg-zinc-50 min-h-screen"
     >
-      {/* Шапка */}
-      <div className="bg-white border-b border-zinc-200">
-        <div className="max-w-md mx-auto px-4 py-6">
+      {/* Шапка - большая таблетка */}
+      <div className="max-w-md mx-auto px-4 pt-4">
+        <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-6">
           <h1 className="text-2xl font-bold text-zinc-900">Профиль</h1>
+          <p className="text-sm text-zinc-500 mt-2">
+            Войдите в аккаунт, чтобы управлять своими бонусами
+          </p>
         </div>
       </div>
 
       {/* Контент */}
-      <div className="max-w-md mx-auto px-4 pt-8">
-        {/* Основной текст */}
-        <div className="text-center mb-8">
-          <h2 className="text-xl font-semibold text-zinc-900">
-            Войдите в аккаунт или зарегистрируйтесь
-          </h2>
-          <p className="text-sm text-zinc-500 mt-2">
-            Введите номер телефона
-          </p>
-        </div>
-
+      <div className="max-w-md mx-auto px-4 pt-6">
         {/* Поле ввода телефона */}
-        <div className="mb-8">
+        <div className="mb-4">
           <div className="relative">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
               <span className={`text-lg font-medium ${phoneNumber ? 'text-zinc-900' : 'text-zinc-400'}`}>
@@ -164,30 +157,36 @@ export default function ProfileScreen() {
             </div>
           </div>
 
-          {/* Кнопки действий под полем */}
-          <div className="flex gap-3 mt-4">
-            <motion.button
-              whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
-              transition={{ type: "spring", stiffness: 700, damping: 40 }}
-              onClick={handleLogin}
-              className="flex-1 py-3 bg-white border border-zinc-200 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-zinc-50 transition-colors"
-            >
-              <LogIn size={18} />
-              Войти
-            </motion.button>
-            <motion.button
-              whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
-              transition={{ type: "spring", stiffness: 700, damping: 40 }}
-              onClick={handleLogin}
-              className="flex-1 py-3 bg-zinc-900 text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors"
-            >
-              <UserPlus size={18} />
-              Регистрация
-            </motion.button>
-          </div>
+          {/* Кнопка Войти (черная) */}
+          <motion.button
+            whileTap={{ scale: 0.97, backgroundColor: "#27272a" }}
+            transition={{ type: "spring", stiffness: 700, damping: 40 }}
+            onClick={handleLogin}
+            className="w-full mt-4 py-4 bg-zinc-900 text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors"
+          >
+            <LogIn size={18} />
+            Войти
+          </motion.button>
         </div>
 
-        {/* Кнопки поддержки и о компании */}
+        {/* Разделитель с текстом */}
+        <div className="flex items-center gap-4 my-6">
+          <div className="flex-1 h-px bg-zinc-200" />
+          <span className="text-sm text-zinc-400">или</span>
+          <div className="flex-1 h-px bg-zinc-200" />
+        </div>
+
+        {/* Кнопка Войти через Telegram */}
+        <motion.button
+          whileTap={{ scale: 0.97, backgroundColor: "#e8f0fe" }}
+          transition={{ type: "spring", stiffness: 700, damping: 40 }}
+          className="w-full py-4 bg-[#54A9EB] text-white rounded-xl font-medium flex items-center justify-center gap-3 hover:bg-[#4098E0] transition-colors mb-8"
+        >
+          <Send size={18} className="text-white" />
+          Войти через Telegram
+        </motion.button>
+
+        {/* Кнопки внизу */}
         <div className="space-y-3">
           <motion.button
             whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
