@@ -7,7 +7,7 @@ export function useLargeScale() {
 
   useEffect(() => {
     const checkScale = () => {
-      // 1. Проверяем, что это iPhone
+      // Проверяем, что это iPhone
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
       
       if (!isIOS) {
@@ -15,28 +15,29 @@ export function useLargeScale() {
         return;
       }
 
-      // 2. Проверяем масштаб через devicePixelRatio
-      const pixelRatio = window.devicePixelRatio;
-      const isZoomed = pixelRatio > 2; // На iPhone с масштабом pixelRatio > 2
-      
-      // 3. Проверяем ширину viewport (при масштабе она уменьшается)
+      // Получаем ширину экрана устройства
+      const screenWidth = window.screen.width;
       const viewportWidth = window.innerWidth;
-      const isNarrowViewport = viewportWidth < 375; // iPhone SE ширина 375
       
-      // 4. Проверяем размер шрифта
+      // iPhone не-Max имеют ширину экрана 375px или 390px
+      const isNonMaxiPhone = screenWidth <= 390;
+      
+      // Проверяем масштаб (отношение экрана к viewport)
+      const scale = screenWidth / viewportWidth;
+      const isZoomed = scale > 1.1;
+      
+      // Проверяем размер шрифта
       const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
       const isLargeFont = fontSize > 16;
-
-      // Включаем адаптацию если хотя бы два условия совпадают
-      const conditions = [isZoomed, isNarrowViewport, isLargeFont];
-      const trueCount = conditions.filter(Boolean).length;
       
-      setIsLargeScale(trueCount >= 2);
+      // Включаем адаптацию если:
+      // 1. Это iPhone не-Max И
+      // 2. Масштаб увеличен ИЛИ шрифт большой
+      setIsLargeScale(isNonMaxiPhone && (isZoomed || isLargeFont));
     };
 
     checkScale();
     
-    // Проверяем при изменении размера и ориентации
     window.addEventListener('resize', checkScale);
     window.addEventListener('orientationchange', checkScale);
     

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   HelpCircle,
@@ -169,7 +168,7 @@ export default function WalletScreen({
               />
             </div>
 
-            {/* ACTIONS */}
+            {/* ACTIONS - 4 КНОПКИ */}
             <div className="mt-4 grid grid-cols-2 gap-3">
               <ActionCard 
                 label="Отправить" 
