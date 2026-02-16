@@ -101,6 +101,8 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
       if (onServiceClick) {
         onServiceClick(service.title);
       }
+    } else {
+      console.log(`${service.title} clicked`);
     }
   };
 
@@ -116,7 +118,7 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
         </div>
       </div>
 
-      {/* Плитки */}
+      {/* Плитки - точно как кнопки на главном экране */}
       <div className="max-w-md mx-auto w-full px-4 pt-4 pb-4">
         <div className="grid grid-cols-2 gap-3">
           {services.map((service) => {
@@ -125,7 +127,7 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
               <motion.button
                 key={service.id}
                 onClick={() => handleServiceClick(service)}
-                whileTap={{ scale: 0.98, backgroundColor: "#f4f4f5" }}
+                whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
                 transition={{ type: "spring", stiffness: 700, damping: 40 }}
                 className="bg-white rounded-xl border border-zinc-200 shadow-sm p-3.5 text-left relative flex flex-col"
               >
