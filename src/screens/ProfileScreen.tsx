@@ -11,7 +11,7 @@ import {
   LogOut,
   Send
 } from "lucide-react";
-import { PrimaryButton, IconButton } from "../components/ui";
+import { IconButton } from "../components/ui";
 
 export default function ProfileScreen() {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -125,7 +125,7 @@ export default function ProfileScreen() {
 
           {/* Кнопка выхода */}
           <motion.button
-            whileTap={{ scale: 0.95, backgroundColor: "#fecaca" }}
+            whileTap={{ scale: 0.95, backgroundColor: "#fee2e2" }}
             transition={{ type: "spring", stiffness: 800, damping: 20 }}
             onClick={handleLogout}
             className="w-full mt-6 py-3 rounded-xl border border-red-200 text-red-600 font-medium flex items-center justify-center gap-2 hover:bg-red-50 transition-colors"
@@ -176,8 +176,16 @@ export default function ProfileScreen() {
             />
           </div>
 
-          {/* Кнопка Войти (зеленая) - используем PrimaryButton */}
-          <PrimaryButton label="Войти" onClick={handleLogin} />
+          {/* Кнопка Войти (как было раньше) */}
+          <motion.button
+            whileTap={{ scale: 0.95, backgroundColor: "#27272a" }}
+            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            onClick={handleLogin}
+            className="w-full mt-4 py-3 bg-zinc-900 text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors"
+          >
+            <LogIn size={16} />
+            Войти
+          </motion.button>
         </div>
 
         {/* Разделитель с текстом */}
