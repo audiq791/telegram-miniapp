@@ -7,41 +7,23 @@ export function useLargeScale() {
 
   useEffect(() => {
     const checkScale = () => {
-      // Проверяем, что это iPhone
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      
-      if (!isIOS) {
-        setIsLargeScale(false);
-        return;
-      }
-
-      // Определяем масштаб по нескольким параметрам
+      // iOS увеличивает масштаб через изменение размеров окна
       const screenWidth = window.screen.width;
-      const viewportWidth = window.innerWidth;
-      const scale = screenWidth / viewportWidth;
+      const windowWidth = window.innerWidth;
       
-      // Проверяем размер шрифта
-      const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      const isZoomed = fontSize > 16 || scale > 1.1;
+      // Если ширина окна заметно меньше ширины экрана — значит включён масштаб
+      const scale = screenWidth / windowWidth;
       
-      // Для iPhone не-Max (ширина экрана <= 390)
-      const isNonMaxiPhone = screenWidth <= 390;
-      
-      // Включаем режим масштаба если:
-      // 1. Это iPhone не-Max И
-      // 2. Масштаб увеличен
-      setIsLargeScale(isNonMaxiPhone && isZoomed);
+      // Порог: если масштаб больше 1.15 — значит реально крупно
+      setIsLargeScale(scale > 1.15);
     };
 
     checkScale();
     
+    // Проверяем при изменении размера (поворот экрана и т.д.)
     window.addEventListener('resize', checkScale);
-    window.addEventListener('orientationchange', checkScale);
     
-    return () => {
-      window.removeEventListener('resize', checkScale);
-      window.removeEventListener('orientationchange', checkScale);
-    };
+    return () => window.removeEventListener('resize', checkScale);
   }, []);
 
   return isLargeScale;
