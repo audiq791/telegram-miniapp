@@ -12,7 +12,8 @@ import {
   Search,
   Filter,
   X,
-  Calendar
+  Calendar,
+  ChevronDown
 } from "lucide-react";
 import { IconButton } from "../components/ui";
 import { useState, useMemo } from "react";
@@ -123,6 +124,243 @@ const getTypeText = (type: string) => {
   }
 };
 
+// Компонент фильтра по партнеру
+const PartnerFilter = ({ 
+  selectedPartner, 
+  onPartnerChange 
+}: { 
+  selectedPartner: string;
+  onPartnerChange: (partner: string) => void;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full h-11 px-4 bg-white border border-zinc-200 rounded-2xl flex items-center justify-between gap-2 shadow-sm hover:shadow-md transition-all"
+      >
+        <span className="text-sm font-medium truncate">
+          {selectedPartner === "all" ? "Все партнеры" : selectedPartner}
+        </span>
+        <ChevronDown size={16} className={`text-zinc-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute z-20 w-full mt-1 bg-white border border-zinc-200 rounded-2xl shadow-lg max-h-60 overflow-y-auto"
+          >
+            <button
+              onClick={() => {
+                onPartnerChange("all");
+                setIsOpen(false);
+              }}
+              className="w-full px-4 py-3 text-left text-sm hover:bg-zinc-50 transition-colors"
+            >
+              Все партнеры
+            </button>
+            {topPartners.map(p => (
+              <button
+                key={p}
+                onClick={() => {
+                  onPartnerChange(p);
+                  setIsOpen(false);
+                }}
+                className="w-full px-4 py-3 text-left text-sm hover:bg-zinc-50 transition-colors"
+              >
+                {p}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// Компонент фильтра по типу операции
+const TypeFilter = ({ 
+  selectedType, 
+  onTypeChange 
+}: { 
+  selectedType: string;
+  onTypeChange: (type: string) => void;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const types = [
+    { value: "all", label: "Все операции" },
+    { value: "receive", label: "Начисления" },
+    { value: "spend", label: "Списания" },
+    { value: "exchange", label: "Обмены" },
+  ];
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full h-11 px-4 bg-white border border-zinc-200 rounded-2xl flex items-center justify-between gap-2 shadow-sm hover:shadow-md transition-all"
+      >
+        <span className="text-sm font-medium truncate">
+          {types.find(t => t.value === selectedType)?.label}
+        </span>
+        <ChevronDown size={16} className={`text-zinc-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute z-20 w-full mt-1 bg-white border border-zinc-200 rounded-2xl shadow-lg"
+          >
+            {types.map(t => (
+              <button
+                key={t.value}
+                onClick={() => {
+                  onTypeChange(t.value);
+                  setIsOpen(false);
+                }}
+                className="w-full px-4 py-3 text-left text-sm hover:bg-zinc-50 transition-colors"
+              >
+                {t.label}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// Компонент фильтра по дате
+const DateFilter = ({ 
+  dateRange, 
+  onDateRangeChange 
+}: { 
+  dateRange: { start: Date | null; end: Date | null };
+  onDateRangeChange: (range: { start: Date | null; end: Date | null }) => void;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [tempStart, setTempStart] = useState<Date | null>(dateRange.start);
+  const [tempEnd, setTempEnd] = useState<Date | null>(dateRange.end);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const presets = [
+    { label: "Неделя", days: 7 },
+    { label: "Месяц", days: 30 },
+    { label: "Квартал", days: 90 },
+    { label: "Год", days: 365 },
+  ];
+
+  const applyPreset = (days: number) => {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - days);
+    setTempStart(start);
+    setTempEnd(end);
+  };
+
+  const formatDate = (date: Date | null) => {
+    if (!date) return "";
+    return date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  };
+
+  const handleApply = () => {
+    onDateRangeChange({ start: tempStart, end: tempEnd });
+    setIsOpen(false);
+  };
+
+  const handleClear = () => {
+    setTempStart(null);
+    setTempEnd(null);
+    onDateRangeChange({ start: null, end: null });
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full h-11 px-4 bg-white border border-zinc-200 rounded-2xl flex items-center justify-between gap-2 shadow-sm hover:shadow-md transition-all"
+      >
+        <div className="flex items-center gap-2 text-sm font-medium truncate">
+          <Calendar size={16} className="text-zinc-400" />
+          <span>
+            {dateRange.start && dateRange.end
+              ? `${formatDate(dateRange.start)} - ${formatDate(dateRange.end)}`
+              : "Все время"}
+          </span>
+        </div>
+        <ChevronDown size={16} className={`text-zinc-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute z-20 w-96 mt-1 bg-white border border-zinc-200 rounded-2xl shadow-lg p-4 right-0"
+          >
+            {/* Быстрые пресеты */}
+            <div className="grid grid-cols-4 gap-2 mb-4">
+              {presets.map(preset => (
+                <button
+                  key={preset.label}
+                  onClick={() => applyPreset(preset.days)}
+                  className="px-3 py-2 bg-zinc-100 rounded-xl text-xs font-medium hover:bg-zinc-200 transition-colors"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Поля для ручного ввода */}
+            <div className="flex gap-2">
+              <input
+                type="date"
+                value={tempStart ? formatDate(tempStart).split('.').reverse().join('-') : ''}
+                onChange={(e) => setTempStart(e.target.value ? new Date(e.target.value) : null)}
+                className="flex-1 px-3 py-2 border border-zinc-200 rounded-xl text-sm"
+                placeholder="С"
+              />
+              <input
+                type="date"
+                value={tempEnd ? formatDate(tempEnd).split('.').reverse().join('-') : ''}
+                onChange={(e) => setTempEnd(e.target.value ? new Date(e.target.value) : null)}
+                className="flex-1 px-3 py-2 border border-zinc-200 rounded-xl text-sm"
+                placeholder="По"
+              />
+            </div>
+
+            {/* Кнопки действий */}
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={handleClear}
+                className="flex-1 px-4 py-2 border border-zinc-200 rounded-xl text-sm font-medium hover:bg-zinc-50 transition-colors"
+              >
+                Сбросить
+              </button>
+              <button
+                onClick={handleApply}
+                className="flex-1 px-4 py-2 bg-zinc-900 text-white rounded-xl text-sm font-medium hover:bg-zinc-800 transition-colors"
+              >
+                Применить
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 export default function ActivityScreen({ onBack }: { onBack: () => void }) {
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const [selectedPartner, setSelectedPartner] = useState<string>("all");
@@ -146,6 +384,7 @@ export default function ActivityScreen({ onBack }: { onBack: () => void }) {
   // Фильтрация транзакций
   const filteredTransactions = useMemo(() => {
     return allTransactions.filter(tx => {
+      // Фильтр по партнеру
       if (selectedPartner !== "all") {
         if (tx.type === "exchange") {
           if (tx.fromPartner !== selectedPartner && tx.toPartner !== selectedPartner) return false;
@@ -154,8 +393,10 @@ export default function ActivityScreen({ onBack }: { onBack: () => void }) {
         }
       }
 
+      // Фильтр по типу операции
       if (selectedType !== "all" && tx.type !== selectedType) return false;
 
+      // Фильтр по дате
       if (dateRange.start && dateRange.end) {
         const txDate = new Date(tx.timestamp);
         if (txDate < dateRange.start || txDate > dateRange.end) return false;
@@ -210,48 +451,23 @@ export default function ActivityScreen({ onBack }: { onBack: () => void }) {
           )}
         </div>
 
-        {/* Фильтры (упрощенные для демо) */}
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-          <button
-            onClick={() => setSelectedType("all")}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-              selectedType === "all" 
-                ? "bg-zinc-900 text-white" 
-                : "bg-white border border-zinc-200 text-zinc-600"
-            }`}
-          >
-            Все
-          </button>
-          <button
-            onClick={() => setSelectedType("receive")}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-              selectedType === "receive" 
-                ? "bg-green-600 text-white" 
-                : "bg-white border border-zinc-200 text-zinc-600"
-            }`}
-          >
-            Начисления
-          </button>
-          <button
-            onClick={() => setSelectedType("spend")}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-              selectedType === "spend" 
-                ? "bg-red-600 text-white" 
-                : "bg-white border border-zinc-200 text-zinc-600"
-            }`}
-          >
-            Списания
-          </button>
-          <button
-            onClick={() => setSelectedType("exchange")}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-              selectedType === "exchange" 
-                ? "bg-blue-600 text-white" 
-                : "bg-white border border-zinc-200 text-zinc-600"
-            }`}
-          >
-            Обмены
-          </button>
+        {/* Фильтры */}
+        <div className="space-y-2 mb-6">
+          <PartnerFilter
+            selectedPartner={selectedPartner}
+            onPartnerChange={setSelectedPartner}
+          />
+          
+          <div className="grid grid-cols-2 gap-2">
+            <TypeFilter
+              selectedType={selectedType}
+              onTypeChange={setSelectedType}
+            />
+            <DateFilter
+              dateRange={dateRange}
+              onDateRangeChange={setDateRange}
+            />
+          </div>
         </div>
 
         {/* История операций */}
@@ -385,7 +601,7 @@ export default function ActivityScreen({ onBack }: { onBack: () => void }) {
         </div>
 
         {/* Кнопка загрузить еще */}
-        {filteredTransactions.length > 0 && (
+        {filteredTransactions.length > 0 && filteredTransactions.length < allTransactions.length && (
           <motion.button
             whileTap={{ scale: 0.98 }}
             className="w-full mt-4 py-3 rounded-2xl bg-white border border-zinc-200 shadow-sm text-zinc-600 font-medium flex items-center justify-center gap-2"
