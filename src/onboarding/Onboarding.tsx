@@ -7,7 +7,15 @@ import SceneDigitize from "./SceneDigitize";
 import SceneSwap from "./SceneSwap";
 
 export default function Onboarding({ onDone }: { onDone: () => void }) {
+  console.log("🟢 Онбординг смонтирован");
+  
   const [index, setIndex] = useState(0);
+
+  const handleDone = () => {
+    console.log("✅ onDone вызван");
+    haptic("success");
+    onDone();
+  };
 
   return (
     <motion.div
@@ -69,8 +77,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 haptic("light");
                 setIndex(1);
               } else {
-                haptic("success");
-                onDone();
+                handleDone();
               }
             }}
             className="w-full h-12 rounded-2xl bg-zinc-900 text-white font-semibold shadow-sm"
