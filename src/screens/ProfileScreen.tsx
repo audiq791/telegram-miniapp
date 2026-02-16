@@ -76,11 +76,10 @@ export default function ProfileScreen() {
         exit={{ opacity: 0 }}
         className="bg-zinc-50 min-h-screen"
       >
-        {/* Шапка - большая таблетка */}
+        {/* Шапка - аккуратная таблетка */}
         <div className="max-w-md mx-auto px-4 pt-4">
-          <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-6">
-            <h1 className="text-2xl font-bold text-zinc-900">Профиль</h1>
-            <p className="text-sm text-zinc-500 mt-1">Войдите в аккаунт, чтобы управлять своими бонусами</p>
+          <div className="bg-white rounded-xl border border-zinc-200 shadow-sm p-4">
+            <h1 className="text-xl font-semibold text-zinc-900">Профиль</h1>
           </div>
         </div>
 
@@ -151,11 +150,11 @@ export default function ProfileScreen() {
       exit={{ opacity: 0 }}
       className="bg-zinc-50 min-h-screen"
     >
-      {/* Шапка - большая таблетка с текстом */}
+      {/* Шапка - аккуратная таблетка */}
       <div className="max-w-md mx-auto px-4 pt-4">
-        <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-6">
-          <h1 className="text-2xl font-bold text-zinc-900">Профиль</h1>
-          <p className="text-sm text-zinc-500 mt-1">Войдите в аккаунт, чтобы управлять своими бонусами</p>
+        <div className="bg-white rounded-xl border border-zinc-200 shadow-sm p-4">
+          <h1 className="text-xl font-semibold text-zinc-900">Профиль</h1>
+          <p className="text-xs text-zinc-500 mt-1">Войдите в аккаунт</p>
         </div>
       </div>
 
