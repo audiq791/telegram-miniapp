@@ -33,7 +33,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
 
 IconButton.displayName = 'IconButton';
 
-// Кнопка Активность с цветом #10614e
+// Основная зеленая кнопка (Активность, Войти, Продолжить и т.д.)
 export function PrimaryButton({ label, onClick }: { label: string; onClick?: () => void }) {
   return (
     <motion.button
