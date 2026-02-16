@@ -33,13 +33,15 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
 
 IconButton.displayName = 'IconButton';
 
+// Кнопка Активность с новым цветом #143932
 export function PrimaryButton({ label, onClick }: { label: string; onClick?: () => void }) {
   return (
     <motion.button
       onClick={onClick}
-      whileTap={{ scale: 0.95, backgroundColor: "#18181b" }}
+      whileTap={{ scale: 0.95, backgroundColor: "#0f2a24" }}
       transition={{ type: "spring", stiffness: 800, damping: 20 }}
-      className="h-11 px-5 sm:h-12 sm:px-6 md:h-14 md:px-8 rounded-2xl bg-zinc-900 text-white font-semibold shadow-[0_10px_25px_rgba(0,0,0,0.18)] text-[clamp(14px,2vw,16px)]"
+      className="h-11 px-5 sm:h-12 sm:px-6 md:h-14 md:px-8 rounded-2xl text-white font-semibold shadow-[0_10px_25px_rgba(0,0,0,0.18)] text-[clamp(14px,2vw,16px)]"
+      style={{ backgroundColor: "#143932" }}
     >
       {label}
     </motion.button>
@@ -47,7 +49,7 @@ export function PrimaryButton({ label, onClick }: { label: string; onClick?: () 
 }
 
 // ===========================
-// НИЖНЕЕ МЕНЮ - старая анимация
+// НИЖНЕЕ МЕНЮ - активная вкладка с новым цветом #143932
 // ===========================
 
 export function TabButton({
@@ -70,9 +72,10 @@ export function TabButton({
         "w-full rounded-2xl px-3 py-2 flex flex-col items-center justify-center gap-1 border",
         "min-h-[52px] sm:min-h-[60px] md:min-h-[70px]",
         active
-          ? "bg-zinc-900 border-zinc-900 text-white shadow-[0_10px_25px_rgba(0,0,0,0.18)]"
+          ? "text-white border-[#143932] shadow-[0_10px_25px_rgba(0,0,0,0.18)]"
           : "bg-white border-zinc-200 text-zinc-900 shadow-sm",
       ].join(" ")}
+      style={active ? { backgroundColor: "#143932" } : undefined}
     >
       <span className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 inline-flex items-center justify-center">
         {icon}
