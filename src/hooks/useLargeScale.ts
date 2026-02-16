@@ -6,23 +6,18 @@ export function useLargeScale() {
   const [isLargeScale, setIsLargeScale] = useState(false);
 
   useEffect(() => {
+    // Единственный надежный способ: сравнить реальный экран и видимую область
     const checkScale = () => {
-      // iOS увеличивает масштаб через изменение размеров окна
+      // iPhone с масштабом имеет visual viewport меньше screen
       const screenWidth = window.screen.width;
-      const windowWidth = window.innerWidth;
+      const visualWidth = window.visualViewport?.width || window.innerWidth;
       
-      // Если ширина окна заметно меньше ширины экрана — значит включён масштаб
-      const scale = screenWidth / windowWidth;
-      
-      // Порог: если масштаб больше 1.15 — значит реально крупно
-      setIsLargeScale(scale > 1.15);
+      // Если видимая область меньше 90% экрана - масштаб включен
+      setIsLargeScale(visualWidth < screenWidth * 0.9);
     };
 
     checkScale();
-    
-    // Проверяем при изменении размера (поворот экрана и т.д.)
     window.addEventListener('resize', checkScale);
-    
     return () => window.removeEventListener('resize', checkScale);
   }, []);
 
