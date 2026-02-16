@@ -32,7 +32,8 @@ type Route =
   | { name: "partner-site"; url: string; title: string; logo: string; fallbackColor: string };
 
 export default function MainApp() {
-  const [onboardingStage, setOnboardingStage] = useState<"onboarding" | "login" | "app">("onboarding");
+  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [showLogin, setShowLogin] = useState(false);
   const [tab, setTab] = useState<"wallet" | "market" | "services" | "profile">("wallet");
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
@@ -201,14 +202,17 @@ export default function MainApp() {
 
   const showNavbar = route.name === "home";
 
-  // Если проходим онбординг
-  if (onboardingStage === "onboarding") {
-    return <Onboarding onDone={() => setOnboardingStage("login")} />;
+  // Показываем онбординг
+  if (showOnboarding) {
+    return <Onboarding onDone={() => {
+      setShowOnboarding(false);
+      setShowLogin(true);
+    }} />;
   }
 
-  // Если экран входа
-  if (onboardingStage === "login") {
-    return <OnboardingProfileScreen onComplete={() => setOnboardingStage("app")} />;
+  // Показываем экран входа
+  if (showLogin) {
+    return <OnboardingProfileScreen onComplete={() => setShowLogin(false)} />;
   }
 
   // Основное приложение
