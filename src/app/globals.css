@@ -50,3 +50,145 @@ input[type=number] {
     padding-top: max(0.5rem, env(safe-area-inset-top));
   }
 }
+
+/* ========== АДАПТАЦИЯ ТОЛЬКО ДЛЯ КРУПНОГО МАСШТАБА ========== */
+.large-scale {
+  /* Контейнеры */
+  --scale-container-padding: 0.5rem;
+  --scale-grid-gap: 0.3rem;
+  --scale-font-reduction: 0.85;
+}
+
+.large-scale .max-w-md {
+  max-width: 360px !important;
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+
+/* Уменьшаем все размеры */
+.large-scale .text-xs {
+  font-size: 0.6rem !important;
+}
+
+.large-scale .text-sm {
+  font-size: 0.7rem !important;
+}
+
+.large-scale .text-base {
+  font-size: 0.8rem !important;
+}
+
+.large-scale .text-lg {
+  font-size: 0.9rem !important;
+}
+
+.large-scale .text-xl {
+  font-size: 1rem !important;
+}
+
+.large-scale .text-2xl {
+  font-size: 1.2rem !important;
+}
+
+.large-scale .text-3xl {
+  font-size: 1.4rem !important;
+}
+
+/* Кнопки */
+.large-scale button,
+.large-scale .btn {
+  padding-top: 0.4rem !important;
+  padding-bottom: 0.4rem !important;
+  padding-left: 0.6rem !important;
+  padding-right: 0.6rem !important;
+}
+
+.large-scale .TabButton {
+  min-height: 36px !important;
+  padding: 0.2rem 0.1rem !important;
+}
+
+.large-scale .TabButton span {
+  font-size: 0.65rem !important;
+}
+
+/* Сетка действий */
+.large-scale .grid-cols-2 {
+  gap: 0.3rem !important;
+}
+
+.large-scale .grid-cols-4 {
+  gap: 0.2rem !important;
+}
+
+/* Карточки */
+.large-scale .rounded-2xl {
+  border-radius: 0.8rem !important;
+}
+
+.large-scale .p-4 {
+  padding: 0.6rem !important;
+}
+
+.large-scale .p-3 {
+  padding: 0.4rem !important;
+}
+
+.large-scale .gap-3 {
+  gap: 0.4rem !important;
+}
+
+.large-scale .gap-2 {
+  gap: 0.3rem !important;
+}
+
+/* Аватарки и иконки */
+.large-scale .h-10,
+.large-scale .w-10 {
+  height: 1.8rem !important;
+  width: 1.8rem !important;
+}
+
+.large-scale .h-11,
+.large-scale .w-11 {
+  height: 2rem !important;
+  width: 2rem !important;
+}
+
+.large-scale .h-12,
+.large-scale .w-12 {
+  height: 2.2rem !important;
+  width: 2.2rem !important;
+}
+
+/* Поля ввода */
+.large-scale input {
+  height: 2rem !important;
+  font-size: 0.8rem !important;
+}
+
+.large-scale input::placeholder {
+  font-size: 0.8rem !important;
+}
+
+/* Нижнее меню */
+.large-scale .fixed.bottom-0 {
+  padding-bottom: env(safe-area-inset-bottom) !important;
+}
+
+.large-scale .grid.grid-cols-4 {
+  gap: 0.2rem !important;
+}
+
+/* Модальные окна */
+.large-scale .fixed.left-1\/2.top-1\/2 {
+  width: 95% !important;
+}
+
+.large-scale .p-6 {
+  padding: 1rem !important;
+}
+
+.large-scale .max-h-\[70vh\] {
+  max-height: 80vh !important;
+}
