@@ -341,106 +341,59 @@ export default function MainApp() {
                           </motion.div>
                         </div>
                         
-                        {/* Кнопка Активность с анимацией как в профиле */}
-                        <motion.button
-                          whileTap={{ scale: 0.95, backgroundColor: "#18181b" }}
-                          transition={{ type: "spring", stiffness: 800, damping: 20 }}
+                        {/* Кнопка Активность с зеленым цветом #10614e */}
+                        <PrimaryButton 
+                          label="Активность" 
                           onClick={() => {
                             const tg = (window as any).Telegram?.WebApp;
                             tg?.HapticFeedback.impactOccurred("light");
                             goBlank("Активность");
-                          }}
-                          className="h-11 px-5 sm:h-12 sm:px-6 md:h-14 md:px-8 rounded-2xl bg-zinc-900 text-white font-semibold shadow-[0_10px_25px_rgba(0,0,0,0.18)] text-[clamp(14px,2vw,16px)]"
-                        >
-                          Активность
-                        </motion.button>
+                          }} 
+                        />
                       </div>
 
-                      {/* Кнопки действий с анимацией как в профиле */}
+                      {/* Кнопки действий */}
                       <div className="mt-4 grid grid-cols-2 gap-3">
-                        <motion.button
-                          whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
-                          transition={{ type: "spring", stiffness: 800, damping: 20 }}
+                        <ActionCard 
+                          label="Отправить" 
+                          hint="Перевод" 
+                          kind="send" 
                           onClick={() => {
                             const tg = (window as any).Telegram?.WebApp;
                             tg?.HapticFeedback.impactOccurred("light");
                             setIsSendModalOpen(true);
-                          }}
-                          className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 sm:p-5 md:p-6 text-left hover:shadow-md transition-colors"
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="min-w-0">
-                              <div className="text-[clamp(14px,2vw,16px)] font-semibold truncate">Отправить</div>
-                              <div className="text-[clamp(11px,1.5vw,13px)] text-zinc-500 truncate">Перевод</div>
-                            </div>
-                            <div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
-                              <img src="/icons/send.gif" alt="send" className="w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] md:w-[36px] md:h-[36px] object-contain" />
-                            </div>
-                          </div>
-                        </motion.button>
-
-                        <motion.button
-                          whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
-                          transition={{ type: "spring", stiffness: 800, damping: 20 }}
+                          }} 
+                        />
+                        <ActionCard 
+                          label="Получить" 
+                          hint="Входящие" 
+                          kind="receive" 
                           onClick={() => {
                             const tg = (window as any).Telegram?.WebApp;
                             tg?.HapticFeedback.impactOccurred("light");
                             setIsReceiveModalOpen(true);
-                          }}
-                          className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 sm:p-5 md:p-6 text-left hover:shadow-md transition-colors"
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="min-w-0">
-                              <div className="text-[clamp(14px,2vw,16px)] font-semibold truncate">Получить</div>
-                              <div className="text-[clamp(11px,1.5vw,13px)] text-zinc-500 truncate">Входящие</div>
-                            </div>
-                            <div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
-                              <img src="/icons/receive.gif" alt="receive" className="w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] md:w-[36px] md:h-[36px] object-contain" />
-                            </div>
-                          </div>
-                        </motion.button>
-
-                        <motion.button
-                          whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
-                          transition={{ type: "spring", stiffness: 800, damping: 20 }}
+                          }} 
+                        />
+                        <ActionCard 
+                          label="Обменять" 
+                          hint="Бонусы" 
+                          kind="swap" 
                           onClick={() => {
                             const tg = (window as any).Telegram?.WebApp;
                             tg?.HapticFeedback.impactOccurred("light");
                             setIsSwapModalOpen(true);
-                          }}
-                          className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 sm:p-5 md:p-6 text-left hover:shadow-md transition-colors"
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="min-w-0">
-                              <div className="text-[clamp(14px,2vw,16px)] font-semibold truncate">Обменять</div>
-                              <div className="text-[clamp(11px,1.5vw,13px)] text-zinc-500 truncate">Бонусы</div>
-                            </div>
-                            <div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
-                              <img src="/icons/exchange.gif" alt="swap" className="w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] md:w-[36px] md:h-[36px] object-contain" />
-                            </div>
-                          </div>
-                        </motion.button>
-
-                        <motion.button
-                          whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
-                          transition={{ type: "spring", stiffness: 800, damping: 20 }}
+                          }} 
+                        />
+                        <ActionCard 
+                          label="Списать" 
+                          hint="Оплата" 
+                          kind="spend" 
                           onClick={() => {
                             const tg = (window as any).Telegram?.WebApp;
                             tg?.HapticFeedback.impactOccurred("light");
                             goBlank("Списать");
-                          }}
-                          className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 sm:p-5 md:p-6 text-left hover:shadow-md transition-colors"
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="min-w-0">
-                              <div className="text-[clamp(14px,2vw,16px)] font-semibold truncate">Списать</div>
-                              <div className="text-[clamp(11px,1.5vw,13px)] text-zinc-500 truncate">Оплата</div>
-                            </div>
-                            <div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
-                              <img src="/icons/pay.gif" alt="spend" className="w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] md:w-[36px] md:h-[36px] object-contain" />
-                            </div>
-                          </div>
-                        </motion.button>
+                          }} 
+                        />
                       </div>
                     </div>
 
