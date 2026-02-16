@@ -50,19 +50,3 @@ input[type=number] {
     padding-top: max(0.5rem, env(safe-area-inset-top));
   }
 }
-
-/* ========== МИНИМАЛЬНАЯ АДАПТАЦИЯ ========== */
-/* Удаляем пустой блок .large-scale */
-
-/* Только самые необходимые правки для крупного масштаба */
-.large-scale .text-xs {
-  font-size: 0.65rem;
-}
-
-.large-scale .text-sm {
-  font-size: 0.75rem;
-}
-
-.large-scale .text-base {
-  font-size: 0.85rem;
-}
