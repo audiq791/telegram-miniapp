@@ -12,6 +12,7 @@ import SendModal from "../modals/SendModal";
 import ReceiveModal from "../modals/ReceiveModal";
 import SwapModal from "../modals/SwapModal";
 import { partnersSeed, type Partner } from "../data/partners";
+import { useNonMaxiPhone } from "../hooks/useNonMaxiPhone";
 
 type WalletScreenProps = {
   onOpenInfo: () => void;
@@ -52,9 +53,14 @@ export default function WalletScreen({
   handleSend,
   handleSwap
 }: WalletScreenProps) {
+  const { isNonMaxiPhone, deviceModel } = useNonMaxiPhone();
+  
+  // Для отладки можно раскомментировать
+  // console.log("Device model:", deviceModel, "isNonMax:", isNonMaxiPhone);
+
   return (
     <motion.div
-      className="min-h-dvh bg-zinc-50"
+      className={`min-h-dvh bg-zinc-50 ${isNonMaxiPhone ? 'iphone-non-max-scale' : ''}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -144,7 +150,8 @@ export default function WalletScreen({
                     onError={() => onImageError(selectedPartner.id)}
                   />
                 ) : (
-                  <div className={`w-full h-full bg-gradient-to-br ${selectedPartner.fallbackColor}`} />
+                  // ИСПРАВЛЕНО: bg-gradient-to-br → bg-linear-to-br
+                  <div className={`w-full h-full bg-linear-to-br ${selectedPartner.fallbackColor}`} />
                 )}
               </motion.div>
             </div>

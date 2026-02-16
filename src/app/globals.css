@@ -103,3 +103,32 @@ input[type=number] {
     font-size: 0.6rem !important;
   }
 }
+
+/* ========== УМЕНЬШЕНИЕ ДЛЯ iPhone НЕ-Max НА 8px ========== */
+.iphone-non-max-scale .ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
+  font-size: 8px !important;  /* Было 16px, стало 8px */
+  line-height: 1.2 !important;
+}
+
+.iphone-non-max-scale .ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
+  font-size: 5px !important;  /* Было 13px, стало 5px */
+  line-height: 1.2 !important;
+}
+
+/* Уменьшаем сами кнопки */
+.iphone-non-max-scale .ActionCard {
+  padding: 0.5rem !important;
+}
+
+/* Уменьшаем иконки в кнопках */
+.iphone-non-max-scale .ActionCard .h-11.w-11,
+.iphone-non-max-scale .ActionCard .h-12.w-12,
+.iphone-non-max-scale .ActionCard .h-14.w-14 {
+  height: 1.8rem !important;
+  width: 1.8rem !important;
+}
+
+.iphone-non-max-scale .ActionCard img.w-\[30px\] {
+  width: 18px !important;
+  height: 18px !important;
+}
