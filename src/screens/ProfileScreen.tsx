@@ -159,7 +159,7 @@ export default function ProfileScreen() {
         {/* Подпись над полем */}
         <p className="text-xs text-zinc-500 mb-2">Введите номер телефона</p>
 
-        {/* Поле ввода телефона */}
+        {/* Поле ввода телефона - убрали placeholder "10 цифр" */}
         <div className="mb-4">
           <div className="relative">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
@@ -170,13 +170,13 @@ export default function ProfileScreen() {
               type="text"
               value={phoneNumber}
               onChange={handlePhoneChange}
-              placeholder=" 10 цифр"
+              placeholder=""
               className="w-full h-12 pl-12 pr-4 bg-white border border-zinc-200 rounded-xl text-base outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900"
               inputMode="numeric"
             />
           </div>
 
-          {/* Кнопка Войти (как было раньше) */}
+          {/* Кнопка Войти (черная) */}
           <motion.button
             whileTap={{ scale: 0.95, backgroundColor: "#27272a" }}
             transition={{ type: "spring", stiffness: 800, damping: 20 }}
