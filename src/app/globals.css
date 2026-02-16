@@ -53,74 +53,76 @@ input[type=number] {
 
 /* ========== АДАПТАЦИЯ ДЛЯ КРУПНОГО МАСШТАБА ========== */
 .large-scale {
-  /* Контейнер */
-  .max-w-md {
-    max-width: 360px !important;
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
-  }
+  --scale-container-padding: 0.5rem;
+  --scale-grid-gap: 0.3rem;
+  --scale-font-reduction: 0.85;
+}
 
-  /* Уменьшаем текст в 4 кнопках */
-  .ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
-    font-size: 12px !important;
-  }
-  
-  .ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
-    font-size: 9px !important;
-  }
+.large-scale .max-w-md {
+  max-width: 360px !important;
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
 
-  /* Уменьшаем сами кнопки */
-  .ActionCard {
-    padding: 0.6rem !important;
-  }
+/* Уменьшаем текст в 4 кнопках */
+.large-scale .ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
+  font-size: 12px !important;
+}
 
-  /* Уменьшаем текст в табах */
-  .TabButton span {
-    font-size: 0.65rem !important;
-  }
+.large-scale .ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
+  font-size: 9px !important;
+}
 
-  /* Уменьшаем отступы */
-  .gap-3 {
-    gap: 0.4rem !important;
-  }
+/* Уменьшаем сами кнопки */
+.large-scale .ActionCard {
+  padding: 0.6rem !important;
+}
 
-  .p-4 {
-    padding: 0.6rem !important;
-  }
+/* Уменьшаем текст в табах */
+.large-scale .TabButton span {
+  font-size: 0.65rem !important;
+}
 
-  /* Уменьшаем размеры иконок */
-  .h-10, .w-10 {
-    height: 1.8rem !important;
-    width: 1.8rem !important;
-  }
+/* Уменьшаем отступы */
+.large-scale .gap-3 {
+  gap: 0.4rem !important;
+}
 
-  /* Уменьшаем текст в списке партнеров */
-  .font-semibold {
-    font-size: 0.8rem !important;
-  }
+.large-scale .p-4 {
+  padding: 0.6rem !important;
+}
 
-  .text-xs {
-    font-size: 0.6rem !important;
-  }
+/* Уменьшаем размеры иконок */
+.large-scale .h-10,
+.large-scale .w-10 {
+  height: 1.8rem !important;
+  width: 1.8rem !important;
+}
+
+/* Уменьшаем текст в списке партнеров */
+.large-scale .font-semibold {
+  font-size: 0.8rem !important;
+}
+
+.large-scale .text-xs {
+  font-size: 0.6rem !important;
 }
 
 /* ========== УМЕНЬШЕНИЕ ДЛЯ iPhone НЕ-Max НА 8px ========== */
 .iphone-non-max-scale .ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
-  font-size: 8px !important;  /* Было 16px, стало 8px */
+  font-size: 8px !important;
   line-height: 1.2 !important;
 }
 
 .iphone-non-max-scale .ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
-  font-size: 5px !important;  /* Было 13px, стало 5px */
+  font-size: 5px !important;
   line-height: 1.2 !important;
 }
 
-/* Уменьшаем сами кнопки */
 .iphone-non-max-scale .ActionCard {
   padding: 0.5rem !important;
 }
 
-/* Уменьшаем иконки в кнопках */
 .iphone-non-max-scale .ActionCard .h-11.w-11,
 .iphone-non-max-scale .ActionCard .h-12.w-12,
 .iphone-non-max-scale .ActionCard .h-14.w-14 {
@@ -133,13 +135,33 @@ input[type=number] {
   height: 18px !important;
 }
 
-/* ========== УМЕНЬШЕНИЕ ТЕКСТА В 4 КНОПКАХ НА ВСЕХ iPhone ========== */
+/* ========== АВТОМАТИЧЕСКОЕ УМЕНЬШЕНИЕ ТЕКСТА В 4 КНОПКАХ ========== */
 @media (max-width: 430px) {
+  .ActionCard {
+    min-width: 0;
+  }
+  
   .ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
-    font-size: 12px !important;
+    font-size: clamp(8px, 3.5vw, 16px) !important;
+    word-break: break-word;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
-    font-size: 9px !important;
+    font-size: clamp(6px, 2.8vw, 13px) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .ActionCard .min-w-0 {
+    min-width: 0;
+    max-width: 100%;
+  }
+  
+  .ActionCard .flex.items-center.justify-between.gap-3 {
+    gap: clamp(0.25rem, 1vw, 0.75rem);
   }
 }
