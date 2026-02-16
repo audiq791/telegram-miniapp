@@ -17,6 +17,7 @@ import BlackScreen from "./BlackScreen";
 import PartnerSiteScreen from "./PartnerSiteScreen";
 import ServicesScreen from "./ServicesScreen";
 import ProfileScreen from "./ProfileScreen";
+import OnboardingProfileScreen from "./OnboardingProfileScreen";
 import SendModal from "../modals/SendModal";
 import ReceiveModal from "../modals/ReceiveModal";
 import SwapModal from "../modals/SwapModal";
@@ -30,6 +31,7 @@ type Route =
   | { name: "partner-site"; url: string; title: string; logo: string; fallbackColor: string };
 
 export default function MainApp() {
+  const [isOnboarded, setIsOnboarded] = useState(false);
   const [tab, setTab] = useState<"wallet" | "market" | "services" | "profile">("wallet");
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
@@ -198,6 +200,13 @@ export default function MainApp() {
 
   const showNavbar = route.name === "home";
 
+  // Если не прошли онбординг, показываем экран входа
+  if (!isOnboarded) {
+    return (
+      <OnboardingProfileScreen onComplete={() => setIsOnboarded(true)} />
+    );
+  }
+
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
       {/* HEADER */}
@@ -341,7 +350,6 @@ export default function MainApp() {
                           </motion.div>
                         </div>
                         
-                        {/* Кнопка Активность с зеленым цветом #10614e */}
                         <PrimaryButton 
                           label="Активность" 
                           onClick={() => {
@@ -352,7 +360,6 @@ export default function MainApp() {
                         />
                       </div>
 
-                      {/* Кнопки действий */}
                       <div className="mt-4 grid grid-cols-2 gap-3">
                         <ActionCard 
                           label="Отправить" 
