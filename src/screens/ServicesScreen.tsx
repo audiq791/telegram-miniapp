@@ -108,18 +108,16 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
 
   return (
     <div className="bg-zinc-50">
-      {/* Аккуратная таблетка для шапки */}
-      <div className="max-w-md mx-auto w-full px-4 pt-4">
-        <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5">
-          <h1 className="text-2xl font-bold text-zinc-900">Сервисы</h1>
-          <p className="text-sm text-zinc-500 mt-1">
-            Услуги и преимущества для держателей бонусов
-          </p>
+      {/* Шапка - аккуратная таблетка */}
+      <div className="max-w-md mx-auto px-4 pt-4">
+        <div className="bg-white rounded-xl border border-zinc-200 shadow-sm p-4">
+          <h1 className="text-xl font-semibold text-zinc-900">Сервисы</h1>
+          <p className="text-xs text-zinc-500 mt-1">Услуги и преимущества для держателей бонусов</p>
         </div>
       </div>
 
-      {/* Плитки - точно как кнопки на главном экране */}
-      <div className="max-w-md mx-auto w-full px-4 pt-4 pb-4">
+      {/* Плитки - с анимацией как в профиле */}
+      <div className="max-w-md mx-auto px-4 pt-6 pb-4">
         <div className="grid grid-cols-2 gap-3">
           {services.map((service) => {
             const Icon = service.icon;
@@ -127,8 +125,8 @@ export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) 
               <motion.button
                 key={service.id}
                 onClick={() => handleServiceClick(service)}
-                whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
-                transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
+                transition={{ type: "spring", stiffness: 800, damping: 20 }}
                 className="bg-white rounded-xl border border-zinc-200 shadow-sm p-3.5 text-left relative flex flex-col"
               >
                 {/* Бейдж для GPT */}
