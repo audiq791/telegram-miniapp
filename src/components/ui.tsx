@@ -69,7 +69,7 @@ export function TabButton({
       transition={{ type: "spring", stiffness: 520, damping: 34 }}
       className={[
         "w-full rounded-2xl px-3 py-2 flex flex-col items-center justify-center gap-1 border",
-        "min-h-13 sm:min-h-15 md:min-h-17.5", // Исправлено для v4
+        "min-h-13 sm:min-h-15 md:min-h-17.5",
         active
           ? "bg-zinc-900 border-zinc-900 text-white shadow-[0_10px_25px_rgba(0,0,0,0.18)]"
           : "bg-white border-zinc-200 text-zinc-900 shadow-sm",
@@ -91,7 +91,7 @@ export function TabButton({
 }
 
 // ===========================
-// ACTION CARD (4 КНОПКИ) - ИСПРАВЛЕНО ДЛЯ v4
+// ACTION CARD (4 КНОПКИ) - ОПТИМИЗИРОВАНО
 // ===========================
 
 export type ActionKind = "send" | "receive" | "swap" | "spend";
@@ -107,7 +107,6 @@ export function ActionCard({
   kind: ActionKind;
   onClick?: () => void;
 }) {
-  // Пути к GIF файлам
   const gifSrc = {
     send: "/icons/send.gif",
     receive: "/icons/receive.gif",
@@ -118,27 +117,30 @@ export function ActionCard({
   return (
     <motion.button
       onClick={onClick}
-      whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
+      whileTap={{ scale: 0.95 }}
       transition={{ type: "spring", stiffness: 800, damping: 20 }}
-      className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-4 sm:p-5 md:p-6 text-left hover:shadow-md transition-colors"
+      className="w-full rounded-2xl bg-white border border-zinc-200 shadow-sm p-3 sm:p-4 md:p-5 text-left hover:shadow-md transition-colors"
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-2 sm:gap-3">
+        {/* Текстовый блок */}
         <div className="min-w-0 flex-1">
-          <div className="text-[clamp(12px,4vw,16px)] font-semibold">
+          {/* Заголовок - динамический размер */}
+          <div className="font-semibold leading-tight text-[clamp(11px,3vw,15px)] sm:text-[clamp(12px,2.5vw,16px)] md:text-[clamp(13px,2vw,17px)]">
             {label}
           </div>
-          <div className="text-[clamp(9px,3vw,13px)] text-zinc-500">
+          {/* Подпись - динамический размер */}
+          <div className="text-zinc-500 leading-tight text-[clamp(8px,2.5vw,12px)] sm:text-[clamp(9px,2vw,13px)] md:text-[clamp(10px,1.5vw,14px)]">
             {hint}
           </div>
         </div>
 
-        {/* Контейнер для гифки - исправлено для v4 */}
-        <div className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
+        {/* Иконка - фиксированный размер с адаптацией */}
+        <div className="h-9 w-9 sm:h-10 sm:w-10 md:h-11 md:w-11 rounded-xl sm:rounded-2xl border border-zinc-200 shadow-sm grid place-items-center shrink-0 bg-white overflow-hidden">
           <img
             src={gifSrc[kind]}
             alt={kind}
             draggable={false}
-            className="w-7.5 h-7.5 sm:w-8 sm:h-8 md:w-9 md:h-9 object-contain"
+            className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 object-contain"
           />
         </div>
       </div>
