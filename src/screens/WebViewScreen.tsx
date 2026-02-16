@@ -32,7 +32,7 @@ export default function WebViewScreen({
   if (!isAllowed) {
     return (
       <motion.div
-        className="min-h-[100dvh] bg-white flex flex-col"
+        className="min-h-dvh bg-white flex flex-col"
         initial={{ opacity: 0, x: 24 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -24 }}
@@ -45,7 +45,7 @@ export default function WebViewScreen({
               <IconButton aria="back" onClick={onBack}>
                 <ArrowLeft size={18} />
               </IconButton>
-              <div className="font-semibold truncate max-w-[150px]">{title}</div>
+              <div className="font-semibold truncate max-w-37.5">{title}</div>
             </div>
             
             <div className="flex items-center gap-2">
@@ -80,7 +80,7 @@ export default function WebViewScreen({
   // Для ЦСКА открываем в iframe
   return (
     <motion.div
-      className="min-h-[100dvh] bg-white flex flex-col"
+      className="min-h-dvh bg-white flex flex-col"
       initial={{ opacity: 0, x: 24 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -24 }}
@@ -93,7 +93,7 @@ export default function WebViewScreen({
             <IconButton aria="back" onClick={onBack}>
               <ArrowLeft size={18} />
             </IconButton>
-            <div className="font-semibold truncate max-w-[150px]">{title}</div>
+            <div className="font-semibold truncate max-w-37.5">{title}</div>
           </div>
           
           <div className="flex items-center gap-2">
