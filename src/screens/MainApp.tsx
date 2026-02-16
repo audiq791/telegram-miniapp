@@ -17,7 +17,6 @@ import BlackScreen from "./BlackScreen";
 import PartnerSiteScreen from "./PartnerSiteScreen";
 import ServicesScreen from "./ServicesScreen";
 import ProfileScreen from "./ProfileScreen";
-import Onboarding from "../onboarding/Onboarding";
 import SendModal from "../modals/SendModal";
 import ReceiveModal from "../modals/ReceiveModal";
 import SwapModal from "../modals/SwapModal";
@@ -31,7 +30,6 @@ type Route =
   | { name: "partner-site"; url: string; title: string; logo: string; fallbackColor: string };
 
 export default function MainApp() {
-  const [showOnboarding, setShowOnboarding] = useState(true);
   const [tab, setTab] = useState<"wallet" | "market" | "services" | "profile">("wallet");
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
@@ -188,10 +186,6 @@ export default function MainApp() {
   };
 
   const showNavbar = route.name === "home";
-
-  if (showOnboarding) {
-    return <Onboarding onDone={() => setShowOnboarding(false)} />;
-  }
 
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
