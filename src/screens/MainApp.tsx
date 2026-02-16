@@ -440,7 +440,7 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* НАВБАР */}
+    {/* НАВБАР */}
 <AnimatePresence>
   {showNavbar && (
     <motion.nav
@@ -450,7 +450,7 @@ export default function MainApp() {
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
       style={{ 
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 0px)",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 40px)",
       }}
     >
       <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
