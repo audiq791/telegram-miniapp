@@ -33,7 +33,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
 
 IconButton.displayName = 'IconButton';
 
-// Кнопка Активность с новым цветом #10614e
+// Кнопка Активность с цветом #10614e
 export function PrimaryButton({ label, onClick }: { label: string; onClick?: () => void }) {
   return (
     <motion.button
@@ -49,7 +49,7 @@ export function PrimaryButton({ label, onClick }: { label: string; onClick?: () 
 }
 
 // ===========================
-// НИЖНЕЕ МЕНЮ - активная вкладка с новым цветом #10614e
+// НИЖНЕЕ МЕНЮ - активная вкладка с цветом #10614e
 // ===========================
 
 export function TabButton({
