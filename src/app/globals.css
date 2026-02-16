@@ -132,3 +132,14 @@ input[type=number] {
   width: 18px !important;
   height: 18px !important;
 }
+
+/* ========== УМЕНЬШЕНИЕ ТЕКСТА В 4 КНОПКАХ НА ВСЕХ iPhone ========== */
+@media (max-width: 430px) {
+  .ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
+    font-size: 12px !important;
+  }
+  
+  .ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
+    font-size: 9px !important;
+  }
+}
