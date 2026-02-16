@@ -31,20 +31,20 @@ export default function ProfileScreen() {
     setPhoneNumber(cleaned);
   };
 
-  // Форматирование для отображения: +7 123 456-78-90
+  // Форматирование для отображения: +7 (123) 456-78-90
   const formatPhoneNumber = () => {
     if (!phoneNumber) return "";
     
     let formatted = "";
     for (let i = 0; i < phoneNumber.length; i++) {
       if (i === 0) {
-        formatted += phoneNumber[i];
-      } else if (i === 3) {
-        formatted += ` ${phoneNumber[i]}`;
-      } else if (i === 6) {
-        formatted += `-${phoneNumber[i]}`;
-      } else if (i === 8) {
-        formatted += `-${phoneNumber[i]}`;
+        formatted += `(${phoneNumber[i]}`;
+      } else if (i === 2) {
+        formatted += `${phoneNumber[i]}) `;
+      } else if (i === 5) {
+        formatted += `${phoneNumber[i]}-`;
+      } else if (i === 7) {
+        formatted += `${phoneNumber[i]}-`;
       } else {
         formatted += phoneNumber[i];
       }
@@ -80,6 +80,7 @@ export default function ProfileScreen() {
         <div className="max-w-md mx-auto px-4 pt-4">
           <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-6">
             <h1 className="text-2xl font-bold text-zinc-900">Профиль</h1>
+            <p className="text-sm text-zinc-500 mt-1">Войдите в аккаунт, чтобы управлять своими бонусами</p>
           </div>
         </div>
 
@@ -100,8 +101,8 @@ export default function ProfileScreen() {
           {/* Секции профиля */}
           <div className="space-y-2">
             <motion.button
-              whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
-              transition={{ type: "spring", stiffness: 700, damping: 40 }}
+              whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
+              transition={{ type: "spring", stiffness: 800, damping: 20 }}
               className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 text-left flex items-center justify-between hover:shadow-md transition-colors"
             >
               <span className="font-medium text-zinc-900">Мои бонусы</span>
@@ -109,8 +110,8 @@ export default function ProfileScreen() {
             </motion.button>
             
             <motion.button
-              whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
-              transition={{ type: "spring", stiffness: 700, damping: 40 }}
+              whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
+              transition={{ type: "spring", stiffness: 800, damping: 20 }}
               className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 text-left flex items-center justify-between hover:shadow-md transition-colors"
             >
               <span className="font-medium text-zinc-900">История операций</span>
@@ -118,8 +119,8 @@ export default function ProfileScreen() {
             </motion.button>
             
             <motion.button
-              whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
-              transition={{ type: "spring", stiffness: 700, damping: 40 }}
+              whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
+              transition={{ type: "spring", stiffness: 800, damping: 20 }}
               className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 text-left flex items-center justify-between hover:shadow-md transition-colors"
             >
               <span className="font-medium text-zinc-900">Настройки</span>
@@ -129,8 +130,8 @@ export default function ProfileScreen() {
 
           {/* Кнопка выхода */}
           <motion.button
-            whileTap={{ scale: 0.97, backgroundColor: "#fee2e2" }}
-            transition={{ type: "spring", stiffness: 700, damping: 40 }}
+            whileTap={{ scale: 0.95, backgroundColor: "#fecaca" }}
+            transition={{ type: "spring", stiffness: 800, damping: 20 }}
             onClick={handleLogout}
             className="w-full mt-6 py-3 rounded-xl border border-red-200 text-red-600 font-medium flex items-center justify-center gap-2 hover:bg-red-50 transition-colors"
           >
@@ -150,19 +151,18 @@ export default function ProfileScreen() {
       exit={{ opacity: 0 }}
       className="bg-zinc-50 min-h-screen"
     >
-      {/* Шапка - большая таблетка */}
+      {/* Шапка - большая таблетка с текстом */}
       <div className="max-w-md mx-auto px-4 pt-4">
         <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-6">
           <h1 className="text-2xl font-bold text-zinc-900">Профиль</h1>
+          <p className="text-sm text-zinc-500 mt-1">Войдите в аккаунт, чтобы управлять своими бонусами</p>
         </div>
       </div>
 
       {/* Контент */}
       <div className="max-w-md mx-auto px-4 pt-6">
-        {/* Текст чуть меньше и нежирный */}
-        <p className="text-base text-zinc-600 mb-6">
-          Войдите в аккаунт, чтобы управлять своими бонусами
-        </p>
+        {/* Подпись над полем */}
+        <p className="text-xs text-zinc-500 mb-2">Введите номер телефона</p>
 
         {/* Поле ввода телефона */}
         <div className="mb-4">
@@ -177,7 +177,7 @@ export default function ProfileScreen() {
               type="text"
               value={formatPhoneNumber()}
               onChange={handlePhoneChange}
-              placeholder="  ___ ___ __-__"
+              placeholder=" (___) ___-__-__"
               className="w-full h-12 pl-12 pr-4 bg-white border border-zinc-200 rounded-xl text-base outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900"
               inputMode="numeric"
               pattern="[0-9]*"
@@ -187,10 +187,10 @@ export default function ProfileScreen() {
             </div>
           </div>
 
-          {/* Кнопка Войти (черная) - с анимацией как в кошельке */}
+          {/* Кнопка Войти (черная) - с улучшенной анимацией */}
           <motion.button
-            whileTap={{ scale: 0.97, backgroundColor: "#27272a" }}
-            transition={{ type: "spring", stiffness: 700, damping: 40 }}
+            whileTap={{ scale: 0.95, backgroundColor: "#18181b" }}
+            transition={{ type: "spring", stiffness: 800, damping: 20 }}
             onClick={handleLogin}
             className="w-full mt-4 py-3 bg-zinc-900 text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors"
           >
@@ -206,21 +206,21 @@ export default function ProfileScreen() {
           <div className="flex-1 h-px bg-zinc-200" />
         </div>
 
-        {/* Кнопка Войти через Telegram - с анимацией как в кошельке */}
+        {/* Кнопка Войти через Telegram - с улучшенной анимацией */}
         <motion.button
-          whileTap={{ scale: 0.97, backgroundColor: "#4098E0" }}
-          transition={{ type: "spring", stiffness: 700, damping: 40 }}
+          whileTap={{ scale: 0.95, backgroundColor: "#3390EC" }}
+          transition={{ type: "spring", stiffness: 800, damping: 20 }}
           className="w-full py-3 bg-[#54A9EB] text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-[#4098E0] transition-colors mb-6"
         >
           <Send size={16} className="text-white" />
           Войти через Telegram
         </motion.button>
 
-        {/* Кнопки внизу */}
+        {/* Кнопки внизу - с улучшенной анимацией */}
         <div className="space-y-2">
           <motion.button
-            whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
-            transition={{ type: "spring", stiffness: 700, damping: 40 }}
+            whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
+            transition={{ type: "spring", stiffness: 800, damping: 20 }}
             className="w-full py-3 bg-white border border-zinc-200 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-zinc-50 transition-colors"
           >
             <Headphones size={16} className="text-zinc-600" />
@@ -228,8 +228,8 @@ export default function ProfileScreen() {
           </motion.button>
           
           <motion.button
-            whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
-            transition={{ type: "spring", stiffness: 700, damping: 40 }}
+            whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
+            transition={{ type: "spring", stiffness: 800, damping: 20 }}
             className="w-full py-3 bg-white border border-zinc-200 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-zinc-50 transition-colors"
           >
             <Building2 size={16} className="text-zinc-600" />
