@@ -112,3 +112,120 @@ input[type=number] {
   margin-left: auto !important;
   width: auto !important;
 }
+
+/* ========== ДОПОЛНИТЕЛЬНАЯ АДАПТАЦИЯ ДЛЯ IPHONE С МАСШТАБОМ ========== */
+.large-scale {
+  /* Дополнительные переменные для масштаба */
+  --scale-text-xs: 0.6rem;
+  --scale-text-sm: 0.7rem;
+  --scale-text-base: 0.8rem;
+  --scale-text-lg: 0.9rem;
+  --scale-text-xl: 1rem;
+  --scale-text-2xl: 1.1rem;
+  --scale-text-3xl: 1.2rem;
+}
+
+/* ===== УМЕНЬШЕНИЕ ТЕКСТА В 4 КНОПКАХ ===== */
+.large-scale .ActionCard .font-semibold {
+  font-size: 9px !important;
+}
+
+.large-scale .ActionCard .text-zinc-500 {
+  font-size: 7px !important;
+}
+
+/* ===== УМЕНЬШЕНИЕ БАЛАНСА ===== */
+.large-scale .text-3xl.font-semibold {
+  font-size: 1.3rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.15rem !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+}
+
+.large-scale .text-3xl.font-semibold span {
+  font-size: 0.7rem !important;
+  margin-left: 0.1rem !important;
+  display: inline-block !important;
+  white-space: nowrap !important;
+}
+
+/* Контейнер баланса - чтобы B не переносился */
+.large-scale .flex.items-end.justify-between.gap-3 {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.5rem !important;
+  flex-wrap: nowrap !important;
+}
+
+.large-scale .flex.items-end.justify-between.gap-3 > div:first-child {
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 0.25rem !important;
+  flex-wrap: nowrap !important;
+  min-width: fit-content !important;
+}
+
+/* ===== ГАРМОНИЧНАЯ КНОПКА АКТИВНОСТЬ ===== */
+.large-scale .PrimaryButton,
+.large-scale button:has(span:contains("Активность")),
+.large-scale .flex.items-end.justify-between.gap-3 button:last-child {
+  height: 2rem !important;
+  padding-left: 0.6rem !important;
+  padding-right: 0.6rem !important;
+  font-size: 10px !important;
+  border-radius: 0.75rem !important;
+  min-width: fit-content !important;
+  width: auto !important;
+  flex-shrink: 0 !important;
+  margin-left: 0.25rem !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* ===== УМЕНЬШЕНИЕ ОТСТУПОВ В КАРТОЧКЕ БАЛАНСА ===== */
+.large-scale .rounded-2xl.bg-zinc-50.border.border-zinc-200.p-4 {
+  padding: 0.6rem !important;
+}
+
+/* ===== УМЕНЬШЕНИЕ ИКОНОК В 4 КНОПКАХ ===== */
+.large-scale .ActionCard .h-9.w-9,
+.large-scale .ActionCard .sm\:h-10.sm\:w-10,
+.large-scale .ActionCard .md\:h-11.md\:w-11 {
+  height: 1.8rem !important;
+  width: 1.8rem !important;
+}
+
+.large-scale .ActionCard img {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+/* ===== УМЕНЬШЕНИЕ ЗАГОЛОВКА "ОСНОВНОЙ ПАРТНЁР" ===== */
+.large-scale .text-xs.text-zinc-500 {
+  font-size: 0.6rem !important;
+}
+
+/* ===== УМЕНЬШЕНИЕ НАЗВАНИЯ ПАРТНЁРА ===== */
+.large-scale .text-xl.font-semibold {
+  font-size: 1rem !important;
+}
+
+/* ===== УМЕНЬШЕНИЕ ЛОГОТИПА ПАРТНЁРА ===== */
+.large-scale .h-12.w-12 {
+  height: 2.2rem !important;
+  width: 2.2rem !important;
+}
+
+/* ===== УМЕНЬШЕНИЕ ОБЩИХ ОТСТУПОВ ===== */
+.large-scale .p-4 {
+  padding: 0.6rem !important;
+}
+
+.large-scale .gap-3 {
+  gap: 0.4rem !important;
+}
