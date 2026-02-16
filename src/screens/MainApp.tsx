@@ -195,6 +195,7 @@ export default function MainApp() {
 
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
+      {/* HEADER */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-zinc-200">
         <div className="mx-auto max-w-md px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -242,6 +243,7 @@ export default function MainApp() {
         </div>
       </header>
 
+      {/* CONTENT */}
       <div className="mx-auto max-w-md">
         <AnimatePresence mode="wait">
           {route.name === "home" ? (
@@ -253,6 +255,7 @@ export default function MainApp() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
             >
+              {/* Кошелек */}
               {tab === "wallet" && (
                 <>
                   <motion.div
@@ -365,6 +368,7 @@ export default function MainApp() {
                 </>
               )}
 
+              {/* Маркет */}
               {tab === "market" && (
                 <div className="rounded-[28px] bg-white border border-zinc-200 p-6 text-center">
                   <p className="text-zinc-500">Маркет</p>
@@ -372,10 +376,12 @@ export default function MainApp() {
                 </div>
               )}
 
+              {/* Сервисы */}
               {tab === "services" && (
                 <ServicesScreen onServiceClick={(title) => goBlank(title)} />
               )}
 
+              {/* Профиль */}
               {tab === "profile" && (
                 <ProfileScreen />
               )}
@@ -400,6 +406,7 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
+      {/* НАВБАР */}
       <AnimatePresence>
         {showNavbar && (
           <motion.nav
@@ -422,6 +429,7 @@ export default function MainApp() {
         )}
       </AnimatePresence>
 
+      {/* МОДАЛЬНЫЕ ОКНА */}
       <SendModal isOpen={isSendModalOpen} onClose={() => setIsSendModalOpen(false)} onSend={handleSend} currentBalance={selectedPartner.balance} />
       <ReceiveModal isOpen={isReceiveModalOpen} onClose={() => setIsReceiveModalOpen(false)} />
       <SwapModal isOpen={isSwapModalOpen} onClose={() => setIsSwapModalOpen(false)} onSwap={handleSwap} currentBalance={selectedPartner.balance} selectedPartner={selectedPartner} />
