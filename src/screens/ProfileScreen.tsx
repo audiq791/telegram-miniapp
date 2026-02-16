@@ -8,15 +8,13 @@ import {
   Building2,
   LogIn,
   UserPlus,
-  ChevronRight
+  ChevronRight,
+  LogOut
 } from "lucide-react";
-
-// Временно, пока нет настоящей авторизации
-const DEMO_IS_LOGGED_IN = false; // Поменяй на true, чтобы увидеть зарегистрированную версию
 
 export default function ProfileScreen() {
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(DEMO_IS_LOGGED_IN);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Форматирование номера при вводе
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +38,24 @@ export default function ProfileScreen() {
     return formatted;
   };
 
-  // Для зарегистрированного пользователя (заглушка)
+  // Форматирование полного номера с +7
+  const getFullPhoneNumber = () => {
+    if (!phoneNumber) return "+7";
+    return `+7 ${formatPhoneNumber()}`;
+  };
+
+  // Обработчик входа (с любым номером или без)
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  // Обработчик выхода
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setPhoneNumber(""); // очищаем номер при выходе
+  };
+
+  // Для зарегистрированного пользователя
   if (isLoggedIn) {
     return (
       <motion.div
@@ -65,7 +80,7 @@ export default function ProfileScreen() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-zinc-900">Анна Иванова</h2>
-                <p className="text-sm text-zinc-500 mt-1">+7 (999) 123-45-67</p>
+                <p className="text-sm text-zinc-500 mt-1">{getFullPhoneNumber()}</p>
               </div>
             </div>
           </div>
@@ -87,12 +102,15 @@ export default function ProfileScreen() {
           </div>
 
           {/* Кнопка выхода */}
-          <button 
-            onClick={() => setIsLoggedIn(false)}
-            className="w-full mt-6 py-3 rounded-xl border border-red-200 text-red-600 font-medium hover:bg-red-50 transition-colors"
+          <motion.button
+            whileTap={{ scale: 0.97, backgroundColor: "#fee2e2" }}
+            transition={{ type: "spring", stiffness: 700, damping: 40 }}
+            onClick={handleLogout}
+            className="w-full mt-6 py-3 rounded-xl border border-red-200 text-red-600 font-medium flex items-center justify-center gap-2 hover:bg-red-50 transition-colors"
           >
+            <LogOut size={18} />
             Выйти
-          </button>
+          </motion.button>
         </div>
       </motion.div>
     );
@@ -151,6 +169,7 @@ export default function ProfileScreen() {
             <motion.button
               whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
               transition={{ type: "spring", stiffness: 700, damping: 40 }}
+              onClick={handleLogin}
               className="flex-1 py-3 bg-white border border-zinc-200 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-zinc-50 transition-colors"
             >
               <LogIn size={18} />
@@ -159,6 +178,7 @@ export default function ProfileScreen() {
             <motion.button
               whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
               transition={{ type: "spring", stiffness: 700, damping: 40 }}
+              onClick={handleLogin}
               className="flex-1 py-3 bg-zinc-900 text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors"
             >
               <UserPlus size={18} />
