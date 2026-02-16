@@ -144,7 +144,6 @@ export default function WalletScreen({
                     onError={() => onImageError(selectedPartner.id)}
                   />
                 ) : (
-                  // ИСПРАВЛЕНО: bg-gradient-to-br → bg-linear-to-br (без комментариев внутри JSX)
                   <div className={`w-full h-full bg-linear-to-br ${selectedPartner.fallbackColor}`} />
                 )}
               </motion.div>

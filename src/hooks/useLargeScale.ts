@@ -15,25 +15,22 @@ export function useLargeScale() {
         return;
       }
 
-      // Получаем ширину экрана устройства
+      // Определяем масштаб по нескольким параметрам
       const screenWidth = window.screen.width;
       const viewportWidth = window.innerWidth;
-      
-      // iPhone не-Max имеют ширину экрана 375px или 390px
-      const isNonMaxiPhone = screenWidth <= 390;
-      
-      // Проверяем масштаб (отношение экрана к viewport)
       const scale = screenWidth / viewportWidth;
-      const isZoomed = scale > 1.1;
       
       // Проверяем размер шрифта
       const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      const isLargeFont = fontSize > 16;
+      const isZoomed = fontSize > 16 || scale > 1.1;
       
-      // Включаем адаптацию если:
+      // Для iPhone не-Max (ширина экрана <= 390)
+      const isNonMaxiPhone = screenWidth <= 390;
+      
+      // Включаем режим масштаба если:
       // 1. Это iPhone не-Max И
-      // 2. Масштаб увеличен ИЛИ шрифт большой
-      setIsLargeScale(isNonMaxiPhone && (isZoomed || isLargeFont));
+      // 2. Масштаб увеличен
+      setIsLargeScale(isNonMaxiPhone && isZoomed);
     };
 
     checkScale();

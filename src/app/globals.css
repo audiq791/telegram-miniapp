@@ -50,59 +50,65 @@ input[type=number] {
     padding-top: max(0.5rem, env(safe-area-inset-top));
   }
 }
-
-/* ========== АВТОМАТИЧЕСКОЕ УМЕНЬШЕНИЕ ТЕКСТА В 4 КНОПКАХ ========== */
-.ActionCard {
-  /* Фиксированная ширина для точного расчета */
-  width: 100%;
+/* ========== АДАПТАЦИЯ ТОЛЬКО ДЛЯ IPHONE С МАСШТАБОМ ========== */
+.large-scale .ActionCard {
+  /* Уменьшаем отступы в кнопках */
+  padding: 0.5rem !important;
 }
 
-.ActionCard .min-w-0 {
-  /* Текстовый блок занимает все свободное место */
-  flex: 1;
-  min-width: 0;
-}
-
-.ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
-  /* Убираем truncate */
-  white-space: normal !important;
-  overflow: visible !important;
-  text-overflow: clip !important;
-  
-  /* Размер текста подстраивается от 8px до 16px */
-  font-size: clamp(8px, 4vw, 16px) !important;
-  
-  /* Высота строки тоже подстраивается */
+.large-scale .ActionCard .font-semibold {
+  /* Уменьшаем заголовки */
+  font-size: 10px !important;
   line-height: 1.2 !important;
 }
 
-.ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
-  white-space: normal !important;
-  overflow: visible !important;
-  text-overflow: clip !important;
-  
-  /* Подпись от 6px до 13px */
-  font-size: clamp(6px, 3vw, 13px) !important;
+.large-scale .ActionCard .text-zinc-500 {
+  /* Уменьшаем подписи */
+  font-size: 8px !important;
   line-height: 1.2 !important;
 }
 
-/* Если текст все еще не влезает - уменьшаем еще сильнее */
-@media (max-width: 380px) {
-  .ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
-    font-size: clamp(7px, 3.5vw, 14px) !important;
-  }
-  
-  .ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
-    font-size: clamp(5px, 2.5vw, 11px) !important;
-  }
+.large-scale .ActionCard .h-9.w-9,
+.large-scale .ActionCard .sm\:h-10.sm\:w-10,
+.large-scale .ActionCard .md\:h-11.md\:w-11 {
+  /* Уменьшаем контейнер иконки */
+  height: 2rem !important;
+  width: 2rem !important;
 }
 
-@media (max-width: 340px) {
-  .ActionCard .text-\[clamp\(14px\2c 2vw\2c 16px\)\] {
-    font-size: clamp(6px, 3vw, 12px) !important;
-  }
-  
-  .ActionCard .text-\[clamp\(11px\2c 1\.5vw\2c 13px\)\] {
-    font-size: clamp(4px, 2vw, 9px) !important;
-  }
+.large-scale .ActionCard img {
+  /* Уменьшаем саму иконку */
+  width: 1.2rem !important;
+  height: 1.2rem !important;
+}
+
+.large-scale .ActionCard .gap-2,
+.large-scale .ActionCard .sm\:gap-3 {
+  /* Уменьшаем отступ между текстом и иконкой */
+  gap: 0.25rem !important;
+}
+
+/* ========== КНОПКА АКТИВНОСТЬ В РЕЖИМЕ МАСШТАБА ========== */
+.large-scale .PrimaryButton,
+.large-scale button:has(> span:contains("Активность")),
+.large-scale button[class*="bg-zinc-900"]:has(span) {
+  /* Фиксируем размер кнопки Активность */
+  min-width: fit-content !important;
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+  height: 2.2rem !important;
+  font-size: 11px !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Более точный селектор для кнопки Активность */
+.large-scale .flex.items-end.justify-between .PrimaryButton,
+.large-scale .flex.items-end.justify-between button:last-child {
+  /* Кнопка в правой части карточки баланса */
+  flex-shrink: 0 !important;
+  margin-left: auto !important;
+  width: auto !important;
 }
