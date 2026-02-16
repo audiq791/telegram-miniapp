@@ -98,3 +98,172 @@ input[type=number] {
   padding-right: 0.8rem !important;
   font-size: 12px !important;
 }
+
+/* ========== АДАПТАЦИЯ ДЛЯ IPHONE PRO (390px) - ОБЫЧНЫЙ РЕЖИМ ========== */
+@media (max-width: 390px) {
+  /* Основная карточка баланса */
+  .rounded-\[28px\] {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Контейнер баланса и кнопки */
+  .flex.items-end.justify-between.gap-3 {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.6rem !important;
+  }
+
+  /* Блок с балансом */
+  .flex.items-end.justify-between.gap-3 > div:first-child {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 0.2rem !important;
+    flex-wrap: nowrap !important;
+    min-width: fit-content !important;
+  }
+
+  /* Число баланса */
+  .text-3xl.font-semibold {
+    font-size: 1.6rem !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+  }
+
+  /* Буква B */
+  .text-3xl.font-semibold span {
+    font-size: 0.9rem !important;
+    margin-left: 0.1rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* Кнопка Активность */
+  .PrimaryButton,
+  .flex.items-end.justify-between.gap-3 button:last-child {
+    height: 2.4rem !important;
+    padding-left: 0.8rem !important;
+    padding-right: 0.8rem !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    min-width: fit-content !important;
+    margin-left: auto !important;
+  }
+
+  /* 4 кнопки действий */
+  .grid-cols-2 {
+    gap: 0.5rem !important;
+  }
+
+  .ActionCard {
+    padding: 0.7rem !important;
+  }
+
+  .ActionCard .font-semibold {
+    font-size: 13px !important;
+  }
+
+  .ActionCard .text-zinc-500 {
+    font-size: 10px !important;
+  }
+
+  .ActionCard .h-11.w-11 {
+    height: 2.2rem !important;
+    width: 2.2rem !important;
+  }
+
+  .ActionCard img {
+    width: 1.3rem !important;
+    height: 1.3rem !important;
+  }
+}
+
+/* ========== АДАПТАЦИЯ ДЛЯ IPHONE PRO (390px) - РЕЖИМ МАСШТАБА ========== */
+.large-scale .rounded-\[28px\] {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.large-scale .flex.items-end.justify-between.gap-3 {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  padding: 0.5rem !important;
+}
+
+.large-scale .flex.items-end.justify-between.gap-3 > div:first-child {
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 0.15rem !important;
+  flex-wrap: nowrap !important;
+  min-width: fit-content !important;
+}
+
+.large-scale .text-3xl.font-semibold {
+  font-size: 1.4rem !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+.large-scale .text-3xl.font-semibold span {
+  font-size: 0.8rem !important;
+  margin-left: 0.1rem !important;
+  white-space: nowrap !important;
+}
+
+.large-scale .PrimaryButton,
+.large-scale .flex.items-end.justify-between.gap-3 button:last-child {
+  height: 2.2rem !important;
+  padding-left: 0.7rem !important;
+  padding-right: 0.7rem !important;
+  font-size: 12px !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  min-width: fit-content !important;
+  margin-left: auto !important;
+}
+
+.large-scale .grid-cols-2 {
+  gap: 0.4rem !important;
+}
+
+.large-scale .ActionCard {
+  padding: 0.5rem !important;
+}
+
+.large-scale .ActionCard .font-semibold {
+  font-size: 11px !important;
+}
+
+.large-scale .ActionCard .text-zinc-500 {
+  font-size: 8px !important;
+}
+
+.large-scale .ActionCard .h-11.w-11 {
+  height: 2rem !important;
+  width: 2rem !important;
+}
+
+.large-scale .ActionCard img {
+  width: 1.2rem !important;
+  height: 1.2rem !important;
+}
+
+/* Уменьшаем заголовок "Основной партнёр" */
+.large-scale .text-xs.text-zinc-500 {
+  font-size: 0.6rem !important;
+}
+
+/* Уменьшаем название партнёра */
+.large-scale .text-xl.font-semibold {
+  font-size: 1.1rem !important;
+}
+
+/* Уменьшаем логотип партнёра */
+.large-scale .h-12.w-12 {
+  height: 2.2rem !important;
+  width: 2.2rem !important;
+}
