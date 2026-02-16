@@ -7,8 +7,7 @@ import {
   LogOut,
   Settings,
   History,
-  Award,
-  User
+  Award
 } from "lucide-react";
 
 export default function ProfileScreen() {
@@ -28,9 +27,9 @@ export default function ProfileScreen() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-zinc-50 flex items-center justify-center px-4"
+      className="min-h-screen bg-zinc-50"
     >
-      <div className="w-full max-w-md">
+      <div className="max-w-md mx-auto px-4 pt-[200px]">
         {/* Заголовок */}
         <h1 className="text-2xl font-bold text-zinc-900 text-center mb-8">
           Профиль

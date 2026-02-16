@@ -11,8 +11,9 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [index, setIndex] = useState(0);
 
   const handleLoginComplete = () => {
+    console.log("Login complete, calling onDone");
     haptic("success");
-    onDone();
+    onDone(); // Это должно переключить showOnboarding в MainApp
   };
 
   return (
@@ -86,11 +87,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
             >
               Продолжить
             </motion.button>
-          ) : (
-            <div className="text-center text-xs text-zinc-400">
-              Войдите в аккаунт выше
-            </div>
-          )}
+          ) : null}
 
           <div className="text-center text-xs text-zinc-400 mt-3">
             Свайпните влево/вправо для навигации
