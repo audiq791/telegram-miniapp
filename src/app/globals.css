@@ -50,220 +50,129 @@ input[type=number] {
     padding-top: max(0.5rem, env(safe-area-inset-top));
   }
 }
-/* ========== АДАПТАЦИЯ ТОЛЬКО ДЛЯ IPHONE С МАСШТАБОМ ========== */
-.large-scale .ActionCard {
-  /* Только тонкая настройка для масштаба */
-  padding: 0.6rem !important;
-}
 
-.large-scale .ActionCard .font-semibold {
-  font-size: 12px !important;
-}
-
-.large-scale .ActionCard .text-zinc-500 {
-  font-size: 9px !important;
-}
-
-.large-scale .ActionCard .h-11.w-11,
-.large-scale .ActionCard .sm\:h-12.sm\:w-12,
-.large-scale .ActionCard .md\:h-14.md\:w-14 {
-  height: 2.2rem !important;
-  width: 2.2rem !important;
-}
-
-.large-scale .ActionCard img {
-  width: 1.4rem !important;
-  height: 1.4rem !important;
-}
-
-/* ===== БАЛАНС В РЕЖИМЕ МАСШТАБА ===== */
-.large-scale .text-3xl.font-semibold {
-  font-size: 1.5rem !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.15rem !important;
-  flex-wrap: nowrap !important;
-  white-space: nowrap !important;
-}
-
-.large-scale .text-3xl.font-semibold span {
-  font-size: 0.8rem !important;
-}
-
-/* ===== КНОПКА АКТИВНОСТЬ В РЕЖИМЕ МАСШТАБА ===== */
-.large-scale .PrimaryButton,
-.large-scale .flex.items-end.justify-between.gap-3 button:last-child {
-  height: 2.2rem !important;
-  padding-left: 0.8rem !important;
-  padding-right: 0.8rem !important;
-  font-size: 12px !important;
-}
-
-/* ========== АДАПТАЦИЯ ДЛЯ IPHONE PRO (390px) - ОБЫЧНЫЙ РЕЖИМ ========== */
-@media (max-width: 390px) {
-  /* Основная карточка баланса */
-  .rounded-\[28px\] {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-
+/* ========== УНИВЕРСАЛЬНАЯ АДАПТАЦИЯ ДЛЯ ВСЕХ iPhone ========== */
+@media (max-width: 430px) {
   /* Контейнер баланса и кнопки */
   .flex.items-end.justify-between.gap-3 {
     display: flex !important;
     flex-wrap: nowrap !important;
     align-items: center !important;
-    gap: 0.5rem !important;
-    padding: 0.6rem !important;
+    gap: clamp(0.3rem, 2vw, 0.75rem) !important;
+    padding: clamp(0.5rem, 3vw, 1rem) !important;
   }
 
   /* Блок с балансом */
   .flex.items-end.justify-between.gap-3 > div:first-child {
     display: flex !important;
     align-items: baseline !important;
-    gap: 0.2rem !important;
+    gap: clamp(0.1rem, 1vw, 0.25rem) !important;
     flex-wrap: nowrap !important;
     min-width: fit-content !important;
   }
 
-  /* Число баланса */
+  /* Число баланса - автоматически уменьшается */
   .text-3xl.font-semibold {
-    font-size: 1.6rem !important;
+    font-size: clamp(1.2rem, 8vw, 2rem) !important;
     line-height: 1.2 !important;
     white-space: nowrap !important;
   }
 
   /* Буква B */
   .text-3xl.font-semibold span {
-    font-size: 0.9rem !important;
+    font-size: clamp(0.6rem, 4vw, 1rem) !important;
     margin-left: 0.1rem !important;
     white-space: nowrap !important;
   }
 
-  /* Кнопка Активность */
+  /* Кнопка Активность - всегда красиво вписывается */
   .PrimaryButton,
   .flex.items-end.justify-between.gap-3 button:last-child {
-    height: 2.4rem !important;
-    padding-left: 0.8rem !important;
-    padding-right: 0.8rem !important;
-    font-size: 13px !important;
+    height: clamp(2rem, 8vw, 2.5rem) !important;
+    padding-left: clamp(0.5rem, 3vw, 1rem) !important;
+    padding-right: clamp(0.5rem, 3vw, 1rem) !important;
+    font-size: clamp(11px, 3.5vw, 14px) !important;
     white-space: nowrap !important;
     flex-shrink: 0 !important;
     min-width: fit-content !important;
     margin-left: auto !important;
+    border-radius: clamp(0.6rem, 3vw, 1rem) !important;
   }
 
-  /* 4 кнопки действий */
+  /* Сетка 4 кнопок */
   .grid-cols-2 {
-    gap: 0.5rem !important;
+    gap: clamp(0.3rem, 2vw, 0.75rem) !important;
   }
 
+  /* Карточки действий */
   .ActionCard {
-    padding: 0.7rem !important;
+    padding: clamp(0.4rem, 2.5vw, 0.75rem) !important;
   }
 
+  /* Заголовки в 4 кнопках */
   .ActionCard .font-semibold {
-    font-size: 13px !important;
+    font-size: clamp(10px, 3.5vw, 14px) !important;
+    line-height: 1.2 !important;
   }
 
+  /* Подписи в 4 кнопках */
   .ActionCard .text-zinc-500 {
-    font-size: 10px !important;
+    font-size: clamp(7px, 2.5vw, 11px) !important;
+    line-height: 1.2 !important;
   }
 
+  /* Контейнер иконок */
   .ActionCard .h-11.w-11 {
-    height: 2.2rem !important;
-    width: 2.2rem !important;
+    height: clamp(1.8rem, 8vw, 2.5rem) !important;
+    width: clamp(1.8rem, 8vw, 2.5rem) !important;
   }
 
+  /* Сами иконки */
   .ActionCard img {
-    width: 1.3rem !important;
-    height: 1.3rem !important;
+    width: clamp(1rem, 5vw, 1.5rem) !important;
+    height: clamp(1rem, 5vw, 1.5rem) !important;
+  }
+
+  /* Заголовок "Основной партнёр" */
+  .text-xs.text-zinc-500 {
+    font-size: clamp(0.5rem, 3vw, 0.75rem) !important;
+  }
+
+  /* Название партнёра */
+  .text-xl.font-semibold {
+    font-size: clamp(1rem, 6vw, 1.5rem) !important;
+  }
+
+  /* Логотип партнёра */
+  .h-12.w-12 {
+    height: clamp(2rem, 10vw, 3rem) !important;
+    width: clamp(2rem, 10vw, 3rem) !important;
   }
 }
 
-/* ========== АДАПТАЦИЯ ДЛЯ IPHONE PRO (390px) - РЕЖИМ МАСШТАБА ========== */
-.large-scale .rounded-\[28px\] {
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-}
-
-.large-scale .flex.items-end.justify-between.gap-3 {
-  display: flex !important;
-  flex-wrap: nowrap !important;
-  align-items: center !important;
-  gap: 0.4rem !important;
-  padding: 0.5rem !important;
-}
-
+/* ========== ОТДЕЛЬНАЯ ТОНКАЯ НАСТРОЙКА ДЛЯ РЕЖИМА МАСШТАБА ========== */
 .large-scale .flex.items-end.justify-between.gap-3 > div:first-child {
-  display: flex !important;
-  align-items: baseline !important;
-  gap: 0.15rem !important;
-  flex-wrap: nowrap !important;
-  min-width: fit-content !important;
+  gap: 0.1rem !important;
 }
 
 .large-scale .text-3xl.font-semibold {
-  font-size: 1.4rem !important;
-  line-height: 1.2 !important;
-  white-space: nowrap !important;
+  font-size: clamp(1rem, 7vw, 1.4rem) !important;
 }
 
 .large-scale .text-3xl.font-semibold span {
-  font-size: 0.8rem !important;
-  margin-left: 0.1rem !important;
-  white-space: nowrap !important;
+  font-size: clamp(0.5rem, 3.5vw, 0.7rem) !important;
 }
 
 .large-scale .PrimaryButton,
 .large-scale .flex.items-end.justify-between.gap-3 button:last-child {
-  height: 2.2rem !important;
-  padding-left: 0.7rem !important;
-  padding-right: 0.7rem !important;
-  font-size: 12px !important;
-  white-space: nowrap !important;
-  flex-shrink: 0 !important;
-  min-width: fit-content !important;
-  margin-left: auto !important;
-}
-
-.large-scale .grid-cols-2 {
-  gap: 0.4rem !important;
-}
-
-.large-scale .ActionCard {
-  padding: 0.5rem !important;
+  height: clamp(1.8rem, 7vw, 2.2rem) !important;
+  font-size: clamp(10px, 3vw, 12px) !important;
 }
 
 .large-scale .ActionCard .font-semibold {
-  font-size: 11px !important;
+  font-size: clamp(9px, 3vw, 11px) !important;
 }
 
 .large-scale .ActionCard .text-zinc-500 {
-  font-size: 8px !important;
-}
-
-.large-scale .ActionCard .h-11.w-11 {
-  height: 2rem !important;
-  width: 2rem !important;
-}
-
-.large-scale .ActionCard img {
-  width: 1.2rem !important;
-  height: 1.2rem !important;
-}
-
-/* Уменьшаем заголовок "Основной партнёр" */
-.large-scale .text-xs.text-zinc-500 {
-  font-size: 0.6rem !important;
-}
-
-/* Уменьшаем название партнёра */
-.large-scale .text-xl.font-semibold {
-  font-size: 1.1rem !important;
-}
-
-/* Уменьшаем логотип партнёра */
-.large-scale .h-12.w-12 {
-  height: 2.2rem !important;
-  width: 2.2rem !important;
+  font-size: clamp(6px, 2vw, 8px) !important;
 }
