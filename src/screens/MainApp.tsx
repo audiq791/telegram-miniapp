@@ -454,64 +454,64 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* НАВБАР */}
-      <AnimatePresence>
-        {showNavbar && (
-          <motion.nav
-            initial={{ y: 100 }}
-            animate={{ y: 0 }}
-            exit={{ y: 100 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
-            style={{ 
-              paddingBottom: isIOS ? "calc(env(safe-area-inset-bottom, 0px) + 10px)" : "0px",
-            }}
-          >
-            <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
-              <TabButton
-                active={tab === "wallet"}
-                onClick={() => {
-                  const tg = (window as any).Telegram?.WebApp;
-                  tg?.HapticFeedback.impactOccurred("light");
-                  setTab("wallet");
-                }}
-                label="Кошелёк"
-                icon={<WalletCards size={18} strokeWidth={1.9} />}
-              />
-              <TabButton
-                active={tab === "market"}
-                onClick={() => {
-                  const tg = (window as any).Telegram?.WebApp;
-                  tg?.HapticFeedback.impactOccurred("light");
-                  setTab("market");
-                }}
-                label="Маркет"
-                icon={<ShoppingBag size={18} strokeWidth={1.9} />}
-              />
-              <TabButton
-                active={tab === "services"}
-                onClick={() => {
-                  const tg = (window as any).Telegram?.WebApp;
-                  tg?.HapticFeedback.impactOccurred("light");
-                  setTab("services");
-                }}
-                label="Сервисы"
-                icon={<Layers size={18} strokeWidth={1.9} />}
-              />
-              <TabButton
-                active={tab === "profile"}
-                onClick={() => {
-                  const tg = (window as any).Telegram?.WebApp;
-                  tg?.HapticFeedback.impactOccurred("light");
-                  setTab("profile");
-                }}
-                label="Профиль"
-                icon={<UserRound size={18} strokeWidth={1.9} />}
-              />
-            </div>
-          </motion.nav>
-        )}
-      </AnimatePresence>
+    {/* НАВБАР */}
+<AnimatePresence>
+  {showNavbar && (
+    <motion.nav
+      initial={{ y: 100 }}
+      animate={{ y: 0 }}
+      exit={{ y: 100 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
+      style={{ 
+        paddingBottom: isIOS ? "calc(env(safe-area-inset-bottom, 0px) + 12px)" : "0px",
+      }}
+    >
+      <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
+        <TabButton
+          active={tab === "wallet"}
+          onClick={() => {
+            const tg = (window as any).Telegram?.WebApp;
+            tg?.HapticFeedback.impactOccurred("light");
+            setTab("wallet");
+          }}
+          label="Кошелёк"
+          icon={<WalletCards size={18} strokeWidth={1.9} />}
+        />
+        <TabButton
+          active={tab === "market"}
+          onClick={() => {
+            const tg = (window as any).Telegram?.WebApp;
+            tg?.HapticFeedback.impactOccurred("light");
+            setTab("market");
+          }}
+          label="Маркет"
+          icon={<ShoppingBag size={18} strokeWidth={1.9} />}
+        />
+        <TabButton
+          active={tab === "services"}
+          onClick={() => {
+            const tg = (window as any).Telegram?.WebApp;
+            tg?.HapticFeedback.impactOccurred("light");
+            setTab("services");
+          }}
+          label="Сервисы"
+          icon={<Layers size={18} strokeWidth={1.9} />}
+        />
+        <TabButton
+          active={tab === "profile"}
+          onClick={() => {
+            const tg = (window as any).Telegram?.WebApp;
+            tg?.HapticFeedback.impactOccurred("light");
+            setTab("profile");
+          }}
+          label="Профиль"
+          icon={<UserRound size={18} strokeWidth={1.9} />}
+        />
+      </div>
+    </motion.nav>
+  )}
+</AnimatePresence>
 
       {/* МОДАЛЬНЫЕ ОКНА */}
       <SendModal
