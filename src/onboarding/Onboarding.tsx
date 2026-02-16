@@ -5,10 +5,15 @@ import { motion } from "framer-motion";
 import { haptic } from "../components/haptics";
 import SceneDigitize from "./SceneDigitize";
 import SceneSwap from "./SceneSwap";
-
+import OnboardingProfileScreen from "../screens/OnboardingProfileScreen";
 
 export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [index, setIndex] = useState(0);
+
+  const handleLoginComplete = () => {
+    haptic("success");
+    onDone();
+  };
 
   return (
     <motion.div
@@ -27,15 +32,16 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
             dragConstraints={{ left: 0, right: 0 }}
             onDragEnd={(_, info) => {
               const swipe = info.offset.x;
-              if (swipe < -70 && index < 1) {
+              if (swipe < -70 && index < 2) {
                 haptic("light");
-                setIndex(1);
+                setIndex(index + 1);
               } else if (swipe > 70 && index > 0) {
                 haptic("light");
-                setIndex(0);
+                setIndex(index - 1);
               }
             }}
           >
+            {/* Экран 1 */}
             <div className="w-full shrink-0 px-6 pt-10">
               <SceneDigitize />
               <TextBlock
@@ -44,6 +50,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
               />
             </div>
 
+            {/* Экран 2 */}
             <div className="w-full shrink-0 px-6 pt-10">
               <SceneSwap />
               <TextBlock
@@ -51,34 +58,42 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 subtitle="Меняйте бонусы между брендами — быстро, красиво и прозрачно."
               />
             </div>
+
+            {/* Экран 3 - вход */}
+            <div className="w-full shrink-0 px-6 pt-10">
+              <OnboardingProfileScreen onComplete={handleLoginComplete} />
+            </div>
           </motion.div>
         </div>
 
+        {/* Индикаторы */}
         <div className="px-6 pb-8">
           <div className="flex items-center justify-center gap-2 mb-5">
             <Dot active={index === 0} />
             <Dot active={index === 1} />
+            <Dot active={index === 2} />
           </div>
 
-          <motion.button
-            whileTap={{ scale: 0.985 }}
-            transition={{ type: "spring", stiffness: 700, damping: 40 }}
-            onClick={() => {
-              if (index === 0) {
+          {index < 2 ? (
+            <motion.button
+              whileTap={{ scale: 0.985 }}
+              transition={{ type: "spring", stiffness: 700, damping: 40 }}
+              onClick={() => {
                 haptic("light");
-                setIndex(1);
-              } else {
-                haptic("success");
-                onDone();
-              }
-            }}
-            className="w-full h-12 rounded-2xl bg-zinc-900 text-white font-semibold shadow-sm"
-          >
-            {index === 0 ? "Продолжить" : "Начать"}
-          </motion.button>
+                setIndex(index + 1);
+              }}
+              className="w-full h-12 rounded-2xl bg-zinc-900 text-white font-semibold shadow-sm"
+            >
+              Продолжить
+            </motion.button>
+          ) : (
+            <div className="text-center text-xs text-zinc-400">
+              Войдите в аккаунт выше
+            </div>
+          )}
 
           <div className="text-center text-xs text-zinc-400 mt-3">
-            Свайпните вправо, чтобы увидеть следующий шаг
+            Свайпните влево/вправо для навигации
           </div>
         </div>
       </div>

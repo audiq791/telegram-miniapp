@@ -18,7 +18,6 @@ import PartnerSiteScreen from "./PartnerSiteScreen";
 import ServicesScreen from "./ServicesScreen";
 import ProfileScreen from "./ProfileScreen";
 import Onboarding from "../onboarding/Onboarding";
-import OnboardingProfileScreen from "./OnboardingProfileScreen";
 import SendModal from "../modals/SendModal";
 import ReceiveModal from "../modals/ReceiveModal";
 import SwapModal from "../modals/SwapModal";
@@ -33,47 +32,37 @@ type Route =
 
 export default function MainApp() {
   const [showOnboarding, setShowOnboarding] = useState(true);
-  const [showLogin, setShowLogin] = useState(false);
   const [tab, setTab] = useState<"wallet" | "market" | "services" | "profile">("wallet");
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [selectedPartner, setSelectedPartner] = useState<Partner>(partnersSeed[0]);
   
-  // Стек истории для кнопки назад
   const [history, setHistory] = useState<Route[]>([{ name: "home" }]);
 
-  // Состояния для модальных окон
   const [isSendModalOpen, setIsSendModalOpen] = useState(false);
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
 
-  // Состояние для отслеживания клавиатуры
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-
-  // Состояние для определения платформы
   const [isIOS, setIsIOS] = useState(false);
 
-  // Отслеживаем появление клавиатуры
   useEffect(() => {
     const handleResize = () => {
       const isKeyboard = window.innerHeight < 500;
       setKeyboardVisible(isKeyboard);
     };
-
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Определяем платформу
   useEffect(() => {
     const checkPlatform = () => {
       const userAgent = window.navigator.userAgent;
       const ios = /iPad|iPhone|iPod/.test(userAgent);
       setIsIOS(ios);
     };
-    
     checkPlatform();
   }, []);
 
@@ -83,9 +72,7 @@ export default function MainApp() {
 
   const selectPartner = (partner: Partner) => {
     if (partner.id === selectedPartner.id) return;
-    
     setSelectedPartner(partner);
-    
     const tg = (window as any).Telegram?.WebApp;
     tg?.HapticFeedback.impactOccurred("light");
   };
@@ -202,23 +189,12 @@ export default function MainApp() {
 
   const showNavbar = route.name === "home";
 
-  // Показываем онбординг
   if (showOnboarding) {
-    return <Onboarding onDone={() => {
-      setShowOnboarding(false);
-      setShowLogin(true);
-    }} />;
+    return <Onboarding onDone={() => setShowOnboarding(false)} />;
   }
 
-  // Показываем экран входа
-  if (showLogin) {
-    return <OnboardingProfileScreen onComplete={() => setShowLogin(false)} />;
-  }
-
-  // Основное приложение
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
-      {/* HEADER */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-zinc-200">
         <div className="mx-auto max-w-md px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -266,7 +242,6 @@ export default function MainApp() {
         </div>
       </header>
 
-      {/* CONTENT */}
       <div className="mx-auto max-w-md">
         <AnimatePresence mode="wait">
           {route.name === "home" ? (
@@ -278,7 +253,6 @@ export default function MainApp() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
             >
-              {/* Кошелек */}
               {tab === "wallet" && (
                 <>
                   <motion.div
@@ -370,49 +344,12 @@ export default function MainApp() {
                       </div>
 
                       <div className="mt-4 grid grid-cols-2 gap-3">
-                        <ActionCard 
-                          label="Отправить" 
-                          hint="Перевод" 
-                          kind="send" 
-                          onClick={() => {
-                            const tg = (window as any).Telegram?.WebApp;
-                            tg?.HapticFeedback.impactOccurred("light");
-                            setIsSendModalOpen(true);
-                          }} 
-                        />
-                        <ActionCard 
-                          label="Получить" 
-                          hint="Входящие" 
-                          kind="receive" 
-                          onClick={() => {
-                            const tg = (window as any).Telegram?.WebApp;
-                            tg?.HapticFeedback.impactOccurred("light");
-                            setIsReceiveModalOpen(true);
-                          }} 
-                        />
-                        <ActionCard 
-                          label="Обменять" 
-                          hint="Бонусы" 
-                          kind="swap" 
-                          onClick={() => {
-                            const tg = (window as any).Telegram?.WebApp;
-                            tg?.HapticFeedback.impactOccurred("light");
-                            setIsSwapModalOpen(true);
-                          }} 
-                        />
-                        <ActionCard 
-                          label="Списать" 
-                          hint="Оплата" 
-                          kind="spend" 
-                          onClick={() => {
-                            const tg = (window as any).Telegram?.WebApp;
-                            tg?.HapticFeedback.impactOccurred("light");
-                            goBlank("Списать");
-                          }} 
-                        />
+                        <ActionCard label="Отправить" hint="Перевод" kind="send" onClick={() => setIsSendModalOpen(true)} />
+                        <ActionCard label="Получить" hint="Входящие" kind="receive" onClick={() => setIsReceiveModalOpen(true)} />
+                        <ActionCard label="Обменять" hint="Бонусы" kind="swap" onClick={() => setIsSwapModalOpen(true)} />
+                        <ActionCard label="Списать" hint="Оплата" kind="spend" onClick={() => goBlank("Списать")} />
                       </div>
                     </div>
-
                     <div className="h-2" />
                   </motion.div>
 
@@ -428,7 +365,6 @@ export default function MainApp() {
                 </>
               )}
 
-              {/* Маркет */}
               {tab === "market" && (
                 <div className="rounded-[28px] bg-white border border-zinc-200 p-6 text-center">
                   <p className="text-zinc-500">Маркет</p>
@@ -436,12 +372,10 @@ export default function MainApp() {
                 </div>
               )}
 
-              {/* Сервисы */}
               {tab === "services" && (
                 <ServicesScreen onServiceClick={(title) => goBlank(title)} />
               )}
 
-              {/* Профиль */}
               {tab === "profile" && (
                 <ProfileScreen />
               )}
@@ -466,7 +400,6 @@ export default function MainApp() {
         </AnimatePresence>
       </div>
 
-      {/* НАВБАР */}
       <AnimatePresence>
         {showNavbar && (
           <motion.nav
@@ -480,81 +413,20 @@ export default function MainApp() {
             }}
           >
             <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
-              <TabButton
-                active={tab === "wallet"}
-                onClick={() => {
-                  const tg = (window as any).Telegram?.WebApp;
-                  tg?.HapticFeedback.impactOccurred("light");
-                  setTab("wallet");
-                }}
-                label="Кошелёк"
-                icon={<WalletCards size={18} strokeWidth={1.9} />}
-              />
-              <TabButton
-                active={tab === "market"}
-                onClick={() => {
-                  const tg = (window as any).Telegram?.WebApp;
-                  tg?.HapticFeedback.impactOccurred("light");
-                  setTab("market");
-                }}
-                label="Маркет"
-                icon={<ShoppingBag size={18} strokeWidth={1.9} />}
-              />
-              <TabButton
-                active={tab === "services"}
-                onClick={() => {
-                  const tg = (window as any).Telegram?.WebApp;
-                  tg?.HapticFeedback.impactOccurred("light");
-                  setTab("services");
-                }}
-                label="Сервисы"
-                icon={<Layers size={18} strokeWidth={1.9} />}
-              />
-              <TabButton
-                active={tab === "profile"}
-                onClick={() => {
-                  const tg = (window as any).Telegram?.WebApp;
-                  tg?.HapticFeedback.impactOccurred("light");
-                  setTab("profile");
-                }}
-                label="Профиль"
-                icon={<UserRound size={18} strokeWidth={1.9} />}
-              />
+              <TabButton active={tab === "wallet"} onClick={() => setTab("wallet")} label="Кошелёк" icon={<WalletCards size={18} strokeWidth={1.9} />} />
+              <TabButton active={tab === "market"} onClick={() => setTab("market")} label="Маркет" icon={<ShoppingBag size={18} strokeWidth={1.9} />} />
+              <TabButton active={tab === "services"} onClick={() => setTab("services")} label="Сервисы" icon={<Layers size={18} strokeWidth={1.9} />} />
+              <TabButton active={tab === "profile"} onClick={() => setTab("profile")} label="Профиль" icon={<UserRound size={18} strokeWidth={1.9} />} />
             </div>
           </motion.nav>
         )}
       </AnimatePresence>
 
-      {/* МОДАЛЬНЫЕ ОКНА */}
-      <SendModal
-        isOpen={isSendModalOpen}
-        onClose={() => setIsSendModalOpen(false)}
-        onSend={handleSend}
-        currentBalance={selectedPartner.balance}
-      />
-
-      <ReceiveModal
-        isOpen={isReceiveModalOpen}
-        onClose={() => setIsReceiveModalOpen(false)}
-      />
-
-      <SwapModal
-        isOpen={isSwapModalOpen}
-        onClose={() => setIsSwapModalOpen(false)}
-        onSwap={handleSwap}
-        currentBalance={selectedPartner.balance}
-        selectedPartner={selectedPartner}
-      />
-
-      <InfoModal
-        isOpen={isInfoModalOpen}
-        onClose={() => setIsInfoModalOpen(false)}
-      />
-
-      <MoreMenu
-        isOpen={isMoreMenuOpen}
-        onClose={() => setIsMoreMenuOpen(false)}
-      />
+      <SendModal isOpen={isSendModalOpen} onClose={() => setIsSendModalOpen(false)} onSend={handleSend} currentBalance={selectedPartner.balance} />
+      <ReceiveModal isOpen={isReceiveModalOpen} onClose={() => setIsReceiveModalOpen(false)} />
+      <SwapModal isOpen={isSwapModalOpen} onClose={() => setIsSwapModalOpen(false)} onSwap={handleSwap} currentBalance={selectedPartner.balance} selectedPartner={selectedPartner} />
+      <InfoModal isOpen={isInfoModalOpen} onClose={() => setIsInfoModalOpen(false)} />
+      <MoreMenu isOpen={isMoreMenuOpen} onClose={() => setIsMoreMenuOpen(false)} />
     </div>
   );
 }
