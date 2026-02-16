@@ -15,47 +15,107 @@ import {
 export default function ProfileScreen() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState(0);
   
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Форматирование номера при вводе
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Убираем всё кроме цифр
-    let cleaned = e.target.value.replace(/\D/g, '');
-    
-    // Ограничиваем 10 цифрами (без учёта +7)
-    if (cleaned.length > 10) {
-      cleaned = cleaned.slice(0, 10);
-    }
-    
-    setPhoneNumber(cleaned);
-  };
-
   // Форматирование для отображения: +7 (123) 456-78-90
-  const formatPhoneNumber = () => {
-    if (!phoneNumber) return "";
+  const formatPhoneNumber = (raw: string) => {
+    if (!raw) return "";
     
     let formatted = "";
-    for (let i = 0; i < phoneNumber.length; i++) {
+    for (let i = 0; i < raw.length; i++) {
       if (i === 0) {
-        formatted += `(${phoneNumber[i]}`;
+        formatted += `(${raw[i]}`;
       } else if (i === 2) {
-        formatted += `${phoneNumber[i]}) `;
+        formatted += `${raw[i]}) `;
       } else if (i === 5) {
-        formatted += `${phoneNumber[i]}-`;
+        formatted += `${raw[i]}-`;
       } else if (i === 7) {
-        formatted += `${phoneNumber[i]}-`;
+        formatted += `${raw[i]}-`;
       } else {
-        formatted += phoneNumber[i];
+        formatted += raw[i];
       }
     }
     return formatted;
   };
 
+  // Обработчик изменения поля
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target;
+    const cursorPos = input.selectionStart || 0;
+    
+    // Получаем введенное значение
+    let value = e.target.value;
+    
+    // Если пытаются удалить +7 - игнорируем
+    if (value.length < 2) {
+      setPhoneNumber("");
+      return;
+    }
+    
+    // Убираем всё кроме цифр из введенного значения
+    let cleaned = value.replace(/\D/g, '');
+    
+    // Если очищенное значение короче - значит удаляли
+    if (cleaned.length < phoneNumber.length) {
+      // Просто обновляем состояние на очищенное
+      setPhoneNumber(cleaned);
+      return;
+    }
+    
+    // Если добавляли - ограничиваем 10 цифрами
+    if (cleaned.length > 10) {
+      cleaned = cleaned.slice(0, 10);
+    }
+    
+    setPhoneNumber(cleaned);
+    
+    // Восстанавливаем позицию курсора после форматирования
+    setTimeout(() => {
+      if (inputRef.current) {
+        const newPosition = cursorPos;
+        inputRef.current.setSelectionRange(newPosition, newPosition);
+      }
+    }, 0);
+  };
+
+  // Обработчик клавиш для удаления
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace') {
+      const input = e.currentTarget;
+      const cursorPos = input.selectionStart || 0;
+      const rawLength = phoneNumber.length;
+      
+      // Если курсор в начале или после +7 - ничего не делаем
+      if (cursorPos <= 2) {
+        e.preventDefault();
+        return;
+      }
+      
+      // Вычисляем позицию в сырых цифрах
+      let rawPos = 0;
+      if (cursorPos <= 4) rawPos = 0;
+      else if (cursorPos <= 7) rawPos = 1;
+      else if (cursorPos <= 11) rawPos = 2;
+      else if (cursorPos <= 14) rawPos = 3;
+      else if (cursorPos <= 17) rawPos = 4;
+      else rawPos = 5;
+      
+      // Удаляем соответствующую цифру
+      const newRaw = phoneNumber.split('');
+      if (rawPos < newRaw.length) {
+        newRaw.splice(rawPos, 1);
+        setPhoneNumber(newRaw.join(''));
+      }
+      e.preventDefault();
+    }
+  };
+
   // Полный номер для отображения
   const getFullPhoneNumber = () => {
     if (!phoneNumber) return "+7";
-    return `+7 ${formatPhoneNumber()}`;
+    return `+7 ${formatPhoneNumber(phoneNumber)}`;
   };
 
   const handleLogin = () => {
@@ -80,6 +140,7 @@ export default function ProfileScreen() {
         <div className="max-w-md mx-auto px-4 pt-4">
           <div className="bg-white rounded-xl border border-zinc-200 shadow-sm p-4">
             <h1 className="text-xl font-semibold text-zinc-900">Профиль</h1>
+            <p className="text-xs text-zinc-500 mt-1">Войдите в аккаунт</p>
           </div>
         </div>
 
@@ -174,8 +235,9 @@ export default function ProfileScreen() {
             <input
               ref={inputRef}
               type="text"
-              value={formatPhoneNumber()}
+              value={formatPhoneNumber(phoneNumber)}
               onChange={handlePhoneChange}
+              onKeyDown={handleKeyDown}
               placeholder=" (___) ___-__-__"
               className="w-full h-12 pl-12 pr-4 bg-white border border-zinc-200 rounded-xl text-base outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900"
               inputMode="numeric"
