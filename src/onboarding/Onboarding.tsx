@@ -163,7 +163,10 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
         </div>
 
         {!isExiting && index < 2 && (
-          <div className="px-6 pb-8" style={{ marginTop: "-40px" }}>
+          <div 
+            className="absolute left-0 right-0 px-6"
+            style={{ bottom: "160px" }}
+          >
             <div className="flex items-center justify-center gap-2 mb-5">
               <div className={`h-2 rounded-full transition-all ${index === 0 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
               <div className={`h-2 rounded-full transition-all ${index === 1 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
@@ -181,11 +184,9 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
               </motion.button>
             </div>
 
-            {index === 0 && (
-              <div className="text-center text-xs text-zinc-400 mt-3">
-                Свайпните или нажмите "Продолжить"
-              </div>
-            )}
+            <div className="text-center text-xs text-zinc-400 mt-3">
+              Свайпните или нажмите "Продолжить"
+            </div>
           </div>
         )}
       </div>
