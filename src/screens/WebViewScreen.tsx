@@ -36,15 +36,13 @@ export default function WebViewScreen({
         exit={{ opacity: 0, x: -24 }}
         transition={{ type: "spring", stiffness: 260, damping: 30 }}
       >
-        {/* Шапка с кнопками */}
+        {/* Шапка только с кнопкой назад и названием */}
         <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-zinc-200 px-4 py-3">
-          <div className="flex items-center justify-between max-w-md mx-auto">
-            <div className="flex items-center gap-2">
-              <IconButton aria="back" onClick={onBack}>
-                <ArrowLeft size={18} />
-              </IconButton>
-              <div className="font-semibold truncate max-w-37.5">{title}</div>
-            </div>
+          <div className="flex items-center gap-2 max-w-md mx-auto">
+            <IconButton aria="back" onClick={onBack}>
+              <ArrowLeft size={18} />
+            </IconButton>
+            <div className="font-semibold truncate">{title}</div>
           </div>
         </div>
 
@@ -78,7 +76,7 @@ export default function WebViewScreen({
       exit={{ opacity: 0, x: -24 }}
       transition={{ type: "spring", stiffness: 260, damping: 30 }}
     >
-      {/* Шапка с кнопками */}
+      {/* Шапка с кнопкой назад, названием и кнопкой внешнего браузера (без Home) */}
       <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-zinc-200 px-4 py-3">
         <div className="flex items-center justify-between max-w-md mx-auto">
           <div className="flex items-center gap-2">
@@ -88,11 +86,10 @@ export default function WebViewScreen({
             <div className="font-semibold truncate max-w-37.5">{title}</div>
           </div>
           
-          <div className="flex items-center gap-2">
-            <IconButton aria="external" onClick={() => window.open(url, '_blank')}>
-              <ExternalLink size={18} />
-            </IconButton>
-          </div>
+          {/* Только кнопка внешнего браузера */}
+          <IconButton aria="external" onClick={() => window.open(url, '_blank')}>
+            <ExternalLink size={18} />
+          </IconButton>
         </div>
       </div>
 
@@ -103,7 +100,7 @@ export default function WebViewScreen({
         </div>
       )}
 
-      {/* WebView iframe - только для ЦСКА */}
+      {/* WebView iframe */}
       <iframe
         src={url}
         className="flex-1 w-full"
