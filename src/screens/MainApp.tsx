@@ -311,7 +311,7 @@ export default function MainApp() {
                               onError={() => handleImageError(selectedPartner.id)}
                             />
                           ) : (
-                            <div className={`w-full h-full bg-gradient-to-br ${selectedPartner.fallbackColor}`} />
+                            <div className={`w-full h-full bg-linear-to-br ${selectedPartner.fallbackColor}`} />
                           )}
                         </motion.div>
                       </div>
@@ -394,7 +394,6 @@ export default function MainApp() {
               logo={route.logo}
               fallbackColor={route.fallbackColor}
               onBack={goBack}
-              onHome={goHome}
             />
           )}
         </AnimatePresence>
