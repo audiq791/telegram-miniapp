@@ -63,25 +63,16 @@ export default function ProfileScreen() {
       className="bg-zinc-50 min-h-screen flex flex-col"
     >
       <div className="max-w-md mx-auto w-full px-4 py-6 flex-1 flex flex-col">
-        {/* Шапка как в ServicesScreen */}
+        {/* Шапка как в ServicesScreen — Профиль + подпись в одной таблетке */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.3 }}
-          className="bg-white rounded-xl border border-zinc-200 shadow-sm p-4 mb-1"
+          className="bg-white rounded-xl border border-zinc-200 shadow-sm p-4 mb-6"
         >
           <h1 className="text-xl font-semibold text-zinc-900">Профиль</h1>
+          <p className="text-xs text-zinc-500 mt-1">Вы успешно авторизованы в системе</p>
         </motion.div>
-
-        {/* Подпись как в ServicesScreen */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.15, duration: 0.3 }}
-          className="text-xs text-zinc-500 mb-6"
-        >
-          Вы успешно авторизованы в системе
-        </motion.p>
 
         {/* Карточка пользователя */}
         <motion.div
@@ -142,7 +133,7 @@ export default function ProfileScreen() {
           className="h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-6"
         />
 
-        {/* Меню - с анимацией как в ServicesScreen */}
+        {/* Меню */}
         <motion.div 
           className="space-y-2"
           initial={{ opacity: 0 }}
@@ -198,7 +189,7 @@ export default function ProfileScreen() {
           </motion.button>
         </motion.div>
 
-        {/* Кнопка выхода - с той же анимацией */}
+        {/* Кнопка выхода */}
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
