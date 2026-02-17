@@ -18,7 +18,7 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Просто цифры, максимум 10
+    // Только цифры, максимум 10
     const value = e.target.value.replace(/\D/g, '');
     if (value.length <= 10) {
       setPhoneNumber(value);
@@ -35,9 +35,9 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
       } else if (i === 2) {
         formatted += `${phoneNumber[i]}) `;
       } else if (i === 5) {
-        formatted += `${phoneNumber[i]}-`;
+        formatted += `${phoneNumber[i]} `;
       } else if (i === 7) {
-        formatted += `${phoneNumber[i]}-`;
+        formatted += `${phoneNumber[i]} `;
       } else {
         formatted += phoneNumber[i];
       }
@@ -75,7 +75,7 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
               type="text"
               value={getDisplayNumber()}
               onChange={handlePhoneChange}
-              placeholder=""
+              placeholder="(999) 999 99 99"
               className="w-full h-12 pl-12 pr-4 bg-white border border-zinc-200 rounded-xl text-base outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900"
               inputMode="numeric"
             />
