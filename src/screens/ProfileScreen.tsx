@@ -59,16 +59,27 @@ export default function ProfileScreen() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
       className="bg-zinc-50 min-h-screen flex flex-col"
     >
       <div className="max-w-md mx-auto w-full px-4 py-6 flex-1 flex flex-col">
-        {/* Таблетка с заголовком */}
-        <div className="bg-white/80 backdrop-blur rounded-2xl border border-zinc-200 shadow-sm p-3 mb-6 w-fit px-6">
-          <h1 className="text-lg font-semibold text-zinc-900">Профиль</h1>
-        </div>
+        {/* Шапка как в ServicesScreen */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.3 }}
+          className="bg-white rounded-xl border border-zinc-200 shadow-sm p-4 mb-6"
+        >
+          <h1 className="text-xl font-semibold text-zinc-900">Профиль</h1>
+        </motion.div>
 
         {/* Карточка пользователя */}
-        <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 mb-4">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
+          className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 mb-4"
+        >
           <div className="flex items-center gap-4 mb-4">
             <div className="h-16 w-16 rounded-full bg-linear-to-br from-zinc-900 to-zinc-700 flex items-center justify-center shadow-sm">
               <span className="text-2xl font-bold text-white">{userData.initials}</span>
@@ -80,7 +91,12 @@ export default function ProfileScreen() {
           </div>
 
           {/* BON кошелек */}
-          <div className="bg-zinc-50 rounded-xl border border-zinc-200 p-3">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.3 }}
+            className="bg-zinc-50 rounded-xl border border-zinc-200 p-3"
+          >
             <div className="text-xs text-zinc-500 mb-1">BON кошелек</div>
             <div className="flex items-center justify-between gap-2">
               <div className="font-mono text-xs truncate text-zinc-700" title={userData.bonAddress}>
@@ -105,14 +121,27 @@ export default function ProfileScreen() {
                 )}
               </motion.button>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Тонкая линия-разделитель */}
+        <motion.div
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-6"
+        />
 
         {/* Меню */}
-        <div className="space-y-2">
+        <motion.div 
+          className="space-y-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.3 }}
+        >
           <motion.button
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
             className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-all"
           >
             <div className="flex items-center gap-3">
@@ -123,8 +152,8 @@ export default function ProfileScreen() {
           </motion.button>
           
           <motion.button
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
             className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-all"
           >
             <div className="flex items-center gap-3">
@@ -135,8 +164,8 @@ export default function ProfileScreen() {
           </motion.button>
           
           <motion.button
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
             className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-all"
           >
             <div className="flex items-center gap-3">
@@ -147,8 +176,8 @@ export default function ProfileScreen() {
           </motion.button>
           
           <motion.button
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            whileTap={{ scale: 0.97, backgroundColor: "#f4f4f5" }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
             className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-all"
           >
             <div className="flex items-center gap-3">
@@ -157,14 +186,16 @@ export default function ProfileScreen() {
             </div>
             <ChevronRight size={18} className="text-zinc-400" />
           </motion.button>
-        </div>
+        </motion.div>
 
         {/* Кнопка выхода */}
         <motion.button
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 800, damping: 20 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.3 }}
+          whileTap={{ scale: 0.97, backgroundColor: "#fee2e2" }}
           onClick={handleLogout}
-          className="w-full mt-4 py-4 rounded-xl border border-red-200 bg-white text-red-600 font-medium flex items-center justify-center gap-2 hover:bg-red-50 transition-colors shadow-sm"
+          className="w-full mt-6 py-4 rounded-xl border border-red-200 bg-white text-red-600 font-medium flex items-center justify-center gap-2 hover:bg-red-50 transition-colors shadow-sm"
         >
           <LogOut size={18} />
           Выйти
