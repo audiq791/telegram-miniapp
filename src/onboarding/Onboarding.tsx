@@ -5,13 +5,14 @@ import { motion } from "framer-motion";
 import { haptic } from "../components/haptics";
 import SceneDigitize from "./SceneDigitize";
 import SceneSwap from "./SceneSwap";
+import ProfileScreen from "../screens/ProfileScreen"; // <-- целиком экран профиля
 
 export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [index, setIndex] = useState(0);
-  const isDoneRef = useRef(false); // 🛡️ защита от двойного вызова
+  const isDoneRef = useRef(false);
 
   const handleDone = () => {
-    if (isDoneRef.current) return; // уже вызвали — выходим
+    if (isDoneRef.current) return;
     isDoneRef.current = true;
     haptic("success");
     onDone();
@@ -19,7 +20,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-[100] bg-white"
+      className="fixed inset-0 z-100 bg-white"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -34,7 +35,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
             dragConstraints={{ left: 0, right: 0 }}
             onDragEnd={(_, info) => {
               const swipe = info.offset.x;
-              if (swipe < -70 && index < 1) {
+              if (swipe < -70 && index < 2) {
                 haptic("light");
                 setIndex(index + 1);
               } else if (swipe > 70 && index > 0) {
@@ -60,6 +61,11 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 subtitle="Меняйте бонусы между брендами — быстро, красиво и прозрачно."
               />
             </div>
+
+            {/* Экран 3 — ProfileScreen целиком */}
+            <div className="w-full shrink-0">
+              <ProfileScreen />
+            </div>
           </motion.div>
         </div>
 
@@ -67,26 +73,27 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           <div className="flex items-center justify-center gap-2 mb-5">
             <Dot active={index === 0} />
             <Dot active={index === 1} />
+            <Dot active={index === 2} />
           </div>
 
           <motion.button
             whileTap={{ scale: 0.985 }}
             transition={{ type: "spring", stiffness: 700, damping: 40 }}
             onClick={() => {
-              if (index === 0) {
-                haptic("light");
-                setIndex(1);
+              if (index === 2) {
+                handleDone();
               } else {
-                handleDone(); // 🛡️ защищено useRef
+                haptic("light");
+                setIndex(index + 1);
               }
             }}
             className="w-full h-12 rounded-2xl bg-zinc-900 text-white font-semibold shadow-sm"
           >
-            {index === 0 ? "Продолжить" : "Начать"}
+            {index === 2 ? "Начать" : "Продолжить"}
           </motion.button>
 
           <div className="text-center text-xs text-zinc-400 mt-3">
-            Свайпните вправо, чтобы увидеть следующий шаг
+            Свайпните, чтобы увидеть следующий шаг
           </div>
         </div>
       </div>
