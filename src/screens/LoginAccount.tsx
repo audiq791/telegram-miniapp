@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Headphones,
   Building2,
@@ -89,10 +89,11 @@ function FloatingBonuses() {
 
 export default function LoginAccount({ onLogin }: LoginAccountProps) {
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Только цифры, максимум 10
     const value = e.target.value.replace(/\D/g, '');
     if (value.length <= 10) {
       setPhoneNumber(value);
@@ -101,6 +102,28 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
 
   const handleLogin = () => {
     onLogin?.();
+  };
+
+  const handleCompanyClick = () => {
+    window.open('https://oemservice.tech/', '_blank');
+  };
+
+  const handleSupportClick = async () => {
+    const email = 'info@oe-media.ru';
+    
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopied(true);
+      setShowToast(true);
+      
+      setTimeout(() => {
+        setShowToast(false);
+        setCopied(false);
+      }, 2000);
+      
+    } catch (err) {
+      alert(`Наш email: ${email}`);
+    }
   };
 
   return (
@@ -169,18 +192,22 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
         </motion.button>
 
         <div className="space-y-2 mt-8">
+          {/* Кнопка Поддержка - копирует email как в MoreMenu */}
           <motion.button
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            onClick={handleSupportClick}
             className="w-full py-3 bg-white border border-zinc-200 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-zinc-50 transition-colors"
           >
             <Headphones size={16} className="text-zinc-600" />
-            Поддержка
+            Техническая Поддержка
           </motion.button>
           
+          {/* Кнопка О компании - ведёт на сайт как в MoreMenu */}
           <motion.button
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            onClick={handleCompanyClick}
             className="w-full py-3 bg-white border border-zinc-200 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-zinc-50 transition-colors"
           >
             <Building2 size={16} className="text-zinc-600" />
@@ -188,6 +215,25 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
           </motion.button>
         </div>
       </div>
+
+      {/* Toast уведомление о копировании email */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-32 left-1/2 transform -translate-x-1/2 z-200 bg-green-500/90 backdrop-blur-sm text-white px-8 py-5 rounded-2xl shadow-2xl flex items-center gap-4 w-[90%] max-w-md border border-green-400/50"
+          >
+            <svg className="w-6 h-6 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <p className="text-sm font-medium leading-relaxed flex-1">
+              Адрес электронной почты скопирован
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
