@@ -25,26 +25,6 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
     }
   };
 
-  const getDisplayNumber = () => {
-    if (!phoneNumber) return "";
-    
-    let formatted = "";
-    for (let i = 0; i < phoneNumber.length; i++) {
-      if (i === 0) {
-        formatted += `(${phoneNumber[i]}`;
-      } else if (i === 2) {
-        formatted += `${phoneNumber[i]}) `;
-      } else if (i === 5) {
-        formatted += `${phoneNumber[i]} `;
-      } else if (i === 7) {
-        formatted += `${phoneNumber[i]} `;
-      } else {
-        formatted += phoneNumber[i];
-      }
-    }
-    return formatted;
-  };
-
   const handleLogin = () => {
     onLogin?.();
   };
@@ -73,9 +53,9 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
             <input
               ref={inputRef}
               type="text"
-              value={getDisplayNumber()}
+              value={phoneNumber}
               onChange={handlePhoneChange}
-              placeholder="(999) 999 99 99"
+              placeholder=""
               className="w-full h-12 pl-12 pr-4 bg-white border border-zinc-200 rounded-xl text-base outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900"
               inputMode="numeric"
             />
