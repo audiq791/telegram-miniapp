@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowLeft, ExternalLink, Home, AlertCircle } from "lucide-react";
+import { ArrowLeft, ExternalLink, AlertCircle } from "lucide-react";
 import { IconButton } from "../components/ui";
 import { useState } from "react";
 
@@ -14,13 +14,11 @@ const ALLOWED_SITES = [
 export default function WebViewScreen({ 
   url, 
   title, 
-  onBack, 
-  onHome 
+  onBack
 }: { 
   url: string; 
   title: string;
   onBack: () => void;
-  onHome: () => void;
 }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -46,12 +44,6 @@ export default function WebViewScreen({
                 <ArrowLeft size={18} />
               </IconButton>
               <div className="font-semibold truncate max-w-37.5">{title}</div>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <IconButton aria="home" onClick={onHome}>
-                <Home size={18} />
-              </IconButton>
             </div>
           </div>
         </div>
@@ -97,9 +89,6 @@ export default function WebViewScreen({
           </div>
           
           <div className="flex items-center gap-2">
-            <IconButton aria="home" onClick={onHome}>
-              <Home size={18} />
-            </IconButton>
             <IconButton aria="external" onClick={() => window.open(url, '_blank')}>
               <ExternalLink size={18} />
             </IconButton>
