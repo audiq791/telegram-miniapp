@@ -13,6 +13,80 @@ interface LoginAccountProps {
   onLogin?: () => void;
 }
 
+// Анимация летающих бонусов
+function FloatingBonuses() {
+  return (
+    <div className="relative h-48 w-full mb-8">
+      <div className="absolute inset-0 opacity-[0.15] bg-[radial-gradient(#00000012_1px,transparent_1px)] bg-size-[18px_18px]" />
+
+      <motion.div
+        className="absolute left-1/2 top-1/2"
+        style={{ x: "-50%", y: "-50%" }}
+      >
+        {/* Летающие монетки B */}
+        {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+          <motion.div
+            key={i}
+            className="absolute"
+            initial={{ opacity: 0, y: 40, scale: 0.8 }}
+            animate={{
+              opacity: [0, 1, 1, 0],
+              y: [40, 0, -40, -80],
+              x: [0, (i - 3.5) * 20, (i - 3.5) * 25, (i - 3.5) * 15],
+              scale: [0.8, 1, 0.9, 0.7],
+              rotate: [0, 180, 360],
+            }}
+            transition={{
+              duration: 3,
+              delay: i * 0.15,
+              repeat: Infinity,
+              repeatDelay: 1,
+              ease: "easeInOut",
+            }}
+          >
+            <div className="h-12 w-12 rounded-2xl bg-white border-2 border-zinc-200 shadow-lg flex items-center justify-center">
+              <span className="text-xl font-bold text-zinc-900">B</span>
+            </div>
+          </motion.div>
+        ))}
+
+        {/* Центральный элемент */}
+        <motion.div
+          animate={{ 
+            scale: [1, 1.1, 1],
+            rotate: [0, 360],
+          }}
+          transition={{ 
+            duration: 8,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="h-24 w-24 rounded-3xl bg-linear-to-br from-zinc-800 to-zinc-900 shadow-2xl flex items-center justify-center"
+        >
+          <span className="text-4xl font-bold text-white">B</span>
+        </motion.div>
+      </motion.div>
+
+      {/* Пульсирующее свечение */}
+      <motion.div
+        className="absolute left-1/2 top-1/2 h-32 w-32 rounded-full"
+        style={{ x: "-50%", y: "-50%" }}
+        animate={{ 
+          opacity: [0.1, 0.3, 0.1],
+          scale: [0.8, 1.2, 0.8],
+        }}
+        transition={{ 
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      >
+        <div className="h-full w-full rounded-full bg-[radial-gradient(circle_at_center,#00000020,transparent_70%)]" />
+      </motion.div>
+    </div>
+  );
+}
+
 export default function LoginAccount({ onLogin }: LoginAccountProps) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -42,9 +116,14 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-4" style={{ marginTop: "180px" }}>
-        <p className="text-xs text-zinc-500 mb-1">Войдите или зарегистрируйтесь</p>
-        <p className="text-xs text-zinc-400 mb-2">Введите номер телефона</p>
+      {/* Анимация */}
+      <div className="max-w-md mx-auto px-4 mt-8">
+        <FloatingBonuses />
+      </div>
+
+      <div className="max-w-md mx-auto px-4" style={{ marginTop: "280px" }}>
+        <p className="text-4xl font-bold text-zinc-900 mb-2">Войдите или зарегистрируйтесь</p>
+        <p className="text-xs text-zinc-400 mb-4">Введите номер телефона</p>
 
         <div className="mb-4">
           <div className="relative">
