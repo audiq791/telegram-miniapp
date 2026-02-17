@@ -281,8 +281,6 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       haptic("light");
       setIndex(index - 1);
     }
-    // на первом экране свайп вправо ничего не делает (только резинка)
-    // на последнем экране свайп влево ничего не делает (только резинка)
   };
 
   const variants = {
