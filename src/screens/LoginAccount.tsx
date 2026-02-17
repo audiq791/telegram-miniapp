@@ -121,7 +121,7 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
         <FloatingBonuses />
       </div>
 
-      <div className="max-w-md mx-auto px-4" style={{ marginTop: "280px" }}>
+      <div className="max-w-md mx-auto px-4" style={{ marginTop: "230px" }}>
         <p className="text-4xl font-bold text-zinc-900 mb-2">Войдите или зарегистрируйтесь</p>
         <p className="text-xs text-zinc-400 mb-4">Введите номер телефона</p>
 
