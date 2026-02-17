@@ -18,6 +18,7 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Просто цифры, максимум 10
     const value = e.target.value.replace(/\D/g, '');
     if (value.length <= 10) {
       setPhoneNumber(value);
