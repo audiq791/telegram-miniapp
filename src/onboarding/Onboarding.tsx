@@ -18,10 +18,25 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     isDoneRef.current = true;
     haptic("success");
     setIsExiting(true);
-    // Даем время на анимацию
     setTimeout(() => {
       onDone();
     }, 300);
+  };
+
+  const next = () => {
+    if (index < 2) {
+      setDirection(1);
+      haptic("light");
+      setIndex(index + 1);
+    }
+  };
+
+  const prev = () => {
+    if (index > 0) {
+      setDirection(-1);
+      haptic("light");
+      setIndex(index - 1);
+    }
   };
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
@@ -142,7 +157,6 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 </motion.div>
               )}
 
-              {/* Анимация ухода вниз при входе */}
               {isExiting && (
                 <motion.div
                   key="exit"
@@ -164,9 +178,33 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
               <div className={`h-2 rounded-full transition-all ${index === 2 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
             </div>
 
-            {index < 2 && (
+            <div className="flex gap-3">
+              {index > 0 && (
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                  onClick={prev}
+                  className="flex-1 h-12 rounded-2xl border border-zinc-200 bg-white text-zinc-900 font-semibold shadow-sm"
+                >
+                  Назад
+                </motion.button>
+              )}
+
+              {index < 2 ? (
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 700, damping: 40 }}
+                  onClick={next}
+                  className="flex-1 h-12 rounded-2xl bg-zinc-900 text-white font-semibold shadow-sm"
+                >
+                  Продолжить
+                </motion.button>
+              ) : null}
+            </div>
+
+            {index === 0 && (
               <div className="text-center text-xs text-zinc-400 mt-3">
-                Свайпните влево, чтобы продолжить
+                Свайпните или нажмите "Продолжить"
               </div>
             )}
           </div>
