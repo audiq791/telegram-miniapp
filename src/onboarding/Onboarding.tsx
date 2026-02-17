@@ -31,14 +31,6 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     }
   };
 
-  const prev = () => {
-    if (index > 0) {
-      setDirection(-1);
-      haptic("light");
-      setIndex(index - 1);
-    }
-  };
-
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (isExiting) return;
 
@@ -170,7 +162,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           </div>
         </div>
 
-        {!isExiting && (
+        {!isExiting && index < 2 && (
           <div className="px-6 pb-8">
             <div className="flex items-center justify-center gap-2 mb-5">
               <div className={`h-2 rounded-full transition-all ${index === 0 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
@@ -178,28 +170,15 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
               <div className={`h-2 rounded-full transition-all ${index === 2 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
             </div>
 
-            <div className="flex gap-3">
-              {index > 0 && (
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 700, damping: 40 }}
-                  onClick={prev}
-                  className="flex-1 h-12 rounded-2xl border border-zinc-200 bg-white text-zinc-900 font-semibold shadow-sm"
-                >
-                  Назад
-                </motion.button>
-              )}
-
-              {index < 2 ? (
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 700, damping: 40 }}
-                  onClick={next}
-                  className="flex-1 h-12 rounded-2xl bg-zinc-900 text-white font-semibold shadow-sm"
-                >
-                  Продолжить
-                </motion.button>
-              ) : null}
+            <div className="flex justify-center">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 800, damping: 20 }}
+                onClick={next}
+                className="w-40 h-12 rounded-2xl bg-zinc-900 text-white font-semibold shadow-sm"
+              >
+                Продолжить
+              </motion.button>
             </div>
 
             {index === 0 && (
