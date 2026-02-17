@@ -55,7 +55,7 @@ export default function PartnerSiteScreen({
         dragPropagation={false}
         dragMomentum={false}
       >
-        {/* Шапка только с кнопкой назад */}
+        {/* Шапка: только назад и внешний браузер */}
         <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-zinc-200 px-4 py-3">
           <div className="flex items-center justify-between max-w-md mx-auto">
             <div className="flex items-center gap-2">
@@ -104,7 +104,7 @@ export default function PartnerSiteScreen({
       dragPropagation={false}
       dragMomentum={false}
     >
-      {/* Шапка только с кнопкой назад */}
+      {/* Шапка: только назад */}
       <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-zinc-200 px-4 py-3">
         <div className="flex items-center gap-2 max-w-md mx-auto">
           <IconButton aria="back" onClick={onBack}>
