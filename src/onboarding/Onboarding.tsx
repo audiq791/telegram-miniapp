@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { motion, PanInfo } from "framer-motion";
+import { motion } from "framer-motion";
 import { haptic } from "../components/haptics";
 import SceneDigitize from "./SceneDigitize";
 import SceneSwap from "./SceneSwap";
@@ -16,37 +16,6 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     isDoneRef.current = true;
     haptic("success");
     onDone();
-  };
-
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const swipe = info.offset.x;
-    const velocity = info.velocity.x;
-    const threshold = 70;
-
-    // Экран 1
-    if (index === 0) {
-      if (swipe < -threshold && velocity < -0.3) {
-        haptic("light");
-        setIndex(1);
-      }
-    }
-    // Экран 2
-    else if (index === 1) {
-      if (swipe > threshold && velocity > 0.3) {
-        haptic("light");
-        setIndex(0);
-      } else if (swipe < -threshold && velocity < -0.3) {
-        haptic("light");
-        setIndex(2);
-      }
-    }
-    // Экран 3
-    else if (index === 2) {
-      if (swipe > threshold && velocity > 0.3) {
-        haptic("light");
-        setIndex(1);
-      }
-    }
   };
 
   return (
@@ -66,7 +35,16 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.2}
-            onDragEnd={handleDragEnd}
+            onDragEnd={(_, info) => {
+              const swipe = info.offset.x;
+              if (swipe < -50 && index < 2) {
+                haptic("light");
+                setIndex(index + 1);
+              } else if (swipe > 50 && index > 0) {
+                haptic("light");
+                setIndex(index - 1);
+              }
+            }}
           >
             {/* Экран 1 */}
             <div className="w-full shrink-0 px-6 pt-10">
