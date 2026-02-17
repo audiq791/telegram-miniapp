@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, PanInfo } from "framer-motion";
-import { ArrowLeft, ExternalLink, Home } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import { IconButton } from "../components/ui";
 import { useState } from "react";
 
@@ -17,14 +17,12 @@ export default function PartnerSiteScreen({
   logo,
   fallbackColor,
   onBack, 
-  onHome 
 }: { 
   url: string; 
   title: string;
   logo: string;
   fallbackColor: string;
   onBack: () => void;
-  onHome: () => void;
 }) {
   const [imageError, setImageError] = useState(false);
   const [iframeLoading, setIframeLoading] = useState(true);
@@ -45,7 +43,7 @@ export default function PartnerSiteScreen({
   if (canUseIframe) {
     return (
       <motion.div
-        className="min-h-[100dvh] bg-white flex flex-col"
+        className="min-h-dvh bg-white flex flex-col"
         initial={{ opacity: 0, x: 24 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -24 }}
@@ -57,24 +55,19 @@ export default function PartnerSiteScreen({
         dragPropagation={false}
         dragMomentum={false}
       >
-        {/* Шапка с кнопками */}
+        {/* Шапка только с кнопкой назад */}
         <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-zinc-200 px-4 py-3">
           <div className="flex items-center justify-between max-w-md mx-auto">
             <div className="flex items-center gap-2">
               <IconButton aria="back" onClick={onBack}>
                 <ArrowLeft size={18} />
               </IconButton>
-              <div className="font-semibold truncate max-w-[150px]">{title}</div>
+              <div className="font-semibold truncate max-w-37.5">{title}</div>
             </div>
             
-            <div className="flex items-center gap-2">
-              <IconButton aria="home" onClick={onHome}>
-                <Home size={18} />
-              </IconButton>
-              <IconButton aria="external" onClick={() => window.open(url, '_blank')}>
-                <ExternalLink size={18} />
-              </IconButton>
-            </div>
+            <IconButton aria="external" onClick={() => window.open(url, '_blank')}>
+              <ExternalLink size={18} />
+            </IconButton>
           </div>
         </div>
 
@@ -99,7 +92,7 @@ export default function PartnerSiteScreen({
   // Для остальных партнеров показываем красивый экран с лого и кнопкой
   return (
     <motion.div
-      className="min-h-[100dvh] bg-zinc-50 flex flex-col"
+      className="min-h-dvh bg-zinc-50 flex flex-col"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -111,19 +104,13 @@ export default function PartnerSiteScreen({
       dragPropagation={false}
       dragMomentum={false}
     >
-      {/* Шапка с кнопками */}
+      {/* Шапка только с кнопкой назад */}
       <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-zinc-200 px-4 py-3">
-        <div className="flex items-center justify-between max-w-md mx-auto">
-          <div className="flex items-center gap-2">
-            <IconButton aria="back" onClick={onBack}>
-              <ArrowLeft size={18} />
-            </IconButton>
-            <div className="font-semibold truncate max-w-[150px]">{title}</div>
-          </div>
-          
-          <IconButton aria="home" onClick={onHome}>
-            <Home size={18} />
+        <div className="flex items-center gap-2 max-w-md mx-auto">
+          <IconButton aria="back" onClick={onBack}>
+            <ArrowLeft size={18} />
           </IconButton>
+          <div className="font-semibold truncate">{title}</div>
         </div>
       </div>
 
@@ -145,7 +132,7 @@ export default function PartnerSiteScreen({
                 onError={() => setImageError(true)}
               />
             ) : (
-              <div className={`w-full h-full bg-gradient-to-br ${fallbackColor}`} />
+              <div className={`w-full h-full bg-linear-to-br ${fallbackColor}`} />
             )}
           </div>
         </motion.div>
