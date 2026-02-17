@@ -68,10 +68,20 @@ export default function ProfileScreen() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.3 }}
-          className="bg-white rounded-xl border border-zinc-200 shadow-sm p-4 mb-6"
+          className="bg-white rounded-xl border border-zinc-200 shadow-sm p-4 mb-1"
         >
           <h1 className="text-xl font-semibold text-zinc-900">Профиль</h1>
         </motion.div>
+
+        {/* Подпись как в ServicesScreen */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15, duration: 0.3 }}
+          className="text-xs text-zinc-500 mb-6"
+        >
+          Вы успешно авторизованы в системе
+        </motion.p>
 
         {/* Карточка пользователя */}
         <motion.div
