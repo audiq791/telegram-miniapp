@@ -178,7 +178,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 800, damping: 20 }}
                 onClick={next}
-                className="w-40 h-12 rounded-2xl bg-zinc-900 text-white font-semibold shadow-sm"
+                className="w-56 h-14 rounded-2xl bg-zinc-900 text-white font-semibold text-lg shadow-sm"
               >
                 Продолжить
               </motion.button>
