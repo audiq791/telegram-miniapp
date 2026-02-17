@@ -10,9 +10,8 @@ function Scene1() {
   return (
     <div className="w-full h-full px-6 pt-10 overflow-y-auto">
       <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
-        {/* Анимация: пульсирующие бонусы и летающие монеты */}
+        {/* Анимация */}
         <div className="relative h-80 w-full bg-linear-to-br from-amber-50 to-orange-100 rounded-2xl flex items-center justify-center mb-4 overflow-hidden">
-          {/* Фоновые частицы */}
           {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
@@ -35,7 +34,6 @@ function Scene1() {
             />
           ))}
 
-          {/* Центральный элемент */}
           <motion.div
             className="relative z-10"
             animate={{
@@ -53,16 +51,10 @@ function Scene1() {
             </div>
           </motion.div>
 
-          {/* Летающие монетки вокруг */}
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <motion.div
               key={i}
               className="absolute h-12 w-12 rounded-2xl bg-white border-2 border-amber-200 shadow-lg flex items-center justify-center"
-              initial={{
-                x: 0,
-                y: 0,
-                rotate: 0,
-              }}
               animate={{
                 x: [0, 100 * Math.cos(i * 60), 0],
                 y: [0, 100 * Math.sin(i * 60), 0],
@@ -94,18 +86,11 @@ function Scene2() {
   return (
     <div className="w-full h-full px-6 pt-10 overflow-y-auto">
       <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
-        {/* Анимация: QR-код и сканирующая линия */}
         <div className="relative h-80 w-full bg-linear-to-br from-emerald-50 to-green-100 rounded-2xl flex items-center justify-center mb-4 overflow-hidden">
-          {/* QR-код */}
           <motion.div
             className="relative"
-            animate={{
-              scale: [1, 1.02, 1],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-            }}
+            animate={{ scale: [1, 1.02, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
           >
             <div className="h-40 w-40 bg-white rounded-2xl shadow-lg p-2">
               <div className="grid grid-cols-7 gap-1">
@@ -120,35 +105,22 @@ function Scene2() {
               </div>
             </div>
 
-            {/* Сканирующая линия */}
             <motion.div
               className="absolute left-0 right-0 h-1 bg-emerald-400"
               animate={{
                 top: ["10%", "90%", "10%"],
                 opacity: [0.5, 1, 0.5],
               }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "linear",
-              }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
             />
           </motion.div>
 
-          {/* Падающие монеты */}
           {[...Array(8)].map((_, i) => (
             <motion.div
               key={i}
               className="absolute h-8 w-8 rounded-full bg-linear-to-br from-amber-400 to-amber-600"
-              initial={{
-                x: Math.random() * 200 + 50,
-                y: -50,
-                rotate: 0,
-              }}
-              animate={{
-                y: 400,
-                rotate: 360,
-              }}
+              initial={{ x: Math.random() * 200 + 50, y: -50 }}
+              animate={{ y: 400, rotate: 360 }}
               transition={{
                 duration: 3 + Math.random() * 2,
                 repeat: Infinity,
@@ -161,7 +133,7 @@ function Scene2() {
         <h2 className="text-2xl font-bold mb-1">Покупки приносят больше</h2>
         <p className="text-sm text-zinc-500 mb-3">Ваши повседневные траты превращаются в ценность.</p>
         <p className="text-base font-medium text-zinc-700">
-          Показывайте QR-код у партнёров и получайте бонусы, которые можно конвертировать и использовать выгодно.
+          Показывайте QR-код у партнёров и получайте бонусы.
         </p>
       </div>
     </div>
@@ -173,9 +145,7 @@ function Scene3() {
   return (
     <div className="w-full h-full px-6 pt-10 overflow-y-auto">
       <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
-        {/* Анимация: график/биржевые свечи */}
         <div className="relative h-80 w-full bg-linear-to-br from-slate-50 to-slate-100 rounded-2xl flex items-center justify-center mb-4 overflow-hidden">
-          {/* Свечной график */}
           <div className="flex items-end gap-2 h-48">
             {[40, 70, 45, 90, 60, 85, 55].map((height, i) => (
               <motion.div
@@ -190,33 +160,24 @@ function Scene3() {
                   repeatType: "reverse",
                 }}
               >
-                {/* Тело свечи */}
                 <div
                   className={`absolute bottom-0 w-full ${
                     height > 50 ? "bg-green-500" : "bg-red-500"
                   } rounded-t-sm`}
                   style={{ height: height * 0.7 }}
                 />
-                {/* Тень свечи */}
                 <div className="absolute w-0.5 bg-black/30 left-1/2 -translate-x-1/2 h-full" />
               </motion.div>
             ))}
           </div>
 
-          {/* Бегущая строка с ценами */}
           <motion.div
             className="absolute bottom-4 left-0 right-0 bg-slate-800/80 text-white py-2"
-            animate={{
-              x: [300, -300],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "linear",
-            }}
+            animate={{ x: [300, -300] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
           >
             <p className="text-sm whitespace-nowrap">
-              BON/VV: +2.4%  •  BON/DODO: -1.2%  •  BON/CSKA: +5.7%  •  BON/WB: +3.1%  •
+              BON/VV: +2.4% • BON/DODO: -1.2% • BON/CSKA: +5.7% • BON/WB: +3.1% •
             </p>
           </motion.div>
         </div>
@@ -224,7 +185,7 @@ function Scene3() {
         <h2 className="text-2xl font-bold mb-1">Добро пожаловать на торги</h2>
         <p className="text-sm text-zinc-500 mb-3">Здесь бонусы работают по законам рынка.</p>
         <p className="text-base font-medium text-zinc-700">
-          Следите за спросом на бонусы партнёров. Выбирайте момент. Обменивайте с выгодой.
+          Следите за спросом на бонусы партнёров.
         </p>
       </div>
     </div>
@@ -236,24 +197,15 @@ function Scene4() {
   return (
     <div className="w-full h-full px-6 pt-10 overflow-y-auto">
       <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
-        {/* Анимация: вращающиеся бонусы и управление */}
         <div className="relative h-80 w-full bg-linear-to-br from-violet-50 to-purple-100 rounded-2xl flex items-center justify-center mb-4 overflow-hidden">
-          {/* Центральный элемент управления */}
           <motion.div
             className="relative z-10"
-            animate={{
-              rotate: 360,
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: "linear",
-            }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
           >
             <div className="h-32 w-32 rounded-full border-4 border-violet-400 border-t-violet-600" />
           </motion.div>
 
-          {/* Бонусы на орбите */}
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <motion.div
               key={i}
@@ -266,17 +218,12 @@ function Scene4() {
                 y: [0, 120 * Math.sin(i * 60), 0],
                 rotate: [0, 360],
               }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                delay: i * 0.3,
-              }}
+              transition={{ duration: 5, repeat: Infinity, delay: i * 0.3 }}
             >
               <span className="text-white font-bold">B</span>
             </motion.div>
           ))}
 
-          {/* Маленькие частицы */}
           {[...Array(12)].map((_, i) => (
             <motion.div
               key={i}
@@ -286,11 +233,7 @@ function Scene4() {
                 y: [0, 150 * Math.sin(i * 30), 0],
                 opacity: [0, 1, 0],
               }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                delay: i * 0.2,
-              }}
+              transition={{ duration: 3, repeat: Infinity, delay: i * 0.2 }}
             />
           ))}
         </div>
@@ -321,33 +264,19 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     }, 300);
   };
 
-  const next = () => {
-    if (index < 4) {
-      setDirection(1);
-      haptic("light");
-      setIndex(index + 1);
-    }
-  };
-
-  const prev = () => {
-    if (index > 0) {
-      setDirection(-1);
-      haptic("light");
-      setIndex(index - 1);
-    }
-  };
-
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (isExiting) return;
 
     const swipe = info.offset.x;
     const velocity = info.velocity.x;
 
+    // свайп влево → следующий экран
     if (swipe < -50 && velocity < -0.2 && index < 4) {
       setDirection(1);
       haptic("light");
       setIndex(index + 1);
     }
+    // свайп вправо → предыдущий экран
     else if (swipe > 50 && velocity > 0.2 && index > 0) {
       setDirection(-1);
       haptic("light");
@@ -358,16 +287,16 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const variants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 300 : -300,
-      opacity: 0
+      opacity: 0,
     }),
     center: {
       x: 0,
-      opacity: 1
+      opacity: 1,
     },
     exit: (direction: number) => ({
       x: direction < 0 ? 300 : -300,
-      opacity: 0
-    })
+      opacity: 0,
+    }),
   };
 
   return (
@@ -491,10 +420,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
         </div>
 
         {!isExiting && index < 4 && (
-          <div 
-            className="absolute left-0 right-0 px-6"
-            style={{ bottom: "140px" }}
-          >
+          <div className="absolute left-0 right-0 px-6" style={{ bottom: "140px" }}>
             <div className="flex items-center justify-center gap-2 mb-5">
               {[0, 1, 2, 3, 4].map((i) => (
                 <div
@@ -510,7 +436,13 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 800, damping: 20 }}
-                onClick={next}
+                onClick={() => {
+                  if (index < 4) {
+                    setDirection(1);
+                    haptic("light");
+                    setIndex(index + 1);
+                  }
+                }}
                 className="w-56 h-14 rounded-2xl bg-zinc-900 text-white font-semibold text-lg shadow-sm"
               >
                 Продолжить
