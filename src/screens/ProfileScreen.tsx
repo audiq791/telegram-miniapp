@@ -54,6 +54,24 @@ export default function ProfileScreen() {
     console.log("Выход");
   };
 
+  // Мгновенная анимация нажатия — 0.02 секунды
+  const tapAnimation = {
+    scale: 0.92,
+    backgroundColor: "#e4e4e7",
+    transition: { duration: 0.02 }
+  };
+
+  const copyTapAnimation = {
+    scale: 0.85,
+    transition: { duration: 0.02 }
+  };
+
+  const logoutTapAnimation = {
+    scale: 0.92,
+    backgroundColor: "#fee2e2",
+    transition: { duration: 0.02 }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -104,8 +122,7 @@ export default function ProfileScreen() {
                 {userData.bonAddress}
               </div>
               <motion.button
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 800, damping: 20 }}
+                whileTap={copyTapAnimation}
                 onClick={handleCopy}
                 className="h-8 px-3 rounded-lg bg-white border border-zinc-200 text-xs font-medium flex items-center gap-1 hover:bg-zinc-50 transition-colors shrink-0"
               >
@@ -141,8 +158,7 @@ export default function ProfileScreen() {
           transition={{ delay: 0.5, duration: 0.3 }}
         >
           <motion.button
-            whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
-            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            whileTap={tapAnimation}
             className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-all"
           >
             <div className="flex items-center gap-3">
@@ -153,8 +169,7 @@ export default function ProfileScreen() {
           </motion.button>
           
           <motion.button
-            whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
-            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            whileTap={tapAnimation}
             className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-all"
           >
             <div className="flex items-center gap-3">
@@ -165,8 +180,7 @@ export default function ProfileScreen() {
           </motion.button>
           
           <motion.button
-            whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
-            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            whileTap={tapAnimation}
             className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-all"
           >
             <div className="flex items-center gap-3">
@@ -177,8 +191,7 @@ export default function ProfileScreen() {
           </motion.button>
           
           <motion.button
-            whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
-            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            whileTap={tapAnimation}
             className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-all"
           >
             <div className="flex items-center gap-3">
@@ -189,12 +202,12 @@ export default function ProfileScreen() {
           </motion.button>
         </motion.div>
 
-        {/* Кнопка выхода - с такой же анимацией как "Войти через Telegram" в LoginAccount */}
+        {/* Кнопка выхода - с такой же мгновенной анимацией */}
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.3 }}
-          whileTap={{ scale: 0.95 }}
+          whileTap={logoutTapAnimation}
           onClick={handleLogout}
           className="w-full mt-6 py-4 rounded-xl border border-red-200 bg-white text-red-600 font-medium flex items-center justify-center gap-2 hover:bg-red-50 transition-colors shadow-sm"
         >
