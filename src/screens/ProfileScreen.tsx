@@ -61,11 +61,9 @@ export default function ProfileScreen() {
       exit={{ opacity: 0 }}
       className="bg-zinc-50 min-h-screen"
     >
-      <div className="max-w-md mx-auto px-4 pt-6 pb-8">
-        {/* Таблетка с заголовком */}
-        <div className="bg-white/80 backdrop-blur rounded-2xl border border-zinc-200 shadow-sm p-3 mb-6">
-          <h1 className="text-lg font-semibold text-zinc-900 text-center">Профиль</h1>
-        </div>
+      <div className="max-w-md mx-auto px-4 pt-8 pb-8">
+        {/* Заголовок слева и крупнее */}
+        <h1 className="text-4xl font-bold text-zinc-900 mb-8">Профиль</h1>
 
         {/* Карточка пользователя */}
         <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 mb-4">
@@ -88,6 +86,7 @@ export default function ProfileScreen() {
               </div>
               <motion.button
                 whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 800, damping: 20 }}
                 onClick={handleCopy}
                 className="h-8 px-3 rounded-lg bg-white border border-zinc-200 text-xs font-medium flex items-center gap-1 hover:bg-zinc-50 transition-colors shrink-0"
               >
@@ -110,21 +109,21 @@ export default function ProfileScreen() {
         {/* Меню */}
         <div className="space-y-2">
           <motion.button
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 700, damping: 40 }}
-            className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 text-left flex items-center justify-between hover:shadow-md transition-all"
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 text-left flex items-center justify-between hover:shadow-md transition-all hover:bg-zinc-50"
           >
             <div className="flex items-center gap-3">
               <CreditCard size={18} className="text-zinc-600" />
-              <span className="font-medium text-zinc-900">Способы Оплаты</span>
+              <span className="font-medium text-zinc-900">Платежная информация</span>
             </div>
             <ChevronRight size={18} className="text-zinc-400" />
           </motion.button>
           
           <motion.button
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 700, damping: 40 }}
-            className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 text-left flex items-center justify-between hover:shadow-md transition-all"
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 text-left flex items-center justify-between hover:shadow-md transition-all hover:bg-zinc-50"
           >
             <div className="flex items-center gap-3">
               <Headphones size={18} className="text-zinc-600" />
@@ -134,9 +133,9 @@ export default function ProfileScreen() {
           </motion.button>
           
           <motion.button
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 700, damping: 40 }}
-            className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 text-left flex items-center justify-between hover:shadow-md transition-all"
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 text-left flex items-center justify-between hover:shadow-md transition-all hover:bg-zinc-50"
           >
             <div className="flex items-center gap-3">
               <Settings size={18} className="text-zinc-600" />
@@ -146,9 +145,9 @@ export default function ProfileScreen() {
           </motion.button>
           
           <motion.button
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 700, damping: 40 }}
-            className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 text-left flex items-center justify-between hover:shadow-md transition-all"
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 text-left flex items-center justify-between hover:shadow-md transition-all hover:bg-zinc-50"
           >
             <div className="flex items-center gap-3">
               <Building2 size={18} className="text-zinc-600" />
@@ -160,8 +159,8 @@ export default function ProfileScreen() {
 
         {/* Кнопка выхода */}
         <motion.button
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: "spring", stiffness: 700, damping: 40 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 800, damping: 20 }}
           onClick={handleLogout}
           className="w-full mt-6 py-4 rounded-xl border border-red-200 bg-white text-red-600 font-medium flex items-center justify-center gap-2 hover:bg-red-50 transition-colors shadow-sm"
         >
