@@ -9,27 +9,32 @@ import LoginAccount from "../screens/LoginAccount";
 
 export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [index, setIndex] = useState(0);
-  const [direction, setDirection] = useState(0); // -1: назад, 1: вперед
+  const [direction, setDirection] = useState(0);
+  const [isExiting, setIsExiting] = useState(false);
   const isDoneRef = useRef(false);
 
   const handleDone = () => {
     if (isDoneRef.current) return;
     isDoneRef.current = true;
     haptic("success");
-    onDone();
+    setIsExiting(true);
+    // Даем время на анимацию
+    setTimeout(() => {
+      onDone();
+    }, 300);
   };
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (isExiting) return;
+
     const swipe = info.offset.x;
     const velocity = info.velocity.x;
 
-    // Свайп влево (следующий экран)
     if (swipe < -50 && velocity < -0.2 && index < 2) {
       setDirection(1);
       haptic("light");
       setIndex(index + 1);
     }
-    // Свайп вправо (предыдущий экран)
     else if (swipe > 50 && velocity > 0.2 && index > 0) {
       setDirection(-1);
       haptic("light");
@@ -37,7 +42,6 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     }
   };
 
-  // Варианты анимации в зависимости от направления
   const variants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 300 : -300,
@@ -65,7 +69,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
         <div className="flex-1 overflow-hidden">
           <div className="relative h-full">
             <AnimatePresence initial={false} custom={direction} mode="wait">
-              {index === 0 && (
+              {!isExiting && index === 0 && (
                 <motion.div
                   key="screen1"
                   custom={direction}
@@ -92,7 +96,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 </motion.div>
               )}
 
-              {index === 1 && (
+              {!isExiting && index === 1 && (
                 <motion.div
                   key="screen2"
                   custom={direction}
@@ -119,7 +123,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 </motion.div>
               )}
 
-              {index === 2 && (
+              {!isExiting && index === 2 && (
                 <motion.div
                   key="screen3"
                   custom={direction}
@@ -137,23 +141,36 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                   <LoginAccount onLogin={handleDone} />
                 </motion.div>
               )}
+
+              {/* Анимация ухода вниз при входе */}
+              {isExiting && (
+                <motion.div
+                  key="exit"
+                  initial={{ y: 0, opacity: 1 }}
+                  animate={{ y: "100%", opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 25 }}
+                  className="absolute inset-0 bg-white"
+                />
+              )}
             </AnimatePresence>
           </div>
         </div>
 
-        <div className="px-6 pb-8">
-          <div className="flex items-center justify-center gap-2 mb-5">
-            <div className={`h-2 rounded-full transition-all ${index === 0 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
-            <div className={`h-2 rounded-full transition-all ${index === 1 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
-            <div className={`h-2 rounded-full transition-all ${index === 2 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
-          </div>
-
-          {index < 2 && (
-            <div className="text-center text-xs text-zinc-400 mt-3">
-              Свайпните влево, чтобы продолжить
+        {!isExiting && (
+          <div className="px-6 pb-8">
+            <div className="flex items-center justify-center gap-2 mb-5">
+              <div className={`h-2 rounded-full transition-all ${index === 0 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
+              <div className={`h-2 rounded-full transition-all ${index === 1 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
+              <div className={`h-2 rounded-full transition-all ${index === 2 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
             </div>
-          )}
-        </div>
+
+            {index < 2 && (
+              <div className="text-center text-xs text-zinc-400 mt-3">
+                Свайпните влево, чтобы продолжить
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </motion.div>
   );
