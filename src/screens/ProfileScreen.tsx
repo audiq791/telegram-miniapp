@@ -189,7 +189,7 @@ export default function ProfileScreen() {
           </motion.button>
         </motion.div>
 
-        {/* Кнопка выхода - теперь с ТОЧНО ТАКОЙ ЖЕ анимацией как остальные кнопки */}
+        {/* Кнопка выхода - с моментальным откликом как у остальных */}
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
