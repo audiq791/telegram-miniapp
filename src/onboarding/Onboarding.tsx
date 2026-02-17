@@ -21,42 +21,31 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const swipe = info.offset.x;
     const velocity = info.velocity.x;
-
-    // Порог свайпа
-    const swipeThreshold = 70;
+    const threshold = 70;
 
     // Экран 1
     if (index === 0) {
-      // Свайп вправо → на экран 2 (только если достаточно быстро и далеко)
-      if (swipe < -swipeThreshold && velocity < -0.3) {
+      if (swipe < -threshold && velocity < -0.3) {
         haptic("light");
         setIndex(1);
       }
-      // Свайп влево — ничего не делаем (только резинка)
     }
-
     // Экран 2
     else if (index === 1) {
-      // Свайп влево → на экран 1
-      if (swipe > swipeThreshold && velocity > 0.3) {
+      if (swipe > threshold && velocity > 0.3) {
         haptic("light");
         setIndex(0);
-      }
-      // Свайп вправо → на экран 3
-      else if (swipe < -swipeThreshold && velocity < -0.3) {
+      } else if (swipe < -threshold && velocity < -0.3) {
         haptic("light");
         setIndex(2);
       }
     }
-
     // Экран 3
     else if (index === 2) {
-      // Свайп влево → на экран 2
-      if (swipe > swipeThreshold && velocity > 0.3) {
+      if (swipe > threshold && velocity > 0.3) {
         haptic("light");
         setIndex(1);
       }
-      // Свайп вправо — ничего не делаем (только резинка)
     }
   };
 
@@ -66,131 +55,64 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+      transition={{ duration: 0.2 }}
     >
       <div className="h-full flex flex-col">
         <div className="flex-1 overflow-hidden">
           <motion.div
             className="h-full flex"
             animate={{ x: `-${index * 100}%` }}
-            transition={{
-              type: "spring",
-              stiffness: 280,
-              damping: 28,
-              mass: 1.2,
-              restDelta: 0.5,
-              restSpeed: 0.5
-            }}
+            transition={{ type: "spring", stiffness: 260, damping: 30 }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.25}
-            dragTransition={{
-              power: 0.2,
-              timeConstant: 200,
-              modifyTarget: target => target // без прилипания
-            }}
+            dragElastic={0.2}
             onDragEnd={handleDragEnd}
           >
             {/* Экран 1 */}
-            <motion.div
-              className="w-full shrink-0 px-6 pt-10"
-              layout
-              transition={{ type: "spring", stiffness: 200, damping: 25 }}
-            >
+            <div className="w-full shrink-0 px-6 pt-10">
               <SceneDigitize />
               <div className="mt-6 max-w-md">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-                  className="text-2xl font-semibold tracking-tight"
-                >
+                <div className="text-2xl font-semibold tracking-tight">
                   Деньги → Бонусы
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-                  className="text-sm text-zinc-500 mt-2 leading-relaxed"
-                >
+                </div>
+                <div className="text-sm text-zinc-500 mt-2 leading-relaxed">
                   Оцифровывайте покупки и превращайте их в бонусы партнёров.
-                </motion.div>
+                </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Экран 2 */}
-            <motion.div
-              className="w-full shrink-0 px-6 pt-10"
-              layout
-              transition={{ type: "spring", stiffness: 200, damping: 25 }}
-            >
+            <div className="w-full shrink-0 px-6 pt-10">
               <SceneSwap />
               <div className="mt-6 max-w-md">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-                  className="text-2xl font-semibold tracking-tight"
-                >
+                <div className="text-2xl font-semibold tracking-tight">
                   Обмен внутри партнёров
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-                  className="text-sm text-zinc-500 mt-2 leading-relaxed"
-                >
+                </div>
+                <div className="text-sm text-zinc-500 mt-2 leading-relaxed">
                   Меняйте бонусы между брендами — быстро, красиво и прозрачно.
-                </motion.div>
+                </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Экран 3 — LoginAccount */}
-            <motion.div
-              className="w-full shrink-0"
-              layout
-              transition={{ type: "spring", stiffness: 200, damping: 25 }}
-            >
+            <div className="w-full shrink-0">
               <LoginAccount onLogin={handleDone} />
-            </motion.div>
+            </div>
           </motion.div>
         </div>
 
-        <motion.div
-          className="px-6 pb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-        >
+        <div className="px-6 pb-8">
           <div className="flex items-center justify-center gap-2 mb-5">
-            <motion.div
-              className={`h-2 rounded-full transition-all duration-300 ease-out ${
-                index === 0 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"
-              }`}
-              animate={{ scale: index === 0 ? 1.1 : 1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            />
-            <motion.div
-              className={`h-2 rounded-full transition-all duration-300 ease-out ${
-                index === 1 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"
-              }`}
-              animate={{ scale: index === 1 ? 1.1 : 1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            />
-            <motion.div
-              className={`h-2 rounded-full transition-all duration-300 ease-out ${
-                index === 2 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"
-              }`}
-              animate={{ scale: index === 2 ? 1.1 : 1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            />
+            <div className={`h-2 rounded-full transition-all ${index === 0 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
+            <div className={`h-2 rounded-full transition-all ${index === 1 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
+            <div className={`h-2 rounded-full transition-all ${index === 2 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
           </div>
 
           {index < 2 && (
             <>
               <motion.button
-                whileTap={{ scale: 0.97 }}
-                transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 700, damping: 40 }}
                 onClick={() => {
                   haptic("light");
                   setIndex(index + 1);
@@ -200,17 +122,12 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 Продолжить
               </motion.button>
 
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="text-center text-xs text-zinc-400 mt-3"
-              >
+              <div className="text-center text-xs text-zinc-400 mt-3">
                 Свайпните, чтобы увидеть следующий шаг
-              </motion.div>
+              </div>
             </>
           )}
-        </motion.div>
+        </div>
       </div>
     </motion.div>
   );
