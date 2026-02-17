@@ -6,7 +6,7 @@ import { haptic } from "../components/haptics";
 import LoginAccount from "../screens/LoginAccount";
 
 // ==================== ЭКРАН 1 ====================
-function Scene1({ onPrev }: { onPrev?: () => void }) {
+function Scene1() {
   return (
     <div className="w-full h-full px-6 pt-10 overflow-y-auto">
       <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
@@ -81,7 +81,7 @@ function Scene1({ onPrev }: { onPrev?: () => void }) {
 }
 
 // ==================== ЭКРАН 2 ====================
-function Scene2({ onPrev }: { onPrev?: () => void }) {
+function Scene2() {
   return (
     <div className="w-full h-full px-6 pt-10 overflow-y-auto">
       <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
@@ -140,7 +140,7 @@ function Scene2({ onPrev }: { onPrev?: () => void }) {
 }
 
 // ==================== ЭКРАН 3 ====================
-function Scene3({ onPrev }: { onPrev?: () => void }) {
+function Scene3() {
   return (
     <div className="w-full h-full px-6 pt-10 overflow-y-auto">
       <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
@@ -192,7 +192,7 @@ function Scene3({ onPrev }: { onPrev?: () => void }) {
 }
 
 // ==================== ЭКРАН 4 ====================
-function Scene4({ onPrev }: { onPrev?: () => void }) {
+function Scene4() {
   return (
     <div className="w-full h-full px-6 pt-10 overflow-y-auto">
       <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
@@ -330,93 +330,26 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.2}
+            dragMomentum={false}
             onDragEnd={handleDragEnd}
           >
             <AnimatePresence initial={false} custom={direction} mode="wait">
-              {!isExiting && index === 0 && (
-                <motion.div
-                  key="screen0"
-                  custom={direction}
-                  variants={variants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ type: "spring", stiffness: 260, damping: 30 }}
-                  className="absolute inset-0 overflow-y-auto"
-                >
-                  <Scene1 />
-                </motion.div>
-              )}
-
-              {!isExiting && index === 1 && (
-                <motion.div
-                  key="screen1"
-                  custom={direction}
-                  variants={variants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ type: "spring", stiffness: 260, damping: 30 }}
-                  className="absolute inset-0 overflow-y-auto"
-                >
-                  <Scene2 />
-                </motion.div>
-              )}
-
-              {!isExiting && index === 2 && (
-                <motion.div
-                  key="screen2"
-                  custom={direction}
-                  variants={variants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ type: "spring", stiffness: 260, damping: 30 }}
-                  className="absolute inset-0 overflow-y-auto"
-                >
-                  <Scene3 />
-                </motion.div>
-              )}
-
-              {!isExiting && index === 3 && (
-                <motion.div
-                  key="screen3"
-                  custom={direction}
-                  variants={variants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ type: "spring", stiffness: 260, damping: 30 }}
-                  className="absolute inset-0 overflow-y-auto"
-                >
-                  <Scene4 />
-                </motion.div>
-              )}
-
-              {!isExiting && index === 4 && (
-                <motion.div
-                  key="screen4"
-                  custom={direction}
-                  variants={variants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ type: "spring", stiffness: 260, damping: 30 }}
-                  className="absolute inset-0 overflow-y-auto"
-                >
-                  <LoginAccount onLogin={handleDone} />
-                </motion.div>
-              )}
-
-              {isExiting && (
-                <motion.div
-                  key="exit"
-                  initial={{ y: 0, opacity: 1 }}
-                  animate={{ y: "100%", opacity: 0 }}
-                  transition={{ type: "spring", stiffness: 200, damping: 25 }}
-                  className="absolute inset-0 bg-white"
-                />
-              )}
+              <motion.div
+                key={index}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ type: "spring", stiffness: 260, damping: 30 }}
+                className="absolute inset-0 overflow-y-auto"
+              >
+                {index === 0 && <Scene1 />}
+                {index === 1 && <Scene2 />}
+                {index === 2 && <Scene3 />}
+                {index === 3 && <Scene4 />}
+                {index === 4 && <LoginAccount onLogin={handleDone} />}
+              </motion.div>
             </AnimatePresence>
           </motion.div>
         </div>
@@ -460,12 +393,6 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 </motion.button>
               )}
             </div>
-
-            {index === 0 && (
-              <div className="text-center text-xs text-zinc-400 mt-3">
-                Свайпните или нажмите "Далее"
-              </div>
-            )}
           </div>
         )}
       </div>
