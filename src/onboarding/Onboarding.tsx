@@ -6,7 +6,7 @@ import { haptic } from "../components/haptics";
 import LoginAccount from "../screens/LoginAccount";
 
 // ==================== ЭКРАН 1 ====================
-function Scene1() {
+function Scene1({ onPrev }: { onPrev?: () => void }) {
   return (
     <div className="w-full h-full px-6 pt-10 overflow-y-auto">
       <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
@@ -81,7 +81,7 @@ function Scene1() {
 }
 
 // ==================== ЭКРАН 2 ====================
-function Scene2() {
+function Scene2({ onPrev }: { onPrev?: () => void }) {
   return (
     <div className="w-full h-full px-6 pt-10 overflow-y-auto">
       <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
@@ -140,7 +140,7 @@ function Scene2() {
 }
 
 // ==================== ЭКРАН 3 ====================
-function Scene3() {
+function Scene3({ onPrev }: { onPrev?: () => void }) {
   return (
     <div className="w-full h-full px-6 pt-10 overflow-y-auto">
       <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
@@ -192,7 +192,7 @@ function Scene3() {
 }
 
 // ==================== ЭКРАН 4 ====================
-function Scene4() {
+function Scene4({ onPrev }: { onPrev?: () => void }) {
   return (
     <div className="w-full h-full px-6 pt-10 overflow-y-auto">
       <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
@@ -263,25 +263,41 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     }, 300);
   };
 
+  const next = () => {
+    if (index < 4) {
+      setDirection(1);
+      haptic("light");
+      setIndex(index + 1);
+    }
+  };
+
+  const prev = () => {
+    if (index > 0) {
+      setDirection(-1);
+      haptic("light");
+      setIndex(index - 1);
+    }
+  };
+
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (isExiting) return;
 
     const swipe = info.offset.x;
     const velocity = info.velocity.x;
 
-    // свайп влево → следующий экран (кроме последнего)
-    if (swipe < -50 && velocity < -0.2 && index < 4) {
-      setDirection(1);
-      haptic("light");
-      setIndex(index + 1);
+    // На экране логина (index === 4) — свайп вправо в любом месте → на экран 4
+    if (index === 4 && swipe > 50 && velocity > 0.2) {
+      prev();
     }
-    // свайп вправо → предыдущий экран (кроме первого)
-    else if (swipe > 50 && velocity > 0.2 && index > 0) {
-      setDirection(-1);
-      haptic("light");
-      setIndex(index - 1);
+    
+    // На остальных экранах свайпы работают как обычно
+    else if (index < 4) {
+      if (swipe < -50 && velocity < -0.2) {
+        next();
+      } else if (swipe > 50 && velocity > 0.2) {
+        prev();
+      }
     }
-    // на границах — просто резинка (ничего не делаем)
   };
 
   const variants = {
@@ -421,26 +437,33 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
               ))}
             </div>
 
-            <div className="flex justify-center">
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 800, damping: 20 }}
-                onClick={() => {
-                  if (index < 4) {
-                    setDirection(1);
-                    haptic("light");
-                    setIndex(index + 1);
-                  }
-                }}
-                className="w-56 h-14 rounded-2xl bg-zinc-900 text-white font-semibold text-lg shadow-sm"
-              >
-                Продолжить
-              </motion.button>
+            <div className="flex gap-3 justify-center">
+              {index > 0 && (
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 800, damping: 20 }}
+                  onClick={prev}
+                  className="w-28 h-14 rounded-2xl border border-zinc-200 bg-white text-zinc-900 font-semibold text-lg shadow-sm"
+                >
+                  Назад
+                </motion.button>
+              )}
+              
+              {index < 4 && (
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 800, damping: 20 }}
+                  onClick={next}
+                  className="w-28 h-14 rounded-2xl bg-zinc-900 text-white font-semibold text-lg shadow-sm"
+                >
+                  Далее
+                </motion.button>
+              )}
             </div>
 
             {index === 0 && (
               <div className="text-center text-xs text-zinc-400 mt-3">
-                Свайпните или нажмите "Продолжить"
+                Свайпните или нажмите "Далее"
               </div>
             )}
           </div>
