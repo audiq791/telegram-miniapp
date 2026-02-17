@@ -43,7 +43,8 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
       </div>
 
       <div className="max-w-md mx-auto px-4" style={{ marginTop: "180px" }}>
-        <p className="text-xs text-zinc-500 mb-2">Введите номер телефона</p>
+        <p className="text-xs text-zinc-500 mb-1">Войдите или зарегистрируйтесь</p>
+        <p className="text-xs text-zinc-400 mb-2">Введите номер телефона</p>
 
         <div className="mb-4">
           <div className="relative">
