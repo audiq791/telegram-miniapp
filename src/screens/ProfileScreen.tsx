@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { 
   ChevronRight,
   LogOut,
@@ -54,7 +55,12 @@ export default function ProfileScreen() {
   };
 
   return (
-    <div className="bg-zinc-50 min-h-screen flex flex-col">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="bg-zinc-50 min-h-screen flex flex-col"
+    >
       <div className="max-w-md mx-auto w-full px-4 py-6 flex-1 flex flex-col">
         {/* Таблетка с заголовком */}
         <div className="bg-white/80 backdrop-blur rounded-2xl border border-zinc-200 shadow-sm p-3 mb-6 w-fit px-6">
@@ -80,7 +86,9 @@ export default function ProfileScreen() {
               <div className="font-mono text-xs truncate text-zinc-700" title={userData.bonAddress}>
                 {userData.bonAddress}
               </div>
-              <button
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 800, damping: 20 }}
                 onClick={handleCopy}
                 className="h-8 px-3 rounded-lg bg-white border border-zinc-200 text-xs font-medium flex items-center gap-1 hover:bg-zinc-50 transition-colors shrink-0"
               >
@@ -95,55 +103,73 @@ export default function ProfileScreen() {
                     <span>Копировать</span>
                   </>
                 )}
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
 
         {/* Меню */}
         <div className="space-y-2">
-          <div className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between">
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-all"
+          >
             <div className="flex items-center gap-3">
               <CreditCard size={18} className="text-zinc-600" />
               <span className="font-medium text-zinc-900">Платежная информация</span>
             </div>
             <ChevronRight size={18} className="text-zinc-400" />
-          </div>
+          </motion.button>
           
-          <div className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between">
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-all"
+          >
             <div className="flex items-center gap-3">
               <Headphones size={18} className="text-zinc-600" />
               <span className="font-medium text-zinc-900">Техническая Поддержка</span>
             </div>
             <ChevronRight size={18} className="text-zinc-400" />
-          </div>
+          </motion.button>
           
-          <div className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between">
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-all"
+          >
             <div className="flex items-center gap-3">
               <Settings size={18} className="text-zinc-600" />
               <span className="font-medium text-zinc-900">Настройки</span>
             </div>
             <ChevronRight size={18} className="text-zinc-400" />
-          </div>
+          </motion.button>
           
-          <div className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between">
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 800, damping: 20 }}
+            className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-all"
+          >
             <div className="flex items-center gap-3">
               <Building2 size={18} className="text-zinc-600" />
               <span className="font-medium text-zinc-900">О Компании</span>
             </div>
             <ChevronRight size={18} className="text-zinc-400" />
-          </div>
+          </motion.button>
         </div>
 
         {/* Кнопка выхода */}
-        <button
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 800, damping: 20 }}
           onClick={handleLogout}
           className="w-full mt-4 py-4 rounded-xl border border-red-200 bg-white text-red-600 font-medium flex items-center justify-center gap-2 hover:bg-red-50 transition-colors shadow-sm"
         >
           <LogOut size={18} />
           Выйти
-        </button>
+        </motion.button>
       </div>
-    </div>
+    </motion.div>
   );
 }
