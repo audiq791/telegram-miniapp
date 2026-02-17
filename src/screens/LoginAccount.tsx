@@ -45,7 +45,6 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
   };
 
   const handleLogin = () => {
-    // Обе кнопки делают одно и то же — открывают приложение
     onLogin?.();
   };
 
@@ -82,7 +81,7 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
           </div>
 
           <motion.button
-            whileTap={{ scale: 0.95, backgroundColor: "#27272a" }}
+            whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 800, damping: 20 }}
             onClick={handleLogin}
             className="w-full mt-4 py-3 bg-zinc-900 text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors"
@@ -99,7 +98,7 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
         </div>
 
         <motion.button
-          whileTap={{ scale: 0.95, backgroundColor: "#3390EC" }}
+          whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 800, damping: 20 }}
           onClick={handleLogin}
           className="w-full py-3 bg-[#54A9EB] text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-[#4098E0] transition-colors"
@@ -110,7 +109,7 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
 
         <div className="space-y-2 mt-8">
           <motion.button
-            whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
+            whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 800, damping: 20 }}
             className="w-full py-3 bg-white border border-zinc-200 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-zinc-50 transition-colors"
           >
@@ -119,7 +118,7 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
           </motion.button>
           
           <motion.button
-            whileTap={{ scale: 0.95, backgroundColor: "#e4e4e7" }}
+            whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 800, damping: 20 }}
             className="w-full py-3 bg-white border border-zinc-200 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-zinc-50 transition-colors"
           >
