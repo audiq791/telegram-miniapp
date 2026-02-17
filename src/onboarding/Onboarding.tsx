@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { haptic } from "../components/haptics";
 import SceneDigitize from "./SceneDigitize";
 import SceneSwap from "./SceneSwap";
-import ProfileScreen from "../screens/ProfileScreen"; // <-- целиком экран профиля
+import ProfileScreen from "../screens/ProfileScreen";
 
 export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [index, setIndex] = useState(0);
@@ -47,33 +47,41 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
             {/* Экран 1 */}
             <div className="w-full shrink-0 px-6 pt-10">
               <SceneDigitize />
-              <TextBlock
-                title="Деньги → Бонусы"
-                subtitle="Оцифровывайте покупки и превращайте их в бонусы партнёров."
-              />
+              <div className="mt-6 max-w-md">
+                <div className="text-2xl font-semibold tracking-tight">
+                  Деньги → Бонусы
+                </div>
+                <div className="text-sm text-zinc-500 mt-2 leading-relaxed">
+                  Оцифровывайте покупки и превращайте их в бонусы партнёров.
+                </div>
+              </div>
             </div>
 
             {/* Экран 2 */}
             <div className="w-full shrink-0 px-6 pt-10">
               <SceneSwap />
-              <TextBlock
-                title="Обмен внутри партнёров"
-                subtitle="Меняйте бонусы между брендами — быстро, красиво и прозрачно."
-              />
+              <div className="mt-6 max-w-md">
+                <div className="text-2xl font-semibold tracking-tight">
+                  Обмен внутри партнёров
+                </div>
+                <div className="text-sm text-zinc-500 mt-2 leading-relaxed">
+                  Меняйте бонусы между брендами — быстро, красиво и прозрачно.
+                </div>
+              </div>
             </div>
 
-            {/* Экран 3 — ProfileScreen целиком */}
+            {/* Экран 3 — ProfileScreen */}
             <div className="w-full shrink-0">
-              <ProfileScreen />
+              <ProfileScreen onLogin={handleDone} />
             </div>
           </motion.div>
         </div>
 
         <div className="px-6 pb-8">
           <div className="flex items-center justify-center gap-2 mb-5">
-            <Dot active={index === 0} />
-            <Dot active={index === 1} />
-            <Dot active={index === 2} />
+            <div className={`h-2 rounded-full transition-all ${index === 0 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
+            <div className={`h-2 rounded-full transition-all ${index === 1 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
+            <div className={`h-2 rounded-full transition-all ${index === 2 ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"}`} />
           </div>
 
           <motion.button
@@ -81,37 +89,27 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
             transition={{ type: "spring", stiffness: 700, damping: 40 }}
             onClick={() => {
               if (index === 2) {
-                handleDone();
+                // На третьем экране кнопка не нужна, вход через ProfileScreen
+                return;
               } else {
                 haptic("light");
                 setIndex(index + 1);
               }
             }}
-            className="w-full h-12 rounded-2xl bg-zinc-900 text-white font-semibold shadow-sm"
+            className={`w-full h-12 rounded-2xl bg-zinc-900 text-white font-semibold shadow-sm ${
+              index === 2 ? "opacity-0 pointer-events-none" : ""
+            }`}
           >
-            {index === 2 ? "Начать" : "Продолжить"}
+            Продолжить
           </motion.button>
 
-          <div className="text-center text-xs text-zinc-400 mt-3">
-            Свайпните, чтобы увидеть следующий шаг
-          </div>
+          {index < 2 && (
+            <div className="text-center text-xs text-zinc-400 mt-3">
+              Свайпните, чтобы увидеть следующий шаг
+            </div>
+          )}
         </div>
       </div>
     </motion.div>
-  );
-}
-
-function Dot({ active }: { active: boolean }) {
-  return (
-    <div className={["h-2 rounded-full transition-all", active ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"].join(" ")} />
-  );
-}
-
-function TextBlock({ title, subtitle }: { title: string; subtitle: string }) {
-  return (
-    <div className="mt-6 max-w-md">
-      <div className="text-2xl font-semibold tracking-tight">{title}</div>
-      <div className="text-sm text-zinc-500 mt-2 leading-relaxed">{subtitle}</div>
-    </div>
   );
 }
