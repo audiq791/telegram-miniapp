@@ -281,6 +281,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       haptic("light");
       setIndex(index - 1);
     }
+    // на границах — просто резинка (ничего не делаем)
   };
 
   const variants = {
