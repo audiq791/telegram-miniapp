@@ -8,13 +8,11 @@ import {
   ChevronDown,
   CandlestickChart,
   Settings2,
-  ArrowUpDown,
-  Sparkles,
   Zap,
   Info
 } from "lucide-react";
 import { IconButton } from "../components/ui";
-import MarketInfo from "../modals/MarketInfo"; // ← ИМПОРТ МОДАЛКИ
+import MarketInfo from "../modals/MarketInfo";
 
 // Типы данных
 type Pair = {
@@ -23,6 +21,8 @@ type Pair = {
   quoteAsset: string;
   baseName: string;
   quoteName: string;
+  logo?: string;
+  fallbackColor: string;
   lastPrice: number;
   priceChange24h: number;
   volume24h: number;
@@ -40,44 +40,76 @@ type OrderType = "limit" | "market";
 type OrderSide = "buy" | "sell";
 type Timeframe = "1h" | "24h" | "7d" | "30d";
 
-// Демо-данные торговых пар
-const PAIRS: Pair[] = [
+// Данные партнёров с ценами от 0.90 до 1.30
+const PARTNER_PAIRS: Pair[] = [
   {
-    id: "BON-USDT",
-    baseAsset: "BON",
-    quoteAsset: "USDT",
-    baseName: "Bonus Token",
-    quoteName: "Tether",
-    lastPrice: 1.2456,
-    priceChange24h: 2.34,
-    volume24h: 1245678,
+    id: "DODO-BRUB",
+    baseAsset: "DODO",
+    quoteAsset: "BRUB",
+    baseName: "Додо Пицца",
+    quoteName: "Bonus Ruble",
+    logo: "/logos/dodo.svg",
+    fallbackColor: "from-red-400 to-red-600",
+    lastPrice: 0.95,
+    priceChange24h: 2.1,
+    volume24h: 456789,
     isFavorite: true,
   },
   {
-    id: "BON-RUB",
-    baseAsset: "BON",
-    quoteAsset: "RUB",
-    baseName: "Bonus Token",
-    quoteName: "Russian Ruble",
-    lastPrice: 98.76,
-    priceChange24h: -1.23,
-    volume24h: 5678901,
+    id: "CSKA-BRUB",
+    baseAsset: "CSKA",
+    quoteAsset: "BRUB",
+    baseName: "ЦСКА",
+    quoteName: "Bonus Ruble",
+    logo: "/logos/cska.svg",
+    fallbackColor: "from-blue-400 to-blue-600",
+    lastPrice: 1.15,
+    priceChange24h: -0.8,
+    volume24h: 234567,
     isFavorite: true,
   },
   {
-    id: "VV-BON",
+    id: "COFIX-BRUB",
+    baseAsset: "COFIX",
+    quoteAsset: "BRUB",
+    baseName: "Cofix",
+    quoteName: "Bonus Ruble",
+    logo: "/logos/cofix.svg",
+    fallbackColor: "from-red-400 to-red-600",
+    lastPrice: 1.08,
+    priceChange24h: 1.5,
+    volume24h: 123456,
+    isFavorite: false,
+  },
+  {
+    id: "VV-BRUB",
     baseAsset: "VV",
-    quoteAsset: "BON",
+    quoteAsset: "BRUB",
     baseName: "ВкусВилл",
-    quoteName: "Bonus Token",
-    lastPrice: 0.5678,
-    priceChange24h: 5.67,
+    quoteName: "Bonus Ruble",
+    logo: "/logos/vkusvill.svg",
+    fallbackColor: "from-emerald-400 to-emerald-600",
+    lastPrice: 1.22,
+    priceChange24h: 3.2,
+    volume24h: 654321,
+    isFavorite: true,
+  },
+  {
+    id: "WB-BRUB",
+    baseAsset: "WB",
+    quoteAsset: "BRUB",
+    baseName: "Wildberries",
+    quoteName: "Bonus Ruble",
+    logo: "/logos/wildberries.svg",
+    fallbackColor: "from-purple-400 to-purple-600",
+    lastPrice: 0.92,
+    priceChange24h: -2.3,
     volume24h: 345678,
     isFavorite: false,
   },
 ];
 
-// Генерация данных для свечного графика с реалистичными значениями
+// Генерация данных для свечного графика
 const generateCandleData = (count: number, basePrice: number) => {
   const data = [];
   let currentPrice = basePrice;
@@ -230,7 +262,7 @@ function CandleChart({ data, height = 168 }: { data: any[]; height?: number }) {
 }
 
 export default function MarketScreen({ onBack }: { onBack: () => void }) {
-  const [selectedPair, setSelectedPair] = useState<Pair>(PAIRS[0]);
+  const [selectedPair, setSelectedPair] = useState<Pair>(PARTNER_PAIRS[0]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showPairSelector, setShowPairSelector] = useState(false);
   const [orderType, setOrderType] = useState<OrderType>("limit");
@@ -238,7 +270,7 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
   const [orderAmount, setOrderAmount] = useState("");
   const [orderPrice, setOrderPrice] = useState(selectedPair.lastPrice.toString());
   const [timeframe, setTimeframe] = useState<Timeframe>("24h");
-  const [isMarketInfoOpen, setIsMarketInfoOpen] = useState(true); // ← СОСТОЯНИЕ ДЛЯ МОДАЛКИ
+  const [isMarketInfoOpen, setIsMarketInfoOpen] = useState(true);
   
   const candleData = useMemo(() => 
     generateCandleData(30, selectedPair.lastPrice), [selectedPair, timeframe]);
@@ -260,9 +292,8 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
     return () => clearInterval(interval);
   }, [selectedPair]);
 
-  const filteredPairs = PAIRS.filter(pair => 
+  const filteredPairs = PARTNER_PAIRS.filter(pair => 
     pair.baseAsset.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    pair.quoteAsset.toLowerCase().includes(searchQuery.toLowerCase()) ||
     pair.baseName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -280,29 +311,21 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
   };
 
   const handleCreateOrder = () => {
-    alert(`${orderSide === "buy" ? "Покупка" : "Продажа"} ${orderAmount} ${selectedPair.baseAsset} по цене ${orderPrice} ${selectedPair.quoteAsset}`);
+    alert(`${orderSide === "buy" ? "Покупка" : "Продажа"} ${orderAmount} ${selectedPair.baseAsset} за ${formatPrice(parseFloat(orderAmount) * parseFloat(orderPrice))} BRUB`);
   };
 
   return (
     <motion.div
       className="min-h-dvh bg-zinc-50"
-      initial={{ opacity: 0, x: 24 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -24 }}
-      transition={{ type: "spring", stiffness: 260, damping: 30 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
     >
       <div className="mx-auto max-w-md px-4 pt-4 pb-8">
-        {/* Шапка с кнопкой информации */}
+        {/* Шапка — только Маркет и кнопка информации */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <IconButton aria="back" onClick={onBack}>
-              <ArrowUpDown size={18} />
-            </IconButton>
-            <div>
-              <div className="text-[13px] text-zinc-500 leading-none">Биржа</div>
-              <div className="text-xl font-semibold">Маркет</div>
-            </div>
-          </div>
+          <h1 className="text-2xl font-bold text-zinc-900">Маркет</h1>
           
           {/* Кнопка информации */}
           <IconButton 
@@ -310,7 +333,7 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
             onClick={() => setIsMarketInfoOpen(true)}
             className="bg-zinc-100 hover:bg-zinc-200"
           >
-            <Info size={18} className="text-zinc-600" />
+            <Info size={20} className="text-zinc-600" />
           </IconButton>
         </div>
 
@@ -322,12 +345,21 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
             className="w-full bg-white rounded-xl border border-zinc-200 shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-all"
           >
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-linear-to-br from-zinc-900 to-zinc-700 flex items-center justify-center">
-                <Sparkles size={20} className="text-white" />
+              {/* Логотип партнёра вместо звезды */}
+              <div className="h-10 w-10 rounded-xl bg-white border border-zinc-200 overflow-hidden flex items-center justify-center">
+                {selectedPair.logo ? (
+                  <img 
+                    src={selectedPair.logo} 
+                    alt={selectedPair.baseName}
+                    className="w-full h-full object-contain p-1.5"
+                  />
+                ) : (
+                  <div className={`w-full h-full bg-linear-to-br ${selectedPair.fallbackColor}`} />
+                )}
               </div>
               <div className="text-left">
                 <div className="font-semibold">{selectedPair.baseAsset}/{selectedPair.quoteAsset}</div>
-                <div className="text-xs text-zinc-500">{selectedPair.baseName} / {selectedPair.quoteName}</div>
+                <div className="text-xs text-zinc-500">{selectedPair.baseName}</div>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -362,7 +394,7 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Поиск пары..."
+                      placeholder="Поиск партнёра..."
                       className="w-full h-10 pl-9 pr-3 bg-zinc-50 rounded-lg text-sm outline-none focus:ring-2 focus:ring-zinc-900/10"
                     />
                   </div>
@@ -379,10 +411,13 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
                     className="w-full px-4 py-3 flex items-center justify-between transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <Star 
-                        size={16} 
-                        className={pair.isFavorite ? "text-amber-400 fill-amber-400" : "text-zinc-300"} 
-                      />
+                      <div className="h-8 w-8 rounded-lg bg-white border border-zinc-200 overflow-hidden">
+                        {pair.logo ? (
+                          <img src={pair.logo} alt="" className="w-full h-full object-contain p-1" />
+                        ) : (
+                          <div className={`w-full h-full bg-linear-to-br ${pair.fallbackColor}`} />
+                        )}
+                      </div>
                       <div>
                         <span className="font-medium">{pair.baseAsset}</span>
                         <span className="text-xs text-zinc-400 ml-1">/{pair.quoteAsset}</span>
@@ -432,7 +467,6 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
 
           {/* Свечной график */}
           <div className="relative h-44 w-full border border-zinc-100 rounded-lg bg-zinc-50/50 overflow-hidden">
-            {/* Сетка */}
             <div className="absolute inset-0">
               <div className="absolute inset-0 flex flex-col justify-between pointer-events-none px-2">
                 {[0, 1, 2, 3].map(i => (
@@ -446,13 +480,11 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
               </div>
             </div>
 
-            {/* Свечи */}
             <div className="absolute inset-0 px-2 py-1">
               <CandleChart data={candleData} height={168} />
             </div>
           </div>
 
-          {/* Информация под графиком */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-zinc-100 text-xs">
             <div className="flex items-center gap-4">
               <div>
@@ -473,7 +505,7 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
               </div>
             </div>
             <div className="text-zinc-500">
-              Vol: {formatVolume(selectedPair.volume24h)} {selectedPair.quoteAsset}
+              Vol: {formatVolume(selectedPair.volume24h)} BRUB
             </div>
           </div>
         </motion.div>
@@ -502,7 +534,7 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
           </div>
 
           <div className="grid grid-cols-3 gap-2 mb-2 text-xs text-zinc-500">
-            <div>Цена ({selectedPair.quoteAsset})</div>
+            <div>Цена (BRUB)</div>
             <div className="text-right">Объём ({selectedPair.baseAsset})</div>
             <div className="text-right">Сумма</div>
           </div>
@@ -549,7 +581,7 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                {formatPrice(selectedPair.lastPrice)}
+                {formatPrice(selectedPair.lastPrice)} BRUB
               </motion.span>
             </div>
           </motion.div>
@@ -650,13 +682,14 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
               exit={{ opacity: 0, height: 0 }}
               className="mb-4"
             >
-              <label className="text-xs text-zinc-500 mb-1 block">Цена ({selectedPair.quoteAsset})</label>
+              <label className="text-xs text-zinc-500 mb-1 block">Цена (BRUB)</label>
               <div className="relative">
                 <input
                   type="text"
                   value={orderPrice}
                   onChange={(e) => setOrderPrice(e.target.value.replace(/[^0-9.]/g, ''))}
                   className="w-full h-11 px-3 bg-zinc-50 border border-zinc-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-zinc-900/10"
+                  inputMode="decimal"
                 />
               </div>
             </motion.div>
@@ -671,6 +704,7 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
                 onChange={(e) => setOrderAmount(e.target.value.replace(/[^0-9.]/g, ''))}
                 placeholder="0.00"
                 className="w-full h-11 px-3 bg-zinc-50 border border-zinc-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-zinc-900/10"
+                inputMode="decimal"
               />
             </div>
           </div>
@@ -685,7 +719,7 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
             >
               {orderAmount && orderPrice
                 ? formatPrice(parseFloat(orderAmount) * parseFloat(orderPrice))
-                : "0.00"} {selectedPair.quoteAsset}
+                : "0.00"} BRUB
             </motion.span>
           </div>
 
