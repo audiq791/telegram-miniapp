@@ -76,7 +76,8 @@ function Scene1() {
             Биржа Бонусов от OEM Tech
           </h1>
           
-          <div className="w-12 h-0.5 bg-zinc-300 my-4" />
+          {/* Линия на всю ширину как в ProfileScreen */}
+          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
           
           <div className="space-y-3">
             <p className="text-sm text-zinc-600 leading-relaxed">
@@ -153,7 +154,8 @@ function Scene2() {
             Покупки приносят больше
           </h2>
           
-          <div className="w-12 h-0.5 bg-zinc-300 my-4" />
+          {/* Линия на всю ширину */}
+          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
           
           <div className="space-y-3">
             <p className="text-sm text-zinc-600 leading-relaxed">
@@ -217,7 +219,8 @@ function Scene3() {
             Добро пожаловать на торги
           </h2>
           
-          <div className="w-12 h-0.5 bg-zinc-300 my-4" />
+          {/* Линия на всю ширину */}
+          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
           
           <div className="space-y-3">
             <p className="text-sm text-zinc-600 leading-relaxed">
@@ -284,7 +287,8 @@ function Scene4() {
             Теперь лояльность работает на вас
           </h2>
           
-          <div className="w-12 h-0.5 bg-zinc-300 my-4" />
+          {/* Линия на всю ширину */}
+          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
           
           <div className="space-y-3">
             <p className="text-sm text-zinc-600 leading-relaxed">
