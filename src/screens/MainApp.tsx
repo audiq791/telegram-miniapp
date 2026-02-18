@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo, memo } from "react";
 import { AnimatePresence, motion, PanInfo } from "framer-motion";
 import {
   WalletCards,
@@ -29,6 +29,42 @@ type Route =
   | { name: "home" }
   | { name: "blank"; title: string; fromTab: "wallet" | "market" | "services" | "profile" }
   | { name: "partner-site"; url: string; title: string; logo: string; fallbackColor: string };
+
+// Отдельный компонент навбара с memo
+const Navbar = memo(function Navbar({ 
+  tab, 
+  onTabChange, 
+  isVisible, 
+  safeAreaPadding 
+}: { 
+  tab: "wallet" | "market" | "services" | "profile";
+  onTabChange: (tab: "wallet" | "market" | "services" | "profile") => void;
+  isVisible: boolean;
+  safeAreaPadding: string;
+}) {
+  return (
+    <motion.nav
+      animate={{
+        y: isVisible ? 0 : 100,
+        opacity: isVisible ? 1 : 0,
+      }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200 will-change-transform"
+      style={{ 
+        paddingBottom: safeAreaPadding,
+        pointerEvents: isVisible ? "auto" : "none",
+        transform: "translateZ(0)",
+      }}
+    >
+      <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
+        <TabButton active={tab === "wallet"} onClick={() => onTabChange("wallet")} label="Кошелёк" icon={<WalletCards size={18} strokeWidth={1.9} />} />
+        <TabButton active={tab === "market"} onClick={() => onTabChange("market")} label="Маркет" icon={<ShoppingBag size={18} strokeWidth={1.9} />} />
+        <TabButton active={tab === "services"} onClick={() => onTabChange("services")} label="Сервисы" icon={<Layers size={18} strokeWidth={1.9} />} />
+        <TabButton active={tab === "profile"} onClick={() => onTabChange("profile")} label="Профиль" icon={<UserRound size={18} strokeWidth={1.9} />} />
+      </div>
+    </motion.nav>
+  );
+});
 
 export default function MainApp() {
   const [tab, setTab] = useState<"wallet" | "market" | "services" | "profile">("wallet");
@@ -440,26 +476,13 @@ export default function MainApp() {
         </AnimatePresence>
       </motion.div>
 
-      {/* НАВБАР — полностью отдельно, без привязки к контенту */}
-      <motion.nav
-        animate={{
-          y: showNavbar ? 0 : 100,
-          opacity: showNavbar ? 1 : 0,
-        }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
-        style={{ 
-          paddingBottom: safeAreaPadding,
-          pointerEvents: showNavbar ? "auto" : "none",
-        }}
-      >
-        <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
-          <TabButton active={tab === "wallet"} onClick={() => setTab("wallet")} label="Кошелёк" icon={<WalletCards size={18} strokeWidth={1.9} />} />
-          <TabButton active={tab === "market"} onClick={() => setTab("market")} label="Маркет" icon={<ShoppingBag size={18} strokeWidth={1.9} />} />
-          <TabButton active={tab === "services"} onClick={() => setTab("services")} label="Сервисы" icon={<Layers size={18} strokeWidth={1.9} />} />
-          <TabButton active={tab === "profile"} onClick={() => setTab("profile")} label="Профиль" icon={<UserRound size={18} strokeWidth={1.9} />} />
-        </div>
-      </motion.nav>
+      {/* НАВБАР — отдельный компонент с memo */}
+      <Navbar 
+        tab={tab}
+        onTabChange={setTab}
+        isVisible={showNavbar}
+        safeAreaPadding={safeAreaPadding}
+      />
 
       {/* МОДАЛЬНЫЕ ОКНА */}
       <SendModal isOpen={isSendModalOpen} onClose={() => setIsSendModalOpen(false)} onSend={handleSend} currentBalance={selectedPartner.balance} />
