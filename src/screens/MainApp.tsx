@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef, useMemo } from "react";
-import { AnimatePresence, motion, PanInfo } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   WalletCards,
   ShoppingBag,
@@ -11,13 +11,13 @@ import {
   Layers,
 } from "lucide-react";
 
-import { ActionCard, IconButton, PrimaryButton } from "../components/ui";
+import { ActionCard, IconButton, PrimaryButton, TabButton } from "../components/ui";
 import PartnersList from "../components/PartnersList";
 import BlackScreen from "./BlackScreen";
 import PartnerSiteScreen from "./PartnerSiteScreen";
 import ServicesScreen from "./ServicesScreen";
 import ProfileScreen from "./ProfileScreen";
-import MarketScreen from "./MarketScreen";
+import MarketScreen from "./MarketScreen"; // ← ДОБАВЛЕН ИМПОРТ
 import SendModal from "../modals/SendModal";
 import ReceiveModal from "../modals/ReceiveModal";
 import SwapModal from "../modals/SwapModal";
@@ -29,69 +29,6 @@ type Route =
   | { name: "home" }
   | { name: "blank"; title: string; fromTab: "wallet" | "market" | "services" | "profile" }
   | { name: "partner-site"; url: string; title: string; logo: string; fallbackColor: string };
-
-// Фиксированный навбар — чистый CSS, без Framer Motion
-function Navbar({ 
-  tab, 
-  onTabChange, 
-  isVisible,
-  safeAreaPadding 
-}: { 
-  tab: "wallet" | "market" | "services" | "profile";
-  onTabChange: (tab: "wallet" | "market" | "services" | "profile") => void;
-  isVisible: boolean;
-  safeAreaPadding: string;
-}) {
-  return (
-    <div
-      className="fixed inset-x-0 bottom-0 z-50 transition-all duration-300 ease-in-out"
-      style={{
-        transform: isVisible ? 'translateY(0)' : 'translateY(100%)',
-        opacity: isVisible ? 1 : 0,
-        pointerEvents: isVisible ? 'auto' : 'none',
-      }}
-    >
-      <div 
-        className="bg-white/90 backdrop-blur border-t border-zinc-200"
-        style={{ paddingBottom: safeAreaPadding }}
-      >
-        <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
-          <TabButton active={tab === "wallet"} onClick={() => onTabChange("wallet")} label="Кошелёк" icon={<WalletCards size={18} strokeWidth={1.9} />} />
-          <TabButton active={tab === "market"} onClick={() => onTabChange("market")} label="Маркет" icon={<ShoppingBag size={18} strokeWidth={1.9} />} />
-          <TabButton active={tab === "services"} onClick={() => onTabChange("services")} label="Сервисы" icon={<Layers size={18} strokeWidth={1.9} />} />
-          <TabButton active={tab === "profile"} onClick={() => onTabChange("profile")} label="Профиль" icon={<UserRound size={18} strokeWidth={1.9} />} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TabButton({ active, onClick, label, icon }: { active: boolean; onClick: () => void; label: string; icon: React.ReactNode }) {
-  return (
-    <button
-      onClick={onClick}
-      className={[
-        "w-full rounded-2xl px-3 py-2 flex flex-col items-center justify-center gap-1 border transition-all duration-200",
-        "min-h-13 sm:min-h-15 md:min-h-17.5",
-        active
-          ? "bg-zinc-900 border-zinc-900 text-white shadow-[0_10px_25px_rgba(0,0,0,0.18)]"
-          : "bg-white border-zinc-200 text-zinc-900 shadow-sm hover:bg-zinc-50",
-      ].join(" ")}
-    >
-      <span className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 inline-flex items-center justify-center">
-        {icon}
-      </span>
-      <span className={[
-        "font-semibold leading-none",
-        "text-[clamp(11px,2.5vw,14px)]",
-        "sm:text-[clamp(12px,2vw,15px)]",
-        "md:text-[clamp(13px,1.5vw,16px)]"
-      ].join(" ")}>
-        {label}
-      </span>
-    </button>
-  );
-}
 
 export default function MainApp() {
   const [tab, setTab] = useState<"wallet" | "market" | "services" | "profile">("wallet");
@@ -109,13 +46,6 @@ export default function MainApp() {
 
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
-
-  const tabs: ("wallet" | "market" | "services" | "profile")[] = ["wallet", "market", "services", "profile"];
-
-  // Мемоизируем safeAreaPadding
-  const safeAreaPadding = useMemo(() => {
-    return isIOS ? "calc(env(safe-area-inset-bottom, 0px) + 14px)" : "0px";
-  }, [isIOS]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -256,25 +186,6 @@ export default function MainApp() {
     tg?.HapticFeedback.impactOccurred("light");
   };
 
-  const handleTabDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (route.name !== "home") return;
-
-    const swipe = info.offset.x;
-    const velocity = info.velocity.x;
-    const currentIndex = tabs.indexOf(tab);
-
-    if (swipe < -50 && velocity < -0.2 && currentIndex < tabs.length - 1) {
-      const tg = (window as any).Telegram?.WebApp;
-      tg?.HapticFeedback.impactOccurred("light");
-      setTab(tabs[currentIndex + 1]);
-    }
-    else if (swipe > 50 && velocity > 0.2 && currentIndex > 0) {
-      const tg = (window as any).Telegram?.WebApp;
-      tg?.HapticFeedback.impactOccurred("light");
-      setTab(tabs[currentIndex - 1]);
-    }
-  };
-
   const showNavbar = route.name === "home";
 
   return (
@@ -327,174 +238,187 @@ export default function MainApp() {
         </div>
       </header>
 
-      {/* Контейнер для свайпа — только контент, без навбара */}
+      {/* CONTENT */}
       <div className="mx-auto max-w-md">
-        <motion.div
-          drag={route.name === "home" ? "x" : false}
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.2}
-          dragMomentum={false}
-          onDragEnd={handleTabDragEnd}
-          className="relative"
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={route.name === "home" ? tab : route.name}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ type: "spring", stiffness: 260, damping: 30 }}
-              className="px-4 pt-4"
+        <AnimatePresence mode="wait">
+          {route.name === "home" ? (
+            <motion.main
+              key={tab}
+              className="px-4 pt-4 pb-28"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
             >
-              {route.name === "home" ? (
+              {/* Кошелек */}
+              {tab === "wallet" && (
                 <>
-                  {/* Кошелек */}
-                  {tab === "wallet" && (
-                    <>
-                      <motion.div
-                        key={selectedPartner.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden mb-4"
-                      >
-                        <div className="p-4">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <div className="text-xs text-zinc-500">Основной партнёр</div>
-                              <motion.div
-                                key={selectedPartner.name}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="text-xl font-semibold mt-1 truncate"
-                              >
-                                {selectedPartner.displayName || selectedPartner.name}
-                              </motion.div>
-                            </div>
-                            
-                            <motion.div
-                              key={selectedPartner.id}
-                              initial={{ scale: 0.8, rotate: -5 }}
-                              animate={{ scale: 1, rotate: 0 }}
-                              whileTap={{ scale: 0.9, rotate: 0 }}
-                              transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                              className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer active:bg-zinc-50"
-                              onClick={() => {
-                                const urlMap: { [key: string]: string } = {
-                                  vv: "https://m.vkusvill.ru",
-                                  dodo: "https://m.dodopizza.ru",
-                                  cska: "https://pfc-cska.com",
-                                  wb: "https://m.wildberries.ru",
-                                  cofix: "https://cofix.ru",
-                                };
-                                
-                                const url = urlMap[selectedPartner.id];
-                                if (url) {
-                                  goToPartnerSite(
-                                    url, 
-                                    selectedPartner.displayName || selectedPartner.name, 
-                                    selectedPartner.logo, 
-                                    selectedPartner.fallbackColor
-                                  );
-                                }
-                                
-                                const tg = (window as any).Telegram?.WebApp;
-                                tg?.HapticFeedback.impactOccurred("light");
-                              }}
-                            >
-                              {selectedPartner.logo && !failedImages.has(selectedPartner.id) ? (
-                                <img 
-                                  src={selectedPartner.logo} 
-                                  alt={selectedPartner.displayName || selectedPartner.name}
-                                  className="w-full h-full object-contain p-1"
-                                  onError={() => handleImageError(selectedPartner.id)}
-                                />
-                              ) : (
-                                <div className={`w-full h-full bg-linear-to-br ${selectedPartner.fallbackColor}`} />
-                              )}
-                            </motion.div>
-                          </div>
-
-                          <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-4 flex items-end justify-between gap-3">
-                            <div>
-                              <div className="text-xs text-zinc-500">Баланс</div>
-                              <motion.div
-                                key={selectedPartner.balance}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.4, ease: "easeOut" }}
-                                className="text-3xl font-semibold leading-none mt-1"
-                              >
-                                {formatMoney(selectedPartner.balance)} <span className="text-base font-medium text-zinc-500">{selectedPartner.unit}</span>
-                              </motion.div>
-                            </div>
-                            
-                            <PrimaryButton 
-                              label="Активность" 
-                              onClick={() => {
-                                const tg = (window as any).Telegram?.WebApp;
-                                tg?.HapticFeedback.impactOccurred("light");
-                                goBlank("Активность");
-                              }} 
-                            />
-                          </div>
-
-                          <div className="mt-4 grid grid-cols-2 gap-3">
-                            <ActionCard label="Отправить" hint="Перевод" kind="send" onClick={() => setIsSendModalOpen(true)} />
-                            <ActionCard label="Получить" hint="Входящие" kind="receive" onClick={() => setIsReceiveModalOpen(true)} />
-                            <ActionCard label="Обменять" hint="Бонусы" kind="swap" onClick={() => setIsSwapModalOpen(true)} />
-                            <ActionCard label="Списать" hint="Оплата" kind="spend" onClick={() => goBlank("Списать")} />
-                          </div>
+                  <motion.div
+                    key={selectedPartner.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden"
+                  >
+                    <div className="p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="text-xs text-zinc-500">Основной партнёр</div>
+                          <motion.div
+                            key={selectedPartner.name}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="text-xl font-semibold mt-1 truncate"
+                          >
+                            {selectedPartner.displayName || selectedPartner.name}
+                          </motion.div>
                         </div>
-                      </motion.div>
+                        
+                        <motion.div
+                          key={selectedPartner.id}
+                          initial={{ scale: 0.8, rotate: -5 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          whileTap={{ scale: 0.9, rotate: 0 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                          className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer active:bg-zinc-50"
+                          onClick={() => {
+                            const urlMap: { [key: string]: string } = {
+                              vv: "https://m.vkusvill.ru",
+                              dodo: "https://m.dodopizza.ru",
+                              cska: "https://pfc-cska.com",
+                              wb: "https://m.wildberries.ru",
+                              cofix: "https://cofix.ru",
+                            };
+                            
+                            const url = urlMap[selectedPartner.id];
+                            if (url) {
+                              goToPartnerSite(
+                                url, 
+                                selectedPartner.displayName || selectedPartner.name, 
+                                selectedPartner.logo, 
+                                selectedPartner.fallbackColor
+                              );
+                            }
+                            
+                            const tg = (window as any).Telegram?.WebApp;
+                            tg?.HapticFeedback.impactOccurred("light");
+                          }}
+                        >
+                          {selectedPartner.logo && !failedImages.has(selectedPartner.id) ? (
+                            <img 
+                              src={selectedPartner.logo} 
+                              alt={selectedPartner.displayName || selectedPartner.name}
+                              className="w-full h-full object-contain p-1"
+                              onError={() => handleImageError(selectedPartner.id)}
+                            />
+                          ) : (
+                            <div className={`w-full h-full bg-linear-to-br ${selectedPartner.fallbackColor}`} />
+                          )}
+                        </motion.div>
+                      </div>
 
-                      <PartnersList
-                        partners={partnersSeed}
-                        selectedPartner={selectedPartner}
-                        onSelectPartner={selectPartner}
-                        failedImages={failedImages}
-                        onImageError={handleImageError}
-                        formatMoney={formatMoney}
-                        onOpenBlank={goBlank}
-                      />
-                    </>
-                  )}
+                      <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-4 flex items-end justify-between gap-3">
+                        <div>
+                          <div className="text-xs text-zinc-500">Баланс</div>
+                          <motion.div
+                            key={selectedPartner.balance}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4, ease: "easeOut" }}
+                            className="text-3xl font-semibold leading-none mt-1"
+                          >
+                            {formatMoney(selectedPartner.balance)} <span className="text-base font-medium text-zinc-500">{selectedPartner.unit}</span>
+                          </motion.div>
+                        </div>
+                        
+                        <PrimaryButton 
+                          label="Активность" 
+                          onClick={() => {
+                            const tg = (window as any).Telegram?.WebApp;
+                            tg?.HapticFeedback.impactOccurred("light");
+                            goBlank("Активность");
+                          }} 
+                        />
+                      </div>
 
-                  {/* Маркет */}
-                  {tab === "market" && <MarketScreen onBack={goBack} />}
+                      <div className="mt-4 grid grid-cols-2 gap-3">
+                        <ActionCard label="Отправить" hint="Перевод" kind="send" onClick={() => setIsSendModalOpen(true)} />
+                        <ActionCard label="Получить" hint="Входящие" kind="receive" onClick={() => setIsReceiveModalOpen(true)} />
+                        <ActionCard label="Обменять" hint="Бонусы" kind="swap" onClick={() => setIsSwapModalOpen(true)} />
+                        <ActionCard label="Списать" hint="Оплата" kind="spend" onClick={() => goBlank("Списать")} />
+                      </div>
+                    </div>
+                    <div className="h-2" />
+                  </motion.div>
 
-                  {/* Сервисы */}
-                  {tab === "services" && <ServicesScreen onServiceClick={(title) => goBlank(title)} />}
-
-                  {/* Профиль */}
-                  {tab === "profile" && <ProfileScreen />}
+                  <PartnersList
+                    partners={partnersSeed}
+                    selectedPartner={selectedPartner}
+                    onSelectPartner={selectPartner}
+                    failedImages={failedImages}
+                    onImageError={handleImageError}
+                    formatMoney={formatMoney}
+                    onOpenBlank={goBlank}
+                  />
                 </>
-              ) : route.name === "blank" ? (
-                <BlackScreen title={route.title} onBack={goBack} />
-              ) : (
-                <PartnerSiteScreen
-                  url={route.url}
-                  title={route.title}
-                  logo={route.logo}
-                  fallbackColor={route.fallbackColor}
-                  onBack={goBack}
-                />
               )}
-            </motion.div>
-          </AnimatePresence>
-        </motion.div>
 
-        {/* Добавляем отступ снизу для контента, чтобы не перекрывался навбаром */}
-        {route.name === "home" && <div className="h-24" />}
+              {/* Маркет — ТЕПЕРЬ НАСТОЯЩИЙ */}
+              {tab === "market" && (
+                <MarketScreen onBack={goBack} />
+              )}
+
+              {/* Сервисы */}
+              {tab === "services" && (
+                <ServicesScreen onServiceClick={(title) => goBlank(title)} />
+              )}
+
+              {/* Профиль */}
+              {tab === "profile" && (
+                <ProfileScreen />
+              )}
+            </motion.main>
+          ) : route.name === "blank" ? (
+            <BlackScreen 
+              key="blank" 
+              title={route.title} 
+              onBack={goBack}
+            />
+          ) : (
+            <PartnerSiteScreen
+              key="partner-site"
+              url={route.url}
+              title={route.title}
+              logo={route.logo}
+              fallbackColor={route.fallbackColor}
+              onBack={goBack}
+            />
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* НАВБАР — полностью отдельно, не зависит от свайпа */}
-      <Navbar 
-        tab={tab}
-        onTabChange={setTab}
-        isVisible={showNavbar}
-        safeAreaPadding={safeAreaPadding}
-      />
+      {/* НАВБАР */}
+      <AnimatePresence>
+        {showNavbar && (
+          <motion.nav
+            initial={{ y: 100 }}
+            animate={{ y: 0 }}
+            exit={{ y: 100 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
+            style={{ 
+              paddingBottom: isIOS ? "calc(env(safe-area-inset-bottom, 0px) + 14px)" : "0px",
+            }}
+          >
+            <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
+              <TabButton active={tab === "wallet"} onClick={() => setTab("wallet")} label="Кошелёк" icon={<WalletCards size={18} strokeWidth={1.9} />} />
+              <TabButton active={tab === "market"} onClick={() => setTab("market")} label="Маркет" icon={<ShoppingBag size={18} strokeWidth={1.9} />} />
+              <TabButton active={tab === "services"} onClick={() => setTab("services")} label="Сервисы" icon={<Layers size={18} strokeWidth={1.9} />} />
+              <TabButton active={tab === "profile"} onClick={() => setTab("profile")} label="Профиль" icon={<UserRound size={18} strokeWidth={1.9} />} />
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
 
       {/* МОДАЛЬНЫЕ ОКНА */}
       <SendModal isOpen={isSendModalOpen} onClose={() => setIsSendModalOpen(false)} onSend={handleSend} currentBalance={selectedPartner.balance} />
