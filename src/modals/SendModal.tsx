@@ -75,17 +75,17 @@ export default function SendModal({ isOpen, onClose, onSend, currentBalance = 18
     );
   });
 
- // Обработка результата сканирования
-const handleScan = (detectedCodes: any[]) => {
-  if (detectedCodes && detectedCodes.length > 0) {
-    const result = detectedCodes[0].rawValue || detectedCodes[0].text;
-    if (result) {
-      setBonAddress(result);
-      setShowQrScanner(false);
-      setStep("amount");
+  // Обработка результата сканирования
+  const handleScan = (detectedCodes: any[]) => {
+    if (detectedCodes && detectedCodes.length > 0) {
+      const result = detectedCodes[0].rawValue || detectedCodes[0].text;
+      if (result) {
+        setBonAddress(result);
+        setShowQrScanner(false);
+        setStep("amount");
+      }
     }
-  }
-};
+  };
 
   const handleError = (error: unknown) => {
     console.error('QR Scan error:', error);
@@ -317,7 +317,7 @@ const handleScan = (detectedCodes: any[]) => {
                             onClick={() => handleSelectContact(contact)}
                             className="w-full p-3 rounded-2xl bg-white border border-zinc-200 flex items-center gap-3 hover:border-zinc-300 transition-colors text-left"
                           >
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-zinc-200 to-zinc-300 flex items-center justify-center shrink-0">
+                            <div className="h-10 w-10 rounded-full bg-linear-to-br from-zinc-200 to-zinc-300 flex items-center justify-center shrink-0">
                               <User size={18} className="text-zinc-600" />
                             </div>
                             <div className="flex-1 min-w-0">
