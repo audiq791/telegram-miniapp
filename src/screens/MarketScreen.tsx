@@ -10,9 +10,11 @@ import {
   Settings2,
   ArrowUpDown,
   Sparkles,
-  Zap
+  Zap,
+  Info
 } from "lucide-react";
 import { IconButton } from "../components/ui";
+import MarketInfo from "../modals/MarketInfo"; // ← ИМПОРТ МОДАЛКИ
 
 // Типы данных
 type Pair = {
@@ -236,6 +238,7 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
   const [orderAmount, setOrderAmount] = useState("");
   const [orderPrice, setOrderPrice] = useState(selectedPair.lastPrice.toString());
   const [timeframe, setTimeframe] = useState<Timeframe>("24h");
+  const [isMarketInfoOpen, setIsMarketInfoOpen] = useState(true); // ← СОСТОЯНИЕ ДЛЯ МОДАЛКИ
   
   const candleData = useMemo(() => 
     generateCandleData(30, selectedPair.lastPrice), [selectedPair, timeframe]);
@@ -289,15 +292,26 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
       transition={{ type: "spring", stiffness: 260, damping: 30 }}
     >
       <div className="mx-auto max-w-md px-4 pt-4 pb-8">
-        {/* Шапка */}
-        <div className="flex items-center gap-3 mb-4">
-          <IconButton aria="back" onClick={onBack}>
-            <ArrowUpDown size={18} />
-          </IconButton>
-          <div>
-            <div className="text-[13px] text-zinc-500 leading-none">Биржа</div>
-            <div className="text-xl font-semibold">Маркет</div>
+        {/* Шапка с кнопкой информации */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <IconButton aria="back" onClick={onBack}>
+              <ArrowUpDown size={18} />
+            </IconButton>
+            <div>
+              <div className="text-[13px] text-zinc-500 leading-none">Биржа</div>
+              <div className="text-xl font-semibold">Маркет</div>
+            </div>
           </div>
+          
+          {/* Кнопка информации */}
+          <IconButton 
+            aria="info" 
+            onClick={() => setIsMarketInfoOpen(true)}
+            className="bg-zinc-100 hover:bg-zinc-200"
+          >
+            <Info size={18} className="text-zinc-600" />
+          </IconButton>
         </div>
 
         {/* Селектор пары */}
@@ -690,6 +704,12 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
           </motion.button>
         </motion.div>
       </div>
+
+      {/* МОДАЛКА MARKETINFO */}
+      <MarketInfo 
+        isOpen={isMarketInfoOpen} 
+        onClose={() => setIsMarketInfoOpen(false)} 
+      />
     </motion.div>
   );
 }
