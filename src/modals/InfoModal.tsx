@@ -40,7 +40,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
             className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md bg-white rounded-3xl shadow-2xl z-50 overflow-hidden"
           >
             {/* Шапка с градиентом */}
-            <div className="relative bg-gradient-to-br from-zinc-900 to-zinc-800 p-6 text-white">
+            <div className="relative bg-linear-to-br from-zinc-900 to-zinc-800 p-6 text-white">
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={onClose}
@@ -193,7 +193,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.0 }}
-                className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-100"
+                className="mt-6 p-4 bg-linear-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-100"
               >
                 <div className="flex items-start gap-2">
                   <Heart size={16} className="text-amber-500 shrink-0 mt-0.5" />

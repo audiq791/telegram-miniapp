@@ -17,7 +17,7 @@ import BlackScreen from "./BlackScreen";
 import PartnerSiteScreen from "./PartnerSiteScreen";
 import ServicesScreen from "./ServicesScreen";
 import ProfileScreen from "./ProfileScreen";
-import MarketScreen from "./MarketScreen"; // ✅ импорт маркета
+import MarketScreen from "./MarketScreen";
 import SendModal from "../modals/SendModal";
 import ReceiveModal from "../modals/ReceiveModal";
 import SwapModal from "../modals/SwapModal";
@@ -47,7 +47,6 @@ export default function MainApp() {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
 
-  // Массив табов для удобства навигации
   const tabs: ("wallet" | "market" | "services" | "profile")[] = ["wallet", "market", "services", "profile"];
 
   useEffect(() => {
@@ -189,7 +188,6 @@ export default function MainApp() {
     tg?.HapticFeedback.impactOccurred("light");
   };
 
-  // Обработчик свайпа для переключения табов
   const handleTabDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (route.name !== "home") return;
 
@@ -270,16 +268,10 @@ export default function MainApp() {
         dragMomentum={false}
         onDragEnd={handleTabDragEnd}
       >
-        <AnimatePresence mode="wait">
+        {/* Убираем AnimatePresence вокруг main, чтобы не пересоздавать весь контент при смене таба */}
+        <div className="px-4 pt-4 pb-28">
           {route.name === "home" ? (
-            <motion.main
-              key={tab}
-              className="px-4 pt-4 pb-28"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ type: "spring", stiffness: 260, damping: 30 }}
-            >
+            <>
               {/* Кошелек */}
               {tab === "wallet" && (
                 <>
@@ -407,7 +399,7 @@ export default function MainApp() {
               {tab === "profile" && (
                 <ProfileScreen />
               )}
-            </motion.main>
+            </>
           ) : route.name === "blank" ? (
             <BlackScreen 
               key="blank" 
@@ -424,31 +416,29 @@ export default function MainApp() {
               onBack={goBack}
             />
           )}
-        </AnimatePresence>
+        </div>
       </motion.div>
 
-      {/* НАВБАР */}
-      <AnimatePresence>
-        {showNavbar && (
-          <motion.nav
-            initial={{ y: 100 }}
-            animate={{ y: 0 }}
-            exit={{ y: 100 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
-            style={{ 
-              paddingBottom: isIOS ? "calc(env(safe-area-inset-bottom, 0px) + 14px)" : "0px",
-            }}
-          >
-            <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
-              <TabButton active={tab === "wallet"} onClick={() => setTab("wallet")} label="Кошелёк" icon={<WalletCards size={18} strokeWidth={1.9} />} />
-              <TabButton active={tab === "market"} onClick={() => setTab("market")} label="Маркет" icon={<ShoppingBag size={18} strokeWidth={1.9} />} />
-              <TabButton active={tab === "services"} onClick={() => setTab("services")} label="Сервисы" icon={<Layers size={18} strokeWidth={1.9} />} />
-              <TabButton active={tab === "profile"} onClick={() => setTab("profile")} label="Профиль" icon={<UserRound size={18} strokeWidth={1.9} />} />
-            </div>
-          </motion.nav>
-        )}
-      </AnimatePresence>
+      {/* НАВБАР — всегда в DOM, плавно появляется/исчезает */}
+      <motion.nav
+        animate={{
+          y: showNavbar ? 0 : 100,
+          opacity: showNavbar ? 1 : 0,
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="fixed inset-x-0 bottom-0 z-40 bg-white/90 backdrop-blur border-t border-zinc-200"
+        style={{ 
+          paddingBottom: isIOS ? "calc(env(safe-area-inset-bottom, 0px) + 14px)" : "0px",
+          pointerEvents: showNavbar ? "auto" : "none",
+        }}
+      >
+        <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-4 gap-2">
+          <TabButton active={tab === "wallet"} onClick={() => setTab("wallet")} label="Кошелёк" icon={<WalletCards size={18} strokeWidth={1.9} />} />
+          <TabButton active={tab === "market"} onClick={() => setTab("market")} label="Маркет" icon={<ShoppingBag size={18} strokeWidth={1.9} />} />
+          <TabButton active={tab === "services"} onClick={() => setTab("services")} label="Сервисы" icon={<Layers size={18} strokeWidth={1.9} />} />
+          <TabButton active={tab === "profile"} onClick={() => setTab("profile")} label="Профиль" icon={<UserRound size={18} strokeWidth={1.9} />} />
+        </div>
+      </motion.nav>
 
       {/* МОДАЛЬНЫЕ ОКНА */}
       <SendModal isOpen={isSendModalOpen} onClose={() => setIsSendModalOpen(false)} onSend={handleSend} currentBalance={selectedPartner.balance} />
