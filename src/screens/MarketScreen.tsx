@@ -5,17 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   Star,
-  TrendingUp,
-  TrendingDown,
   ChevronDown,
-  Clock,
-  LineChart,
   CandlestickChart,
   Settings2,
   ArrowUpDown,
   Sparkles,
-  Zap,
-  BarChart4
+  Zap
 } from "lucide-react";
 import { IconButton } from "../components/ui";
 
@@ -26,8 +21,6 @@ type Pair = {
   quoteAsset: string;
   baseName: string;
   quoteName: string;
-  baseLogo?: string;
-  quoteLogo?: string;
   lastPrice: number;
   priceChange24h: number;
   volume24h: number;
@@ -38,7 +31,7 @@ type OrderBookItem = {
   price: number;
   amount: number;
   total: number;
-  depth: number; // для визуализации глубины
+  depth: number;
 };
 
 type OrderType = "limit" | "market";
@@ -80,41 +73,23 @@ const PAIRS: Pair[] = [
     volume24h: 345678,
     isFavorite: false,
   },
-  {
-    id: "DODO-BON",
-    baseAsset: "DODO",
-    quoteAsset: "BON",
-    baseName: "Додо Пицца",
-    quoteName: "Bonus Token",
-    lastPrice: 0.1234,
-    priceChange24h: -2.45,
-    volume24h: 234567,
-    isFavorite: false,
-  },
-  {
-    id: "CSKA-BON",
-    baseAsset: "CSKA",
-    quoteAsset: "BON",
-    baseName: "ЦСКА",
-    quoteName: "Bonus Token",
-    lastPrice: 0.3456,
-    priceChange24h: 1.23,
-    volume24h: 123456,
-    isFavorite: true,
-  },
 ];
 
-// Генерация данных для свечного графика
+// Генерация данных для свечного графика с реалистичными значениями
 const generateCandleData = (count: number, basePrice: number) => {
   const data = [];
   let currentPrice = basePrice;
   
   for (let i = 0; i < count; i++) {
+    // Создаём тренд (лёгкое движение вверх/вниз)
+    const trend = Math.sin(i * 0.5) * 0.02;
+    const volatility = 0.03;
+    
     const open = currentPrice;
-    const change = (Math.random() - 0.5) * 0.1 * currentPrice;
+    const change = (Math.random() - 0.5 + trend) * volatility * currentPrice;
     const close = open + change;
-    const high = Math.max(open, close) + Math.random() * 0.05 * currentPrice;
-    const low = Math.min(open, close) - Math.random() * 0.05 * currentPrice;
+    const high = Math.max(open, close) + Math.random() * volatility * currentPrice;
+    const low = Math.min(open, close) - Math.random() * volatility * currentPrice;
     
     data.push({
       time: i,
@@ -131,7 +106,7 @@ const generateCandleData = (count: number, basePrice: number) => {
   return data;
 };
 
-// Генерация стакана цен с глубиной
+// Генерация стакана цен
 const generateOrderBook = (basePrice: number, side: "bids" | "asks"): OrderBookItem[] => {
   const items: OrderBookItem[] = [];
   const count = 12;
@@ -155,7 +130,6 @@ const generateOrderBook = (basePrice: number, side: "bids" | "asks"): OrderBookI
     });
   }
   
-  // Сортируем: bids по убыванию цены, asks по возрастанию
   return side === "bids" 
     ? items.sort((a, b) => b.price - a.price)
     : items.sort((a, b) => a.price - b.price);
@@ -167,7 +141,8 @@ function CandleChart({ data, height = 180 }: { data: any[]; height?: number }) {
   const minPrice = Math.min(...data.map(d => d.low));
   const range = maxPrice - minPrice || 1;
   
-  const candleWidth = 100 / data.length;
+  // Нормализация позиций для анимации
+  const getCandleY = (price: number) => ((maxPrice - price) / range) * height;
   
   return (
     <div className="relative w-full" style={{ height }}>
@@ -182,56 +157,96 @@ function CandleChart({ data, height = 180 }: { data: any[]; height?: number }) {
       <div className="absolute inset-0 flex items-end">
         {data.map((candle, i) => {
           const isGreen = candle.close >= candle.open;
-          const candleHeight = ((candle.high - candle.low) / range) * height;
-          const bodyHeight = (Math.abs(candle.close - candle.open) / range) * height;
-          const bodyY = ((maxPrice - Math.max(candle.open, candle.close)) / range) * height;
-          const wickY = ((maxPrice - candle.high) / range) * height;
+          const highY = getCandleY(candle.high);
+          const lowY = getCandleY(candle.low);
+          const openY = getCandleY(candle.open);
+          const closeY = getCandleY(candle.close);
+          
+          const bodyTop = Math.min(openY, closeY);
+          const bodyBottom = Math.max(openY, closeY);
+          const bodyHeight = bodyBottom - bodyTop;
           
           return (
             <motion.div
               key={i}
-              className="relative flex-1 flex justify-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.02, duration: 0.3 }}
+              className="relative flex-1 flex justify-center group"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ 
+                duration: 2,
+                delay: i * 0.05,
+                ease: "easeOut"
+              }}
             >
               {/* Верхний фитиль */}
-              <div
-                className={`absolute w-0.5 ${isGreen ? 'bg-emerald-500/50' : 'bg-rose-500/50'}`}
+              <motion.div
+                className={`absolute w-0.5 ${isGreen ? 'bg-emerald-500/40' : 'bg-rose-500/40'}`}
                 style={{
-                  height: wickY - bodyY,
-                  top: wickY,
+                  height: highY - bodyTop,
+                  top: highY,
                   left: '50%',
                   transform: 'translateX(-50%)',
+                }}
+                initial={{ scaleY: 0, opacity: 0 }}
+                animate={{ scaleY: 1, opacity: 1 }}
+                transition={{ 
+                  duration: 1.5,
+                  delay: i * 0.05 + 0.2,
+                  ease: "easeOut"
                 }}
               />
               
               {/* Тело свечи */}
               <motion.div
-                className={`absolute w-3/4 ${isGreen ? 'bg-emerald-500' : 'bg-rose-500'}`}
+                className={`absolute w-3/4 ${isGreen ? 'bg-emerald-500' : 'bg-rose-500'} rounded-sm`}
                 style={{
                   height: bodyHeight,
-                  top: bodyY,
+                  top: bodyTop,
                   left: '50%',
                   transform: 'translateX(-50%)',
                 }}
-                animate={{
-                  scaleY: [0, 1],
-                }}
-                transition={{
-                  delay: i * 0.02,
-                  duration: 0.3,
+                initial={{ scaleY: 0, opacity: 0 }}
+                animate={{ scaleY: 1, opacity: 1 }}
+                transition={{ 
+                  duration: 1.5,
+                  delay: i * 0.05,
+                  ease: "easeOut"
                 }}
               />
               
               {/* Нижний фитиль */}
-              <div
-                className={`absolute w-0.5 ${isGreen ? 'bg-emerald-500/50' : 'bg-rose-500/50'}`}
+              <motion.div
+                className={`absolute w-0.5 ${isGreen ? 'bg-emerald-500/40' : 'bg-rose-500/40'}`}
                 style={{
-                  height: bodyY + bodyHeight - ((maxPrice - candle.low) / range) * height,
-                  top: bodyY + bodyHeight,
+                  height: bodyBottom - lowY,
+                  top: bodyBottom,
                   left: '50%',
                   transform: 'translateX(-50%)',
+                }}
+                initial={{ scaleY: 0, opacity: 0 }}
+                animate={{ scaleY: 1, opacity: 1 }}
+                transition={{ 
+                  duration: 1.5,
+                  delay: i * 0.05 + 0.2,
+                  ease: "easeOut"
+                }}
+              />
+              
+              {/* Медленная пульсация свечи */}
+              <motion.div
+                className={`absolute w-full h-full ${isGreen ? 'bg-emerald-500/5' : 'bg-rose-500/5'}`}
+                style={{
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                }}
+                animate={{
+                  opacity: [0, 0.3, 0],
+                }}
+                transition={{
+                  duration: 3,
+                  delay: i * 0.1,
+                  repeat: Infinity,
+                  ease: "easeInOut",
                 }}
               />
             </motion.div>
@@ -250,19 +265,17 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
   const [orderSide, setOrderSide] = useState<OrderSide>("buy");
   const [orderAmount, setOrderAmount] = useState("");
   const [orderPrice, setOrderPrice] = useState(selectedPair.lastPrice.toString());
-  const [chartType, setChartType] = useState<"candle">("candle");
   const [timeframe, setTimeframe] = useState<Timeframe>("24h");
   
   // Генерация данных для графика
   const candleData = useMemo(() => 
-    generateCandleData(30, selectedPair.lastPrice), [selectedPair]);
+    generateCandleData(30, selectedPair.lastPrice), [selectedPair, timeframe]);
   
   // Генерация стакана
   const [bids, setBids] = useState<OrderBookItem[]>([]);
   const [asks, setAsks] = useState<OrderBookItem[]>([]);
   
   useEffect(() => {
-    // Обновляем стакан при смене пары
     setBids(generateOrderBook(selectedPair.lastPrice, "bids"));
     setAsks(generateOrderBook(selectedPair.lastPrice, "asks"));
     setOrderPrice(selectedPair.lastPrice.toString());
@@ -299,11 +312,6 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
   };
 
   const handleCreateOrder = () => {
-    console.log(`${orderSide === "buy" ? "Покупка" : "Продажа"} ${selectedPair.baseAsset}`, {
-      type: orderType,
-      price: orderPrice,
-      amount: orderAmount,
-    });
     alert(`${orderSide === "buy" ? "Покупка" : "Продажа"} ${orderAmount} ${selectedPair.baseAsset} по цене ${orderPrice} ${selectedPair.quoteAsset}`);
   };
 
@@ -438,15 +446,8 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
                 ))}
               </div>
             </div>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setChartType("candle")}
-                className={`p-1.5 rounded-md transition-colors ${
-                  chartType === "candle" ? "bg-zinc-900 text-white" : "hover:bg-zinc-100"
-                }`}
-              >
-                <CandlestickChart size={16} />
-              </button>
+            <div className="p-1.5 rounded-md bg-zinc-100">
+              <CandlestickChart size={16} className="text-zinc-600" />
             </div>
           </div>
 
@@ -521,7 +522,6 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.03 }}
               >
-                {/* Индикатор глубины */}
                 <motion.div
                   className="absolute right-0 h-full bg-rose-500/10"
                   initial={{ width: 0 }}
@@ -569,7 +569,6 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.03 }}
               >
-                {/* Индикатор глубины */}
                 <motion.div
                   className="absolute left-0 h-full bg-emerald-500/10"
                   initial={{ width: 0 }}
