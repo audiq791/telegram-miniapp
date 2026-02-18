@@ -209,6 +209,22 @@ export default function MainApp() {
 
   const showNavbar = route.name === "home";
 
+  // Варианты анимации с учётом направления
+  const pageVariants = {
+    initial: (direction: number) => ({
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+    }),
+    animate: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      x: direction < 0 ? 300 : -300,
+      opacity: 0,
+    }),
+  };
+
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
       {/* HEADER */}
@@ -268,155 +284,165 @@ export default function MainApp() {
         dragMomentum={false}
         onDragEnd={handleTabDragEnd}
       >
-        {/* Убираем AnimatePresence вокруг main, чтобы не пересоздавать весь контент при смене таба */}
-        <div className="px-4 pt-4 pb-28">
-          {route.name === "home" ? (
-            <>
-              {/* Кошелек */}
-              {tab === "wallet" && (
-                <>
-                  <motion.div
-                    key={selectedPartner.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden"
-                  >
-                    <div className="p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="text-xs text-zinc-500">Основной партнёр</div>
+        <AnimatePresence mode="wait" custom={tabs.indexOf(tab) > tabs.indexOf(tab) ? 1 : -1}>
+          <motion.div
+            key={route.name === "home" ? tab : route.name}
+            custom={tabs.indexOf(tab) > tabs.indexOf(tab) ? 1 : -1}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ type: "spring", stiffness: 260, damping: 30 }}
+            className="px-4 pt-4 pb-28"
+          >
+            {route.name === "home" ? (
+              <>
+                {/* Кошелек */}
+                {tab === "wallet" && (
+                  <>
+                    <motion.div
+                      key={selectedPartner.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="rounded-[28px] bg-white border border-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)] overflow-hidden"
+                    >
+                      <div className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="text-xs text-zinc-500">Основной партнёр</div>
+                            <motion.div
+                              key={selectedPartner.name}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              className="text-xl font-semibold mt-1 truncate"
+                            >
+                              {selectedPartner.displayName || selectedPartner.name}
+                            </motion.div>
+                          </div>
+                          
                           <motion.div
-                            key={selectedPartner.name}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="text-xl font-semibold mt-1 truncate"
+                            key={selectedPartner.id}
+                            initial={{ scale: 0.8, rotate: -5 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            whileTap={{ scale: 0.9, rotate: 0 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                            className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer active:bg-zinc-50"
+                            onClick={() => {
+                              const urlMap: { [key: string]: string } = {
+                                vv: "https://m.vkusvill.ru",
+                                dodo: "https://m.dodopizza.ru",
+                                cska: "https://pfc-cska.com",
+                                wb: "https://m.wildberries.ru",
+                                cofix: "https://cofix.ru",
+                              };
+                              
+                              const url = urlMap[selectedPartner.id];
+                              if (url) {
+                                goToPartnerSite(
+                                  url, 
+                                  selectedPartner.displayName || selectedPartner.name, 
+                                  selectedPartner.logo, 
+                                  selectedPartner.fallbackColor
+                                );
+                              }
+                              
+                              const tg = (window as any).Telegram?.WebApp;
+                              tg?.HapticFeedback.impactOccurred("light");
+                            }}
                           >
-                            {selectedPartner.displayName || selectedPartner.name}
+                            {selectedPartner.logo && !failedImages.has(selectedPartner.id) ? (
+                              <img 
+                                src={selectedPartner.logo} 
+                                alt={selectedPartner.displayName || selectedPartner.name}
+                                className="w-full h-full object-contain p-1"
+                                onError={() => handleImageError(selectedPartner.id)}
+                              />
+                            ) : (
+                              <div className={`w-full h-full bg-linear-to-br ${selectedPartner.fallbackColor}`} />
+                            )}
                           </motion.div>
                         </div>
-                        
-                        <motion.div
-                          key={selectedPartner.id}
-                          initial={{ scale: 0.8, rotate: -5 }}
-                          animate={{ scale: 1, rotate: 0 }}
-                          whileTap={{ scale: 0.9, rotate: 0 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                          className="shrink-0 h-12 w-12 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center overflow-hidden cursor-pointer active:bg-zinc-50"
-                          onClick={() => {
-                            const urlMap: { [key: string]: string } = {
-                              vv: "https://m.vkusvill.ru",
-                              dodo: "https://m.dodopizza.ru",
-                              cska: "https://pfc-cska.com",
-                              wb: "https://m.wildberries.ru",
-                              cofix: "https://cofix.ru",
-                            };
-                            
-                            const url = urlMap[selectedPartner.id];
-                            if (url) {
-                              goToPartnerSite(
-                                url, 
-                                selectedPartner.displayName || selectedPartner.name, 
-                                selectedPartner.logo, 
-                                selectedPartner.fallbackColor
-                              );
-                            }
-                            
-                            const tg = (window as any).Telegram?.WebApp;
-                            tg?.HapticFeedback.impactOccurred("light");
-                          }}
-                        >
-                          {selectedPartner.logo && !failedImages.has(selectedPartner.id) ? (
-                            <img 
-                              src={selectedPartner.logo} 
-                              alt={selectedPartner.displayName || selectedPartner.name}
-                              className="w-full h-full object-contain p-1"
-                              onError={() => handleImageError(selectedPartner.id)}
-                            />
-                          ) : (
-                            <div className={`w-full h-full bg-linear-to-br ${selectedPartner.fallbackColor}`} />
-                          )}
-                        </motion.div>
-                      </div>
 
-                      <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-4 flex items-end justify-between gap-3">
-                        <div>
-                          <div className="text-xs text-zinc-500">Баланс</div>
-                          <motion.div
-                            key={selectedPartner.balance}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.4, ease: "easeOut" }}
-                            className="text-3xl font-semibold leading-none mt-1"
-                          >
-                            {formatMoney(selectedPartner.balance)} <span className="text-base font-medium text-zinc-500">{selectedPartner.unit}</span>
-                          </motion.div>
+                        <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-4 flex items-end justify-between gap-3">
+                          <div>
+                            <div className="text-xs text-zinc-500">Баланс</div>
+                            <motion.div
+                              key={selectedPartner.balance}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.4, ease: "easeOut" }}
+                              className="text-3xl font-semibold leading-none mt-1"
+                            >
+                              {formatMoney(selectedPartner.balance)} <span className="text-base font-medium text-zinc-500">{selectedPartner.unit}</span>
+                            </motion.div>
+                          </div>
+                          
+                          <PrimaryButton 
+                            label="Активность" 
+                            onClick={() => {
+                              const tg = (window as any).Telegram?.WebApp;
+                              tg?.HapticFeedback.impactOccurred("light");
+                              goBlank("Активность");
+                            }} 
+                          />
                         </div>
-                        
-                        <PrimaryButton 
-                          label="Активность" 
-                          onClick={() => {
-                            const tg = (window as any).Telegram?.WebApp;
-                            tg?.HapticFeedback.impactOccurred("light");
-                            goBlank("Активность");
-                          }} 
-                        />
+
+                        <div className="mt-4 grid grid-cols-2 gap-3">
+                          <ActionCard label="Отправить" hint="Перевод" kind="send" onClick={() => setIsSendModalOpen(true)} />
+                          <ActionCard label="Получить" hint="Входящие" kind="receive" onClick={() => setIsReceiveModalOpen(true)} />
+                          <ActionCard label="Обменять" hint="Бонусы" kind="swap" onClick={() => setIsSwapModalOpen(true)} />
+                          <ActionCard label="Списать" hint="Оплата" kind="spend" onClick={() => goBlank("Списать")} />
+                        </div>
                       </div>
+                      <div className="h-2" />
+                    </motion.div>
 
-                      <div className="mt-4 grid grid-cols-2 gap-3">
-                        <ActionCard label="Отправить" hint="Перевод" kind="send" onClick={() => setIsSendModalOpen(true)} />
-                        <ActionCard label="Получить" hint="Входящие" kind="receive" onClick={() => setIsReceiveModalOpen(true)} />
-                        <ActionCard label="Обменять" hint="Бонусы" kind="swap" onClick={() => setIsSwapModalOpen(true)} />
-                        <ActionCard label="Списать" hint="Оплата" kind="spend" onClick={() => goBlank("Списать")} />
-                      </div>
-                    </div>
-                    <div className="h-2" />
-                  </motion.div>
+                    <PartnersList
+                      partners={partnersSeed}
+                      selectedPartner={selectedPartner}
+                      onSelectPartner={selectPartner}
+                      failedImages={failedImages}
+                      onImageError={handleImageError}
+                      formatMoney={formatMoney}
+                      onOpenBlank={goBlank}
+                    />
+                  </>
+                )}
 
-                  <PartnersList
-                    partners={partnersSeed}
-                    selectedPartner={selectedPartner}
-                    onSelectPartner={selectPartner}
-                    failedImages={failedImages}
-                    onImageError={handleImageError}
-                    formatMoney={formatMoney}
-                    onOpenBlank={goBlank}
-                  />
-                </>
-              )}
+                {/* Маркет */}
+                {tab === "market" && (
+                  <MarketScreen onBack={goBack} />
+                )}
 
-              {/* Маркет */}
-              {tab === "market" && (
-                <MarketScreen onBack={goBack} />
-              )}
+                {/* Сервисы */}
+                {tab === "services" && (
+                  <ServicesScreen onServiceClick={(title) => goBlank(title)} />
+                )}
 
-              {/* Сервисы */}
-              {tab === "services" && (
-                <ServicesScreen onServiceClick={(title) => goBlank(title)} />
-              )}
-
-              {/* Профиль */}
-              {tab === "profile" && (
-                <ProfileScreen />
-              )}
-            </>
-          ) : route.name === "blank" ? (
-            <BlackScreen 
-              key="blank" 
-              title={route.title} 
-              onBack={goBack}
-            />
-          ) : (
-            <PartnerSiteScreen
-              key="partner-site"
-              url={route.url}
-              title={route.title}
-              logo={route.logo}
-              fallbackColor={route.fallbackColor}
-              onBack={goBack}
-            />
-          )}
-        </div>
+                {/* Профиль */}
+                {tab === "profile" && (
+                  <ProfileScreen />
+                )}
+              </>
+            ) : route.name === "blank" ? (
+              <BlackScreen 
+                key="blank" 
+                title={route.title} 
+                onBack={goBack}
+              />
+            ) : (
+              <PartnerSiteScreen
+                key="partner-site"
+                url={route.url}
+                title={route.title}
+                logo={route.logo}
+                fallbackColor={route.fallbackColor}
+                onBack={goBack}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
       </motion.div>
 
       {/* НАВБАР — всегда в DOM, плавно появляется/исчезает */}
