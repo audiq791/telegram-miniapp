@@ -6,7 +6,7 @@ import { haptic } from "../components/haptics";
 import LoginAccount from "../screens/LoginAccount";
 
 // ==================== ЭКРАН 1 ====================
-function Scene1() {
+function Scene1({ onNext }: { onNext: () => void }) {
   return (
     <div className="w-full h-full px-6 pt-12 overflow-y-auto">
       <div className="max-w-md mx-auto">
@@ -76,10 +76,9 @@ function Scene1() {
             Биржа Бонусов от OEM Tech
           </h1>
           
-          {/* Линия на всю ширину как в ProfileScreen */}
           <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
           
-          <div className="space-y-3">
+          <div className="space-y-3 mb-8">
             <p className="text-sm text-zinc-600 leading-relaxed">
               Добро пожаловать в новую экономику лояльности.
             </p>
@@ -92,6 +91,18 @@ function Scene1() {
             <p className="text-sm text-zinc-600 leading-relaxed font-medium">
               Ваши бонусы начинают работать на вас.
             </p>
+          </div>
+
+          {/* Кнопка Далее только на первом экране — под текстом */}
+          <div className="flex justify-center">
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 800, damping: 20 }}
+              onClick={onNext}
+              className="w-40 h-12 rounded-xl bg-zinc-900 text-white font-medium text-base shadow-md hover:bg-zinc-800 transition-colors"
+            >
+              Далее
+            </motion.button>
           </div>
         </div>
       </div>
@@ -154,7 +165,6 @@ function Scene2() {
             Покупки приносят больше
           </h2>
           
-          {/* Линия на всю ширину */}
           <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
           
           <div className="space-y-3">
@@ -219,7 +229,6 @@ function Scene3() {
             Добро пожаловать на торги
           </h2>
           
-          {/* Линия на всю ширину */}
           <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
           
           <div className="space-y-3">
@@ -287,7 +296,6 @@ function Scene4() {
             Теперь лояльность работает на вас
           </h2>
           
-          {/* Линия на всю ширину */}
           <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
           
           <div className="space-y-3">
@@ -397,7 +405,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 transition={{ type: "spring", stiffness: 260, damping: 30 }}
                 className="absolute inset-0 overflow-y-auto"
               >
-                {index === 0 && <Scene1 />}
+                {index === 0 && <Scene1 onNext={next} />}
                 {index === 1 && <Scene2 />}
                 {index === 2 && <Scene3 />}
                 {index === 3 && <Scene4 />}
@@ -407,7 +415,8 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           </motion.div>
         </div>
 
-        {!isExiting && index < 4 && (
+        {/* На экранах 2–4 кнопки остаются внизу */}
+        {!isExiting && index > 0 && index < 4 && (
           <div className="absolute left-0 right-0 px-6" style={{ bottom: "140px" }}>
             <div className="flex items-center justify-center gap-2 mb-5">
               {[0, 1, 2, 3, 4].map((i) => (
@@ -431,7 +440,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                   Назад
                 </motion.button>
               )}
-
+              
               {index < 4 && (
                 <motion.button
                   whileTap={{ scale: 0.97 }}
