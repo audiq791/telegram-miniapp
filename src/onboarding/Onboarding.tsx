@@ -184,11 +184,11 @@ function Scene2() {
 function Scene3() {
   // Генерируем 40 свечей с рандомными высотами
   const candles = Array.from({ length: 40 }, () => ({
-    height: Math.floor(Math.random() * 90) + 15, // от 15 до 105
+    height: Math.floor(Math.random() * 90) + 15,
     isGreen: Math.random() > 0.48,
   }));
 
-  // Генерируем данные для фонового графика (хаотичное движение)
+  // Генерируем данные для фонового графика
   const chartData = Array.from({ length: 50 }, (_, i) => ({
     x: i,
     y: Math.floor(Math.random() * 100) + 20,
@@ -199,7 +199,7 @@ function Scene3() {
       <div className="max-w-md mx-auto">
         <div className="relative h-80 w-full bg-linear-to-br from-slate-50/80 to-slate-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
           
-          {/* Фоновый график (линия) */}
+          {/* Фоновый график */}
           <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="none">
             <motion.polyline
               points={chartData.map(p => `${p.x * 8},${120 - p.y}`).join(' ')}
@@ -221,16 +221,14 @@ function Scene3() {
             />
           </svg>
 
-          {/* Контейнер для свечей (квадратные, без скругления) */}
+          {/* Свечи */}
           <div className="flex items-end gap-0.5 h-48 w-full px-1 relative z-10">
             {candles.map((candle, i) => (
               <motion.div
                 key={i}
                 className="relative flex-1 max-w-2"
                 initial={{ height: 0 }}
-                animate={{ 
-                  height: candle.height,
-                }}
+                animate={{ height: candle.height }}
                 transition={{
                   duration: 1.5 + Math.random() * 3,
                   delay: i * 0.03,
@@ -239,29 +237,23 @@ function Scene3() {
                   ease: "easeInOut",
                 }}
               >
-                {/* Тело свечи — квадратное, без скругления */}
                 <div
                   className={`absolute bottom-0 w-full ${
                     candle.isGreen ? "bg-emerald-500/70" : "bg-rose-400/70"
                   }`}
                   style={{ height: '70%' }}
                 />
-                {/* Фитиль (тонкая линия) */}
                 <div className="absolute w-px bg-zinc-400/50 left-1/2 -translate-x-1/2 h-full" />
               </motion.div>
             ))}
           </div>
 
-          {/* Бегущая строка — всегда видна */}
+          {/* Бегущая строка */}
           <div className="absolute bottom-4 left-0 right-0 bg-zinc-800/80 backdrop-blur-sm text-white/90 py-2.5 overflow-hidden z-20">
             <motion.div
               className="whitespace-nowrap"
               animate={{ x: [300, -1200] }}
-              transition={{ 
-                duration: 18, 
-                repeat: Infinity, 
-                ease: "linear",
-              }}
+              transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
             >
               <span className="text-xs font-light tracking-wider px-4">
                 BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> • BON/WB <span className="text-emerald-400">+3.1%</span> • BON/FUEL <span className="text-rose-400">-0.8%</span> • BON/MG <span className="text-emerald-400">+1.9%</span> • BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> •
@@ -455,7 +447,12 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 {index === 1 && <Scene2 />}
                 {index === 2 && <Scene3 />}
                 {index === 3 && <Scene4 />}
-                {index === 4 && <LoginAccount onLogin={handleDone} />}
+                {index === 4 && (
+                  <LoginAccount 
+                    onLogin={handleDone} 
+                    onBack={() => prev()} 
+                  />
+                )}
               </motion.div>
             </AnimatePresence>
           </motion.div>
