@@ -54,17 +54,17 @@ export default function ProfileScreen() {
     console.log("Выход");
   };
 
-  // Анимация как в ServicesScreen — длительность 0.02ms
+  // Мгновенная анимация — 0.01ms
   const tapAnimation = {
     scale: 0.95,
     backgroundColor: "#e4e4e7",
-    transition: { duration: 0.02 }
+    transition: { duration: 0.01 }
   };
 
   const logoutTapAnimation = {
     scale: 0.95,
     backgroundColor: "#fee2e2",
-    transition: { duration: 0.02 }
+    transition: { duration: 0.01 }
   };
 
   return (
@@ -118,7 +118,7 @@ export default function ProfileScreen() {
               </div>
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.02 }}
+                transition={{ duration: 0.01 }}
                 onClick={handleCopy}
                 className="h-8 px-3 rounded-lg bg-white border border-zinc-200 text-xs font-medium flex items-center gap-1 hover:bg-zinc-50 transition-colors shrink-0"
               >
@@ -198,7 +198,7 @@ export default function ProfileScreen() {
           </motion.button>
         </motion.div>
 
-        {/* Кнопка выхода — с той же анимацией */}
+        {/* Кнопка выхода */}
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
