@@ -188,12 +188,41 @@ function Scene3() {
     isGreen: Math.random() > 0.48,
   }));
 
+  // Генерируем данные для фонового графика (хаотичное движение)
+  const chartData = Array.from({ length: 50 }, (_, i) => ({
+    x: i,
+    y: Math.floor(Math.random() * 100) + 20,
+  }));
+
   return (
     <div className="w-full h-full px-6 pt-12 overflow-y-auto">
       <div className="max-w-md mx-auto">
         <div className="relative h-80 w-full bg-linear-to-br from-slate-50/80 to-slate-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
-          {/* Контейнер для свечей */}
-          <div className="flex items-end gap-0.5 h-48 w-full px-1">
+          
+          {/* Фоновый график (линия) */}
+          <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="none">
+            <motion.polyline
+              points={chartData.map(p => `${p.x * 8},${120 - p.y}`).join(' ')}
+              fill="none"
+              stroke="#3b82f6"
+              strokeWidth="2"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.3 }}
+              transition={{ duration: 2, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+            />
+            <motion.polyline
+              points={chartData.map(p => `${p.x * 8 + 20},${140 - p.y * 0.8}`).join(' ')}
+              fill="none"
+              stroke="#8b5cf6"
+              strokeWidth="1.5"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.2 }}
+              transition={{ duration: 3, delay: 0.5, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+            />
+          </svg>
+
+          {/* Контейнер для свечей (квадратные, без скругления) */}
+          <div className="flex items-end gap-0.5 h-48 w-full px-1 relative z-10">
             {candles.map((candle, i) => (
               <motion.div
                 key={i}
@@ -210,21 +239,21 @@ function Scene3() {
                   ease: "easeInOut",
                 }}
               >
-                {/* Тело свечи */}
+                {/* Тело свечи — квадратное, без скругления */}
                 <div
                   className={`absolute bottom-0 w-full ${
                     candle.isGreen ? "bg-emerald-500/70" : "bg-rose-400/70"
-                  } rounded-t-sm`}
+                  }`}
                   style={{ height: '70%' }}
                 />
-                {/* Фитиль */}
-                <div className="absolute w-px bg-zinc-400/30 left-1/2 -translate-x-1/2 h-full" />
+                {/* Фитиль (тонкая линия) */}
+                <div className="absolute w-px bg-zinc-400/50 left-1/2 -translate-x-1/2 h-full" />
               </motion.div>
             ))}
           </div>
 
           {/* Бегущая строка — всегда видна */}
-          <div className="absolute bottom-4 left-0 right-0 bg-zinc-800/80 backdrop-blur-sm text-white/90 py-2.5 overflow-hidden">
+          <div className="absolute bottom-4 left-0 right-0 bg-zinc-800/80 backdrop-blur-sm text-white/90 py-2.5 overflow-hidden z-20">
             <motion.div
               className="whitespace-nowrap"
               animate={{ x: [300, -1200] }}
