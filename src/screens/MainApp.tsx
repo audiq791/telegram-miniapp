@@ -17,6 +17,7 @@ import BlackScreen from "./BlackScreen";
 import PartnerSiteScreen from "./PartnerSiteScreen";
 import ServicesScreen from "./ServicesScreen";
 import ProfileScreen from "./ProfileScreen";
+import MarketScreen from "./MarketScreen"; // ✅ импорт маркета
 import SendModal from "../modals/SendModal";
 import ReceiveModal from "../modals/ReceiveModal";
 import SwapModal from "../modals/SwapModal";
@@ -190,20 +191,17 @@ export default function MainApp() {
 
   // Обработчик свайпа для переключения табов
   const handleTabDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    // Не переключаем табы, если мы не на главном экране
     if (route.name !== "home") return;
 
     const swipe = info.offset.x;
     const velocity = info.velocity.x;
     const currentIndex = tabs.indexOf(tab);
 
-    // Свайп влево → следующий таб
     if (swipe < -50 && velocity < -0.2 && currentIndex < tabs.length - 1) {
       const tg = (window as any).Telegram?.WebApp;
       tg?.HapticFeedback.impactOccurred("light");
       setTab(tabs[currentIndex + 1]);
     }
-    // Свайп вправо → предыдущий таб
     else if (swipe > 50 && velocity > 0.2 && currentIndex > 0) {
       const tg = (window as any).Telegram?.WebApp;
       tg?.HapticFeedback.impactOccurred("light");
@@ -397,10 +395,7 @@ export default function MainApp() {
 
               {/* Маркет */}
               {tab === "market" && (
-                <div className="rounded-[28px] bg-white border border-zinc-200 p-6 text-center">
-                  <p className="text-zinc-500">Маркет</p>
-                  <p className="text-sm text-zinc-400 mt-2">Здесь будет маркет</p>
-                </div>
+                <MarketScreen onBack={goBack} />
               )}
 
               {/* Сервисы */}
