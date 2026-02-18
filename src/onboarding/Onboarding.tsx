@@ -71,22 +71,24 @@ function Scene1() {
           ))}
         </div>
 
-        <div className="space-y-6 px-1">
+        <div className="px-1">
           <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
             Биржа Бонусов от OEM Tech
           </h1>
           
-          <div className="space-y-4">
-            <p className="text-base text-zinc-600 leading-relaxed">
+          <div className="w-12 h-0.5 bg-zinc-300 my-4" />
+          
+          <div className="space-y-3">
+            <p className="text-sm text-zinc-600 leading-relaxed">
               Добро пожаловать в новую экономику лояльности.
             </p>
-            <p className="text-base text-zinc-600 leading-relaxed">
+            <p className="text-sm text-zinc-600 leading-relaxed">
               Здесь бонусы — это не просто баллы. Это актив, которым можно управлять.
             </p>
-            <p className="text-base text-zinc-600 leading-relaxed">
+            <p className="text-sm text-zinc-600 leading-relaxed">
               Обменивайте, выбирайте выгодные моменты, увеличивайте ценность своих покупок.
             </p>
-            <p className="text-base text-zinc-600 leading-relaxed font-medium">
+            <p className="text-sm text-zinc-600 leading-relaxed font-medium">
               Ваши бонусы начинают работать на вас.
             </p>
           </div>
@@ -146,16 +148,18 @@ function Scene2() {
           ))}
         </div>
 
-        <div className="space-y-6 px-1">
+        <div className="px-1">
           <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
             Покупки приносят больше
           </h2>
           
-          <div className="space-y-4">
-            <p className="text-base text-zinc-600 leading-relaxed">
+          <div className="w-12 h-0.5 bg-zinc-300 my-4" />
+          
+          <div className="space-y-3">
+            <p className="text-sm text-zinc-600 leading-relaxed">
               Ваши повседневные траты превращаются в ценность.
             </p>
-            <p className="text-base text-zinc-600 leading-relaxed">
+            <p className="text-sm text-zinc-600 leading-relaxed">
               Показывайте QR-код у партнёров и получайте бонусы, которые можно конвертировать и использовать выгодно.
             </p>
           </div>
@@ -208,16 +212,18 @@ function Scene3() {
           </motion.div>
         </div>
 
-        <div className="space-y-6 px-1">
+        <div className="px-1">
           <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
             Добро пожаловать на торги
           </h2>
           
-          <div className="space-y-4">
-            <p className="text-base text-zinc-600 leading-relaxed">
+          <div className="w-12 h-0.5 bg-zinc-300 my-4" />
+          
+          <div className="space-y-3">
+            <p className="text-sm text-zinc-600 leading-relaxed">
               Здесь бонусы работают по законам рынка.
             </p>
-            <p className="text-base text-zinc-600 leading-relaxed">
+            <p className="text-sm text-zinc-600 leading-relaxed">
               Следите за спросом на бонусы партнёров. Выбирайте момент. Обменивайте с выгодой.
             </p>
           </div>
@@ -273,16 +279,18 @@ function Scene4() {
           ))}
         </div>
 
-        <div className="space-y-6 px-1">
+        <div className="px-1">
           <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
             Теперь лояльность работает на вас
           </h2>
           
-          <div className="space-y-4">
-            <p className="text-base text-zinc-600 leading-relaxed">
+          <div className="w-12 h-0.5 bg-zinc-300 my-4" />
+          
+          <div className="space-y-3">
+            <p className="text-sm text-zinc-600 leading-relaxed">
               Вы управляете своими бонусами — а не наоборот.
             </p>
-            <p className="text-base text-zinc-600 leading-relaxed">
+            <p className="text-sm text-zinc-600 leading-relaxed">
               Копите то, что нужно вам. Обменивайте то, что ценят другие.
             </p>
           </div>
