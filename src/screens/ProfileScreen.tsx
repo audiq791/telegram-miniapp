@@ -54,20 +54,15 @@ export default function ProfileScreen() {
     console.log("Выход");
   };
 
-  // Мгновенная анимация нажатия — 0.02 секунды
+  // Анимация как в ServicesScreen — длительность 0.02ms
   const tapAnimation = {
-    scale: 0.92,
+    scale: 0.95,
     backgroundColor: "#e4e4e7",
     transition: { duration: 0.02 }
   };
 
-  const copyTapAnimation = {
-    scale: 0.85,
-    transition: { duration: 0.02 }
-  };
-
   const logoutTapAnimation = {
-    scale: 0.92,
+    scale: 0.95,
     backgroundColor: "#fee2e2",
     transition: { duration: 0.02 }
   };
@@ -122,7 +117,8 @@ export default function ProfileScreen() {
                 {userData.bonAddress}
               </div>
               <motion.button
-                whileTap={copyTapAnimation}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.02 }}
                 onClick={handleCopy}
                 className="h-8 px-3 rounded-lg bg-white border border-zinc-200 text-xs font-medium flex items-center gap-1 hover:bg-zinc-50 transition-colors shrink-0"
               >
@@ -202,7 +198,7 @@ export default function ProfileScreen() {
           </motion.button>
         </motion.div>
 
-        {/* Кнопка выхода - с такой же мгновенной анимацией */}
+        {/* Кнопка выхода — с той же анимацией */}
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
