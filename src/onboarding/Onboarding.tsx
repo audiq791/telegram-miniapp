@@ -78,17 +78,17 @@ function Scene1({ onNext }: { onNext: () => void }) {
           
           <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
           
-          <div className="space-y-3 mb-8">
-            <p className="text-sm text-zinc-600 leading-relaxed">
+          <div className="space-y-4 mb-8">
+            <p className="text-xl text-zinc-600 leading-relaxed">
               Добро пожаловать в новую экономику лояльности.
             </p>
-            <p className="text-sm text-zinc-600 leading-relaxed">
+            <p className="text-xl text-zinc-600 leading-relaxed">
               Здесь бонусы — это не просто баллы. Это актив, которым можно управлять.
             </p>
-            <p className="text-sm text-zinc-600 leading-relaxed">
+            <p className="text-xl text-zinc-600 leading-relaxed">
               Обменивайте, выбирайте выгодные моменты, увеличивайте ценность своих покупок.
             </p>
-            <p className="text-sm text-zinc-600 leading-relaxed font-medium">
+            <p className="text-xl text-zinc-600 leading-relaxed font-medium">
               Ваши бонусы начинают работать на вас.
             </p>
           </div>
@@ -166,11 +166,11 @@ function Scene2() {
           
           <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
           
-          <div className="space-y-3">
-            <p className="text-sm text-zinc-600 leading-relaxed">
+          <div className="space-y-4">
+            <p className="text-xl text-zinc-600 leading-relaxed">
               Ваши повседневные траты превращаются в ценность.
             </p>
-            <p className="text-sm text-zinc-600 leading-relaxed">
+            <p className="text-xl text-zinc-600 leading-relaxed">
               Показывайте QR-код у партнёров и получайте бонусы, которые можно конвертировать и использовать выгодно.
             </p>
           </div>
@@ -269,11 +269,11 @@ function Scene3() {
           
           <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
           
-          <div className="space-y-3">
-            <p className="text-sm text-zinc-600 leading-relaxed">
+          <div className="space-y-4">
+            <p className="text-xl text-zinc-600 leading-relaxed">
               Здесь бонусы работают по законам рынка.
             </p>
-            <p className="text-sm text-zinc-600 leading-relaxed">
+            <p className="text-xl text-zinc-600 leading-relaxed">
               Следите за спросом на бонусы партнёров. Выбирайте момент. Обменивайте с выгодой.
             </p>
           </div>
@@ -336,11 +336,11 @@ function Scene4() {
           
           <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
           
-          <div className="space-y-3">
-            <p className="text-sm text-zinc-600 leading-relaxed">
+          <div className="space-y-4">
+            <p className="text-xl text-zinc-600 leading-relaxed">
               Вы управляете своими бонусами — а не наоборот.
             </p>
-            <p className="text-sm text-zinc-600 leading-relaxed">
+            <p className="text-xl text-zinc-600 leading-relaxed">
               Копите то, что нужно вам. Обменивайте то, что ценят другие.
             </p>
           </div>
