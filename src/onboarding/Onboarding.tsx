@@ -93,7 +93,6 @@ function Scene1({ onNext }: { onNext: () => void }) {
             </p>
           </div>
 
-          {/* Кнопка Далее только на первом экране — под текстом */}
           <div className="flex justify-center">
             <motion.button
               whileTap={{ scale: 0.97 }}
@@ -183,45 +182,63 @@ function Scene2() {
 
 // ==================== ЭКРАН 3 ====================
 function Scene3() {
+  // Генерируем 40 свечей с рандомными высотами
+  const candles = Array.from({ length: 40 }, () => ({
+    height: Math.floor(Math.random() * 90) + 15, // от 15 до 105
+    isGreen: Math.random() > 0.48,
+  }));
+
   return (
     <div className="w-full h-full px-6 pt-12 overflow-y-auto">
       <div className="max-w-md mx-auto">
         <div className="relative h-80 w-full bg-linear-to-br from-slate-50/80 to-slate-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
-          <div className="flex items-end gap-1.5 h-40">
-            {[35, 65, 42, 82, 55, 78, 48].map((height, i) => (
+          {/* Контейнер для свечей */}
+          <div className="flex items-end gap-0.5 h-48 w-full px-1">
+            {candles.map((candle, i) => (
               <motion.div
                 key={i}
-                className="relative w-6"
+                className="relative flex-1 max-w-2"
                 initial={{ height: 0 }}
-                animate={{ height }}
+                animate={{ 
+                  height: candle.height,
+                }}
                 transition={{
-                  duration: 1.5,
-                  delay: i * 0.15,
+                  duration: 1.5 + Math.random() * 3,
+                  delay: i * 0.03,
                   repeat: Infinity,
                   repeatType: "reverse",
                   ease: "easeInOut",
                 }}
               >
+                {/* Тело свечи */}
                 <div
                   className={`absolute bottom-0 w-full ${
-                    height > 50 ? "bg-emerald-500/80" : "bg-rose-400/80"
-                  } rounded-t-md`}
-                  style={{ height: height * 0.7 }}
+                    candle.isGreen ? "bg-emerald-500/70" : "bg-rose-400/70"
+                  } rounded-t-sm`}
+                  style={{ height: '70%' }}
                 />
-                <div className="absolute w-px bg-zinc-300/50 left-1/2 -translate-x-1/2 h-full" />
+                {/* Фитиль */}
+                <div className="absolute w-px bg-zinc-400/30 left-1/2 -translate-x-1/2 h-full" />
               </motion.div>
             ))}
           </div>
 
-          <motion.div
-            className="absolute bottom-4 left-0 right-0 bg-zinc-800/80 backdrop-blur-sm text-white/90 py-2.5"
-            animate={{ x: [300, -300] }}
-            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-          >
-            <p className="text-xs font-light tracking-wider whitespace-nowrap px-4">
-              BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> • BON/WB <span className="text-emerald-400">+3.1%</span> •
-            </p>
-          </motion.div>
+          {/* Бегущая строка — всегда видна */}
+          <div className="absolute bottom-4 left-0 right-0 bg-zinc-800/80 backdrop-blur-sm text-white/90 py-2.5 overflow-hidden">
+            <motion.div
+              className="whitespace-nowrap"
+              animate={{ x: [300, -1200] }}
+              transition={{ 
+                duration: 18, 
+                repeat: Infinity, 
+                ease: "linear",
+              }}
+            >
+              <span className="text-xs font-light tracking-wider px-4">
+                BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> • BON/WB <span className="text-emerald-400">+3.1%</span> • BON/FUEL <span className="text-rose-400">-0.8%</span> • BON/MG <span className="text-emerald-400">+1.9%</span> • BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> •
+              </span>
+            </motion.div>
+          </div>
         </div>
 
         <div className="px-1">
