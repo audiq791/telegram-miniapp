@@ -323,11 +323,14 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
       transition={{ duration: 0.2 }}
     >
       <div className="mx-auto max-w-md px-4 pt-4 pb-8">
-        {/* Шапка — только Маркет и кнопка информации */}
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-zinc-900">Маркет</h1>
+        {/* Таблетка с Маркет и Info */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-xl border border-zinc-200 shadow-sm p-4 mb-6 flex items-center justify-between"
+        >
+          <h1 className="text-xl font-semibold text-zinc-900">Маркет</h1>
           
-          {/* Кнопка информации */}
           <IconButton 
             aria="info" 
             onClick={() => setIsMarketInfoOpen(true)}
@@ -335,7 +338,7 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
           >
             <Info size={20} className="text-zinc-600" />
           </IconButton>
-        </div>
+        </motion.div>
 
         {/* Селектор пары */}
         <div className="relative mb-4">
