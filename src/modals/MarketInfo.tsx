@@ -146,15 +146,15 @@ export default function MarketInfo({ isOpen, onClose }: MarketInfoProps) {
                   key={`title-${currentPage}`}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="text-xl font-bold"
+                  className="text-2xl font-bold" // ← увеличено с text-xl до text-2xl
                 >
                   {pages[currentPage].title}
                 </motion.h2>
               </div>
             </div>
 
-            {/* Контент со свайпом */}
-            <div className="relative h-64">
+            {/* Контент со свайпом — увеличенный шрифт */}
+            <div className="relative h-80"> {/* ← увеличено с h-64 до h-80 */}
               <AnimatePresence initial={false} custom={direction} mode="wait">
                 <motion.div
                   key={currentPage}
@@ -170,11 +170,11 @@ export default function MarketInfo({ isOpen, onClose }: MarketInfoProps) {
                   onDragEnd={handleDragEnd}
                   className="absolute inset-0 p-6 overflow-y-auto"
                 >
-                  <div className="space-y-4">
-                    <p className="text-sm text-zinc-600 leading-relaxed">
+                  <div className="space-y-6"> {/* ← увеличен отступ между абзацами */}
+                    <p className="text-lg text-zinc-600 leading-relaxed"> {/* ← увеличено с text-sm до text-lg */}
                       {pages[currentPage].text}
                     </p>
-                    <p className="text-sm text-zinc-600 leading-relaxed">
+                    <p className="text-lg text-zinc-600 leading-relaxed"> {/* ← увеличено с text-sm до text-lg */}
                       {pages[currentPage].text2}
                     </p>
                   </div>
