@@ -8,22 +8,22 @@ import LoginAccount from "../screens/LoginAccount";
 // ==================== ЭКРАН 1 ====================
 function Scene1() {
   return (
-    <div className="w-full h-full px-6 pt-10 overflow-y-auto">
-      <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
-        <div className="relative h-80 w-full bg-linear-to-br from-amber-50 to-orange-100 rounded-2xl flex items-center justify-center mb-4 overflow-hidden">
+    <div className="w-full h-full px-6 pt-12 overflow-y-auto">
+      <div className="max-w-md mx-auto">
+        <div className="relative h-80 w-full bg-linear-to-br from-amber-50/80 to-orange-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
           {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-2 h-2 bg-amber-400 rounded-full"
+              className="absolute w-2 h-2 bg-amber-400/60 rounded-full"
               initial={{
                 x: Math.random() * 300,
                 y: Math.random() * 300,
-                opacity: 0.3,
+                opacity: 0.2,
               }}
               animate={{
                 y: [null, -30, 30, -30],
                 x: [null, 20, -20, 20],
-                opacity: [0.3, 0.8, 0.3],
+                opacity: [0.2, 0.5, 0.2],
               }}
               transition={{
                 duration: 5 + Math.random() * 3,
@@ -36,45 +36,59 @@ function Scene1() {
           <motion.div
             className="relative z-10"
             animate={{
-              scale: [1, 1.1, 1],
-              rotate: [0, 5, -5, 0],
+              scale: [1, 1.08, 1],
+              rotate: [0, 3, -3, 0],
             }}
             transition={{
-              duration: 4,
+              duration: 5,
               repeat: Infinity,
               ease: "easeInOut",
             }}
           >
-            <div className="h-32 w-32 rounded-3xl bg-linear-to-br from-amber-500 to-orange-600 shadow-2xl flex items-center justify-center">
-              <span className="text-5xl font-bold text-white">B</span>
+            <div className="h-28 w-28 rounded-2xl bg-linear-to-br from-amber-500 to-orange-600 shadow-xl flex items-center justify-center">
+              <span className="text-4xl font-light text-white tracking-tight">B</span>
             </div>
           </motion.div>
 
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <motion.div
               key={i}
-              className="absolute h-12 w-12 rounded-2xl bg-white border-2 border-amber-200 shadow-lg flex items-center justify-center"
+              className="absolute h-10 w-10 rounded-xl bg-white/90 border border-amber-200/50 shadow-md flex items-center justify-center backdrop-blur-xs"
               animate={{
-                x: [0, 100 * Math.cos(i * 60), 0],
-                y: [0, 100 * Math.sin(i * 60), 0],
+                x: [0, 80 * Math.cos(i * 60), 0],
+                y: [0, 80 * Math.sin(i * 60), 0],
                 rotate: [0, 360],
               }}
               transition={{
-                duration: 8,
+                duration: 10,
                 repeat: Infinity,
-                delay: i * 0.5,
+                delay: i * 0.6,
+                ease: "linear",
               }}
             >
-              <span className="text-xl font-bold text-amber-600">B</span>
+              <span className="text-lg font-light text-amber-600">B</span>
             </motion.div>
           ))}
         </div>
 
-        <h2 className="text-2xl font-bold mb-1">Биржа Бонусов от OEM Tech</h2>
-        <p className="text-sm text-zinc-500 mb-3">Где бонусы становятся активом.</p>
-        <p className="text-base font-medium text-zinc-700">
-          Обменивайте. Управляйте. Умножайте.
-        </p>
+        <div className="space-y-4 px-1">
+          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+            Биржа Бонусов
+            <span className="block text-xl font-light text-zinc-500 mt-2 tracking-normal">
+              от OEM Tech
+            </span>
+          </h1>
+          
+          <p className="text-sm text-zinc-500 leading-relaxed max-w-xs">
+            Где бонусы становятся активом.
+          </p>
+          
+          <div className="pt-4">
+            <p className="text-base font-medium text-zinc-700 leading-relaxed">
+              Обменивайте. Управляйте. Умножайте.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -83,21 +97,21 @@ function Scene1() {
 // ==================== ЭКРАН 2 ====================
 function Scene2() {
   return (
-    <div className="w-full h-full px-6 pt-10 overflow-y-auto">
-      <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
-        <div className="relative h-80 w-full bg-linear-to-br from-emerald-50 to-green-100 rounded-2xl flex items-center justify-center mb-4 overflow-hidden">
+    <div className="w-full h-full px-6 pt-12 overflow-y-auto">
+      <div className="max-w-md mx-auto">
+        <div className="relative h-80 w-full bg-linear-to-br from-emerald-50/80 to-green-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
           <motion.div
             className="relative"
             animate={{ scale: [1, 1.02, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
+            transition={{ duration: 3, repeat: Infinity }}
           >
-            <div className="h-40 w-40 bg-white rounded-2xl shadow-lg p-2">
+            <div className="h-36 w-36 bg-white rounded-2xl shadow-lg p-3">
               <div className="grid grid-cols-7 gap-1">
                 {[...Array(49)].map((_, i) => (
                   <div
                     key={i}
-                    className={`h-3 w-3 rounded-sm ${
-                      Math.random() > 0.6 ? "bg-black" : "bg-transparent"
+                    className={`h-2.5 w-2.5 rounded-xs ${
+                      Math.random() > 0.6 ? "bg-zinc-900" : "bg-transparent"
                     }`}
                   />
                 ))}
@@ -105,35 +119,46 @@ function Scene2() {
             </div>
 
             <motion.div
-              className="absolute left-0 right-0 h-1 bg-emerald-400"
+              className="absolute left-0 right-0 h-0.5 bg-emerald-400/70"
               animate={{
                 top: ["10%", "90%", "10%"],
-                opacity: [0.5, 1, 0.5],
+                opacity: [0.3, 0.7, 0.3],
               }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
             />
           </motion.div>
 
-          {[...Array(8)].map((_, i) => (
+          {[...Array(6)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute h-8 w-8 rounded-full bg-linear-to-br from-amber-400 to-amber-600"
+              className="absolute h-6 w-6 rounded-full bg-linear-to-br from-amber-400/60 to-amber-600/60"
               initial={{ x: Math.random() * 200 + 50, y: -50 }}
               animate={{ y: 400, rotate: 360 }}
               transition={{
-                duration: 3 + Math.random() * 2,
+                duration: 4 + Math.random() * 2,
                 repeat: Infinity,
                 delay: Math.random() * 2,
+                ease: "linear",
               }}
             />
           ))}
         </div>
 
-        <h2 className="text-2xl font-bold mb-1">Покупки приносят больше</h2>
-        <p className="text-sm text-zinc-500 mb-3">Ваши повседневные траты превращаются в ценность.</p>
-        <p className="text-base font-medium text-zinc-700">
-          Показывайте QR-код у партнёров и получайте бонусы, которые можно конвертировать и использовать выгодно.
-        </p>
+        <div className="space-y-4 px-1">
+          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+            Покупки приносят больше
+          </h2>
+          
+          <p className="text-sm text-zinc-500 leading-relaxed max-w-xs">
+            Ваши повседневные траты превращаются в ценность.
+          </p>
+          
+          <div className="pt-4">
+            <p className="text-base text-zinc-600 leading-relaxed">
+              Показывайте QR-код у партнёров и получайте бонусы, которые можно конвертировать и использовать выгодно.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -142,50 +167,61 @@ function Scene2() {
 // ==================== ЭКРАН 3 ====================
 function Scene3() {
   return (
-    <div className="w-full h-full px-6 pt-10 overflow-y-auto">
-      <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
-        <div className="relative h-80 w-full bg-linear-to-br from-slate-50 to-slate-100 rounded-2xl flex items-center justify-center mb-4 overflow-hidden">
-          <div className="flex items-end gap-2 h-48">
-            {[40, 70, 45, 90, 60, 85, 55].map((height, i) => (
+    <div className="w-full h-full px-6 pt-12 overflow-y-auto">
+      <div className="max-w-md mx-auto">
+        <div className="relative h-80 w-full bg-linear-to-br from-slate-50/80 to-slate-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
+          <div className="flex items-end gap-1.5 h-40">
+            {[35, 65, 42, 82, 55, 78, 48].map((height, i) => (
               <motion.div
                 key={i}
-                className="relative w-8"
+                className="relative w-6"
                 initial={{ height: 0 }}
                 animate={{ height }}
                 transition={{
-                  duration: 1,
-                  delay: i * 0.1,
+                  duration: 1.5,
+                  delay: i * 0.15,
                   repeat: Infinity,
                   repeatType: "reverse",
+                  ease: "easeInOut",
                 }}
               >
                 <div
                   className={`absolute bottom-0 w-full ${
-                    height > 50 ? "bg-green-500" : "bg-red-500"
-                  } rounded-t-sm`}
+                    height > 50 ? "bg-emerald-500/80" : "bg-rose-400/80"
+                  } rounded-t-md`}
                   style={{ height: height * 0.7 }}
                 />
-                <div className="absolute w-0.5 bg-black/30 left-1/2 -translate-x-1/2 h-full" />
+                <div className="absolute w-px bg-zinc-300/50 left-1/2 -translate-x-1/2 h-full" />
               </motion.div>
             ))}
           </div>
 
           <motion.div
-            className="absolute bottom-4 left-0 right-0 bg-slate-800/80 text-white py-2"
+            className="absolute bottom-4 left-0 right-0 bg-zinc-800/80 backdrop-blur-sm text-white/90 py-2.5"
             animate={{ x: [300, -300] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
           >
-            <p className="text-sm whitespace-nowrap">
-              BON/VV: +2.4% • BON/DODO: -1.2% • BON/CSKA: +5.7% • BON/WB: +3.1% •
+            <p className="text-xs font-light tracking-wider whitespace-nowrap px-4">
+              BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> • BON/WB <span className="text-emerald-400">+3.1%</span> •
             </p>
           </motion.div>
         </div>
 
-        <h2 className="text-2xl font-bold mb-1">Добро пожаловать на торги</h2>
-        <p className="text-sm text-zinc-500 mb-3">Здесь бонусы работают по законам рынка.</p>
-        <p className="text-base font-medium text-zinc-700">
-          Следите за спросом на бонусы партнёров. Выбирайте момент. Обменивайте с выгодой.
-        </p>
+        <div className="space-y-4 px-1">
+          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+            Добро пожаловать на торги
+          </h2>
+          
+          <p className="text-sm text-zinc-500 leading-relaxed max-w-xs">
+            Здесь бонусы работают по законам рынка.
+          </p>
+          
+          <div className="pt-4">
+            <p className="text-base text-zinc-600 leading-relaxed">
+              Следите за спросом на бонусы партнёров. Выбирайте момент. Обменивайте с выгодой.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -194,54 +230,64 @@ function Scene3() {
 // ==================== ЭКРАН 4 ====================
 function Scene4() {
   return (
-    <div className="w-full h-full px-6 pt-10 overflow-y-auto">
-      <div className="mt-6 rounded-[28px] border border-zinc-200 bg-white overflow-hidden shadow-sm p-6">
-        <div className="relative h-80 w-full bg-linear-to-br from-violet-50 to-purple-100 rounded-2xl flex items-center justify-center mb-4 overflow-hidden">
+    <div className="w-full h-full px-6 pt-12 overflow-y-auto">
+      <div className="max-w-md mx-auto">
+        <div className="relative h-80 w-full bg-linear-to-br from-violet-50/80 to-purple-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
           <motion.div
             className="relative z-10"
             animate={{ rotate: 360 }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
           >
-            <div className="h-32 w-32 rounded-full border-4 border-violet-400 border-t-violet-600" />
+            <div className="h-28 w-28 rounded-full border-2 border-violet-400/30 border-t-violet-500/70" />
           </motion.div>
 
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <motion.div
               key={i}
-              className="absolute h-12 w-12 rounded-2xl bg-white shadow-lg flex items-center justify-center"
+              className="absolute h-10 w-10 rounded-xl bg-white/90 shadow-md flex items-center justify-center backdrop-blur-xs"
               style={{
-                background: `linear-gradient(135deg, hsl(${i * 60}, 70%, 50%), hsl(${i * 60 + 30}, 70%, 50%))`,
+                background: `linear-gradient(135deg, hsl(${i * 60}, 80%, 95%), hsl(${i * 60 + 30}, 80%, 92%))`,
               }}
               animate={{
-                x: [0, 120 * Math.cos(i * 60), 0],
-                y: [0, 120 * Math.sin(i * 60), 0],
+                x: [0, 100 * Math.cos(i * 60), 0],
+                y: [0, 100 * Math.sin(i * 60), 0],
                 rotate: [0, 360],
               }}
-              transition={{ duration: 5, repeat: Infinity, delay: i * 0.3 }}
+              transition={{ duration: 8, repeat: Infinity, delay: i * 0.4, ease: "linear" }}
             >
-              <span className="text-white font-bold">B</span>
+              <span className="text-sm font-light text-zinc-700">B</span>
             </motion.div>
           ))}
 
           {[...Array(12)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-1 h-1 bg-purple-400 rounded-full"
+              className="absolute w-1 h-1 bg-purple-400/40 rounded-full"
               animate={{
-                x: [0, 150 * Math.cos(i * 30), 0],
-                y: [0, 150 * Math.sin(i * 30), 0],
-                opacity: [0, 1, 0],
+                x: [0, 120 * Math.cos(i * 30), 0],
+                y: [0, 120 * Math.sin(i * 30), 0],
+                opacity: [0, 0.6, 0],
               }}
-              transition={{ duration: 3, repeat: Infinity, delay: i * 0.2 }}
+              transition={{ duration: 4, repeat: Infinity, delay: i * 0.25 }}
             />
           ))}
         </div>
 
-        <h2 className="text-2xl font-bold mb-1">Теперь лояльность работает на вас</h2>
-        <p className="text-sm text-zinc-500 mb-3">Вы управляете своими бонусами — а не наоборот.</p>
-        <p className="text-base font-medium text-zinc-700">
-          Копите то, что нужно вам. Обменивайте то, что ценят другие.
-        </p>
+        <div className="space-y-4 px-1">
+          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+            Теперь лояльность работает на вас
+          </h2>
+          
+          <p className="text-sm text-zinc-500 leading-relaxed max-w-xs">
+            Вы управляете своими бонусами — а не наоборот.
+          </p>
+          
+          <div className="pt-4">
+            <p className="text-base text-zinc-600 leading-relaxed">
+              Копите то, что нужно вам. Обменивайте то, что ценят другие.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -285,13 +331,9 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     const swipe = info.offset.x;
     const velocity = info.velocity.x;
 
-    // На экране логина (index === 4) — свайп вправо в любом месте → на экран 4
     if (index === 4 && swipe > 50 && velocity > 0.2) {
       prev();
-    }
-    
-    // На остальных экранах свайпы работают как обычно
-    else if (index < 4) {
+    } else if (index < 4) {
       if (swipe < -50 && velocity < -0.2) {
         next();
       } else if (swipe > 50 && velocity > 0.2) {
@@ -303,16 +345,16 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const variants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 300 : -300,
-      opacity: 0
+      opacity: 0,
     }),
     center: {
       x: 0,
-      opacity: 1
+      opacity: 1,
     },
     exit: (direction: number) => ({
       x: direction < 0 ? 300 : -300,
-      opacity: 0
-    })
+      opacity: 0,
+    }),
   };
 
   return (
@@ -355,16 +397,13 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
         </div>
 
         {!isExiting && index < 4 && (
-          <div 
-            className="absolute left-0 right-0 px-6"
-            style={{ bottom: "140px" }}
-          >
+          <div className="absolute left-0 right-0 px-6" style={{ bottom: "140px" }}>
             <div className="flex items-center justify-center gap-2 mb-5">
               {[0, 1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className={`h-2 rounded-full transition-all ${
-                    index === i ? "w-6 bg-zinc-900" : "w-2 bg-zinc-300"
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    index === i ? "w-6 bg-zinc-900" : "w-1.5 bg-zinc-300"
                   }`}
                 />
               ))}
@@ -373,21 +412,21 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
             <div className="flex gap-3 justify-center">
               {index > 0 && (
                 <motion.button
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.97 }}
                   transition={{ type: "spring", stiffness: 800, damping: 20 }}
                   onClick={prev}
-                  className="w-28 h-14 rounded-2xl border border-zinc-200 bg-white text-zinc-900 font-semibold text-lg shadow-sm"
+                  className="w-28 h-12 rounded-xl border border-zinc-200 bg-white/80 backdrop-blur-xs text-zinc-700 font-medium text-base shadow-sm hover:bg-white transition-colors"
                 >
                   Назад
                 </motion.button>
               )}
-              
+
               {index < 4 && (
                 <motion.button
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.97 }}
                   transition={{ type: "spring", stiffness: 800, damping: 20 }}
                   onClick={next}
-                  className="w-28 h-14 rounded-2xl bg-zinc-900 text-white font-semibold text-lg shadow-sm"
+                  className="w-28 h-12 rounded-xl bg-zinc-900 text-white font-medium text-base shadow-md hover:bg-zinc-800 transition-colors"
                 >
                   Далее
                 </motion.button>
