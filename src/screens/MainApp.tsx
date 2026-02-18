@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, PanInfo } from "framer-motion";
 import {
   WalletCards,
   ShoppingBag,
@@ -45,6 +45,9 @@ export default function MainApp() {
 
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+
+  // Массив табов для удобства навигации
+  const tabs: ("wallet" | "market" | "services" | "profile")[] = ["wallet", "market", "services", "profile"];
 
   useEffect(() => {
     const handleResize = () => {
@@ -185,6 +188,29 @@ export default function MainApp() {
     tg?.HapticFeedback.impactOccurred("light");
   };
 
+  // Обработчик свайпа для переключения табов
+  const handleTabDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    // Не переключаем табы, если мы не на главном экране
+    if (route.name !== "home") return;
+
+    const swipe = info.offset.x;
+    const velocity = info.velocity.x;
+    const currentIndex = tabs.indexOf(tab);
+
+    // Свайп влево → следующий таб
+    if (swipe < -50 && velocity < -0.2 && currentIndex < tabs.length - 1) {
+      const tg = (window as any).Telegram?.WebApp;
+      tg?.HapticFeedback.impactOccurred("light");
+      setTab(tabs[currentIndex + 1]);
+    }
+    // Свайп вправо → предыдущий таб
+    else if (swipe > 50 && velocity > 0.2 && currentIndex > 0) {
+      const tg = (window as any).Telegram?.WebApp;
+      tg?.HapticFeedback.impactOccurred("light");
+      setTab(tabs[currentIndex - 1]);
+    }
+  };
+
   const showNavbar = route.name === "home";
 
   return (
@@ -237,17 +263,24 @@ export default function MainApp() {
         </div>
       </header>
 
-      {/* CONTENT */}
-      <div className="mx-auto max-w-md">
+      {/* CONTENT с поддержкой свайпа */}
+      <motion.div
+        className="mx-auto max-w-md"
+        drag={route.name === "home" ? "x" : false}
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.2}
+        dragMomentum={false}
+        onDragEnd={handleTabDragEnd}
+      >
         <AnimatePresence mode="wait">
           {route.name === "home" ? (
             <motion.main
               key={tab}
               className="px-4 pt-4 pb-28"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ type: "spring", stiffness: 260, damping: 30 }}
             >
               {/* Кошелек */}
               {tab === "wallet" && (
@@ -397,7 +430,7 @@ export default function MainApp() {
             />
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
 
       {/* НАВБАР */}
       <AnimatePresence>
