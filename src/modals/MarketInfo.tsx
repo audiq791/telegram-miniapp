@@ -146,15 +146,15 @@ export default function MarketInfo({ isOpen, onClose }: MarketInfoProps) {
                   key={`title-${currentPage}`}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="text-2xl font-bold" // ← увеличено с text-xl до text-2xl
+                  className="text-2xl font-semibold tracking-tight"
                 >
                   {pages[currentPage].title}
                 </motion.h2>
               </div>
             </div>
 
-            {/* Контент со свайпом — увеличенный шрифт */}
-            <div className="relative h-80"> {/* ← увеличено с h-64 до h-80 */}
+            {/* Контент со свайпом — улучшенная типографика */}
+            <div className="relative h-80">
               <AnimatePresence initial={false} custom={direction} mode="wait">
                 <motion.div
                   key={currentPage}
@@ -170,11 +170,11 @@ export default function MarketInfo({ isOpen, onClose }: MarketInfoProps) {
                   onDragEnd={handleDragEnd}
                   className="absolute inset-0 p-6 overflow-y-auto"
                 >
-                  <div className="space-y-6"> {/* ← увеличен отступ между абзацами */}
-                    <p className="text-lg text-zinc-600 leading-relaxed"> {/* ← увеличено с text-sm до text-lg */}
+                  <div className="space-y-6">
+                    <p className="text-lg font-light leading-relaxed tracking-wide text-zinc-700">
                       {pages[currentPage].text}
                     </p>
-                    <p className="text-lg text-zinc-600 leading-relaxed"> {/* ← увеличено с text-sm до text-lg */}
+                    <p className="text-lg font-light leading-relaxed tracking-wide text-zinc-700">
                       {pages[currentPage].text2}
                     </p>
                   </div>
@@ -229,7 +229,7 @@ export default function MarketInfo({ isOpen, onClose }: MarketInfoProps) {
                   animate={{ opacity: 1, y: 0 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={onClose}
-                  className="w-full mt-4 py-3 bg-zinc-900 text-white rounded-xl font-medium"
+                  className="w-full mt-4 py-3 bg-zinc-900 text-white rounded-xl font-medium tracking-wide"
                 >
                   Понятно, спасибо
                 </motion.button>
