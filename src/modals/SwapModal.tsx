@@ -6,7 +6,8 @@ import {
   ChevronDown,
   ArrowLeftRight,
   Info,
-  Repeat
+  Repeat,
+  AlertCircle
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { partnersSeed } from "../data/partners";
@@ -59,7 +60,6 @@ export default function SwapModal({
   // Выбор партнера "Откуда"
   const handleSelectFrom = (partner: typeof partnersSeed[0]) => {
     if (partner.id === toPartner.id) {
-      // Если выбрали того же, что и в "Куда", меняем местами
       setToPartner(fromPartner);
     }
     setFromPartner(partner);
@@ -69,7 +69,6 @@ export default function SwapModal({
   // Выбор партнера "Куда"
   const handleSelectTo = (partner: typeof partnersSeed[0]) => {
     if (partner.id === fromPartner.id) {
-      // Нельзя выбрать того же
       return;
     }
     setToPartner(partner);
@@ -275,11 +274,20 @@ export default function SwapModal({
                       </div>
                     </div>
 
-                    {/* Информация о комиссии */}
+                    {/* Информация о комиссии — ПЕРВАЯ ПОДСКАЗКА */}
                     <div className="p-3 bg-blue-50 rounded-2xl flex items-start gap-2">
                       <Info size={16} className="text-blue-600 shrink-0 mt-0.5" />
                       <p className="text-xs text-blue-700">
                         Комиссия за обмен составляет 2%. Минимальная сумма обмена - 100 B
+                      </p>
+                    </div>
+
+                    {/* ВТОРАЯ ПОДСКАЗКА — про Маркет и обмен */}
+                    <div className="p-3 bg-amber-50 rounded-2xl flex items-start gap-2">
+                      <AlertCircle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                      <p className="text-xs text-amber-700">
+                        Обмен напрямую возможен только при взаимном подключении функции обмена партнерами. 
+                        Во вкладке Маркет вы можете продать или купить любые бонусы партнеров.
                       </p>
                     </div>
 
