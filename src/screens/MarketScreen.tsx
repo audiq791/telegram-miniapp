@@ -81,7 +81,6 @@ const generateCandleData = (count: number, basePrice: number) => {
   let currentPrice = basePrice;
   
   for (let i = 0; i < count; i++) {
-    // Создаём тренд (лёгкое движение вверх/вниз)
     const trend = Math.sin(i * 0.5) * 0.02;
     const volatility = 0.03;
     
@@ -136,123 +135,94 @@ const generateOrderBook = (basePrice: number, side: "bids" | "asks"): OrderBookI
 };
 
 // Компонент свечного графика
-function CandleChart({ data, height = 180 }: { data: any[]; height?: number }) {
+function CandleChart({ data, height = 168 }: { data: any[]; height?: number }) {
   const maxPrice = Math.max(...data.map(d => d.high));
   const minPrice = Math.min(...data.map(d => d.low));
   const range = maxPrice - minPrice || 1;
   
-  // Нормализация позиций для анимации
-  const getCandleY = (price: number) => ((maxPrice - price) / range) * height;
+  const getY = (price: number) => ((maxPrice - price) / range) * height;
   
   return (
-    <div className="relative w-full" style={{ height }}>
-      {/* Сетка */}
-      <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-        {[0, 1, 2, 3].map(i => (
-          <div key={i} className="border-b border-zinc-200/30 w-full h-0" />
-        ))}
-      </div>
-      
-      {/* Свечи */}
-      <div className="absolute inset-0 flex items-end">
-        {data.map((candle, i) => {
-          const isGreen = candle.close >= candle.open;
-          const highY = getCandleY(candle.high);
-          const lowY = getCandleY(candle.low);
-          const openY = getCandleY(candle.open);
-          const closeY = getCandleY(candle.close);
-          
-          const bodyTop = Math.min(openY, closeY);
-          const bodyBottom = Math.max(openY, closeY);
-          const bodyHeight = bodyBottom - bodyTop;
-          
-          return (
+    <div className="relative w-full h-full">
+      {data.map((candle, i) => {
+        const isGreen = candle.close >= candle.open;
+        const highY = getY(candle.high);
+        const lowY = getY(candle.low);
+        const openY = getY(candle.open);
+        const closeY = getY(candle.close);
+        
+        const bodyTop = Math.min(openY, closeY);
+        const bodyBottom = Math.max(openY, closeY);
+        const bodyHeight = bodyBottom - bodyTop;
+        const xPos = (i / data.length) * 100;
+        const width = 80 / data.length;
+        
+        return (
+          <div
+            key={i}
+            className="absolute"
+            style={{
+              left: `${xPos}%`,
+              width: `${width}%`,
+              height: '100%',
+              transform: 'translateX(-40%)',
+            }}
+          >
+            {/* Верхний фитиль */}
             <motion.div
-              key={i}
-              className="relative flex-1 flex justify-center group"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ 
-                duration: 2,
-                delay: i * 0.05,
-                ease: "easeOut"
+              className={`absolute w-0.5 ${isGreen ? 'bg-emerald-500/40' : 'bg-rose-500/40'}`}
+              style={{
+                height: highY - bodyTop,
+                top: highY,
+                left: '50%',
+                transform: 'translateX(-50%)',
               }}
-            >
-              {/* Верхний фитиль */}
-              <motion.div
-                className={`absolute w-0.5 ${isGreen ? 'bg-emerald-500/40' : 'bg-rose-500/40'}`}
-                style={{
-                  height: highY - bodyTop,
-                  top: highY,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                }}
-                initial={{ scaleY: 0, opacity: 0 }}
-                animate={{ scaleY: 1, opacity: 1 }}
-                transition={{ 
-                  duration: 1.5,
-                  delay: i * 0.05 + 0.2,
-                  ease: "easeOut"
-                }}
-              />
-              
-              {/* Тело свечи */}
-              <motion.div
-                className={`absolute w-3/4 ${isGreen ? 'bg-emerald-500' : 'bg-rose-500'} rounded-sm`}
-                style={{
-                  height: bodyHeight,
-                  top: bodyTop,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                }}
-                initial={{ scaleY: 0, opacity: 0 }}
-                animate={{ scaleY: 1, opacity: 1 }}
-                transition={{ 
-                  duration: 1.5,
-                  delay: i * 0.05,
-                  ease: "easeOut"
-                }}
-              />
-              
-              {/* Нижний фитиль */}
-              <motion.div
-                className={`absolute w-0.5 ${isGreen ? 'bg-emerald-500/40' : 'bg-rose-500/40'}`}
-                style={{
-                  height: bodyBottom - lowY,
-                  top: bodyBottom,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                }}
-                initial={{ scaleY: 0, opacity: 0 }}
-                animate={{ scaleY: 1, opacity: 1 }}
-                transition={{ 
-                  duration: 1.5,
-                  delay: i * 0.05 + 0.2,
-                  ease: "easeOut"
-                }}
-              />
-              
-              {/* Медленная пульсация свечи */}
-              <motion.div
-                className={`absolute w-full h-full ${isGreen ? 'bg-emerald-500/5' : 'bg-rose-500/5'}`}
-                style={{
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                }}
-                animate={{
-                  opacity: [0, 0.3, 0],
-                }}
-                transition={{
-                  duration: 3,
-                  delay: i * 0.1,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            </motion.div>
-          );
-        })}
-      </div>
+              initial={{ scaleY: 0, opacity: 0 }}
+              animate={{ scaleY: 1, opacity: 1 }}
+              transition={{ duration: 1.5, delay: i * 0.05 + 0.2 }}
+            />
+            
+            {/* Тело свечи */}
+            <motion.div
+              className={`absolute w-3/4 ${isGreen ? 'bg-emerald-500' : 'bg-rose-500'} rounded-sm`}
+              style={{
+                height: bodyHeight,
+                top: bodyTop,
+                left: '50%',
+                transform: 'translateX(-50%)',
+              }}
+              initial={{ scaleY: 0, opacity: 0 }}
+              animate={{ scaleY: 1, opacity: 1 }}
+              transition={{ duration: 1.5, delay: i * 0.05 }}
+            />
+            
+            {/* Нижний фитиль */}
+            <motion.div
+              className={`absolute w-0.5 ${isGreen ? 'bg-emerald-500/40' : 'bg-rose-500/40'}`}
+              style={{
+                height: bodyBottom - lowY,
+                top: bodyBottom,
+                left: '50%',
+                transform: 'translateX(-50%)',
+              }}
+              initial={{ scaleY: 0, opacity: 0 }}
+              animate={{ scaleY: 1, opacity: 1 }}
+              transition={{ duration: 1.5, delay: i * 0.05 + 0.2 }}
+            />
+            
+            {/* Пульсация */}
+            <motion.div
+              className={`absolute w-full h-full ${isGreen ? 'bg-emerald-500/5' : 'bg-rose-500/5'}`}
+              style={{
+                left: '50%',
+                transform: 'translateX(-50%)',
+              }}
+              animate={{ opacity: [0, 0.2, 0] }}
+              transition={{ duration: 3, delay: i * 0.1, repeat: Infinity }}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -267,11 +237,9 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
   const [orderPrice, setOrderPrice] = useState(selectedPair.lastPrice.toString());
   const [timeframe, setTimeframe] = useState<Timeframe>("24h");
   
-  // Генерация данных для графика
   const candleData = useMemo(() => 
     generateCandleData(30, selectedPair.lastPrice), [selectedPair, timeframe]);
   
-  // Генерация стакана
   const [bids, setBids] = useState<OrderBookItem[]>([]);
   const [asks, setAsks] = useState<OrderBookItem[]>([]);
   
@@ -281,17 +249,14 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
     setOrderPrice(selectedPair.lastPrice.toString());
   }, [selectedPair]);
 
-  // Анимация обновления стакана
   useEffect(() => {
     const interval = setInterval(() => {
       setBids(prev => generateOrderBook(selectedPair.lastPrice, "bids"));
       setAsks(prev => generateOrderBook(selectedPair.lastPrice, "asks"));
     }, 5000);
-    
     return () => clearInterval(interval);
   }, [selectedPair]);
 
-  // Фильтрация пар
   const filteredPairs = PAIRS.filter(pair => 
     pair.baseAsset.toLowerCase().includes(searchQuery.toLowerCase()) ||
     pair.quoteAsset.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -452,11 +417,28 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
           </div>
 
           {/* Свечной график */}
-          <div className="h-44 w-full relative">
-            <CandleChart data={candleData} height={176} />
+          <div className="relative h-44 w-full border border-zinc-100 rounded-lg bg-zinc-50/50 overflow-hidden">
+            {/* Сетка */}
+            <div className="absolute inset-0">
+              <div className="absolute inset-0 flex flex-col justify-between pointer-events-none px-2">
+                {[0, 1, 2, 3].map(i => (
+                  <div key={i} className="border-b border-zinc-200/30 w-full h-0" />
+                ))}
+              </div>
+              <div className="absolute inset-0 flex justify-between pointer-events-none px-2">
+                {[0, 1, 2, 3, 4].map(i => (
+                  <div key={i} className="border-l border-zinc-200/30 h-full w-0" />
+                ))}
+              </div>
+            </div>
+
+            {/* Свечи */}
+            <div className="absolute inset-0 px-2 py-1">
+              <CandleChart data={candleData} height={168} />
+            </div>
           </div>
 
-          {/* Дополнительная информация */}
+          {/* Информация под графиком */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-zinc-100 text-xs">
             <div className="flex items-center gap-4">
               <div>
@@ -505,14 +487,13 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
             </div>
           </div>
 
-          {/* Заголовки */}
           <div className="grid grid-cols-3 gap-2 mb-2 text-xs text-zinc-500">
             <div>Цена ({selectedPair.quoteAsset})</div>
             <div className="text-right">Объём ({selectedPair.baseAsset})</div>
             <div className="text-right">Сумма</div>
           </div>
 
-          {/* Продажи (asks) */}
+          {/* Продажи */}
           <div className="space-y-1 mb-2">
             {asks.map((ask, i) => (
               <motion.div
@@ -559,7 +540,7 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
             </div>
           </motion.div>
 
-          {/* Покупки (bids) */}
+          {/* Покупки */}
           <div className="space-y-1 mt-2">
             {bids.map((bid, i) => (
               <motion.div
@@ -583,7 +564,6 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
             ))}
           </div>
 
-          {/* Спред */}
           <div className="mt-3 pt-3 border-t border-zinc-100 flex justify-between text-xs text-zinc-500">
             <span>Спред</span>
             <span className="font-medium text-zinc-700">
