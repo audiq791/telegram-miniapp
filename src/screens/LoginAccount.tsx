@@ -6,11 +6,13 @@ import {
   Headphones,
   Building2,
   LogIn,
-  Send
+  Send,
+  ArrowLeft
 } from "lucide-react";
 
 interface LoginAccountProps {
   onLogin?: () => void;
+  onBack?: () => void; // новый проп для возврата на 4-й экран
 }
 
 // Анимация летающих бонусов
@@ -87,7 +89,7 @@ function FloatingBonuses() {
   );
 }
 
-export default function LoginAccount({ onLogin }: LoginAccountProps) {
+export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [copied, setCopied] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -133,9 +135,23 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
       exit={{ opacity: 0 }}
       className="bg-zinc-50 min-h-screen"
     >
+      {/* Шапка с кнопкой назад */}
       <div className="bg-white border-b border-zinc-200">
-        <div className="max-w-md mx-auto px-4 py-6">
+        <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-zinc-900">Профиль</h1>
+          
+          {/* Кнопка назад (стрелка влево) */}
+          {onBack && (
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              transition={{ type: "spring", stiffness: 800, damping: 20 }}
+              onClick={onBack}
+              className="h-10 w-10 rounded-full bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors"
+              aria-label="Назад"
+            >
+              <ArrowLeft size={20} className="text-zinc-700" />
+            </motion.button>
+          )}
         </div>
       </div>
 
@@ -192,7 +208,6 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
         </motion.button>
 
         <div className="space-y-2 mt-8">
-          {/* Кнопка Поддержка - копирует email как в MoreMenu */}
           <motion.button
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 800, damping: 20 }}
@@ -203,7 +218,6 @@ export default function LoginAccount({ onLogin }: LoginAccountProps) {
             Техническая Поддержка
           </motion.button>
           
-          {/* Кнопка О компании - ведёт на сайт как в MoreMenu */}
           <motion.button
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 800, damping: 20 }}
