@@ -324,7 +324,7 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
     >
       <div className="mx-auto max-w-md px-4 pt-4 pb-8">
         {/* Шапка с Маркет и Info */}
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-0">
           <h1 className="text-2xl font-bold text-zinc-900">Маркет</h1>
           
           <IconButton 
@@ -335,6 +335,9 @@ export default function MarketScreen({ onBack }: { onBack: () => void }) {
             <Info size={20} className="text-zinc-600" />
           </IconButton>
         </div>
+
+        {/* Подзаголовок как в ServicesScreen */}
+        <p className="text-xs text-zinc-500 mt-1 mb-2">Биржа бонусов</p>
 
         {/* Красивая линия как в профиле */}
         <motion.div
