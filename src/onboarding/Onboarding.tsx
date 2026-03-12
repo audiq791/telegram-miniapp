@@ -339,6 +339,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [direction, setDirection] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
   const [swipeOffset, setSwipeOffset] = useState(0);
+  const swipeAreaRef = useRef<HTMLDivElement | null>(null);
   const isDoneRef = useRef(false);
   const swipeStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const isSwipeGestureRef = useRef(false);
@@ -347,6 +348,56 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   useEffect(() => {
     setSwipeOffset(0);
   }, [index]);
+
+  useEffect(() => {
+    const node = swipeAreaRef.current;
+    if (!node) return;
+
+    const onTouchStart = (event: TouchEvent) => {
+      if (activeSwipeInputRef.current === "pointer") return;
+      activeSwipeInputRef.current = "touch";
+      const touch = event.touches[0];
+      if (!touch) return;
+      beginSwipe(touch.clientX, touch.clientY);
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      if (activeSwipeInputRef.current !== "touch") return;
+      const touch = event.touches[0];
+      if (!touch) return;
+      const isHorizontalSwipe = updateSwipe(touch.clientX, touch.clientY);
+      if (isHorizontalSwipe && event.cancelable) {
+        event.preventDefault();
+      }
+    };
+
+    const onTouchEnd = (event: TouchEvent) => {
+      if (activeSwipeInputRef.current !== "touch") return;
+      const touch = event.changedTouches[0];
+      if (!touch) {
+        cancelSwipe();
+        return;
+      }
+      finalizeSwipe(touch.clientX, touch.clientY);
+      activeSwipeInputRef.current = null;
+    };
+
+    const onTouchCancel = () => {
+      cancelSwipe();
+    };
+
+    node.addEventListener("touchstart", onTouchStart, { passive: true });
+    node.addEventListener("touchmove", onTouchMove, { passive: false });
+    node.addEventListener("touchend", onTouchEnd, { passive: true });
+    node.addEventListener("touchcancel", onTouchCancel, { passive: true });
+
+    return () => {
+      node.removeEventListener("touchstart", onTouchStart);
+      node.removeEventListener("touchmove", onTouchMove);
+      node.removeEventListener("touchend", onTouchEnd);
+      node.removeEventListener("touchcancel", onTouchCancel);
+    };
+  }, [index, isExiting]);
 
   const handleDone = () => {
     if (isDoneRef.current) return;
@@ -473,35 +524,6 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     activeSwipeInputRef.current = null;
   };
 
-  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
-    if (activeSwipeInputRef.current === "pointer") return;
-    activeSwipeInputRef.current = "touch";
-    const touch = event.touches[0];
-    if (!touch) return;
-    beginSwipe(touch.clientX, touch.clientY);
-  };
-
-  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
-    if (activeSwipeInputRef.current !== "touch") return;
-    const touch = event.touches[0];
-    if (!touch) return;
-    const isHorizontalSwipe = updateSwipe(touch.clientX, touch.clientY);
-    if (isHorizontalSwipe && event.cancelable) {
-      event.preventDefault();
-    }
-  };
-
-  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
-    if (activeSwipeInputRef.current !== "touch") return;
-    const touch = event.changedTouches[0];
-    if (!touch) {
-      cancelSwipe();
-      return;
-    }
-    finalizeSwipe(touch.clientX, touch.clientY);
-    activeSwipeInputRef.current = null;
-  };
-
   const variants = {
     enter: (dir: number) => ({
       x: dir > 0 ? 300 : -300,
@@ -530,15 +552,12 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       <div className="flex h-full flex-col">
         <div className="min-h-0 flex-1 overflow-hidden">
           <motion.div
+            ref={swipeAreaRef}
             className="relative h-full"
             onPointerDownCapture={handlePointerDown}
             onPointerMoveCapture={handlePointerMove}
             onPointerUpCapture={handlePointerUp}
             onPointerCancelCapture={cancelSwipe}
-            onTouchStartCapture={handleTouchStart}
-            onTouchMoveCapture={handleTouchMove}
-            onTouchEndCapture={handleTouchEnd}
-            onTouchCancelCapture={cancelSwipe}
             style={{ touchAction: "pan-y" }}
           >
             <AnimatePresence initial={false} custom={direction} mode="wait">
