@@ -5,12 +5,12 @@ import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { haptic } from "../components/haptics";
 import LoginAccount from "../screens/LoginAccount";
 
-// Хук для определения очень маленьких экранов (например, iPhone SE или крупный масштаб)
+// Хук для определения очень маленьких экранов (iPhone SE, крупный масштаб)
 const useTinyScreen = () => {
   const [isTiny, setIsTiny] = useState(false);
   useEffect(() => {
     const check = () => {
-      // Считаем экран "tiny", если высота меньше 650px или включён крупный масштаб (класс large-scale)
+      // Если высота меньше 650px или есть класс large-scale (крупный масштаб)
       const isLargeScale = document.body.classList.contains('large-scale');
       setIsTiny(window.innerHeight < 650 || isLargeScale);
     };
@@ -22,20 +22,12 @@ const useTinyScreen = () => {
 };
 
 // ==================== ЭКРАН 1 ====================
-function Scene1({ onNext }: { onNext: () => void }) {
-  const isTiny = useTinyScreen();
-
+function Scene1({ onNext, isTiny }: { onNext: () => void; isTiny: boolean }) {
   return (
-    <div className="h-full flex flex-col px-6 pt-1">
-      {/* Анимация — динамическая высота */}
-      <div
-        className="flex items-center justify-center"
-        style={{
-          height: isTiny ? "28vh" : "38vh",
-          minHeight: isTiny ? "140px" : "200px",
-        }}
-      >
-        <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-amber-50/80 to-orange-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
+    <div className={`h-full flex flex-col px-6 pt-4 ${isTiny ? 'tiny' : ''}`}>
+      {/* Анимация — фиксированная высота, вверху */}
+      <div className="flex items-center justify-center" style={{ height: isTiny ? '28vh' : '38vh', minHeight: isTiny ? '140px' : '200px' }}>
+        <div className="relative w-full max-w-sm aspect-square bg-linear-to-br from-amber-50/80 to-orange-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
           {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
@@ -59,7 +51,7 @@ function Scene1({ onNext }: { onNext: () => void }) {
             animate={{ scale: [1, 1.08, 1], rotate: [0, 3, -3, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-xl flex items-center justify-center">
+            <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl bg-linear-to-br from-amber-500 to-orange-600 shadow-xl flex items-center justify-center">
               <span className="text-2xl sm:text-3xl font-light text-white tracking-tight">B</span>
             </div>
           </motion.div>
@@ -86,12 +78,12 @@ function Scene1({ onNext }: { onNext: () => void }) {
         </div>
       </div>
 
-      {/* Текст — с возможностью скролла, но стараемся минимизировать */}
-      <div className="flex-1 min-h-0 px-1 py-1 overflow-y-auto">
+      {/* Текст — сразу под анимацией с отступом ~0.5rem */}
+      <div className="flex-1 min-h-0 px-1 mt-2 overflow-y-auto">
         <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900 leading-tight">
           Биржа Бонусов от OEM Tech
         </h1>
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-2" />
+        <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-2" />
         <div className="space-y-1">
           <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
             Добро пожаловать в новую экономику лояльности.
@@ -103,7 +95,7 @@ function Scene1({ onNext }: { onNext: () => void }) {
       </div>
 
       {/* Кнопка */}
-      <div className="pb-3 flex justify-center">
+      <div className="pb-4 flex justify-center">
         <motion.button
           whileTap={{ scale: 0.97 }}
           transition={{ type: "spring", stiffness: 800, damping: 20 }}
@@ -118,19 +110,11 @@ function Scene1({ onNext }: { onNext: () => void }) {
 }
 
 // ==================== ЭКРАН 2 ====================
-function Scene2() {
-  const isTiny = useTinyScreen();
-
+function Scene2({ isTiny }: { isTiny: boolean }) {
   return (
-    <div className="h-full flex flex-col px-6 pt-1">
-      <div
-        className="flex items-center justify-center"
-        style={{
-          height: isTiny ? "28vh" : "38vh",
-          minHeight: isTiny ? "140px" : "200px",
-        }}
-      >
-        <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-emerald-50/80 to-green-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
+    <div className={`h-full flex flex-col px-6 pt-4 ${isTiny ? 'tiny' : ''}`}>
+      <div className="flex items-center justify-center" style={{ height: isTiny ? '28vh' : '38vh', minHeight: isTiny ? '140px' : '200px' }}>
+        <div className="relative w-full max-w-sm aspect-square bg-linear-to-br from-emerald-50/80 to-green-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
             animate={{ scale: [1, 1.02, 1] }}
@@ -159,7 +143,7 @@ function Scene2() {
           {[...Array(6)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-gradient-to-br from-amber-400/60 to-amber-600/60"
+              className="absolute h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-linear-to-br from-amber-400/60 to-amber-600/60"
               initial={{ x: Math.random() * 200 + 50, y: -50 }}
               animate={{ y: 400, rotate: 360 }}
               transition={{
@@ -173,11 +157,11 @@ function Scene2() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 px-1 py-1 overflow-y-auto">
+      <div className="flex-1 min-h-0 px-1 mt-2 overflow-y-auto">
         <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900 leading-tight">
           Покупки приносят больше
         </h2>
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-2" />
+        <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-2" />
         <div className="space-y-1">
           <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
             Ваши повседневные траты превращаются в ценность.
@@ -192,8 +176,7 @@ function Scene2() {
 }
 
 // ==================== ЭКРАН 3 ====================
-function Scene3() {
-  const isTiny = useTinyScreen();
+function Scene3({ isTiny }: { isTiny: boolean }) {
   const candles = Array.from({ length: 40 }, () => ({
     height: Math.floor(Math.random() * 60) + 10,
     isGreen: Math.random() > 0.48,
@@ -201,15 +184,9 @@ function Scene3() {
   const chartData = Array.from({ length: 50 }, (_, i) => ({ x: i, y: Math.floor(Math.random() * 80) + 10 }));
 
   return (
-    <div className="h-full flex flex-col px-6 pt-1">
-      <div
-        className="flex items-center justify-center"
-        style={{
-          height: isTiny ? "28vh" : "38vh",
-          minHeight: isTiny ? "140px" : "200px",
-        }}
-      >
-        <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-slate-50/80 to-slate-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
+    <div className={`h-full flex flex-col px-6 pt-4 ${isTiny ? 'tiny' : ''}`}>
+      <div className="flex items-center justify-center" style={{ height: isTiny ? '28vh' : '38vh', minHeight: isTiny ? '140px' : '200px' }}>
+        <div className="relative w-full max-w-sm aspect-square bg-linear-to-br from-slate-50/80 to-slate-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
           <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="none">
             <motion.polyline
               points={chartData.map(p => `${p.x * 8},${100 - p.y}`).join(' ')}
@@ -273,11 +250,11 @@ function Scene3() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 px-1 py-1 overflow-y-auto">
+      <div className="flex-1 min-h-0 px-1 mt-2 overflow-y-auto">
         <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900 leading-tight">
           Добро пожаловать на торги
         </h2>
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-2" />
+        <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-2" />
         <div className="space-y-1">
           <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
             Здесь бонусы работают по законам рынка.
@@ -292,19 +269,11 @@ function Scene3() {
 }
 
 // ==================== ЭКРАН 4 ====================
-function Scene4() {
-  const isTiny = useTinyScreen();
-
+function Scene4({ isTiny }: { isTiny: boolean }) {
   return (
-    <div className="h-full flex flex-col px-6 pt-1">
-      <div
-        className="flex items-center justify-center"
-        style={{
-          height: isTiny ? "28vh" : "38vh",
-          minHeight: isTiny ? "140px" : "200px",
-        }}
-      >
-        <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-violet-50/80 to-purple-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
+    <div className={`h-full flex flex-col px-6 pt-4 ${isTiny ? 'tiny' : ''}`}>
+      <div className="flex items-center justify-center" style={{ height: isTiny ? '28vh' : '38vh', minHeight: isTiny ? '140px' : '200px' }}>
+        <div className="relative w-full max-w-sm aspect-square bg-linear-to-br from-violet-50/80 to-purple-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
             animate={{ rotate: 360 }}
@@ -346,11 +315,11 @@ function Scene4() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 px-1 py-1 overflow-y-auto">
+      <div className="flex-1 min-h-0 px-1 mt-2 overflow-y-auto">
         <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900 leading-tight">
           Теперь лояльность работает на вас
         </h2>
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-2" />
+        <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-2" />
         <div className="space-y-1">
           <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
             Вы управляете своими бонусами — а не наоборот.
@@ -370,6 +339,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [direction, setDirection] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
   const isDoneRef = useRef(false);
+  const isTiny = useTinyScreen();
 
   const handleDone = () => {
     if (isDoneRef.current) return;
@@ -441,11 +411,15 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 transition={{ type: "spring", stiffness: 260, damping: 30 }}
                 className="absolute inset-0 overflow-y-auto"
               >
-                {index === 0 && <Scene1 onNext={next} />}
-                {index === 1 && <Scene2 />}
-                {index === 2 && <Scene3 />}
-                {index === 3 && <Scene4 />}
-                {index === 4 && <LoginAccount onLogin={handleDone} onBack={prev} />}
+                {index === 0 && <Scene1 onNext={next} isTiny={isTiny} />}
+                {index === 1 && <Scene2 isTiny={isTiny} />}
+                {index === 2 && <Scene3 isTiny={isTiny} />}
+                {index === 3 && <Scene4 isTiny={isTiny} />}
+                {index === 4 && (
+                  <div className="h-full flex flex-col px-6 pt-4">
+                    <LoginAccount onLogin={handleDone} onBack={prev} />
+                  </div>
+                )}
               </motion.div>
             </AnimatePresence>
           </motion.div>
