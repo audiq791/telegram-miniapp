@@ -8,9 +8,9 @@ import LoginAccount from "../screens/LoginAccount";
 // ==================== ЭКРАН 1 ====================
 function Scene1({ onNext }: { onNext: () => void }) {
   return (
-    <div className="w-full h-full px-6 pt-12 overflow-y-auto">
-      <div className="max-w-md mx-auto">
-        <div className="relative h-80 w-full bg-linear-to-br from-amber-50/80 to-orange-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
+    <div className="w-full h-full px-6 pt-4 sm:pt-8 overflow-y-auto flex flex-col">
+      <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
+        <div className="relative h-[35vh] max-h-75 w-full bg-linear-to-br from-amber-50/80 to-orange-100/80 rounded-3xl flex items-center justify-center mb-4 sm:mb-6 overflow-hidden border border-zinc-200/50 shadow-sm">
           {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
@@ -45,15 +45,15 @@ function Scene1({ onNext }: { onNext: () => void }) {
               ease: "easeInOut",
             }}
           >
-            <div className="h-28 w-28 rounded-2xl bg-linear-to-br from-amber-500 to-orange-600 shadow-xl flex items-center justify-center">
-              <span className="text-4xl font-light text-white tracking-tight">B</span>
+            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl bg-linear-to-br from-amber-500 to-orange-600 shadow-xl flex items-center justify-center">
+              <span className="text-3xl sm:text-4xl font-light text-white tracking-tight">B</span>
             </div>
           </motion.div>
 
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <motion.div
               key={i}
-              className="absolute h-10 w-10 rounded-xl bg-white/90 border border-amber-200/50 shadow-md flex items-center justify-center backdrop-blur-xs"
+              className="absolute h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-white/90 border border-amber-200/50 shadow-md flex items-center justify-center backdrop-blur-xs"
               animate={{
                 x: [0, 80 * Math.cos(i * 60), 0],
                 y: [0, 80 * Math.sin(i * 60), 0],
@@ -66,29 +66,29 @@ function Scene1({ onNext }: { onNext: () => void }) {
                 ease: "linear",
               }}
             >
-              <span className="text-lg font-light text-amber-600">B</span>
+              <span className="text-base sm:text-lg font-light text-amber-600">B</span>
             </motion.div>
           ))}
         </div>
 
         <div className="px-1">
-          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
             Биржа Бонусов от OEM Tech
           </h1>
           
-          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
+          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-3 sm:my-4" />
           
-          <div className="space-y-4 mb-8">
-            <p className="text-xl text-zinc-600 leading-relaxed">
+          <div className="space-y-2 sm:space-y-4 mb-4 sm:mb-8">
+            <p className="text-lg sm:text-xl text-zinc-600 leading-relaxed">
               Добро пожаловать в новую экономику лояльности.
             </p>
-            <p className="text-xl text-zinc-600 leading-relaxed">
+            <p className="text-lg sm:text-xl text-zinc-600 leading-relaxed">
               Здесь бонусы — это не просто баллы. Это актив, которым можно управлять.
             </p>
-            <p className="text-xl text-zinc-600 leading-relaxed">
+            <p className="text-lg sm:text-xl text-zinc-600 leading-relaxed">
               Обменивайте, выбирайте выгодные моменты, увеличивайте ценность своих покупок.
             </p>
-            <p className="text-xl text-zinc-600 leading-relaxed font-medium">
+            <p className="text-lg sm:text-xl text-zinc-600 leading-relaxed font-medium">
               Ваши бонусы начинают работать на вас.
             </p>
           </div>
@@ -98,7 +98,7 @@ function Scene1({ onNext }: { onNext: () => void }) {
               whileTap={{ scale: 0.97 }}
               transition={{ type: "spring", stiffness: 800, damping: 20 }}
               onClick={onNext}
-              className="w-40 h-12 rounded-xl bg-zinc-900 text-white font-medium text-base shadow-md hover:bg-zinc-800 transition-colors"
+              className="w-36 sm:w-40 h-10 sm:h-12 rounded-xl bg-zinc-900 text-white font-medium text-sm sm:text-base shadow-md hover:bg-zinc-800 transition-colors"
             >
               Далее
             </motion.button>
@@ -112,20 +112,20 @@ function Scene1({ onNext }: { onNext: () => void }) {
 // ==================== ЭКРАН 2 ====================
 function Scene2() {
   return (
-    <div className="w-full h-full px-6 pt-12 overflow-y-auto">
-      <div className="max-w-md mx-auto">
-        <div className="relative h-80 w-full bg-linear-to-br from-emerald-50/80 to-green-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
+    <div className="w-full h-full px-6 pt-4 sm:pt-8 overflow-y-auto flex flex-col">
+      <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
+        <div className="relative h-[35vh] max-h-75 w-full bg-linear-to-br from-emerald-50/80 to-green-100/80 rounded-3xl flex items-center justify-center mb-4 sm:mb-6 overflow-hidden border border-zinc-200/50 shadow-sm">
           <motion.div
             className="relative"
             animate={{ scale: [1, 1.02, 1] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            <div className="h-36 w-36 bg-white rounded-2xl shadow-lg p-3">
-              <div className="grid grid-cols-7 gap-1">
+            <div className="h-28 w-28 sm:h-32 sm:w-32 bg-white rounded-2xl shadow-lg p-2 sm:p-3">
+              <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
                 {[...Array(49)].map((_, i) => (
                   <div
                     key={i}
-                    className={`h-2.5 w-2.5 rounded-xs ${
+                    className={`h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-xs ${
                       Math.random() > 0.6 ? "bg-zinc-900" : "bg-transparent"
                     }`}
                   />
@@ -146,7 +146,7 @@ function Scene2() {
           {[...Array(6)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute h-6 w-6 rounded-full bg-linear-to-br from-amber-400/60 to-amber-600/60"
+              className="absolute h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-linear-to-br from-amber-400/60 to-amber-600/60"
               initial={{ x: Math.random() * 200 + 50, y: -50 }}
               animate={{ y: 400, rotate: 360 }}
               transition={{
@@ -160,17 +160,17 @@ function Scene2() {
         </div>
 
         <div className="px-1">
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
             Покупки приносят больше
           </h2>
           
-          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
+          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-3 sm:my-4" />
           
-          <div className="space-y-4">
-            <p className="text-xl text-zinc-600 leading-relaxed">
+          <div className="space-y-2 sm:space-y-4">
+            <p className="text-lg sm:text-xl text-zinc-600 leading-relaxed">
               Ваши повседневные траты превращаются в ценность.
             </p>
-            <p className="text-xl text-zinc-600 leading-relaxed">
+            <p className="text-lg sm:text-xl text-zinc-600 leading-relaxed">
               Показывайте QR-код у партнёров и получайте бонусы, которые можно конвертировать и использовать выгодно.
             </p>
           </div>
@@ -182,22 +182,20 @@ function Scene2() {
 
 // ==================== ЭКРАН 3 ====================
 function Scene3() {
-  // Генерируем 40 свечей с рандомными высотами
   const candles = Array.from({ length: 40 }, () => ({
     height: Math.floor(Math.random() * 90) + 15,
     isGreen: Math.random() > 0.48,
   }));
 
-  // Генерируем данные для фонового графика
   const chartData = Array.from({ length: 50 }, (_, i) => ({
     x: i,
     y: Math.floor(Math.random() * 100) + 20,
   }));
 
   return (
-    <div className="w-full h-full px-6 pt-12 overflow-y-auto">
-      <div className="max-w-md mx-auto">
-        <div className="relative h-80 w-full bg-linear-to-br from-slate-50/80 to-slate-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
+    <div className="w-full h-full px-6 pt-4 sm:pt-8 overflow-y-auto flex flex-col">
+      <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
+        <div className="relative h-[35vh] max-h-75 w-full bg-linear-to-br from-slate-50/80 to-slate-100/80 rounded-3xl flex items-center justify-center mb-4 sm:mb-6 overflow-hidden border border-zinc-200/50 shadow-sm">
           
           {/* Фоновый график */}
           <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="none">
@@ -222,7 +220,7 @@ function Scene3() {
           </svg>
 
           {/* Свечи */}
-          <div className="flex items-end gap-0.5 h-48 w-full px-1 relative z-10">
+          <div className="flex items-end gap-0.5 h-40 sm:h-48 w-full px-1 relative z-10">
             {candles.map((candle, i) => (
               <motion.div
                 key={i}
@@ -249,13 +247,13 @@ function Scene3() {
           </div>
 
           {/* Бегущая строка */}
-          <div className="absolute bottom-4 left-0 right-0 bg-zinc-800/80 backdrop-blur-sm text-white/90 py-2.5 overflow-hidden z-20">
+          <div className="absolute bottom-2 sm:bottom-4 left-0 right-0 bg-zinc-800/80 backdrop-blur-sm text-white/90 py-1.5 sm:py-2.5 overflow-hidden z-20">
             <motion.div
               className="whitespace-nowrap"
               animate={{ x: [300, -1200] }}
               transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
             >
-              <span className="text-xs font-light tracking-wider px-4">
+              <span className="text-[10px] sm:text-xs font-light tracking-wider px-4">
                 BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> • BON/WB <span className="text-emerald-400">+3.1%</span> • BON/FUEL <span className="text-rose-400">-0.8%</span> • BON/MG <span className="text-emerald-400">+1.9%</span> • BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> •
               </span>
             </motion.div>
@@ -263,17 +261,17 @@ function Scene3() {
         </div>
 
         <div className="px-1">
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
             Добро пожаловать на торги
           </h2>
           
-          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
+          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-3 sm:my-4" />
           
-          <div className="space-y-4">
-            <p className="text-xl text-zinc-600 leading-relaxed">
+          <div className="space-y-2 sm:space-y-4">
+            <p className="text-lg sm:text-xl text-zinc-600 leading-relaxed">
               Здесь бонусы работают по законам рынка.
             </p>
-            <p className="text-xl text-zinc-600 leading-relaxed">
+            <p className="text-lg sm:text-xl text-zinc-600 leading-relaxed">
               Следите за спросом на бонусы партнёров. Выбирайте момент. Обменивайте с выгодой.
             </p>
           </div>
@@ -286,21 +284,21 @@ function Scene3() {
 // ==================== ЭКРАН 4 ====================
 function Scene4() {
   return (
-    <div className="w-full h-full px-6 pt-12 overflow-y-auto">
-      <div className="max-w-md mx-auto">
-        <div className="relative h-80 w-full bg-linear-to-br from-violet-50/80 to-purple-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
+    <div className="w-full h-full px-6 pt-4 sm:pt-8 overflow-y-auto flex flex-col">
+      <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
+        <div className="relative h-[35vh] max-h-75 w-full bg-linear-to-br from-violet-50/80 to-purple-100/80 rounded-3xl flex items-center justify-center mb-4 sm:mb-6 overflow-hidden border border-zinc-200/50 shadow-sm">
           <motion.div
             className="relative z-10"
             animate={{ rotate: 360 }}
             transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
           >
-            <div className="h-28 w-28 rounded-full border-2 border-violet-400/30 border-t-violet-500/70" />
+            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full border-2 border-violet-400/30 border-t-violet-500/70" />
           </motion.div>
 
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <motion.div
               key={i}
-              className="absolute h-10 w-10 rounded-xl bg-white/90 shadow-md flex items-center justify-center backdrop-blur-xs"
+              className="absolute h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-white/90 shadow-md flex items-center justify-center backdrop-blur-xs"
               style={{
                 background: `linear-gradient(135deg, hsl(${i * 60}, 80%, 95%), hsl(${i * 60 + 30}, 80%, 92%))`,
               }}
@@ -311,7 +309,7 @@ function Scene4() {
               }}
               transition={{ duration: 8, repeat: Infinity, delay: i * 0.4, ease: "linear" }}
             >
-              <span className="text-sm font-light text-zinc-700">B</span>
+              <span className="text-xs sm:text-sm font-light text-zinc-700">B</span>
             </motion.div>
           ))}
 
@@ -330,17 +328,17 @@ function Scene4() {
         </div>
 
         <div className="px-1">
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
             Теперь лояльность работает на вас
           </h2>
           
-          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-4" />
+          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-3 sm:my-4" />
           
-          <div className="space-y-4">
-            <p className="text-xl text-zinc-600 leading-relaxed">
+          <div className="space-y-2 sm:space-y-4">
+            <p className="text-lg sm:text-xl text-zinc-600 leading-relaxed">
               Вы управляете своими бонусами — а не наоборот.
             </p>
-            <p className="text-xl text-zinc-600 leading-relaxed">
+            <p className="text-lg sm:text-xl text-zinc-600 leading-relaxed">
               Копите то, что нужно вам. Обменивайте то, что ценят другие.
             </p>
           </div>
@@ -416,13 +414,13 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-100 bg-white"
+      className="fixed inset-0 z-50 bg-white flex flex-col"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
     >
-      <div className="h-full flex flex-col">
+      <div className="flex-1 flex flex-col">
         <div className="flex-1 overflow-hidden">
           <motion.div
             className="relative h-full"
@@ -458,10 +456,10 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           </motion.div>
         </div>
 
-        {/* На экранах 2–4 кнопки остаются внизу */}
+        {/* Индикаторы и кнопки для экранов 1–3 (кроме последнего) */}
         {!isExiting && index > 0 && index < 4 && (
-          <div className="absolute left-0 right-0 px-6" style={{ bottom: "140px" }}>
-            <div className="flex items-center justify-center gap-2 mb-5">
+          <div className="px-6 pb-6 sm:pb-8 bg-white">
+            <div className="flex items-center justify-center gap-2 mb-4">
               {[0, 1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
@@ -478,7 +476,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                   whileTap={{ scale: 0.97 }}
                   transition={{ type: "spring", stiffness: 800, damping: 20 }}
                   onClick={prev}
-                  className="w-28 h-12 rounded-xl border border-zinc-200 bg-white/80 backdrop-blur-xs text-zinc-700 font-medium text-base shadow-sm hover:bg-white transition-colors"
+                  className="w-24 sm:w-28 h-10 sm:h-12 rounded-xl border border-zinc-200 bg-white/80 backdrop-blur-xs text-zinc-700 font-medium text-sm sm:text-base shadow-sm hover:bg-white transition-colors"
                 >
                   Назад
                 </motion.button>
@@ -489,7 +487,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                   whileTap={{ scale: 0.97 }}
                   transition={{ type: "spring", stiffness: 800, damping: 20 }}
                   onClick={next}
-                  className="w-28 h-12 rounded-xl bg-zinc-900 text-white font-medium text-base shadow-md hover:bg-zinc-800 transition-colors"
+                  className="w-24 sm:w-28 h-10 sm:h-12 rounded-xl bg-zinc-900 text-white font-medium text-sm sm:text-base shadow-md hover:bg-zinc-800 transition-colors"
                 >
                   Далее
                 </motion.button>
