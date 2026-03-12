@@ -85,12 +85,6 @@ function Scene1({ onNext }: { onNext: () => void }) {
             <p className="text-lg sm:text-xl text-zinc-600 leading-relaxed">
               Здесь бонусы — это не просто баллы. Это актив, которым можно управлять.
             </p>
-            <p className="text-lg sm:text-xl text-zinc-600 leading-relaxed">
-              Обменивайте, выбирайте выгодные моменты, увеличивайте ценность своих покупок.
-            </p>
-            <p className="text-lg sm:text-xl text-zinc-600 leading-relaxed font-medium">
-              Ваши бонусы начинают работать на вас.
-            </p>
           </div>
 
           <div className="flex justify-center">
