@@ -5,16 +5,15 @@ import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { haptic } from "../components/haptics";
 import LoginAccount from "../screens/LoginAccount";
 
-// ==================== ЭКРАН 1 ====================
 function Scene1({ onNext }: { onNext: () => void }) {
   return (
-    <div className="w-full h-full px-6 pt-12 overflow-y-auto">
-      <div className="max-w-md mx-auto">
-        <div className="relative h-80 w-full bg-gradient-to-br from-amber-50/80 to-orange-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
+    <div className="h-full w-full overflow-y-auto px-6 pt-8 pb-8 sm:pt-12">
+      <div className="mx-auto max-w-md">
+        <div className="relative mb-6 flex h-64 w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-amber-50/80 to-orange-100/80 shadow-sm sm:mb-8 sm:h-80">
           {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-2 h-2 bg-amber-400/60 rounded-full"
+              className="absolute h-2 w-2 rounded-full bg-amber-400/60"
               initial={{
                 x: Math.random() * 300,
                 y: Math.random() * 300,
@@ -45,15 +44,15 @@ function Scene1({ onNext }: { onNext: () => void }) {
               ease: "easeInOut",
             }}
           >
-            <div className="h-28 w-28 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-xl flex items-center justify-center">
-              <span className="text-4xl font-light text-white tracking-tight">B</span>
+            <div className="flex h-28 w-28 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-xl">
+              <span className="text-4xl font-light tracking-tight text-white">B</span>
             </div>
           </motion.div>
 
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <motion.div
               key={i}
-              className="absolute h-10 w-10 rounded-xl bg-white/90 border border-amber-200/50 shadow-md flex items-center justify-center backdrop-blur-xs"
+              className="absolute flex h-10 w-10 items-center justify-center rounded-xl border border-amber-200/50 bg-white/90 shadow-md backdrop-blur-xs"
               animate={{
                 x: [0, 80 * Math.cos(i * 60), 0],
                 y: [0, 80 * Math.sin(i * 60), 0],
@@ -72,18 +71,18 @@ function Scene1({ onNext }: { onNext: () => void }) {
         </div>
 
         <div className="px-1">
-          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+          <h1 className="text-2xl font-semibold leading-tight tracking-tight text-zinc-900 sm:text-3xl">
             Биржа Бонусов от OEM Tech
           </h1>
-          
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-4" />
-          
-          <div className="space-y-4 mb-8">
-            <p className="text-xl text-zinc-600 leading-relaxed">
+
+          <div className="my-4 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
+
+          <div className="mb-8 space-y-4">
+            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
               Добро пожаловать в новую экономику лояльности.
             </p>
-            <p className="text-xl text-zinc-600 leading-relaxed">
-              Здесь бонусы — это не просто баллы. Это актив, которым можно управлять.
+            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
+              Здесь бонусы это не просто баллы. Это актив, которым можно управлять.
             </p>
           </div>
 
@@ -92,7 +91,7 @@ function Scene1({ onNext }: { onNext: () => void }) {
               whileTap={{ scale: 0.97 }}
               transition={{ type: "spring", stiffness: 800, damping: 20 }}
               onClick={onNext}
-              className="w-40 h-12 rounded-xl bg-zinc-900 text-white font-medium text-base shadow-md hover:bg-zinc-800 transition-colors"
+              className="h-12 w-40 rounded-xl bg-zinc-900 text-base font-medium text-white shadow-md transition-colors hover:bg-zinc-800"
             >
               Далее
             </motion.button>
@@ -103,18 +102,17 @@ function Scene1({ onNext }: { onNext: () => void }) {
   );
 }
 
-// ==================== ЭКРАН 2 ====================
 function Scene2() {
   return (
-    <div className="w-full h-full px-6 pt-12 overflow-y-auto">
-      <div className="max-w-md mx-auto">
-        <div className="relative h-80 w-full bg-gradient-to-br from-emerald-50/80 to-green-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
+    <div className="h-full w-full overflow-y-auto px-6 pt-8 pb-8 sm:pt-12">
+      <div className="mx-auto max-w-md">
+        <div className="relative mb-6 flex h-60 w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-emerald-50/80 to-green-100/80 shadow-sm sm:mb-8 sm:h-80">
           <motion.div
             className="relative"
             animate={{ scale: [1, 1.02, 1] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            <div className="h-36 w-36 bg-white rounded-2xl shadow-lg p-3">
+            <div className="h-28 w-28 rounded-2xl bg-white p-3 shadow-lg sm:h-36 sm:w-36">
               <div className="grid grid-cols-7 gap-1">
                 {[...Array(49)].map((_, i) => (
                   <div
@@ -154,17 +152,17 @@ function Scene2() {
         </div>
 
         <div className="px-1">
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+          <h2 className="text-2xl font-semibold leading-tight tracking-tight text-zinc-900 sm:text-3xl">
             Покупки приносят больше
           </h2>
-          
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-4" />
-          
+
+          <div className="my-4 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
+
           <div className="space-y-4">
-            <p className="text-xl text-zinc-600 leading-relaxed">
+            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
               Ваши повседневные траты превращаются в ценность.
             </p>
-            <p className="text-xl text-zinc-600 leading-relaxed">
+            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
               Показывайте QR-код у партнёров и получайте бонусы, которые можно конвертировать и использовать выгодно.
             </p>
           </div>
@@ -174,29 +172,24 @@ function Scene2() {
   );
 }
 
-// ==================== ЭКРАН 3 ====================
 function Scene3() {
-  // Генерируем 40 свечей с рандомными высотами
   const candles = Array.from({ length: 40 }, () => ({
     height: Math.floor(Math.random() * 90) + 15,
     isGreen: Math.random() > 0.48,
   }));
 
-  // Генерируем данные для фонового графика
   const chartData = Array.from({ length: 50 }, (_, i) => ({
     x: i,
     y: Math.floor(Math.random() * 100) + 20,
   }));
 
   return (
-    <div className="w-full h-full px-6 pt-12 overflow-y-auto">
-      <div className="max-w-md mx-auto">
-        <div className="relative h-80 w-full bg-gradient-to-br from-slate-50/80 to-slate-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
-          
-          {/* Фоновый график */}
-          <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="none">
+    <div className="h-full w-full overflow-y-auto px-6 pt-8 pb-8 sm:pt-12">
+      <div className="mx-auto max-w-md">
+        <div className="relative mb-6 flex h-60 w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-slate-50/80 to-slate-100/80 shadow-sm sm:mb-8 sm:h-80">
+          <svg className="absolute inset-0 h-full w-full opacity-30" preserveAspectRatio="none">
             <motion.polyline
-              points={chartData.map(p => `${p.x * 8},${120 - p.y}`).join(' ')}
+              points={chartData.map((p) => `${p.x * 8},${120 - p.y}`).join(" ")}
               fill="none"
               stroke="#3b82f6"
               strokeWidth="2"
@@ -205,7 +198,7 @@ function Scene3() {
               transition={{ duration: 2, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
             />
             <motion.polyline
-              points={chartData.map(p => `${p.x * 8 + 20},${140 - p.y * 0.8}`).join(' ')}
+              points={chartData.map((p) => `${p.x * 8 + 20},${140 - p.y * 0.8}`).join(" ")}
               fill="none"
               stroke="#8b5cf6"
               strokeWidth="1.5"
@@ -215,12 +208,11 @@ function Scene3() {
             />
           </svg>
 
-          {/* Свечи */}
-          <div className="flex items-end gap-0.5 h-48 w-full px-1 relative z-10">
+          <div className="relative z-10 flex h-40 w-full items-end gap-0.5 px-1 sm:h-48">
             {candles.map((candle, i) => (
               <motion.div
                 key={i}
-                className="relative flex-1 max-w-2"
+                className="relative max-w-2 flex-1"
                 initial={{ height: 0 }}
                 animate={{ height: candle.height }}
                 transition={{
@@ -235,39 +227,38 @@ function Scene3() {
                   className={`absolute bottom-0 w-full ${
                     candle.isGreen ? "bg-emerald-500/70" : "bg-rose-400/70"
                   }`}
-                  style={{ height: '70%' }}
+                  style={{ height: "70%" }}
                 />
-                <div className="absolute w-px bg-zinc-400/50 left-1/2 -translate-x-1/2 h-full" />
+                <div className="absolute left-1/2 h-full w-px -translate-x-1/2 bg-zinc-400/50" />
               </motion.div>
             ))}
           </div>
 
-          {/* Бегущая строка */}
-          <div className="absolute bottom-4 left-0 right-0 bg-zinc-800/80 backdrop-blur-sm text-white/90 py-2.5 overflow-hidden z-20">
+          <div className="absolute bottom-4 left-0 right-0 z-20 overflow-hidden bg-zinc-800/80 py-2.5 text-white/90 backdrop-blur-sm">
             <motion.div
               className="whitespace-nowrap"
               animate={{ x: [300, -1200] }}
               transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
             >
-              <span className="text-xs font-light tracking-wider px-4">
-                BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> • BON/WB <span className="text-emerald-400">+3.1%</span> • BON/FUEL <span className="text-rose-400">-0.8%</span> • BON/MG <span className="text-emerald-400">+1.9%</span> • BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> •
+              <span className="px-4 text-xs font-light tracking-wider">
+                BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> • BON/WB <span className="text-emerald-400">+3.1%</span> • BON/FUEL <span className="text-rose-400">-0.8%</span> • BON/MG <span className="text-emerald-400">+1.9%</span> •
               </span>
             </motion.div>
           </div>
         </div>
 
         <div className="px-1">
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+          <h2 className="text-2xl font-semibold leading-tight tracking-tight text-zinc-900 sm:text-3xl">
             Добро пожаловать на торги
           </h2>
-          
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-4" />
-          
+
+          <div className="my-4 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
+
           <div className="space-y-4">
-            <p className="text-xl text-zinc-600 leading-relaxed">
+            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
               Здесь бонусы работают по законам рынка.
             </p>
-            <p className="text-xl text-zinc-600 leading-relaxed">
+            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
               Следите за спросом на бонусы партнёров. Выбирайте момент. Обменивайте с выгодой.
             </p>
           </div>
@@ -277,12 +268,11 @@ function Scene3() {
   );
 }
 
-// ==================== ЭКРАН 4 ====================
 function Scene4() {
   return (
-    <div className="w-full h-full px-6 pt-12 overflow-y-auto">
-      <div className="max-w-md mx-auto">
-        <div className="relative h-80 w-full bg-gradient-to-br from-violet-50/80 to-purple-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
+    <div className="h-full w-full overflow-y-auto px-6 pt-8 pb-8 sm:pt-12">
+      <div className="mx-auto max-w-md">
+        <div className="relative mb-6 flex h-60 w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-violet-50/80 to-purple-100/80 shadow-sm sm:mb-8 sm:h-80">
           <motion.div
             className="relative z-10"
             animate={{ rotate: 360 }}
@@ -294,7 +284,7 @@ function Scene4() {
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <motion.div
               key={i}
-              className="absolute h-10 w-10 rounded-xl bg-white/90 shadow-md flex items-center justify-center backdrop-blur-xs"
+              className="absolute flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 shadow-md backdrop-blur-xs"
               style={{
                 background: `linear-gradient(135deg, hsl(${i * 60}, 80%, 95%), hsl(${i * 60 + 30}, 80%, 92%))`,
               }}
@@ -312,7 +302,7 @@ function Scene4() {
           {[...Array(12)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-1 h-1 bg-purple-400/40 rounded-full"
+              className="absolute h-1 w-1 rounded-full bg-purple-400/40"
               animate={{
                 x: [0, 120 * Math.cos(i * 30), 0],
                 y: [0, 120 * Math.sin(i * 30), 0],
@@ -324,17 +314,17 @@ function Scene4() {
         </div>
 
         <div className="px-1">
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+          <h2 className="text-2xl font-semibold leading-tight tracking-tight text-zinc-900 sm:text-3xl">
             Теперь лояльность работает на вас
           </h2>
-          
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-4" />
-          
+
+          <div className="my-4 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
+
           <div className="space-y-4">
-            <p className="text-xl text-zinc-600 leading-relaxed">
-              Вы управляете своими бонусами — а не наоборот.
+            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
+              Вы управляете своими бонусами, а не наоборот.
             </p>
-            <p className="text-xl text-zinc-600 leading-relaxed">
+            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
               Копите то, что нужно вам. Обменивайте то, что ценят другие.
             </p>
           </div>
@@ -394,19 +384,21 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   };
 
   const variants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 300 : -300,
+    enter: (dir: number) => ({
+      x: dir > 0 ? 300 : -300,
       opacity: 0,
     }),
     center: {
       x: 0,
       opacity: 1,
     },
-    exit: (direction: number) => ({
-      x: direction < 0 ? 300 : -300,
+    exit: (dir: number) => ({
+      x: dir < 0 ? 300 : -300,
       opacity: 0,
     }),
   };
+
+  const showFooterNav = !isExiting && index > 0 && index < 4;
 
   return (
     <motion.div
@@ -416,8 +408,8 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
     >
-      <div className="h-full flex flex-col">
-        <div className="flex-1 overflow-hidden">
+      <div className="flex h-full flex-col">
+        <div className="min-h-0 flex-1 overflow-hidden">
           <motion.div
             className="relative h-full"
             drag="x"
@@ -435,27 +427,24 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 animate="center"
                 exit="exit"
                 transition={{ type: "spring", stiffness: 260, damping: 30 }}
-                className="absolute inset-0 overflow-y-auto"
+                className="absolute inset-0 overflow-hidden"
               >
                 {index === 0 && <Scene1 onNext={next} />}
                 {index === 1 && <Scene2 />}
                 {index === 2 && <Scene3 />}
                 {index === 3 && <Scene4 />}
-                {index === 4 && (
-                  <LoginAccount 
-                    onLogin={handleDone} 
-                    onBack={() => prev()} 
-                  />
-                )}
+                {index === 4 && <LoginAccount onLogin={handleDone} onBack={prev} />}
               </motion.div>
             </AnimatePresence>
           </motion.div>
         </div>
 
-        {/* На экранах 2–4 кнопки остаются внизу */}
-        {!isExiting && index > 0 && index < 4 && (
-          <div className="absolute left-0 right-0 px-6" style={{ bottom: "140px" }}>
-            <div className="flex items-center justify-center gap-2 mb-5">
+        {showFooterNav && (
+          <div
+            className="shrink-0 border-t border-zinc-100 bg-white/95 px-6 pt-4 backdrop-blur-sm"
+            style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 24px)" }}
+          >
+            <div className="mb-5 flex items-center justify-center gap-2">
               {[0, 1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
@@ -466,28 +455,24 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
               ))}
             </div>
 
-            <div className="flex gap-3 justify-center">
-              {index > 0 && (
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ type: "spring", stiffness: 800, damping: 20 }}
-                  onClick={prev}
-                  className="w-28 h-12 rounded-xl border border-zinc-200 bg-white/80 backdrop-blur-xs text-zinc-700 font-medium text-base shadow-sm hover:bg-white transition-colors"
-                >
-                  Назад
-                </motion.button>
-              )}
-              
-              {index < 4 && (
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ type: "spring", stiffness: 800, damping: 20 }}
-                  onClick={next}
-                  className="w-28 h-12 rounded-xl bg-zinc-900 text-white font-medium text-base shadow-md hover:bg-zinc-800 transition-colors"
-                >
-                  Далее
-                </motion.button>
-              )}
+            <div className="flex justify-center gap-3">
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 800, damping: 20 }}
+                onClick={prev}
+                className="h-12 w-28 rounded-xl border border-zinc-200 bg-white text-base font-medium text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50"
+              >
+                Назад
+              </motion.button>
+
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 800, damping: 20 }}
+                onClick={next}
+                className="h-12 w-28 rounded-xl bg-zinc-900 text-base font-medium text-white shadow-md transition-colors hover:bg-zinc-800"
+              >
+                Далее
+              </motion.button>
             </div>
           </div>
         )}
