@@ -454,17 +454,20 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   };
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") return;
     if (activeSwipeInputRef.current === "touch") return;
     activeSwipeInputRef.current = "pointer";
     beginSwipe(event.clientX, event.clientY);
   };
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") return;
     if (activeSwipeInputRef.current !== "pointer") return;
     updateSwipe(event.clientX, event.clientY);
   };
 
   const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") return;
     if (activeSwipeInputRef.current !== "pointer") return;
     finalizeSwipe(event.clientX, event.clientY);
     activeSwipeInputRef.current = null;
@@ -528,14 +531,14 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
         <div className="min-h-0 flex-1 overflow-hidden">
           <motion.div
             className="relative h-full"
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={cancelSwipe}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            onTouchCancel={cancelSwipe}
+            onPointerDownCapture={handlePointerDown}
+            onPointerMoveCapture={handlePointerMove}
+            onPointerUpCapture={handlePointerUp}
+            onPointerCancelCapture={cancelSwipe}
+            onTouchStartCapture={handleTouchStart}
+            onTouchMoveCapture={handleTouchMove}
+            onTouchEndCapture={handleTouchEnd}
+            onTouchCancelCapture={cancelSwipe}
             style={{ touchAction: "pan-y" }}
           >
             <AnimatePresence initial={false} custom={direction} mode="wait">
