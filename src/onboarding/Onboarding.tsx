@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { haptic } from "../components/haptics";
 import LoginAccount from "../screens/LoginAccount";
@@ -344,6 +344,10 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const isSwipeGestureRef = useRef(false);
   const activeSwipeInputRef = useRef<"pointer" | "touch" | null>(null);
 
+  useEffect(() => {
+    setSwipeOffset(0);
+  }, [index]);
+
   const handleDone = () => {
     if (isDoneRef.current) return;
     isDoneRef.current = true;
@@ -393,6 +397,13 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
     if (!isSwipeGestureRef.current) return false;
 
+    const blockedAtStart = index === 0 && dx > 0;
+    const blockedAtEnd = index === 4 && dx < 0;
+    if (blockedAtStart || blockedAtEnd) {
+      setSwipeOffset(0);
+      return true;
+    }
+
     // Subtle resistance to imitate native pull behavior.
     const resisted = Math.max(-86, Math.min(86, dx * 0.42));
     setSwipeOffset(resisted);
@@ -425,11 +436,11 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       return;
     }
 
-    // Requested behavior: left swipe -> previous, right swipe -> next.
+    // Native behavior: left swipe -> next, right swipe -> previous.
     if (dx < 0) {
-      prev();
-    } else {
       next();
+    } else {
+      prev();
     }
 
     isSwipeGestureRef.current = false;
@@ -529,11 +540,6 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           >
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
-                animate={{ x: swipeOffset }}
-                transition={{ type: "spring", stiffness: 420, damping: 36, mass: 0.5 }}
-                className="absolute inset-0"
-              >
-                <motion.div
                 key={index}
                 custom={direction}
                 variants={variants}
@@ -543,12 +549,17 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 transition={{ type: "spring", stiffness: 260, damping: 30 }}
                 className="absolute inset-0 overflow-hidden"
               >
-                {index === 0 && <Scene1 onNext={next} />}
-                {index === 1 && <Scene2 />}
-                {index === 2 && <Scene3 />}
-                {index === 3 && <Scene4 />}
-                {index === 4 && <LoginAccount onLogin={handleDone} onBack={prev} />}
-              </motion.div>
+                <motion.div
+                  animate={{ x: swipeOffset }}
+                  transition={{ type: "spring", stiffness: 420, damping: 36, mass: 0.5 }}
+                  className="h-full"
+                >
+                  {index === 0 && <Scene1 onNext={next} />}
+                  {index === 1 && <Scene2 />}
+                  {index === 2 && <Scene3 />}
+                  {index === 3 && <Scene4 />}
+                  {index === 4 && <LoginAccount onLogin={handleDone} onBack={prev} />}
+                </motion.div>
               </motion.div>
             </AnimatePresence>
           </motion.div>
