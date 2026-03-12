@@ -9,79 +9,77 @@ import LoginAccount from "../screens/LoginAccount";
 function Scene1({ onNext }: { onNext: () => void }) {
   return (
     <div className="h-full flex flex-col px-6 pt-4 sm:pt-6">
-      <div className="flex-1 min-h-0 flex flex-col">
-        {/* Анимация */}
-        <div className="flex-1 min-h-0 flex items-center justify-center">
-          <div className="relative w-full max-w-sm aspect-square bg-linear-to-br from-amber-50/80 to-orange-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
-            {[...Array(20)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-2 h-2 bg-amber-400/60 rounded-full"
-                initial={{ x: Math.random() * 300, y: Math.random() * 300, opacity: 0.2 }}
-                animate={{
-                  y: [null, -30, 30, -30],
-                  x: [null, 20, -20, 20],
-                  opacity: [0.2, 0.5, 0.2],
-                }}
-                transition={{
-                  duration: 5 + Math.random() * 3,
-                  repeat: Infinity,
-                  delay: Math.random() * 2,
-                }}
-              />
-            ))}
-
+      {/* Анимация — выше, занимает 45% высоты */}
+      <div className="h-[45vh] min-h-[280px] flex items-center justify-center">
+        <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-amber-50/80 to-orange-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
+          {[...Array(20)].map((_, i) => (
             <motion.div
-              className="absolute inset-0 flex items-center justify-center"
-              animate={{ scale: [1, 1.08, 1], rotate: [0, 3, -3, 0] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              key={i}
+              className="absolute w-2 h-2 bg-amber-400/60 rounded-full"
+              initial={{ x: Math.random() * 300, y: Math.random() * 300, opacity: 0.2 }}
+              animate={{
+                y: [null, -30, 30, -30],
+                x: [null, 20, -20, 20],
+                opacity: [0.2, 0.5, 0.2],
+              }}
+              transition={{
+                duration: 5 + Math.random() * 3,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center"
+            animate={{ scale: [1, 1.08, 1], rotate: [0, 3, -3, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-xl flex items-center justify-center">
+              <span className="text-3xl sm:text-4xl font-light text-white tracking-tight">B</span>
+            </div>
+          </motion.div>
+
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <motion.div
+              key={i}
+              className="absolute h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-white/90 border border-amber-200/50 shadow-md flex items-center justify-center backdrop-blur-xs"
+              animate={{
+                x: [0, 80 * Math.cos(i * 60), 0],
+                y: [0, 80 * Math.sin(i * 60), 0],
+                rotate: [0, 360],
+              }}
+              transition={{
+                duration: 10,
+                repeat: Infinity,
+                delay: i * 0.6,
+                ease: "linear",
+              }}
             >
-              <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl bg-linear-to-br from-amber-500 to-orange-600 shadow-xl flex items-center justify-center">
-                <span className="text-3xl sm:text-4xl font-light text-white tracking-tight">B</span>
-              </div>
+              <span className="text-base sm:text-lg font-light text-amber-600">B</span>
             </motion.div>
-
-            {[0, 1, 2, 3, 4, 5].map((i) => (
-              <motion.div
-                key={i}
-                className="absolute h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-white/90 border border-amber-200/50 shadow-md flex items-center justify-center backdrop-blur-xs"
-                animate={{
-                  x: [0, 80 * Math.cos(i * 60), 0],
-                  y: [0, 80 * Math.sin(i * 60), 0],
-                  rotate: [0, 360],
-                }}
-                transition={{
-                  duration: 10,
-                  repeat: Infinity,
-                  delay: i * 0.6,
-                  ease: "linear",
-                }}
-              >
-                <span className="text-base sm:text-lg font-light text-amber-600">B</span>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Текст */}
-        <div className="px-1 py-4 overflow-y-auto">
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
-            Биржа Бонусов от OEM Tech
-          </h1>
-          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-3 sm:my-4" />
-          <div className="space-y-2 sm:space-y-4">
-            <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
-              Добро пожаловать в новую экономику лояльности.
-            </p>
-            <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
-              Здесь бонусы — это не просто баллы. Это актив, которым можно управлять.
-            </p>
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* Кнопка */}
-      <div className="pb-6 sm:pb-8 flex justify-center">
+      {/* Текст с уменьшенными отступами */}
+      <div className="flex-1 min-h-0 px-1 py-3 overflow-y-auto">
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+          Биржа Бонусов от OEM Tech
+        </h1>
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-3" />
+        <div className="space-y-2">
+          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+            Добро пожаловать в новую экономику лояльности.
+          </p>
+          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+            Здесь бонусы — это не просто баллы. Это актив, которым можно управлять.
+          </p>
+        </div>
+      </div>
+
+      {/* Кнопка с небольшим отступом снизу */}
+      <div className="pb-4 sm:pb-5 flex justify-center">
         <motion.button
           whileTap={{ scale: 0.97 }}
           transition={{ type: "spring", stiffness: 800, damping: 20 }}
@@ -99,68 +97,64 @@ function Scene1({ onNext }: { onNext: () => void }) {
 function Scene2() {
   return (
     <div className="h-full flex flex-col px-6 pt-4 sm:pt-6">
-      <div className="flex-1 min-h-0 flex flex-col">
-        <div className="flex-1 min-h-0 flex items-center justify-center">
-          <div className="relative w-full max-w-sm aspect-square bg-linear-to-br from-emerald-50/80 to-green-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
-            <motion.div
-              className="absolute inset-0 flex items-center justify-center"
-              animate={{ scale: [1, 1.02, 1] }}
-              transition={{ duration: 3, repeat: Infinity }}
-            >
-              <div className="h-28 w-28 sm:h-32 sm:w-32 bg-white rounded-2xl shadow-lg p-2 sm:p-3">
-                <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
-                  {[...Array(49)].map((_, i) => (
-                    <div
-                      key={i}
-                      className={`h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-xs ${
-                        Math.random() > 0.6 ? "bg-zinc-900" : "bg-transparent"
-                      }`}
-                    />
-                  ))}
-                </div>
+      <div className="h-[45vh] min-h-[280px] flex items-center justify-center">
+        <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-emerald-50/80 to-green-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center"
+            animate={{ scale: [1, 1.02, 1] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            <div className="h-28 w-28 sm:h-32 sm:w-32 bg-white rounded-2xl shadow-lg p-2 sm:p-3">
+              <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
+                {[...Array(49)].map((_, i) => (
+                  <div
+                    key={i}
+                    className={`h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-xs ${
+                      Math.random() > 0.6 ? "bg-zinc-900" : "bg-transparent"
+                    }`}
+                  />
+                ))}
               </div>
-            </motion.div>
+            </div>
+          </motion.div>
 
+          <motion.div
+            className="absolute left-0 right-0 h-0.5 bg-emerald-400/70"
+            animate={{ top: ["10%", "90%", "10%"], opacity: [0.3, 0.7, 0.3] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+          />
+
+          {[...Array(6)].map((_, i) => (
             <motion.div
-              className="absolute left-0 right-0 h-0.5 bg-emerald-400/70"
-              animate={{ top: ["10%", "90%", "10%"], opacity: [0.3, 0.7, 0.3] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+              key={i}
+              className="absolute h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-gradient-to-br from-amber-400/60 to-amber-600/60"
+              initial={{ x: Math.random() * 200 + 50, y: -50 }}
+              animate={{ y: 400, rotate: 360 }}
+              transition={{
+                duration: 4 + Math.random() * 2,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+                ease: "linear",
+              }}
             />
-
-            {[...Array(6)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-linear-to-br from-amber-400/60 to-amber-600/60"
-                initial={{ x: Math.random() * 200 + 50, y: -50 }}
-                animate={{ y: 400, rotate: 360 }}
-                transition={{
-                  duration: 4 + Math.random() * 2,
-                  repeat: Infinity,
-                  delay: Math.random() * 2,
-                  ease: "linear",
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="px-1 py-4 overflow-y-auto">
-          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
-            Покупки приносят больше
-          </h2>
-          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-3 sm:my-4" />
-          <div className="space-y-2 sm:space-y-4">
-            <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
-              Ваши повседневные траты превращаются в ценность.
-            </p>
-            <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
-              Показывайте QR-код у партнёров и получайте бонусы, которые можно конвертировать и использовать выгодно.
-            </p>
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* Кнопки (Назад/Далее) будут добавлены основным компонентом */}
+      <div className="flex-1 min-h-0 px-1 py-3 overflow-y-auto">
+        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+          Покупки приносят больше
+        </h2>
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-3" />
+        <div className="space-y-2">
+          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+            Ваши повседневные траты превращаются в ценность.
+          </p>
+          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+            Показывайте QR-код у партнёров и получайте бонусы, которые можно конвертировать и использовать выгодно.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -176,85 +170,83 @@ function Scene3() {
 
   return (
     <div className="h-full flex flex-col px-6 pt-4 sm:pt-6">
-      <div className="flex-1 min-h-0 flex flex-col">
-        <div className="flex-1 min-h-0 flex items-center justify-center">
-          <div className="relative w-full max-w-sm aspect-square bg-linear-to-br from-slate-50/80 to-slate-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
-            <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="none">
-              <motion.polyline
-                points={chartData.map(p => `${p.x * 8},${120 - p.y}`).join(' ')}
-                fill="none"
-                stroke="#3b82f6"
-                strokeWidth="2"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 0.3 }}
-                transition={{ duration: 2, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
-              />
-              <motion.polyline
-                points={chartData.map(p => `${p.x * 8 + 20},${140 - p.y * 0.8}`).join(' ')}
-                fill="none"
-                stroke="#8b5cf6"
-                strokeWidth="1.5"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 0.2 }}
-                transition={{ duration: 3, delay: 0.5, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
-              />
-            </svg>
+      <div className="h-[45vh] min-h-[280px] flex items-center justify-center">
+        <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-slate-50/80 to-slate-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
+          <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="none">
+            <motion.polyline
+              points={chartData.map(p => `${p.x * 8},${120 - p.y}`).join(' ')}
+              fill="none"
+              stroke="#3b82f6"
+              strokeWidth="2"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.3 }}
+              transition={{ duration: 2, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+            />
+            <motion.polyline
+              points={chartData.map(p => `${p.x * 8 + 20},${140 - p.y * 0.8}`).join(' ')}
+              fill="none"
+              stroke="#8b5cf6"
+              strokeWidth="1.5"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.2 }}
+              transition={{ duration: 3, delay: 0.5, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+            />
+          </svg>
 
-            <div className="absolute inset-0 flex items-end justify-center">
-              <div className="flex items-end gap-0.5 h-3/4 w-11/12">
-                {candles.map((candle, i) => (
-                  <motion.div
-                    key={i}
-                    className="relative flex-1 max-w-2"
-                    initial={{ height: 0 }}
-                    animate={{ height: candle.height }}
-                    transition={{
-                      duration: 1.5 + Math.random() * 3,
-                      delay: i * 0.03,
-                      repeat: Infinity,
-                      repeatType: "reverse",
-                      ease: "easeInOut",
-                    }}
-                  >
-                    <div
-                      className={`absolute bottom-0 w-full ${
-                        candle.isGreen ? "bg-emerald-500/70" : "bg-rose-400/70"
-                      }`}
-                      style={{ height: '70%' }}
-                    />
-                    <div className="absolute w-px bg-zinc-400/50 left-1/2 -translate-x-1/2 h-full" />
-                  </motion.div>
-                ))}
-              </div>
+          <div className="absolute inset-0 flex items-end justify-center">
+            <div className="flex items-end gap-0.5 h-3/4 w-11/12">
+              {candles.map((candle, i) => (
+                <motion.div
+                  key={i}
+                  className="relative flex-1 max-w-2"
+                  initial={{ height: 0 }}
+                  animate={{ height: candle.height }}
+                  transition={{
+                    duration: 1.5 + Math.random() * 3,
+                    delay: i * 0.03,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    ease: "easeInOut",
+                  }}
+                >
+                  <div
+                    className={`absolute bottom-0 w-full ${
+                      candle.isGreen ? "bg-emerald-500/70" : "bg-rose-400/70"
+                    }`}
+                    style={{ height: '70%' }}
+                  />
+                  <div className="absolute w-px bg-zinc-400/50 left-1/2 -translate-x-1/2 h-full" />
+                </motion.div>
+              ))}
             </div>
+          </div>
 
-            <div className="absolute bottom-2 left-0 right-0 bg-zinc-800/80 backdrop-blur-sm text-white/90 py-1.5 sm:py-2.5 overflow-hidden">
-              <motion.div
-                className="whitespace-nowrap"
-                animate={{ x: [300, -1200] }}
-                transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-              >
-                <span className="text-[10px] sm:text-xs font-light tracking-wider px-4">
-                  BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> • BON/WB <span className="text-emerald-400">+3.1%</span> • BON/FUEL <span className="text-rose-400">-0.8%</span> • BON/MG <span className="text-emerald-400">+1.9%</span> • BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> •
-                </span>
-              </motion.div>
-            </div>
+          <div className="absolute bottom-2 left-0 right-0 bg-zinc-800/80 backdrop-blur-sm text-white/90 py-1.5 sm:py-2.5 overflow-hidden">
+            <motion.div
+              className="whitespace-nowrap"
+              animate={{ x: [300, -1200] }}
+              transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+            >
+              <span className="text-[10px] sm:text-xs font-light tracking-wider px-4">
+                BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> • BON/WB <span className="text-emerald-400">+3.1%</span> • BON/FUEL <span className="text-rose-400">-0.8%</span> • BON/MG <span className="text-emerald-400">+1.9%</span> • BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> •
+              </span>
+            </motion.div>
           </div>
         </div>
+      </div>
 
-        <div className="px-1 py-4 overflow-y-auto">
-          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
-            Добро пожаловать на торги
-          </h2>
-          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-3 sm:my-4" />
-          <div className="space-y-2 sm:space-y-4">
-            <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
-              Здесь бонусы работают по законам рынка.
-            </p>
-            <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
-              Следите за спросом на бонусы партнёров. Выбирайте момент. Обменивайте с выгодой.
-            </p>
-          </div>
+      <div className="flex-1 min-h-0 px-1 py-3 overflow-y-auto">
+        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+          Добро пожаловать на торги
+        </h2>
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-3" />
+        <div className="space-y-2">
+          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+            Здесь бонусы работают по законам рынка.
+          </p>
+          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+            Следите за спросом на бонусы партнёров. Выбирайте момент. Обменивайте с выгодой.
+          </p>
         </div>
       </div>
     </div>
@@ -265,63 +257,61 @@ function Scene3() {
 function Scene4() {
   return (
     <div className="h-full flex flex-col px-6 pt-4 sm:pt-6">
-      <div className="flex-1 min-h-0 flex flex-col">
-        <div className="flex-1 min-h-0 flex items-center justify-center">
-          <div className="relative w-full max-w-sm aspect-square bg-linear-to-br from-violet-50/80 to-purple-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
+      <div className="h-[45vh] min-h-[280px] flex items-center justify-center">
+        <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-violet-50/80 to-purple-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          >
+            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full border-2 border-violet-400/30 border-t-violet-500/70" />
+          </motion.div>
+
+          {[0, 1, 2, 3, 4, 5].map((i) => (
             <motion.div
-              className="absolute inset-0 flex items-center justify-center"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+              key={i}
+              className="absolute h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-white/90 shadow-md flex items-center justify-center backdrop-blur-xs"
+              style={{
+                background: `linear-gradient(135deg, hsl(${i * 60}, 80%, 95%), hsl(${i * 60 + 30}, 80%, 92%))`,
+              }}
+              animate={{
+                x: [0, 100 * Math.cos(i * 60), 0],
+                y: [0, 100 * Math.sin(i * 60), 0],
+                rotate: [0, 360],
+              }}
+              transition={{ duration: 8, repeat: Infinity, delay: i * 0.4, ease: "linear" }}
             >
-              <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full border-2 border-violet-400/30 border-t-violet-500/70" />
+              <span className="text-xs sm:text-sm font-light text-zinc-700">B</span>
             </motion.div>
+          ))}
 
-            {[0, 1, 2, 3, 4, 5].map((i) => (
-              <motion.div
-                key={i}
-                className="absolute h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-white/90 shadow-md flex items-center justify-center backdrop-blur-xs"
-                style={{
-                  background: `linear-gradient(135deg, hsl(${i * 60}, 80%, 95%), hsl(${i * 60 + 30}, 80%, 92%))`,
-                }}
-                animate={{
-                  x: [0, 100 * Math.cos(i * 60), 0],
-                  y: [0, 100 * Math.sin(i * 60), 0],
-                  rotate: [0, 360],
-                }}
-                transition={{ duration: 8, repeat: Infinity, delay: i * 0.4, ease: "linear" }}
-              >
-                <span className="text-xs sm:text-sm font-light text-zinc-700">B</span>
-              </motion.div>
-            ))}
-
-            {[...Array(12)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-1 h-1 bg-purple-400/40 rounded-full"
-                animate={{
-                  x: [0, 120 * Math.cos(i * 30), 0],
-                  y: [0, 120 * Math.sin(i * 30), 0],
-                  opacity: [0, 0.6, 0],
-                }}
-                transition={{ duration: 4, repeat: Infinity, delay: i * 0.25 }}
-              />
-            ))}
-          </div>
+          {[...Array(12)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-purple-400/40 rounded-full"
+              animate={{
+                x: [0, 120 * Math.cos(i * 30), 0],
+                y: [0, 120 * Math.sin(i * 30), 0],
+                opacity: [0, 0.6, 0],
+              }}
+              transition={{ duration: 4, repeat: Infinity, delay: i * 0.25 }}
+            />
+          ))}
         </div>
+      </div>
 
-        <div className="px-1 py-4 overflow-y-auto">
-          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
-            Теперь лояльность работает на вас
-          </h2>
-          <div className="w-full h-px bg-linear-to-r from-transparent via-zinc-300 to-transparent my-3 sm:my-4" />
-          <div className="space-y-2 sm:space-y-4">
-            <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
-              Вы управляете своими бонусами — а не наоборот.
-            </p>
-            <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
-              Копите то, что нужно вам. Обменивайте то, что ценят другие.
-            </p>
-          </div>
+      <div className="flex-1 min-h-0 px-1 py-3 overflow-y-auto">
+        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+          Теперь лояльность работает на вас
+        </h2>
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-3" />
+        <div className="space-y-2">
+          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+            Вы управляете своими бонусами — а не наоборот.
+          </p>
+          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+            Копите то, что нужно вам. Обменивайте то, что ценят другие.
+          </p>
         </div>
       </div>
     </div>
@@ -417,8 +407,8 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
         {/* Кнопки навигации для экранов 1–3 (кроме последнего) */}
         {!isExiting && index > 0 && index < 4 && (
-          <div className="px-6 pb-6 sm:pb-8 bg-white">
-            <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="px-6 pb-5 sm:pb-6 bg-white">
+            <div className="flex items-center justify-center gap-2 mb-3">
               {[0, 1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
