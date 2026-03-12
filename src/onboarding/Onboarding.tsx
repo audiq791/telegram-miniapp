@@ -1,16 +1,36 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { haptic } from "../components/haptics";
 import LoginAccount from "../screens/LoginAccount";
 
+// ==================== Адаптация для очень маленьких экранов ====================
+const useSmallScreen = () => {
+  const [isSmall, setIsSmall] = useState(false);
+  useEffect(() => {
+    const check = () => setIsSmall(window.innerHeight < 700);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isSmall;
+};
+
 // ==================== ЭКРАН 1 ====================
 function Scene1({ onNext }: { onNext: () => void }) {
+  const isSmall = useSmallScreen();
+
   return (
-    <div className="h-full flex flex-col px-6 pt-4 sm:pt-6">
-      {/* Анимация — выше, занимает 45% высоты */}
-      <div className="h-[45vh] min-h-[280px] flex items-center justify-center">
+    <div className="h-full flex flex-col px-6 pt-1 sm:pt-4">
+      {/* Анимация — занимает 42% высоты, но не менее 260px (на маленьких экранах меньше) */}
+      <div
+        className="flex items-center justify-center"
+        style={{
+          height: isSmall ? "35vh" : "42vh",
+          minHeight: isSmall ? "200px" : "260px",
+        }}
+      >
         <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-amber-50/80 to-orange-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
           {[...Array(20)].map((_, i) => (
             <motion.div
@@ -62,8 +82,8 @@ function Scene1({ onNext }: { onNext: () => void }) {
         </div>
       </div>
 
-      {/* Текст с уменьшенными отступами */}
-      <div className="flex-1 min-h-0 px-1 py-3 overflow-y-auto">
+      {/* Текст с возможностью скролла, если совсем не влезает */}
+      <div className="flex-1 min-h-0 px-1 py-2 overflow-y-auto">
         <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
           Биржа Бонусов от OEM Tech
         </h1>
@@ -78,8 +98,8 @@ function Scene1({ onNext }: { onNext: () => void }) {
         </div>
       </div>
 
-      {/* Кнопка с небольшим отступом снизу */}
-      <div className="pb-4 sm:pb-5 flex justify-center">
+      {/* Кнопка */}
+      <div className="pb-4 flex justify-center">
         <motion.button
           whileTap={{ scale: 0.97 }}
           transition={{ type: "spring", stiffness: 800, damping: 20 }}
@@ -95,9 +115,17 @@ function Scene1({ onNext }: { onNext: () => void }) {
 
 // ==================== ЭКРАН 2 ====================
 function Scene2() {
+  const isSmall = useSmallScreen();
+
   return (
-    <div className="h-full flex flex-col px-6 pt-4 sm:pt-6">
-      <div className="h-[45vh] min-h-[280px] flex items-center justify-center">
+    <div className="h-full flex flex-col px-6 pt-1 sm:pt-4">
+      <div
+        className="flex items-center justify-center"
+        style={{
+          height: isSmall ? "35vh" : "42vh",
+          minHeight: isSmall ? "200px" : "260px",
+        }}
+      >
         <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-emerald-50/80 to-green-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
@@ -141,7 +169,7 @@ function Scene2() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 px-1 py-3 overflow-y-auto">
+      <div className="flex-1 min-h-0 px-1 py-2 overflow-y-auto">
         <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
           Покупки приносят больше
         </h2>
@@ -161,16 +189,22 @@ function Scene2() {
 
 // ==================== ЭКРАН 3 ====================
 function Scene3() {
+  const isSmall = useSmallScreen();
   const candles = Array.from({ length: 40 }, () => ({
     height: Math.floor(Math.random() * 90) + 15,
     isGreen: Math.random() > 0.48,
   }));
-
   const chartData = Array.from({ length: 50 }, (_, i) => ({ x: i, y: Math.floor(Math.random() * 100) + 20 }));
 
   return (
-    <div className="h-full flex flex-col px-6 pt-4 sm:pt-6">
-      <div className="h-[45vh] min-h-[280px] flex items-center justify-center">
+    <div className="h-full flex flex-col px-6 pt-1 sm:pt-4">
+      <div
+        className="flex items-center justify-center"
+        style={{
+          height: isSmall ? "35vh" : "42vh",
+          minHeight: isSmall ? "200px" : "260px",
+        }}
+      >
         <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-slate-50/80 to-slate-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
           <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="none">
             <motion.polyline
@@ -235,7 +269,7 @@ function Scene3() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 px-1 py-3 overflow-y-auto">
+      <div className="flex-1 min-h-0 px-1 py-2 overflow-y-auto">
         <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
           Добро пожаловать на торги
         </h2>
@@ -255,9 +289,17 @@ function Scene3() {
 
 // ==================== ЭКРАН 4 ====================
 function Scene4() {
+  const isSmall = useSmallScreen();
+
   return (
-    <div className="h-full flex flex-col px-6 pt-4 sm:pt-6">
-      <div className="h-[45vh] min-h-[280px] flex items-center justify-center">
+    <div className="h-full flex flex-col px-6 pt-1 sm:pt-4">
+      <div
+        className="flex items-center justify-center"
+        style={{
+          height: isSmall ? "35vh" : "42vh",
+          minHeight: isSmall ? "200px" : "260px",
+        }}
+      >
         <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-violet-50/80 to-purple-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
@@ -300,7 +342,7 @@ function Scene4() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 px-1 py-3 overflow-y-auto">
+      <div className="flex-1 min-h-0 px-1 py-2 overflow-y-auto">
         <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
           Теперь лояльность работает на вас
         </h2>
