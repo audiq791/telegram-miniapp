@@ -85,12 +85,6 @@ function Scene1({ onNext }: { onNext: () => void }) {
             <p className="text-xl text-zinc-600 leading-relaxed">
               Здесь бонусы — это не просто баллы. Это актив, которым можно управлять.
             </p>
-            <p className="text-xl text-zinc-600 leading-relaxed">
-              Обменивайте, выбирайте выгодные моменты, увеличивайте ценность своих покупок.
-            </p>
-            <p className="text-xl text-zinc-600 leading-relaxed font-medium">
-              Ваши бонусы начинают работать на вас.
-            </p>
           </div>
 
           <div className="flex justify-center">
@@ -182,10 +176,13 @@ function Scene2() {
 
 // ==================== ЭКРАН 3 ====================
 function Scene3() {
+  // Генерируем 40 свечей с рандомными высотами
   const candles = Array.from({ length: 40 }, () => ({
     height: Math.floor(Math.random() * 90) + 15,
     isGreen: Math.random() > 0.48,
   }));
+
+  // Генерируем данные для фонового графика
   const chartData = Array.from({ length: 50 }, (_, i) => ({
     x: i,
     y: Math.floor(Math.random() * 100) + 20,
@@ -196,6 +193,7 @@ function Scene3() {
       <div className="max-w-md mx-auto">
         <div className="relative h-80 w-full bg-gradient-to-br from-slate-50/80 to-slate-100/80 rounded-3xl flex items-center justify-center mb-8 overflow-hidden border border-zinc-200/50 shadow-sm">
           
+          {/* Фоновый график */}
           <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="none">
             <motion.polyline
               points={chartData.map(p => `${p.x * 8},${120 - p.y}`).join(' ')}
@@ -217,6 +215,7 @@ function Scene3() {
             />
           </svg>
 
+          {/* Свечи */}
           <div className="flex items-end gap-0.5 h-48 w-full px-1 relative z-10">
             {candles.map((candle, i) => (
               <motion.div
@@ -243,6 +242,7 @@ function Scene3() {
             ))}
           </div>
 
+          {/* Бегущая строка */}
           <div className="absolute bottom-4 left-0 right-0 bg-zinc-800/80 backdrop-blur-sm text-white/90 py-2.5 overflow-hidden z-20">
             <motion.div
               className="whitespace-nowrap"
@@ -260,7 +260,9 @@ function Scene3() {
           <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
             Добро пожаловать на торги
           </h2>
+          
           <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-4" />
+          
           <div className="space-y-4">
             <p className="text-xl text-zinc-600 leading-relaxed">
               Здесь бонусы работают по законам рынка.
@@ -325,7 +327,9 @@ function Scene4() {
           <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
             Теперь лояльность работает на вас
           </h2>
+          
           <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-4" />
+          
           <div className="space-y-4">
             <p className="text-xl text-zinc-600 leading-relaxed">
               Вы управляете своими бонусами — а не наоборот.
@@ -374,8 +378,10 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (isExiting) return;
+
     const swipe = info.offset.x;
     const velocity = info.velocity.x;
+
     if (index === 4 && swipe > 50 && velocity > 0.2) {
       prev();
     } else if (index < 4) {
@@ -446,6 +452,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           </motion.div>
         </div>
 
+        {/* На экранах 2–4 кнопки остаются внизу */}
         {!isExiting && index > 0 && index < 4 && (
           <div className="absolute left-0 right-0 px-6" style={{ bottom: "140px" }}>
             <div className="flex items-center justify-center gap-2 mb-5">
@@ -458,6 +465,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 />
               ))}
             </div>
+
             <div className="flex gap-3 justify-center">
               {index > 0 && (
                 <motion.button
@@ -469,6 +477,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                   Назад
                 </motion.button>
               )}
+              
               {index < 4 && (
                 <motion.button
                   whileTap={{ scale: 0.97 }}
