@@ -606,3 +606,79 @@ input[type=number] {
 .large-scale .h-2.rounded-full {
   height: 0.3rem;
 }
+
+/* ========== Экстремальное сжатие для крупного масштаба на iPhone (добавлено) ========== */
+.large-scale .flex-1 .h-\[38vh\] {
+  height: 24vh !important;
+  min-height: 120px !important;
+}
+.large-scale .flex-1 .min-h-\[200px\] {
+  min-height: 120px !important;
+}
+.large-scale .flex-1 .text-xl {
+  font-size: 1rem !important;
+  line-height: 1.2rem !important;
+}
+.large-scale .flex-1 .text-2xl {
+  font-size: 1.2rem !important;
+  line-height: 1.4rem !important;
+}
+.large-scale .flex-1 .text-base {
+  font-size: 0.7rem !important;
+  line-height: 0.9rem !important;
+}
+.large-scale .flex-1 .text-sm {
+  font-size: 0.6rem !important;
+  line-height: 0.8rem !important;
+}
+.large-scale .flex-1 .py-1 {
+  padding-top: 0.1rem !important;
+  padding-bottom: 0.1rem !important;
+}
+.large-scale .flex-1 .my-2 {
+  margin-top: 0.2rem !important;
+  margin-bottom: 0.2rem !important;
+}
+.large-scale .w-32 {
+  width: 5rem !important;
+}
+.large-scale .w-36 {
+  width: 6rem !important;
+}
+.large-scale .h-9 {
+  height: 1.6rem !important;
+}
+.large-scale .h-10 {
+  height: 1.8rem !important;
+}
+.large-scale .h-8 {
+  height: 1.5rem !important;
+}
+.large-scale .px-6 {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+.large-scale .pt-1 {
+  padding-top: 0.1rem !important;
+}
+.large-scale .pb-3 {
+  padding-bottom: 0.3rem !important;
+}
+.large-scale .pb-4 {
+  padding-bottom: 0.4rem !important;
+}
+.large-scale .gap-2 {
+  gap: 0.1rem !important;
+}
+.large-scale .gap-3 {
+  gap: 0.2rem !important;
+}
+.large-scale .mb-2 {
+  margin-bottom: 0.2rem !important;
+}
+.large-scale .w-5 {
+  width: 1rem !important;
+}
+.large-scale .h-1 {
+  height: 0.15rem !important;
+}

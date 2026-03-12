@@ -5,30 +5,34 @@ import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { haptic } from "../components/haptics";
 import LoginAccount from "../screens/LoginAccount";
 
-// ==================== Адаптация для очень маленьких экранов ====================
-const useSmallScreen = () => {
-  const [isSmall, setIsSmall] = useState(false);
+// Хук для определения очень маленьких экранов (например, iPhone SE или крупный масштаб)
+const useTinyScreen = () => {
+  const [isTiny, setIsTiny] = useState(false);
   useEffect(() => {
-    const check = () => setIsSmall(window.innerHeight < 700);
+    const check = () => {
+      // Считаем экран "tiny", если высота меньше 650px или включён крупный масштаб (класс large-scale)
+      const isLargeScale = document.body.classList.contains('large-scale');
+      setIsTiny(window.innerHeight < 650 || isLargeScale);
+    };
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
-  return isSmall;
+  return isTiny;
 };
 
 // ==================== ЭКРАН 1 ====================
 function Scene1({ onNext }: { onNext: () => void }) {
-  const isSmall = useSmallScreen();
+  const isTiny = useTinyScreen();
 
   return (
-    <div className="h-full flex flex-col px-6 pt-1 sm:pt-4">
-      {/* Анимация — занимает 42% высоты, но не менее 260px (на маленьких экранах меньше) */}
+    <div className="h-full flex flex-col px-6 pt-1">
+      {/* Анимация — динамическая высота */}
       <div
         className="flex items-center justify-center"
         style={{
-          height: isSmall ? "35vh" : "42vh",
-          minHeight: isSmall ? "200px" : "260px",
+          height: isTiny ? "28vh" : "38vh",
+          minHeight: isTiny ? "140px" : "200px",
         }}
       >
         <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-amber-50/80 to-orange-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
@@ -55,56 +59,56 @@ function Scene1({ onNext }: { onNext: () => void }) {
             animate={{ scale: [1, 1.08, 1], rotate: [0, 3, -3, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-xl flex items-center justify-center">
-              <span className="text-3xl sm:text-4xl font-light text-white tracking-tight">B</span>
+            <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-xl flex items-center justify-center">
+              <span className="text-2xl sm:text-3xl font-light text-white tracking-tight">B</span>
             </div>
           </motion.div>
 
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <motion.div
               key={i}
-              className="absolute h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-white/90 border border-amber-200/50 shadow-md flex items-center justify-center backdrop-blur-xs"
+              className="absolute h-6 w-6 sm:h-8 sm:w-8 rounded-xl bg-white/90 border border-amber-200/50 shadow-md flex items-center justify-center backdrop-blur-xs"
               animate={{
-                x: [0, 80 * Math.cos(i * 60), 0],
-                y: [0, 80 * Math.sin(i * 60), 0],
+                x: [0, 60 * Math.cos(i * 60), 0],
+                y: [0, 60 * Math.sin(i * 60), 0],
                 rotate: [0, 360],
               }}
               transition={{
-                duration: 10,
+                duration: 8,
                 repeat: Infinity,
                 delay: i * 0.6,
                 ease: "linear",
               }}
             >
-              <span className="text-base sm:text-lg font-light text-amber-600">B</span>
+              <span className="text-sm sm:text-base font-light text-amber-600">B</span>
             </motion.div>
           ))}
         </div>
       </div>
 
-      {/* Текст с возможностью скролла, если совсем не влезает */}
-      <div className="flex-1 min-h-0 px-1 py-2 overflow-y-auto">
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+      {/* Текст — с возможностью скролла, но стараемся минимизировать */}
+      <div className="flex-1 min-h-0 px-1 py-1 overflow-y-auto">
+        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900 leading-tight">
           Биржа Бонусов от OEM Tech
         </h1>
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-3" />
-        <div className="space-y-2">
-          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-2" />
+        <div className="space-y-1">
+          <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
             Добро пожаловать в новую экономику лояльности.
           </p>
-          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+          <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
             Здесь бонусы — это не просто баллы. Это актив, которым можно управлять.
           </p>
         </div>
       </div>
 
       {/* Кнопка */}
-      <div className="pb-4 flex justify-center">
+      <div className="pb-3 flex justify-center">
         <motion.button
           whileTap={{ scale: 0.97 }}
           transition={{ type: "spring", stiffness: 800, damping: 20 }}
           onClick={onNext}
-          className="w-36 sm:w-40 h-10 sm:h-12 rounded-xl bg-zinc-900 text-white font-medium text-sm sm:text-base shadow-md hover:bg-zinc-800 transition-colors"
+          className="w-32 sm:w-36 h-9 sm:h-10 rounded-xl bg-zinc-900 text-white font-medium text-xs sm:text-sm shadow-md hover:bg-zinc-800 transition-colors"
         >
           Далее
         </motion.button>
@@ -115,15 +119,15 @@ function Scene1({ onNext }: { onNext: () => void }) {
 
 // ==================== ЭКРАН 2 ====================
 function Scene2() {
-  const isSmall = useSmallScreen();
+  const isTiny = useTinyScreen();
 
   return (
-    <div className="h-full flex flex-col px-6 pt-1 sm:pt-4">
+    <div className="h-full flex flex-col px-6 pt-1">
       <div
         className="flex items-center justify-center"
         style={{
-          height: isSmall ? "35vh" : "42vh",
-          minHeight: isSmall ? "200px" : "260px",
+          height: isTiny ? "28vh" : "38vh",
+          minHeight: isTiny ? "140px" : "200px",
         }}
       >
         <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-emerald-50/80 to-green-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
@@ -132,12 +136,12 @@ function Scene2() {
             animate={{ scale: [1, 1.02, 1] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            <div className="h-28 w-28 sm:h-32 sm:w-32 bg-white rounded-2xl shadow-lg p-2 sm:p-3">
-              <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
+            <div className="h-24 w-24 sm:h-28 sm:w-28 bg-white rounded-2xl shadow-lg p-2">
+              <div className="grid grid-cols-7 gap-0.5">
                 {[...Array(49)].map((_, i) => (
                   <div
                     key={i}
-                    className={`h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-xs ${
+                    className={`h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-xs ${
                       Math.random() > 0.6 ? "bg-zinc-900" : "bg-transparent"
                     }`}
                   />
@@ -155,7 +159,7 @@ function Scene2() {
           {[...Array(6)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-gradient-to-br from-amber-400/60 to-amber-600/60"
+              className="absolute h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-gradient-to-br from-amber-400/60 to-amber-600/60"
               initial={{ x: Math.random() * 200 + 50, y: -50 }}
               animate={{ y: 400, rotate: 360 }}
               transition={{
@@ -169,16 +173,16 @@ function Scene2() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 px-1 py-2 overflow-y-auto">
-        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+      <div className="flex-1 min-h-0 px-1 py-1 overflow-y-auto">
+        <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900 leading-tight">
           Покупки приносят больше
         </h2>
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-3" />
-        <div className="space-y-2">
-          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-2" />
+        <div className="space-y-1">
+          <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
             Ваши повседневные траты превращаются в ценность.
           </p>
-          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+          <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
             Показывайте QR-код у партнёров и получайте бонусы, которые можно конвертировать и использовать выгодно.
           </p>
         </div>
@@ -189,26 +193,26 @@ function Scene2() {
 
 // ==================== ЭКРАН 3 ====================
 function Scene3() {
-  const isSmall = useSmallScreen();
+  const isTiny = useTinyScreen();
   const candles = Array.from({ length: 40 }, () => ({
-    height: Math.floor(Math.random() * 90) + 15,
+    height: Math.floor(Math.random() * 60) + 10,
     isGreen: Math.random() > 0.48,
   }));
-  const chartData = Array.from({ length: 50 }, (_, i) => ({ x: i, y: Math.floor(Math.random() * 100) + 20 }));
+  const chartData = Array.from({ length: 50 }, (_, i) => ({ x: i, y: Math.floor(Math.random() * 80) + 10 }));
 
   return (
-    <div className="h-full flex flex-col px-6 pt-1 sm:pt-4">
+    <div className="h-full flex flex-col px-6 pt-1">
       <div
         className="flex items-center justify-center"
         style={{
-          height: isSmall ? "35vh" : "42vh",
-          minHeight: isSmall ? "200px" : "260px",
+          height: isTiny ? "28vh" : "38vh",
+          minHeight: isTiny ? "140px" : "200px",
         }}
       >
         <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-slate-50/80 to-slate-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
           <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="none">
             <motion.polyline
-              points={chartData.map(p => `${p.x * 8},${120 - p.y}`).join(' ')}
+              points={chartData.map(p => `${p.x * 8},${100 - p.y}`).join(' ')}
               fill="none"
               stroke="#3b82f6"
               strokeWidth="2"
@@ -217,7 +221,7 @@ function Scene3() {
               transition={{ duration: 2, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
             />
             <motion.polyline
-              points={chartData.map(p => `${p.x * 8 + 20},${140 - p.y * 0.8}`).join(' ')}
+              points={chartData.map(p => `${p.x * 8 + 20},${120 - p.y * 0.8}`).join(' ')}
               fill="none"
               stroke="#8b5cf6"
               strokeWidth="1.5"
@@ -255,30 +259,30 @@ function Scene3() {
             </div>
           </div>
 
-          <div className="absolute bottom-2 left-0 right-0 bg-zinc-800/80 backdrop-blur-sm text-white/90 py-1.5 sm:py-2.5 overflow-hidden">
+          <div className="absolute bottom-2 left-0 right-0 bg-zinc-800/80 backdrop-blur-sm text-white/90 py-1 overflow-hidden">
             <motion.div
               className="whitespace-nowrap"
               animate={{ x: [300, -1200] }}
               transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
             >
-              <span className="text-[10px] sm:text-xs font-light tracking-wider px-4">
-                BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> • BON/WB <span className="text-emerald-400">+3.1%</span> • BON/FUEL <span className="text-rose-400">-0.8%</span> • BON/MG <span className="text-emerald-400">+1.9%</span> • BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> •
+              <span className="text-[8px] sm:text-[10px] font-light tracking-wider px-4">
+                BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> • BON/WB <span className="text-emerald-400">+3.1%</span> • BON/FUEL <span className="text-rose-400">-0.8%</span> • BON/MG <span className="text-emerald-400">+1.9%</span> •
               </span>
             </motion.div>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 px-1 py-2 overflow-y-auto">
-        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+      <div className="flex-1 min-h-0 px-1 py-1 overflow-y-auto">
+        <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900 leading-tight">
           Добро пожаловать на торги
         </h2>
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-3" />
-        <div className="space-y-2">
-          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-2" />
+        <div className="space-y-1">
+          <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
             Здесь бонусы работают по законам рынка.
           </p>
-          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+          <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
             Следите за спросом на бонусы партнёров. Выбирайте момент. Обменивайте с выгодой.
           </p>
         </div>
@@ -289,15 +293,15 @@ function Scene3() {
 
 // ==================== ЭКРАН 4 ====================
 function Scene4() {
-  const isSmall = useSmallScreen();
+  const isTiny = useTinyScreen();
 
   return (
-    <div className="h-full flex flex-col px-6 pt-1 sm:pt-4">
+    <div className="h-full flex flex-col px-6 pt-1">
       <div
         className="flex items-center justify-center"
         style={{
-          height: isSmall ? "35vh" : "42vh",
-          minHeight: isSmall ? "200px" : "260px",
+          height: isTiny ? "28vh" : "38vh",
+          minHeight: isTiny ? "140px" : "200px",
         }}
       >
         <div className="relative w-full max-w-sm aspect-square bg-gradient-to-br from-violet-50/80 to-purple-100/80 rounded-3xl overflow-hidden border border-zinc-200/50 shadow-sm">
@@ -306,19 +310,19 @@ function Scene4() {
             animate={{ rotate: 360 }}
             transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
           >
-            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full border-2 border-violet-400/30 border-t-violet-500/70" />
+            <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full border-2 border-violet-400/30 border-t-violet-500/70" />
           </motion.div>
 
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <motion.div
               key={i}
-              className="absolute h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-white/90 shadow-md flex items-center justify-center backdrop-blur-xs"
+              className="absolute h-6 w-6 sm:h-8 sm:w-8 rounded-xl bg-white/90 shadow-md flex items-center justify-center backdrop-blur-xs"
               style={{
                 background: `linear-gradient(135deg, hsl(${i * 60}, 80%, 95%), hsl(${i * 60 + 30}, 80%, 92%))`,
               }}
               animate={{
-                x: [0, 100 * Math.cos(i * 60), 0],
-                y: [0, 100 * Math.sin(i * 60), 0],
+                x: [0, 80 * Math.cos(i * 60), 0],
+                y: [0, 80 * Math.sin(i * 60), 0],
                 rotate: [0, 360],
               }}
               transition={{ duration: 8, repeat: Infinity, delay: i * 0.4, ease: "linear" }}
@@ -332,8 +336,8 @@ function Scene4() {
               key={i}
               className="absolute w-1 h-1 bg-purple-400/40 rounded-full"
               animate={{
-                x: [0, 120 * Math.cos(i * 30), 0],
-                y: [0, 120 * Math.sin(i * 30), 0],
+                x: [0, 100 * Math.cos(i * 30), 0],
+                y: [0, 100 * Math.sin(i * 30), 0],
                 opacity: [0, 0.6, 0],
               }}
               transition={{ duration: 4, repeat: Infinity, delay: i * 0.25 }}
@@ -342,16 +346,16 @@ function Scene4() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 px-1 py-2 overflow-y-auto">
-        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 leading-tight">
+      <div className="flex-1 min-h-0 px-1 py-1 overflow-y-auto">
+        <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900 leading-tight">
           Теперь лояльность работает на вас
         </h2>
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-3" />
-        <div className="space-y-2">
-          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent my-2" />
+        <div className="space-y-1">
+          <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
             Вы управляете своими бонусами — а не наоборот.
           </p>
-          <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+          <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
             Копите то, что нужно вам. Обменивайте то, что ценят другие.
           </p>
         </div>
@@ -449,13 +453,13 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
         {/* Кнопки навигации для экранов 1–3 (кроме последнего) */}
         {!isExiting && index > 0 && index < 4 && (
-          <div className="px-6 pb-5 sm:pb-6 bg-white">
-            <div className="flex items-center justify-center gap-2 mb-3">
+          <div className="px-6 pb-4 bg-white">
+            <div className="flex items-center justify-center gap-2 mb-2">
               {[0, 1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    index === i ? "w-6 bg-zinc-900" : "w-1.5 bg-zinc-300"
+                  className={`h-1 rounded-full transition-all duration-300 ${
+                    index === i ? "w-5 bg-zinc-900" : "w-1 bg-zinc-300"
                   }`}
                 />
               ))}
@@ -466,7 +470,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                   whileTap={{ scale: 0.97 }}
                   transition={{ type: "spring", stiffness: 800, damping: 20 }}
                   onClick={prev}
-                  className="w-24 sm:w-28 h-10 sm:h-12 rounded-xl border border-zinc-200 bg-white/80 backdrop-blur-xs text-zinc-700 font-medium text-sm sm:text-base shadow-sm hover:bg-white transition-colors"
+                  className="w-20 sm:w-24 h-8 sm:h-10 rounded-xl border border-zinc-200 bg-white/80 backdrop-blur-xs text-zinc-700 font-medium text-xs sm:text-sm shadow-sm hover:bg-white transition-colors"
                 >
                   Назад
                 </motion.button>
@@ -476,7 +480,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                   whileTap={{ scale: 0.97 }}
                   transition={{ type: "spring", stiffness: 800, damping: 20 }}
                   onClick={next}
-                  className="w-24 sm:w-28 h-10 sm:h-12 rounded-xl bg-zinc-900 text-white font-medium text-sm sm:text-base shadow-md hover:bg-zinc-800 transition-colors"
+                  className="w-20 sm:w-24 h-8 sm:h-10 rounded-xl bg-zinc-900 text-white font-medium text-xs sm:text-sm shadow-md hover:bg-zinc-800 transition-colors"
                 >
                   Далее
                 </motion.button>
