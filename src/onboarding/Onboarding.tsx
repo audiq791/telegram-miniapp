@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { haptic } from "../components/haptics";
 import LoginAccount from "../screens/LoginAccount";
 
@@ -338,7 +338,11 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
+  const [swipeOffset, setSwipeOffset] = useState(0);
   const isDoneRef = useRef(false);
+  const swipeStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
+  const isSwipeGestureRef = useRef(false);
+  const activeSwipeInputRef = useRef<"pointer" | "touch" | null>(null);
 
   const handleDone = () => {
     if (isDoneRef.current) return;
@@ -366,21 +370,122 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     }
   };
 
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (isExiting) return;
+  const beginSwipe = (x: number, y: number) => {
+    swipeStartRef.current = {
+      x,
+      y,
+      t: Date.now(),
+    };
+    isSwipeGestureRef.current = false;
+  };
 
-    const swipe = info.offset.x;
-    const velocity = info.velocity.x;
+  const updateSwipe = (x: number, y: number): boolean => {
+    if (!swipeStartRef.current) return false;
 
-    if (index === 4 && swipe > 50 && velocity > 0.2) {
-      prev();
-    } else if (index < 4) {
-      if (swipe < -50 && velocity < -0.2) {
-        next();
-      } else if (swipe > 50 && velocity > 0.2) {
-        prev();
-      }
+    const dx = x - swipeStartRef.current.x;
+    const dy = y - swipeStartRef.current.y;
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+
+    if (!isSwipeGestureRef.current && absX > 10 && absX > absY * 1.15) {
+      isSwipeGestureRef.current = true;
     }
+
+    if (!isSwipeGestureRef.current) return false;
+
+    // Subtle resistance to imitate native pull behavior.
+    const resisted = Math.max(-86, Math.min(86, dx * 0.42));
+    setSwipeOffset(resisted);
+    return true;
+  };
+
+  const finalizeSwipe = (x: number, y: number) => {
+    if (isExiting || !swipeStartRef.current) {
+      swipeStartRef.current = null;
+      isSwipeGestureRef.current = false;
+      setSwipeOffset(0);
+      return;
+    }
+
+    const start = swipeStartRef.current;
+    swipeStartRef.current = null;
+
+    const dx = x - start.x;
+    const dy = y - start.y;
+    const dt = Date.now() - start.t;
+
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+    const velocity = absX / Math.max(dt, 1);
+
+    setSwipeOffset(0);
+
+    if (absX < 42 || absX < absY * 1.25 || velocity < 0.12) {
+      isSwipeGestureRef.current = false;
+      return;
+    }
+
+    // Requested behavior: left swipe -> previous, right swipe -> next.
+    if (dx < 0) {
+      prev();
+    } else {
+      next();
+    }
+
+    isSwipeGestureRef.current = false;
+  };
+
+  const cancelSwipe = () => {
+    swipeStartRef.current = null;
+    isSwipeGestureRef.current = false;
+    setSwipeOffset(0);
+    activeSwipeInputRef.current = null;
+  };
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (activeSwipeInputRef.current === "touch") return;
+    activeSwipeInputRef.current = "pointer";
+    beginSwipe(event.clientX, event.clientY);
+  };
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (activeSwipeInputRef.current !== "pointer") return;
+    updateSwipe(event.clientX, event.clientY);
+  };
+
+  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (activeSwipeInputRef.current !== "pointer") return;
+    finalizeSwipe(event.clientX, event.clientY);
+    activeSwipeInputRef.current = null;
+  };
+
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (activeSwipeInputRef.current === "pointer") return;
+    activeSwipeInputRef.current = "touch";
+    const touch = event.touches[0];
+    if (!touch) return;
+    beginSwipe(touch.clientX, touch.clientY);
+  };
+
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (activeSwipeInputRef.current !== "touch") return;
+    const touch = event.touches[0];
+    if (!touch) return;
+    const isHorizontalSwipe = updateSwipe(touch.clientX, touch.clientY);
+    if (isHorizontalSwipe && event.cancelable) {
+      event.preventDefault();
+    }
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (activeSwipeInputRef.current !== "touch") return;
+    const touch = event.changedTouches[0];
+    if (!touch) {
+      cancelSwipe();
+      return;
+    }
+    finalizeSwipe(touch.clientX, touch.clientY);
+    activeSwipeInputRef.current = null;
   };
 
   const variants = {
@@ -412,14 +517,23 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
         <div className="min-h-0 flex-1 overflow-hidden">
           <motion.div
             className="relative h-full"
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.2}
-            dragMomentum={false}
-            onDragEnd={handleDragEnd}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={cancelSwipe}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={cancelSwipe}
+            style={{ touchAction: "pan-y" }}
           >
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
+                animate={{ x: swipeOffset }}
+                transition={{ type: "spring", stiffness: 420, damping: 36, mass: 0.5 }}
+                className="absolute inset-0"
+              >
+                <motion.div
                 key={index}
                 custom={direction}
                 variants={variants}
@@ -434,6 +548,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 {index === 2 && <Scene3 />}
                 {index === 3 && <Scene4 />}
                 {index === 4 && <LoginAccount onLogin={handleDone} onBack={prev} />}
+              </motion.div>
               </motion.div>
             </AnimatePresence>
           </motion.div>
