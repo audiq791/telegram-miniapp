@@ -161,12 +161,35 @@ const mascotPartnerCoins = [
 
 function ElephantMascot({ layout }: { layout: SceneLayoutProps }) {
   const elephantScale = layout.tier === "roomy" ? 1.12 : layout.tier === "compact" ? 0.9 : 1;
-  const orbitSize = layout.tier === "roomy" ? 240 : layout.tier === "compact" ? 172 : 204;
-  const coinSize = layout.tier === "roomy" ? 62 : layout.tier === "compact" ? 46 : 54;
+  const orbitWidth = layout.tier === "roomy" ? 270 : layout.tier === "compact" ? 190 : 228;
+  const orbitHeight = layout.tier === "roomy" ? 128 : layout.tier === "compact" ? 90 : 108;
+  const coinSize = layout.tier === "roomy" ? 66 : layout.tier === "compact" ? 48 : 56;
+  const mascotY = layout.tier === "compact" ? 10 : 4;
+
+  const orbitConfigs = mascotPartnerCoins.map((coin, index) => {
+    const phase = (index / mascotPartnerCoins.length) * Math.PI * 2;
+    const duration = 10 + index * 0.9;
+    const frames = Array.from({ length: 9 }, (_, frameIndex) => {
+      const t = phase + (frameIndex / 8) * Math.PI * 2;
+      const depth = (Math.sin(t) + 1) / 2;
+      return {
+        x: Math.cos(t) * orbitWidth * 0.5,
+        y: Math.sin(t) * orbitHeight * 0.5,
+        scale: 0.72 + depth * 0.48,
+        opacity: 0.42 + depth * 0.58,
+        blur: (1 - depth) * 1.4,
+        shadow: 0.14 + depth * 0.16,
+        z: Math.round(depth * 100),
+      };
+    });
+
+    return { ...coin, duration, frames };
+  });
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.75),transparent_42%),radial-gradient(circle_at_50%_100%,rgba(245,158,11,0.14),transparent_48%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.82),transparent_42%),radial-gradient(circle_at_50%_100%,rgba(245,158,11,0.16),transparent_48%)]" />
+      <div className="absolute inset-x-10 bottom-10 h-12 rounded-full bg-amber-200/30 blur-2xl" />
 
       {[...Array(10)].map((_, i) => (
         <motion.div
@@ -193,94 +216,150 @@ function ElephantMascot({ layout }: { layout: SceneLayoutProps }) {
       <motion.div
         className="absolute rounded-full bg-amber-200/35 blur-3xl"
         style={{
-          width: orbitSize * 0.9,
-          height: orbitSize * 0.5,
+          width: orbitWidth * 0.9,
+          height: orbitHeight * 1.35,
         }}
         animate={{ scale: [0.92, 1.04, 0.96], opacity: [0.3, 0.48, 0.34] }}
         transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      <motion.div
-        className="absolute rounded-full border border-amber-300/35"
-        style={{
-          width: orbitSize,
-          height: orbitSize,
-        }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
-      >
-        {mascotPartnerCoins.map((coin, i) => {
-          const angle = (Math.PI * 2 * i) / mascotPartnerCoins.length - Math.PI / 2;
-          const radius = orbitSize / 2;
-          const x = Math.cos(angle) * radius;
-          const y = Math.sin(angle) * radius;
+      <div className="absolute inset-0 [perspective:1200px]">
+        <div
+          className="absolute left-1/2 top-1/2"
+          style={{
+            width: orbitWidth,
+            height: orbitHeight,
+            transform: "translate(-50%, -50%) rotateX(68deg)",
+            transformStyle: "preserve-3d",
+          }}
+        >
+          <div className="absolute inset-0 rounded-full border border-amber-300/35" />
+        </div>
 
-          return (
+        {orbitConfigs.map((coin) => (
+          <motion.div
+            key={coin.alt}
+            className="absolute left-1/2 top-1/2"
+            style={{ marginLeft: -coinSize / 2, marginTop: -coinSize / 2 }}
+            animate={{
+              x: coin.frames.map((frame) => frame.x),
+              y: coin.frames.map((frame) => frame.y),
+              scale: coin.frames.map((frame) => frame.scale),
+              opacity: coin.frames.map((frame) => frame.opacity),
+              filter: coin.frames.map((frame) => `blur(${frame.blur}px)`),
+              zIndex: coin.frames.map((frame) => frame.z),
+            }}
+            transition={{
+              duration: coin.duration,
+              ease: "linear",
+              repeat: Infinity,
+            }}
+          >
             <motion.div
-              key={coin.alt}
-              className="absolute left-1/2 top-1/2"
+              animate={{ rotate: [0, -8, 0, 8, 0] }}
+              transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+              className={`grid place-items-center rounded-full border border-white/85 bg-gradient-to-br ${coin.hue}`}
               style={{
-                x: `calc(-50% + ${x}px)`,
-                y: `calc(-50% + ${y}px)`,
+                width: coinSize,
+                height: coinSize,
+                boxShadow: "0 12px 28px rgba(245,158,11,0.18)",
               }}
-              animate={{ rotate: -360 }}
-              transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
             >
-              <div
-                className={`grid place-items-center rounded-full border border-white/80 bg-gradient-to-br ${coin.hue} shadow-[0_12px_28px_rgba(245,158,11,0.18)]`}
-                style={{ width: coinSize, height: coinSize }}
-              >
-                <div className="grid h-[72%] w-[72%] place-items-center rounded-full bg-white shadow-inner">
-                  <Image src={coin.src} alt={coin.alt} width={coinSize * 0.42} height={coinSize * 0.42} className="h-auto w-auto max-h-[60%] max-w-[60%] object-contain" />
-                </div>
+              <div className="grid h-[74%] w-[74%] place-items-center rounded-full bg-white shadow-inner">
+                <Image
+                  src={coin.src}
+                  alt={coin.alt}
+                  width={coinSize * 0.42}
+                  height={coinSize * 0.42}
+                  className="h-auto w-auto max-h-[62%] max-w-[62%] object-contain"
+                />
               </div>
             </motion.div>
-          );
-        })}
-      </motion.div>
+          </motion.div>
+        ))}
+      </div>
 
       <motion.div
         className="relative z-10"
-        animate={{ y: [0, -8, 0], rotate: [0, -1.2, 0, 1.2, 0] }}
+        animate={{ y: [mascotY, mascotY - 8, mascotY], rotate: [0, -1.2, 0, 1.2, 0] }}
         transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
         style={{ scale: elephantScale }}
       >
-        <svg width="210" height="210" viewBox="0 0 210 210" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_18px_36px_rgba(24,24,27,0.12)]">
-          <ellipse cx="105" cy="184" rx="46" ry="12" fill="rgba(24,24,27,0.08)" />
-          <path d="M67 90C67 60.7 90.7 37 120 37C149.3 37 173 60.7 173 90V120C173 149.3 149.3 173 120 173H97C68.8 173 46 150.2 46 122V115C46 94 63 77 84 77H92C104.7 77 115 87.3 115 100V127C115 137.5 106.5 146 96 146C85.5 146 77 137.5 77 127V116" fill="#DDE5F4" />
-          <path d="M67 90C67 60.7 90.7 37 120 37C149.3 37 173 60.7 173 90V120C173 149.3 149.3 173 120 173H97C68.8 173 46 150.2 46 122V115C46 94 63 77 84 77H92C104.7 77 115 87.3 115 100V127C115 137.5 106.5 146 96 146C85.5 146 77 137.5 77 127V116" stroke="#B8C4D9" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M142 99C161.33 99 177 83.33 177 64C177 44.67 161.33 29 142 29C122.67 29 107 44.67 107 64C107 83.33 122.67 99 142 99Z" fill="#E8EEF9" stroke="#B8C4D9" strokeWidth="4" />
-          <path d="M112 107C92.12 107 76 90.88 76 71C76 51.12 92.12 35 112 35C127.89 35 141.37 45.3 146.08 59.56C148.06 65.54 143.28 71 136.98 71H111.5C101.28 71 93 79.28 93 89.5V96C93 102.08 98.24 106.92 104.28 106.44L112 107Z" fill="#F1F5FB" stroke="#B8C4D9" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx="137" cy="86" r="7" fill="#2F3640" />
-          <circle cx="139.5" cy="83.5" r="2" fill="white" />
+        <svg width="236" height="230" viewBox="0 0 236 230" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_26px_46px_rgba(24,24,27,0.16)]">
+          <ellipse cx="118" cy="206" rx="58" ry="14" fill="rgba(24,24,27,0.08)" />
+          <ellipse cx="176" cy="86" rx="42" ry="48" fill="#D7E3F6" stroke="#B5C4DE" strokeWidth="4" />
+          <ellipse cx="83" cy="92" rx="50" ry="58" fill="#E7EEF9" stroke="#B5C4DE" strokeWidth="4" />
+          <path d="M89 82C89 51.62 113.62 27 144 27C174.38 27 199 51.62 199 82V120C199 159.21 167.21 191 128 191H113C80.42 191 54 164.58 54 132V117C54 95.46 71.46 78 93 78H97C111.91 78 124 90.09 124 105V131C124 145.36 112.36 157 98 157C83.64 157 72 145.36 72 131V118" fill="#DDE7F7" />
+          <path d="M89 82C89 51.62 113.62 27 144 27C174.38 27 199 51.62 199 82V120C199 159.21 167.21 191 128 191H113C80.42 191 54 164.58 54 132V117C54 95.46 71.46 78 93 78H97C111.91 78 124 90.09 124 105V131C124 145.36 112.36 157 98 157C83.64 157 72 145.36 72 131V118" stroke="#B5C4DE" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M106 80C106 59.57 122.57 43 143 43C163.43 43 180 59.57 180 80V104C180 124.43 163.43 141 143 141H124C113.51 141 105 132.49 105 122V99C105 88.51 113.51 80 124 80H106Z" fill="url(#elephantBodyLight)" />
+          <ellipse cx="97" cy="96" rx="43" ry="50" fill="#EEF4FD" stroke="#B5C4DE" strokeWidth="4" />
           <motion.path
-            d="M121 102C126.33 106.67 134.67 106.67 140 102"
-            stroke="#2F3640"
+            d="M70 78C63 72 54 69 44 68"
+            stroke="#A0B0C9"
             strokeWidth="4"
             strokeLinecap="round"
-            animate={{ d: ["M121 102C126.33 106.67 134.67 106.67 140 102", "M121 104C126.33 109.33 134.67 109.33 140 104", "M121 102C126.33 106.67 134.67 106.67 140 102"] }}
-            transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ rotate: [0, -7, 0], transformOrigin: "70px 78px" }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           />
-          <path d="M63 138L61 170" stroke="#B8C4D9" strokeWidth="6" strokeLinecap="round" />
-          <path d="M93 142L92 174" stroke="#B8C4D9" strokeWidth="6" strokeLinecap="round" />
-          <path d="M127 144L126 176" stroke="#B8C4D9" strokeWidth="6" strokeLinecap="round" />
-          <path d="M157 139L159 171" stroke="#B8C4D9" strokeWidth="6" strokeLinecap="round" />
+          <path d="M105 115C105 104.51 113.51 96 124 96H126C136.49 96 145 104.51 145 115V137C145 150.81 133.81 162 120 162C106.19 162 95 150.81 95 137V134" fill="#DDE7F7" stroke="#B5C4DE" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M99 133C99 133 107 146 120 146C133 146 141 133 141 133" stroke="#B5C4DE" strokeWidth="4" strokeLinecap="round" />
           <motion.path
-            d="M84 112C84 112 92 120 103 120C114 120 120 111 120 111"
+            d="M124 111C124 111 119 131 120 145C121 158 130 164 138 164C148 164 155 156 155 146C155 136 148 128 139 128H133"
+            fill="none"
+            stroke="#A8B7D0"
+            strokeWidth="8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            animate={{ d: [
+              "M124 111C124 111 119 131 120 145C121 158 130 164 138 164C148 164 155 156 155 146C155 136 148 128 139 128H133",
+              "M124 111C124 111 118 133 120 148C122 161 131 167 139 167C149 167 157 159 157 149C157 139 149 131 140 131H134",
+              "M124 111C124 111 119 131 120 145C121 158 130 164 138 164C148 164 155 156 155 146C155 136 148 128 139 128H133",
+            ] }}
+            transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <circle cx="148" cy="94" r="8" fill="#273142" />
+          <circle cx="151" cy="91" r="2.4" fill="white" />
+          <circle cx="135" cy="117" r="3" fill="#F4B7C2" opacity="0.65" />
+          <motion.path
+            d="M143 108C148.33 112.67 156.67 112.67 162 108"
+            stroke="#273142"
+            strokeWidth="4"
+            strokeLinecap="round"
+            animate={{
+              d: [
+                "M143 108C148.33 112.67 156.67 112.67 162 108",
+                "M143 110C148.33 115 156.67 115 162 110",
+                "M143 108C148.33 112.67 156.67 112.67 162 108",
+              ],
+            }}
+            transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <path d="M86 170L84 200" stroke="#AAB8CF" strokeWidth="7" strokeLinecap="round" />
+          <path d="M112 174L111 204" stroke="#AAB8CF" strokeWidth="7" strokeLinecap="round" />
+          <path d="M150 174L151 204" stroke="#AAB8CF" strokeWidth="7" strokeLinecap="round" />
+          <path d="M176 168L180 198" stroke="#AAB8CF" strokeWidth="7" strokeLinecap="round" />
+          <motion.path
+            d="M93 128C101 135 109 139 118 140"
             stroke="#93A3BC"
             strokeWidth="4"
             strokeLinecap="round"
-            animate={{ opacity: [0.75, 1, 0.75] }}
-            transition={{ duration: 2.4, repeat: Infinity }}
+            animate={{ opacity: [0.55, 0.95, 0.55] }}
+            transition={{ duration: 2.6, repeat: Infinity }}
           />
           <motion.path
-            d="M78 74C75 69 70 66 64 65"
+            d="M170 78C176 74 180 68 181 61"
             stroke="#93A3BC"
             strokeWidth="4"
             strokeLinecap="round"
-            animate={{ rotate: [0, -5, 0], transformOrigin: "78px 74px" }}
+            animate={{ y: [0, -2, 0] }}
             transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
           />
+          <defs>
+            <linearGradient id="elephantBodyLight" x1="143" y1="43" x2="143" y2="141" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#F7FAFF" />
+              <stop offset="1" stopColor="#D8E3F5" />
+            </linearGradient>
+          </defs>
         </svg>
       </motion.div>
     </div>
