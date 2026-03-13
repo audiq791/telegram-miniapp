@@ -20,20 +20,14 @@ type SceneLayoutProps = {
 function FitToViewport({
   children,
   contentClassName = "",
-  settleDelayMs = 0,
-  remountAfterMs = 0,
 }: {
   children: React.ReactNode;
   contentClassName?: string;
-  settleDelayMs?: number;
-  remountAfterMs?: number;
 }) {
   const frameRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(1);
   const [scaledHeight, setScaledHeight] = useState<number | null>(null);
-  const [isReady, setIsReady] = useState(settleDelayMs === 0 && remountAfterMs === 0);
-  const [contentKey, setContentKey] = useState(0);
 
   useLayoutEffect(() => {
     const measure = () => {
@@ -68,45 +62,16 @@ function FitToViewport({
     window.addEventListener("orientationchange", measure);
     document.fonts?.ready.then(measure).catch(() => {});
 
-    let readyTimer: number | null = null;
-    let remountTimer: number | null = null;
-    let postRemountReadyTimer: number | null = null;
-    if (settleDelayMs > 0) {
-      readyTimer = window.setTimeout(() => {
-        measure();
-        setIsReady(true);
-      }, settleDelayMs);
-    }
-
-    if (remountAfterMs > 0) {
-      remountTimer = window.setTimeout(() => {
-        setContentKey((current) => current + 1);
-        postRemountReadyTimer = window.setTimeout(() => {
-          measure();
-          setIsReady(true);
-        }, 120);
-      }, remountAfterMs);
-    }
-
     return () => {
       observer.disconnect();
       window.cancelAnimationFrame(raf1);
       window.cancelAnimationFrame(raf2);
       timeoutIds.forEach((id) => window.clearTimeout(id));
-      if (readyTimer !== null) {
-        window.clearTimeout(readyTimer);
-      }
-      if (remountTimer !== null) {
-        window.clearTimeout(remountTimer);
-      }
-      if (postRemountReadyTimer !== null) {
-        window.clearTimeout(postRemountReadyTimer);
-      }
       window.visualViewport?.removeEventListener("resize", measure);
       window.removeEventListener("resize", measure);
       window.removeEventListener("orientationchange", measure);
     };
-  }, [remountAfterMs, settleDelayMs]);
+  }, []);
 
   return (
     <div ref={frameRef} className="min-h-0 flex-1 overflow-hidden">
@@ -118,15 +83,12 @@ function FitToViewport({
         }}
       >
         <div
-          key={contentKey}
           ref={contentRef}
           className={contentClassName}
           style={{
             transform: `scale(${scale})`,
             transformOrigin: "top center",
             width: "100%",
-            opacity: isReady ? 1 : 0,
-            transition: isReady ? "opacity 120ms ease-out" : undefined,
           }}
         >
           {children}
@@ -204,11 +166,7 @@ function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutPro
   const [dots] = useState(() => createFloatingDots(20));
 
   return (
-    <FitToViewport
-      contentClassName={`px-5 pb-6 pt-5 sm:px-6 sm:pt-7`}
-      settleDelayMs={360}
-      remountAfterMs={180}
-    >
+    <FitToViewport contentClassName={`px-5 pb-6 pt-5 sm:px-6 sm:pt-7`}>
       <div className={`mx-auto flex flex-col ${layout.sectionGapClass}`}>
         <div
           className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-amber-50/80 to-orange-100/80 shadow-sm ${layout.frameHeightClass}`}
@@ -564,8 +522,10 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [isExiting, setIsExiting] = useState(false);
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [viewportSize, setViewportSize] = useState({ width: 390, height: 844 });
+  const [isFirstSceneReady, setIsFirstSceneReady] = useState(false);
   const swipeAreaRef = useRef<HTMLDivElement | null>(null);
   const isDoneRef = useRef(false);
+  const firstViewportHeightRef = useRef<number | null>(null);
   const swipeStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const isSwipeGestureRef = useRef(false);
   const activeSwipeInputRef = useRef<"pointer" | "touch" | null>(null);
@@ -685,6 +645,43 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       window.visualViewport?.removeEventListener("resize", updateViewport);
     };
   }, []);
+
+  useEffect(() => {
+    if (index !== 0) return;
+
+    const viewport = window.visualViewport;
+    let settleTimer: number | null = null;
+
+    const markReadyWhenStable = (height: number) => {
+      if (firstViewportHeightRef.current !== null && Math.abs(firstViewportHeightRef.current - height) > 1) {
+        setIsFirstSceneReady(false);
+      }
+      firstViewportHeightRef.current = height;
+      if (settleTimer !== null) {
+        window.clearTimeout(settleTimer);
+      }
+      settleTimer = window.setTimeout(() => {
+        setIsFirstSceneReady(true);
+      }, 180);
+    };
+
+    markReadyWhenStable(Math.round(viewport?.height ?? window.innerHeight));
+
+    const onResize = () => {
+      markReadyWhenStable(Math.round(viewport?.height ?? window.innerHeight));
+    };
+
+    viewport?.addEventListener("resize", onResize);
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      if (settleTimer !== null) {
+        window.clearTimeout(settleTimer);
+      }
+      viewport?.removeEventListener("resize", onResize);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [index]);
 
   useEffect(() => {
     const node = swipeAreaRef.current;
@@ -819,7 +816,12 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                   transition={{ type: "spring", stiffness: 420, damping: 36, mass: 0.5 }}
                   className="h-full"
                 >
-                  {index === 0 && <Scene1 onNext={next} layout={sceneLayout} />}
+                  {index === 0 &&
+                    (isFirstSceneReady ? (
+                      <Scene1 onNext={next} layout={sceneLayout} />
+                    ) : (
+                      <div className="h-full w-full bg-white" />
+                    ))}
                   {index === 1 && <Scene2 layout={sceneLayout} />}
                   {index === 2 && <Scene3 layout={sceneLayout} />}
                   {index === 3 && <Scene4 layout={sceneLayout} />}
