@@ -388,26 +388,45 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
   ];
   const orbitWidth = Math.max(...orbits.map((orbit) => orbit.width));
   const orbitHeight = Math.max(...orbits.map((orbit) => orbit.height));
+  const orbitStroke = "rgba(82, 82, 91, 0.45)";
+  const orbitGlow = "rgba(255, 255, 255, 0.38)";
 
   const coinsPerOrbit = orbitHeroCoins.length / orbits.length;
-
   const orbitCoins = orbits.flatMap((orbit, orbitIndex) => {
     const orbitCoinsForTrack = orbitHeroCoins.slice(
       orbitIndex * coinsPerOrbit,
       orbitIndex * coinsPerOrbit + coinsPerOrbit,
     );
     return orbitCoinsForTrack.map((coin, coinIndex) => {
+      const totalCoins = orbitCoinsForTrack.length;
+      const frames = Array.from({ length: 21 }, (_, frameIndex) => {
+        const progress = frameIndex / 20;
+        const theta = orbit.phase + ((coinIndex + progress) / totalCoins) * Math.PI * 2;
+        const rawX = Math.cos(theta) * (orbit.width / 2);
+        const rawY = Math.sin(theta) * (orbit.height / 2);
+        const rotateRad = (orbit.rotate * Math.PI) / 180;
+        const x = rawX * Math.cos(rotateRad) - rawY * Math.sin(rotateRad);
+        const y = rawX * Math.sin(rotateRad) + rawY * Math.cos(rotateRad);
+        const depth = (Math.sin(theta) + 1) / 2;
+        return {
+          x,
+          y,
+          scale: 0.78 + depth * 0.32,
+          opacity: 0.5 + depth * 0.5,
+          z: depth > 0.5 ? 4 : 1,
+          blur: (1 - depth) * 1.2,
+        };
+      });
+
       return {
         ...coin,
         key: `${coin.alt}-${orbitIndex}-${coinIndex}`,
         orbit,
         offsetIndex: coinIndex,
+        frames,
       };
     });
   });
-
-  const orbitStroke = "rgba(82, 82, 91, 0.45)";
-  const orbitGlow = "rgba(255, 255, 255, 0.38)";
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
@@ -451,22 +470,27 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
         ))}
 
         {orbitCoins.map((coin) => (
-          <div
+          <motion.div
             key={coin.key}
             className="absolute left-1/2 top-1/2"
-            style={{
-              width: coinSize,
-              height: coinSize,
-              marginLeft: -coinSize / 2,
-              marginTop: -coinSize / 2,
-              transform: `rotate(${coin.orbit.rotate}deg)`,
-              ["--rx" as string]: `${coin.orbit.width / 2}px`,
-              ["--ry" as string]: `${coin.orbit.height / 2}px`,
-              animation: `orbit-hero-ellipse ${coin.orbit.duration}s linear infinite`,
-              animationDelay: `${-coin.offsetIndex * (coin.orbit.duration / 2)}s`,
+            style={{ width: coinSize, height: coinSize, marginLeft: -coinSize / 2, marginTop: -coinSize / 2 }}
+            animate={{
+              x: coin.frames.map((frame) => frame.x),
+              y: coin.frames.map((frame) => frame.y),
+              scale: coin.frames.map((frame) => frame.scale),
+              opacity: coin.frames.map((frame) => frame.opacity),
+              zIndex: coin.frames.map((frame) => frame.z),
+              filter: coin.frames.map((frame) => `blur(${frame.blur}px)`),
+            }}
+            transition={{
+              duration: coin.orbit.duration,
+              ease: "linear",
+              repeat: Infinity,
             }}
           >
-            <div
+            <motion.div
+              animate={{ rotate: [0, -10, 0, 10, 0] }}
+              transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
               className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br ${coin.hue}`}
               style={{
                 width: coinSize,
@@ -485,7 +509,7 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
                   />
                 ) : (
                   <span
-                    className={`font-semibold text-zinc-700 ${
+                    className={`font-semibold text-red-600 ${
                       layout.tier === "roomy" ? "text-[1.2rem]" : layout.tier === "compact" ? "text-[0.9rem]" : "text-[1rem]"
                     }`}
                   >
@@ -493,8 +517,8 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
                   </span>
                 )}
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         ))}
       </div>
 
