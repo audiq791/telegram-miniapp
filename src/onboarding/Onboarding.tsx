@@ -503,8 +503,8 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
 
       <motion.div
         className="relative z-10"
-        animate={{ rotateY: [30, 30, -90, -90, 30], rotateX: [3, 0, -2, 0, 3], y: [2, -3, 2] }}
-        transition={{ duration: 10.8, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ rotateY: [0, 35, -35, 0], rotateX: [2, 0, -2, 2], y: [2, -3, 2] }}
+        transition={{ duration: 9.2, repeat: Infinity, ease: "easeInOut" }}
         style={{ scale: phoneScale, transformStyle: "preserve-3d" }}
       >
         <svg
@@ -516,7 +516,10 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
           className="drop-shadow-[0_28px_42px_rgba(24,24,27,0.16)]"
         >
           <g transform="translate(26 10)">
+            <path d="M14 22C14 12.06 22.06 4 32 4H69C78.94 4 87 12.06 87 22V172C87 181.94 78.94 190 69 190H32C22.06 190 14 181.94 14 172V22Z" fill="#D1D5DB" stroke="#111827" strokeWidth="1.6" />
             <path d="M9 18C9 8.06 17.06 0 27 0H64C73.94 0 82 8.06 82 18V168C82 177.94 73.94 186 64 186H27C17.06 186 9 177.94 9 168V18Z" fill="#F8F8F8" stroke="#111827" strokeWidth="2.2" />
+            <path d="M82 18L87 22V172L82 168V18Z" fill="#E5E7EB" stroke="#111827" strokeWidth="1.2" />
+            <path d="M27 0L32 4H69L64 0H27Z" fill="#F3F4F6" stroke="#111827" strokeWidth="1.2" />
             <path d="M13 22C13 14.27 19.27 8 27 8H64C71.73 8 78 14.27 78 22V164C78 171.73 71.73 178 64 178H27C19.27 178 13 171.73 13 164V22Z" fill="#FFFFFF" stroke="#111827" strokeWidth="1.6" />
             <path d="M38 11H53C56.31 11 59 13.69 59 17C59 18.1 58.1 19 57 19H34C32.9 19 32 18.1 32 17C32 13.69 34.69 11 38 11Z" fill="#111827" />
             <path d="M25 14.5C25 12.84 26.34 11.5 28 11.5C29.66 11.5 31 12.84 31 14.5C31 16.16 29.66 17.5 28 17.5C26.34 17.5 25 16.16 25 14.5Z" fill="#111827" />
@@ -565,22 +568,33 @@ function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutPro
   const [heroMountKey, setHeroMountKey] = useState(0);
 
   useEffect(() => {
-    let restarted = false;
-
     const restartHero = () => {
-      if (restarted) return;
-      restarted = true;
-      setHeroMountKey(1);
+      setHeroMountKey((current) => current + 1);
     };
 
-    const raf = window.requestAnimationFrame(() => {
+    const raf1 = window.requestAnimationFrame(restartHero);
+    const raf2 = window.requestAnimationFrame(() => {
       window.requestAnimationFrame(restartHero);
     });
-    const timeoutId = window.setTimeout(restartHero, 180);
+    const timeoutIds = [120, 260, 520].map((delay) => window.setTimeout(restartHero, delay));
+
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        restartHero();
+      }
+    };
+
+    window.addEventListener("pageshow", restartHero);
+    window.addEventListener("focus", restartHero);
+    document.addEventListener("visibilitychange", onVisible);
 
     return () => {
-      window.cancelAnimationFrame(raf);
-      window.clearTimeout(timeoutId);
+      window.cancelAnimationFrame(raf1);
+      window.cancelAnimationFrame(raf2);
+      timeoutIds.forEach((id) => window.clearTimeout(id));
+      window.removeEventListener("pageshow", restartHero);
+      window.removeEventListener("focus", restartHero);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 
