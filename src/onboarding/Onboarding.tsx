@@ -394,6 +394,8 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
   const orbitStroke = "rgba(82, 82, 91, 0.34)";
   const orbitGlow = "rgba(255, 255, 255, 0.28)";
   const coinsPerOrbit = orbitHeroCoins.length / orbits.length;
+  const [marketChart] = useState(() => createChartData(18));
+  const [marketCandles] = useState(() => createCandles(14));
 
   const orbitCoins = useMemo(
     () =>
@@ -570,49 +572,129 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         }}
       >
         <div
-          className="relative rounded-[32px] border border-white/70 bg-[linear-gradient(180deg,#fefefe_0%,#e8edf5_48%,#d8dee7_100%)] shadow-[0_34px_60px_rgba(15,23,42,0.22)]"
+          className="relative rounded-[34px] border border-white/18 bg-[linear-gradient(180deg,#1e293b_0%,#111827_22%,#0f172a_70%,#020617_100%)] shadow-[0_34px_70px_rgba(15,23,42,0.34)]"
           style={{
             width: phoneWidth,
             height: phoneHeight,
             transformStyle: "preserve-3d",
+            boxShadow:
+              "0 34px 70px rgba(15,23,42,0.32), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -10px 28px rgba(0,0,0,0.42)",
           }}
         >
           <div
-            className="absolute inset-y-[10px] -right-[8px] rounded-r-[26px] bg-[linear-gradient(180deg,#cfd6df_0%,#9aa4b2_100%)]"
+            className="absolute inset-y-[12px] -right-[7px] rounded-r-[30px] bg-[linear-gradient(180deg,#475569_0%,#0f172a_60%,#020617_100%)]"
             style={{
-              width: 10,
-              transform: "translateZ(-8px)",
-              boxShadow: "inset -1px 0 0 rgba(255,255,255,0.42)",
+              width: 9,
+              transform: "translateZ(-7px)",
+              boxShadow: "inset -1px 0 0 rgba(255,255,255,0.18)",
             }}
           />
           <div
-            className="absolute inset-x-[10px] -top-[8px] rounded-t-[26px] bg-[linear-gradient(180deg,#ffffff_0%,#d9dfe8_100%)]"
+            className="absolute inset-x-[10px] -top-[7px] rounded-t-[28px] bg-[linear-gradient(180deg,#334155_0%,#0f172a_100%)]"
             style={{
-              height: 10,
-              transform: "translateZ(-8px)",
+              height: 8,
+              transform: "translateZ(-7px)",
             }}
           />
-          <div className="absolute inset-[7px] rounded-[26px] border border-slate-900/10 bg-[linear-gradient(180deg,#0f172a_0%,#020617_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
-            <div className="absolute inset-x-0 top-0 flex justify-center pt-2.5">
-              <div className="h-1.5 w-14 rounded-full bg-slate-300/30" />
+          <div className="absolute inset-0 rounded-[34px] bg-[radial-gradient(circle_at_18%_14%,rgba(255,255,255,0.22),transparent_24%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent_42%,rgba(255,255,255,0.02)_68%,transparent_100%)]" />
+          <div className="absolute inset-[5px] rounded-[29px] border border-white/8 bg-[linear-gradient(180deg,#020617_0%,#000000_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+            <div className="absolute inset-x-0 top-0 z-20 flex justify-center pt-2.5">
+              <div className="h-1.5 w-16 rounded-full bg-black/65 shadow-[0_1px_0_rgba(255,255,255,0.06)]" />
             </div>
-            <div className="absolute left-1/2 top-4 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-slate-400/35 shadow-[0_0_0_2px_rgba(255,255,255,0.04)]" />
-            <div className="absolute inset-[8px] overflow-hidden rounded-[22px] bg-[radial-gradient(circle_at_28%_18%,rgba(255,255,255,0.38),transparent_26%),linear-gradient(160deg,#60a5fa_0%,#2563eb_28%,#0f172a_70%,#020617_100%)]">
-              <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.18),transparent_40%,rgba(255,255,255,0.08)_68%,transparent_100%)]" />
-              <div className="absolute -left-6 top-8 h-28 w-20 rotate-12 rounded-full bg-white/10 blur-2xl" />
-              <div className="absolute right-4 top-6 h-16 w-16 rounded-full border border-white/18" />
-              <div className="absolute left-4 top-14 h-2 w-18 rounded-full bg-white/50" />
-              <div className="absolute left-4 top-20 h-2 w-12 rounded-full bg-white/24" />
-              <div className="absolute inset-x-4 bottom-5 grid grid-cols-3 gap-2">
-                <div className="h-11 rounded-2xl bg-white/12 backdrop-blur-[2px]" />
-                <div className="h-11 rounded-2xl bg-white/10 backdrop-blur-[2px]" />
-                <div className="h-11 rounded-2xl bg-white/14 backdrop-blur-[2px]" />
+            <div className="absolute left-1/2 top-4 z-20 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-slate-700 shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_0_10px_rgba(14,165,233,0.2)]" />
+            <div className="absolute inset-[7px] overflow-hidden rounded-[25px] bg-[linear-gradient(180deg,#07111f_0%,#0f172a_22%,#020617_100%)]">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_12%,rgba(255,255,255,0.18),transparent_24%),linear-gradient(120deg,rgba(255,255,255,0.08),transparent_30%,rgba(255,255,255,0.03)_68%,transparent_100%)]" />
+              <div className="absolute inset-x-0 top-0 h-10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),transparent)]" />
+              <div className="absolute inset-x-[10px] top-[14px] z-10 rounded-[18px] border border-sky-300/16 bg-[linear-gradient(180deg,rgba(14,165,233,0.12),rgba(15,23,42,0.08))] px-3 pb-3 pt-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                <div className="mb-2 flex items-center justify-between">
+                  <div>
+                    <div className="text-[0.42rem] font-medium uppercase tracking-[0.22em] text-slate-400">
+                      BON / OEM
+                    </div>
+                    <div className="mt-0.5 text-[0.8rem] font-semibold text-white">
+                      +12.4%
+                    </div>
+                  </div>
+                  <div className="rounded-full border border-emerald-400/30 bg-emerald-400/12 px-2 py-0.5 text-[0.42rem] font-medium uppercase tracking-[0.18em] text-emerald-300">
+                    Market
+                  </div>
+                </div>
+
+                <svg className="h-[58px] w-full overflow-visible" viewBox="0 0 120 58" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="market-hero-fill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="rgba(56,189,248,0.42)" />
+                      <stop offset="100%" stopColor="rgba(56,189,248,0)" />
+                    </linearGradient>
+                  </defs>
+                  <motion.path
+                    d={`M 0 58 L ${marketChart
+                      .map((point, index) => `${index * 7} ${48 - point.y * 0.28}`)
+                      .join(" L ")} L 119 58 Z`}
+                    fill="url(#market-hero-fill)"
+                    initial={{ opacity: 0.45 }}
+                    animate={isActive ? { opacity: [0.28, 0.45, 0.28] } : { opacity: 0.34 }}
+                    transition={{ duration: 3.8, repeat: isActive ? Infinity : 0, ease: "easeInOut" }}
+                  />
+                  <motion.path
+                    d={`M ${marketChart
+                      .map((point, index) => `${index * 7},${48 - point.y * 0.28}`)
+                      .join(" L ")}`}
+                    fill="none"
+                    stroke="#67e8f9"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    initial={{ pathLength: 0.2, opacity: 0.55 }}
+                    animate={isActive ? { pathLength: [0.3, 1, 0.3], opacity: [0.55, 0.95, 0.55] } : { pathLength: 1, opacity: 0.8 }}
+                    transition={{ duration: 4.6, repeat: isActive ? Infinity : 0, ease: "easeInOut" }}
+                  />
+                </svg>
+
+                <div className="mt-2 flex h-10 items-end gap-[2px]">
+                  {marketCandles.map((candle, index) => (
+                    <motion.div
+                      key={`market-candle-${index}`}
+                      className="relative flex-1"
+                      animate={
+                        isActive
+                          ? { height: [Math.max(8, candle.height * 0.14), Math.max(12, candle.height * 0.2), Math.max(8, candle.height * 0.14)] }
+                          : { height: Math.max(9, candle.height * 0.17) }
+                      }
+                      transition={{
+                        duration: 2.8 + index * 0.05,
+                        repeat: isActive ? Infinity : 0,
+                        ease: "easeInOut",
+                        delay: index * 0.04,
+                      }}
+                    >
+                      <div className="absolute bottom-0 left-1/2 w-px -translate-x-1/2 bg-white/18" style={{ height: "100%" }} />
+                      <div
+                        className={`absolute bottom-0 left-0 right-0 rounded-[2px] ${
+                          candle.isGreen ? "bg-emerald-400/78" : "bg-rose-400/78"
+                        }`}
+                        style={{ height: "70%" }}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+
+                <div className="mt-3 rounded-[14px] border border-white/8 bg-white/5 px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+                  <div className="text-[0.62rem] font-semibold tracking-[0.18em] text-white/94">
+                    Биржа Бонусов
+                  </div>
+                  <div className="mt-1 text-[0.44rem] font-medium uppercase tracking-[0.16em] text-slate-400">
+                    Торги бонусами партнеров
+                  </div>
+                </div>
               </div>
+              <div className="absolute -left-7 top-10 h-28 w-16 rotate-[14deg] rounded-full bg-white/8 blur-2xl" />
+              <div className="absolute -right-4 bottom-7 h-20 w-20 rounded-full bg-cyan-400/10 blur-2xl" />
             </div>
           </div>
-          <div className="absolute -left-[5px] top-14 h-10 w-[4px] rounded-full bg-slate-400/75" />
-          <div className="absolute -left-[5px] top-26 h-16 w-[4px] rounded-full bg-slate-400/75" />
-          <div className="absolute -right-[5px] top-22 h-18 w-[4px] rounded-full bg-slate-400/78" />
+          <div className="absolute -left-[4px] top-14 h-9 w-[3px] rounded-full bg-slate-500/80" />
+          <div className="absolute -left-[4px] top-24 h-14 w-[3px] rounded-full bg-slate-500/80" />
+          <div className="absolute -right-[4px] top-20 h-16 w-[3px] rounded-full bg-slate-500/85" />
         </div>
       </motion.div>
 
