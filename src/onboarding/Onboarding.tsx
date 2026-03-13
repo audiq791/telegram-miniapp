@@ -907,6 +907,7 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
   );
   const rainCoinSize = layout.tier === "roomy" ? 34 : layout.tier === "compact" ? 24 : 28;
   const burstCoinSize = layout.tier === "roomy" ? 40 : layout.tier === "compact" ? 28 : 32;
+  const qrPixelSize = layout.tier === "roomy" ? 160 : layout.tier === "compact" ? 96 : 128;
 
   return (
     <FitToViewport contentClassName="px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
@@ -921,22 +922,25 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
             animate={{ scale: [1, 1.02, 1] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            <div className="relative">
+            <div
+              className="relative"
+              style={{ width: qrPixelSize, height: qrPixelSize }}
+            >
               {rain.map((drop, i) => (
                 <motion.div
                   key={`rain-${i}`}
-                  className="absolute left-1/2 top-0 z-[3]"
-                  initial={{ x: (i - 3) * 14, y: -64, rotate: -18 + i * 6 }}
+                  className="absolute left-1/2 top-0 z-[1]"
+                  initial={{ x: (i - 3) * 12, y: -70, rotate: -14 + i * 5 }}
                   animate={{
-                    x: [(i - 3) * 14, (i - 3) * 10],
-                    y: [-64, -20, -6],
-                    rotate: [-18 + i * 6, 26 + i * 10, 14 + i * 6],
+                    x: [(i - 3) * 12, (i - 3) * 10, (i - 3) * 8],
+                    y: [-70, -24, 16, 42],
+                    rotate: [-14 + i * 5, -6 + i * 4, 6 + i * 3],
                   }}
                   transition={{
-                    duration: 1.6 + (i % 3) * 0.18,
+                    duration: 2.6 + (i % 3) * 0.35,
                     repeat: Infinity,
                     delay: drop.delay,
-                    ease: [0.18, 0.82, 0.24, 1],
+                    ease: "easeInOut",
                   }}
                 >
                   <div
@@ -957,44 +961,32 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
                 </motion.div>
               ))}
 
-              <div className={`relative rounded-2xl bg-white p-3 shadow-lg overflow-hidden ${qrSize}`}>
-                <div className="grid aspect-square w-full grid-cols-7 gap-[6%]">
-                  {qrCells.map((isFilled, i) => (
-                    <div
-                      key={i}
-                      className={`aspect-square w-full rounded-[2px] ${
-                        isFilled ? "bg-zinc-900" : "bg-transparent"
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <motion.div
-                className="absolute left-0 right-0 h-0.5 bg-emerald-400/70"
-                animate={{
-                  top: ["10%", "90%", "10%"],
-                  opacity: [0.3, 0.7, 0.3],
-                }}
-                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-              />
-
               {[...leftBurst, ...rightBurst].map((burst, index) => {
                 const coin = bonusCoins[index % bonusCoins.length];
+                const isLeft = index < leftBurst.length;
+                const targetX = isLeft ? burst.x * 1.05 : burst.x * 1.05;
+                const targetY = 42 + (index % 4) * 22;
+
                 return (
                   <motion.div
                     key={burst.id}
-                    className="absolute left-1/2 top-full z-[4]"
-                    initial={{ x: burst.x * 0.12, y: -4, scale: 0.68, rotate: 0, opacity: 0 }}
+                    className="absolute left-1/2 top-1/2 z-[2]"
+                    initial={{
+                      x: isLeft ? -8 : 8,
+                      y: qrPixelSize * 0.18,
+                      scale: 0.72,
+                      rotate: 0,
+                      opacity: 0,
+                    }}
                     animate={{
-                      x: [burst.x * 0.12, burst.x * 0.72, burst.x],
-                      y: [-4, burst.y * 0.55, burst.y + 28],
-                      scale: [0.68, 1, 0.94],
-                      rotate: [0, burst.rotate],
+                      x: [isLeft ? -8 : 8, targetX * 0.42, targetX],
+                      y: [qrPixelSize * 0.18, qrPixelSize * 0.42, targetY + qrPixelSize * 0.34],
+                      scale: [0.72, 0.96, 0.92],
+                      rotate: [0, burst.rotate * 0.5, burst.rotate],
                       opacity: [0, 1, 1, 0],
                     }}
                     transition={{
-                      duration: burst.duration,
+                      duration: 3.2 + (index % 3) * 0.35,
                       repeat: Infinity,
                       delay: burst.delay,
                       ease: "easeOut",
@@ -1021,6 +1013,28 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
                   </motion.div>
                 );
               })}
+
+              <div className={`relative z-[3] rounded-2xl bg-white p-3 shadow-lg overflow-hidden ${qrSize}`}>
+                <div className="grid aspect-square w-full grid-cols-7 gap-[6%]">
+                  {qrCells.map((isFilled, i) => (
+                    <div
+                      key={i}
+                      className={`aspect-square w-full rounded-[2px] ${
+                        isFilled ? "bg-zinc-900" : "bg-transparent"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <motion.div
+                className="absolute left-0 right-0 z-[4] h-0.5 bg-emerald-400/70"
+                animate={{
+                  top: ["10%", "90%", "10%"],
+                  opacity: [0.3, 0.7, 0.3],
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+              />
             </div>
           </motion.div>
         </div>
