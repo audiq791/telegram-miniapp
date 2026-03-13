@@ -1,13 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Manrope } from "next/font/google";
-import ClientLayout from "./ClientLayout"; // <-- Создадим этот файл
-
-const manrope = Manrope({
-  subsets: ["cyrillic", "latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-sans",
-});
+import ClientLayout from "./ClientLayout";
 
 export const metadata: Metadata = {
   title: "Биржа бонусов",
@@ -16,13 +9,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={manrope.variable}>
+    <html lang="ru">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
-      <ClientLayout> {/* <-- Используем клиентский компонент */}
-        {children}
-      </ClientLayout>
+      <body>
+        <ClientLayout>{children}</ClientLayout>
+      </body>
     </html>
   );
 }

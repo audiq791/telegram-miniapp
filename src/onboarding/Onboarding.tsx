@@ -185,6 +185,8 @@ function ElephantMascot({ layout }: { layout: SceneLayoutProps }) {
       offset: Math.PI / 6,
     },
   ];
+  const orbitWidth = Math.max(...orbits.map((orbit) => orbit.width));
+  const orbitHeight = Math.max(...orbits.map((orbit) => orbit.height));
 
   const orbitCoins = mascotPartnerCoins.map((coin, index) => {
     const orbit = orbits[index % orbits.length];
