@@ -55,3 +55,44 @@ input[type=number] {
 .large-scale {
   zoom: 0.75;
 }
+
+@keyframes orbit-hero-glow {
+  0% { transform: scale(0.96); opacity: 0.22; }
+  50% { transform: scale(1.04); opacity: 0.34; }
+  100% { transform: scale(0.98); opacity: 0.26; }
+}
+
+@keyframes orbit-hero-phone {
+  0% { transform: rotateY(0deg) rotateX(2deg) translateY(2px) scale(var(--phone-scale, 1)); }
+  25% { transform: rotateY(35deg) rotateX(0deg) translateY(-3px) scale(var(--phone-scale, 1)); }
+  75% { transform: rotateY(-35deg) rotateX(-2deg) translateY(-1px) scale(var(--phone-scale, 1)); }
+  100% { transform: rotateY(0deg) rotateX(2deg) translateY(2px) scale(var(--phone-scale, 1)); }
+}
+
+@keyframes orbit-hero-ellipse {
+  0% {
+    transform: translate3d(0, calc(var(--ry) * -1), 0) scale(0.78);
+    opacity: 0.52;
+    filter: blur(0.9px);
+  }
+  25% {
+    transform: translate3d(var(--rx), 0, 0) scale(1.02);
+    opacity: 0.98;
+    filter: blur(0px);
+  }
+  50% {
+    transform: translate3d(0, var(--ry), 0) scale(0.78);
+    opacity: 0.52;
+    filter: blur(0.9px);
+  }
+  75% {
+    transform: translate3d(calc(var(--rx) * -1), 0, 0) scale(0.64);
+    opacity: 0.38;
+    filter: blur(1.1px);
+  }
+  100% {
+    transform: translate3d(0, calc(var(--ry) * -1), 0) scale(0.78);
+    opacity: 0.52;
+    filter: blur(0.9px);
+  }
+}

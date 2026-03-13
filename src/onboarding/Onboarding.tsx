@@ -389,32 +389,11 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
   const orbitCoins = orbits.flatMap((orbit, orbitIndex) => {
     const orbitCoinsForTrack = orbitHeroCoins.slice(orbitIndex * 2, orbitIndex * 2 + 2);
     return orbitCoinsForTrack.map((coin, coinIndex) => {
-      const start = orbit.phase + coinIndex * Math.PI;
-      const radians = (orbit.rotate * Math.PI) / 180;
-      const frames = Array.from({ length: 17 }, (_, frameIndex) => {
-        const t = start + (frameIndex / 16) * Math.PI * 2;
-        const baseX = Math.cos(t) * orbit.width * 0.5;
-        const baseY = Math.sin(t) * orbit.height * 0.5;
-        const x = baseX * Math.cos(radians) - baseY * Math.sin(radians);
-        const y = baseX * Math.sin(radians) + baseY * Math.cos(radians);
-        const depth = (Math.sin(t) + 1) / 2;
-        const front = depth > 0.5;
-        return {
-          x,
-          y,
-          scale: 0.76 + depth * 0.3,
-          opacity: 0.48 + depth * 0.5,
-          blur: (1 - depth) * 1.1,
-          rotateY: -14 + depth * 28,
-          z: front ? 30 : 6,
-        };
-      });
-
       return {
         ...coin,
         key: `${coin.alt}-${orbitIndex}-${coinIndex}`,
         orbit,
-        frames,
+        offsetIndex: coinIndex,
       };
     });
   });
@@ -425,11 +404,13 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,rgba(255,255,255,0.9),transparent_36%),radial-gradient(circle_at_50%_72%,rgba(251,191,36,0.16),transparent_48%),linear-gradient(180deg,rgba(255,255,255,0.18),transparent_100%)]" />
-      <motion.div
+      <div
         className="absolute rounded-full bg-amber-200/30 blur-3xl"
-        style={{ width: orbitWidth * 0.9, height: orbitHeight * 0.62 }}
-        animate={{ scale: [0.96, 1.04, 0.98], opacity: [0.22, 0.34, 0.26] }}
-        transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          width: orbitWidth * 0.9,
+          height: orbitHeight * 0.62,
+          animation: "orbit-hero-glow 5.2s ease-in-out infinite",
+        }}
       />
 
       <div className="absolute inset-0">
@@ -462,24 +443,22 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
         ))}
 
         {orbitCoins.map((coin) => (
-          <motion.div
+          <div
             key={coin.key}
             className="absolute left-1/2 top-1/2"
-            style={{ marginLeft: -coinSize / 2, marginTop: -coinSize / 2 }}
-            animate={{
-              x: coin.frames.map((frame) => frame.x),
-              y: coin.frames.map((frame) => frame.y),
-              scale: coin.frames.map((frame) => frame.scale),
-              opacity: coin.frames.map((frame) => frame.opacity),
-              filter: coin.frames.map((frame) => `blur(${frame.blur}px)`),
-              rotateY: coin.frames.map((frame) => frame.rotateY),
-              zIndex: coin.frames.map((frame) => frame.z),
+            style={{
+              width: coinSize,
+              height: coinSize,
+              marginLeft: -coinSize / 2,
+              marginTop: -coinSize / 2,
+              transform: `rotate(${coin.orbit.rotate}deg)`,
+              ["--rx" as string]: `${coin.orbit.width / 2}px`,
+              ["--ry" as string]: `${coin.orbit.height / 2}px`,
+              animation: `orbit-hero-ellipse ${coin.orbit.duration}s linear infinite`,
+              animationDelay: `${-coin.offsetIndex * (coin.orbit.duration / 2)}s`,
             }}
-            transition={{ duration: coin.orbit.duration, ease: "linear", repeat: Infinity }}
           >
-            <motion.div
-              animate={{ rotate: [0, 5, 0, -5, 0] }}
-              transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+            <div
               className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br ${coin.hue}`}
               style={{
                 width: coinSize,
@@ -496,16 +475,18 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
                   className="h-auto w-auto max-h-[62%] max-w-[62%] object-contain"
                 />
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         ))}
       </div>
 
-      <motion.div
+      <div
         className="relative z-10"
-        animate={{ rotateY: [0, 35, -35, 0], rotateX: [2, 0, -2, 2], y: [2, -3, 2] }}
-        transition={{ duration: 9.2, repeat: Infinity, ease: "easeInOut" }}
-        style={{ scale: phoneScale, transformStyle: "preserve-3d" }}
+        style={{
+          transformStyle: "preserve-3d",
+          ["--phone-scale" as string]: String(phoneScale),
+          animation: "orbit-hero-phone 9.2s ease-in-out infinite",
+        }}
       >
         <svg
           width="144"
@@ -529,7 +510,7 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
             <path d="M53 42L66 88" stroke="rgba(148,163,184,0.16)" strokeWidth="1.1" strokeLinecap="round" />
           </g>
         </svg>
-      </motion.div>
+      </div>
 
       <div className="absolute inset-0 pointer-events-none">
         {orbits.map((orbit, index) => (
