@@ -1,22 +1,102 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { haptic } from "../components/haptics";
 import LoginAccount from "../screens/LoginAccount";
 
-function Scene1({ onNext }: { onNext: () => void }) {
+type LayoutTier = "compact" | "regular" | "roomy";
+
+type SceneLayoutProps = {
+  tier: LayoutTier;
+  frameHeightClass: string;
+  titleClass: string;
+  bodyClass: string;
+  bodyGapClass: string;
+  sectionGapClass: string;
+  buttonClass: string;
+};
+
+function getSceneLayout(viewportHeight: number, viewportWidth: number): SceneLayoutProps {
+  const shortSide = Math.min(viewportHeight, viewportWidth);
+  const compact = viewportHeight <= 710 || shortSide <= 350;
+  const roomy = viewportHeight >= 860 && shortSide >= 390;
+  const tier: LayoutTier = compact ? "compact" : roomy ? "roomy" : "regular";
+
+  return {
+    tier,
+    frameHeightClass: compact
+      ? "min-h-[220px] basis-[34vh] max-h-[280px]"
+      : roomy
+        ? "min-h-[320px] basis-[44vh] max-h-[430px]"
+        : "min-h-[270px] basis-[40vh] max-h-[360px]",
+    titleClass: compact
+      ? "text-[1.6rem] leading-[1.05]"
+      : roomy
+        ? "text-4xl leading-[1.02]"
+        : "text-[1.9rem] leading-[1.04]",
+    bodyClass: compact
+      ? "text-[0.95rem] leading-[1.45]"
+      : roomy
+        ? "text-[1.18rem] leading-[1.6]"
+        : "text-[1.04rem] leading-[1.52]",
+    bodyGapClass: compact ? "space-y-2.5" : roomy ? "space-y-4.5" : "space-y-3.5",
+    sectionGapClass: compact ? "gap-4" : roomy ? "gap-7" : "gap-5",
+    buttonClass: compact ? "h-11 w-36 text-[0.95rem]" : "h-12 w-40 text-base",
+  };
+}
+
+function createFloatingDots(count: number) {
+  return Array.from({ length: count }, () => ({
+    x: Math.random() * 300,
+    y: Math.random() * 300,
+    duration: 5 + Math.random() * 3,
+    delay: Math.random() * 2,
+  }));
+}
+
+function createCoinRain(count: number) {
+  return Array.from({ length: count }, () => ({
+    x: Math.random() * 200 + 50,
+    delay: Math.random() * 2,
+    duration: 4 + Math.random() * 2,
+  }));
+}
+
+function createCandles(count: number) {
+  return Array.from({ length: count }, () => ({
+    height: Math.floor(Math.random() * 90) + 15,
+    isGreen: Math.random() > 0.48,
+    duration: 1.5 + Math.random() * 3,
+  }));
+}
+
+function createChartData(count: number) {
+  return Array.from({ length: count }, (_, i) => ({
+    x: i,
+    y: Math.floor(Math.random() * 100) + 20,
+  }));
+}
+
+function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutProps }) {
+  const orbitDistance = layout.tier === "roomy" ? 104 : layout.tier === "compact" ? 70 : 84;
+  const iconSize = layout.tier === "roomy" ? "h-11 w-11" : "h-10 w-10";
+  const centerSize = layout.tier === "roomy" ? "h-32 w-32 text-[2.65rem]" : layout.tier === "compact" ? "h-24 w-24 text-3xl" : "h-28 w-28 text-4xl";
+  const [dots] = useState(() => createFloatingDots(20));
+
   return (
-    <div className="h-full w-full overflow-y-auto px-6 pt-8 pb-8 sm:pt-12">
-      <div className="mx-auto max-w-md">
-        <div className="relative mb-6 flex h-64 w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-amber-50/80 to-orange-100/80 shadow-sm sm:mb-8 sm:h-80">
-          {[...Array(20)].map((_, i) => (
+    <div className="h-full w-full overflow-hidden px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
+      <div className={`mx-auto flex h-full max-w-md flex-col ${layout.sectionGapClass}`}>
+        <div
+          className={`relative flex w-full flex-1 items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-amber-50/80 to-orange-100/80 shadow-sm ${layout.frameHeightClass}`}
+        >
+          {dots.map((dot, i) => (
             <motion.div
               key={i}
               className="absolute h-2 w-2 rounded-full bg-amber-400/60"
               initial={{
-                x: Math.random() * 300,
-                y: Math.random() * 300,
+                x: dot.x,
+                y: dot.y,
                 opacity: 0.2,
               }}
               animate={{
@@ -25,9 +105,9 @@ function Scene1({ onNext }: { onNext: () => void }) {
                 opacity: [0.2, 0.5, 0.2],
               }}
               transition={{
-                duration: 5 + Math.random() * 3,
+                duration: dot.duration,
                 repeat: Infinity,
-                delay: Math.random() * 2,
+                delay: dot.delay,
               }}
             />
           ))}
@@ -44,18 +124,18 @@ function Scene1({ onNext }: { onNext: () => void }) {
               ease: "easeInOut",
             }}
           >
-            <div className="flex h-28 w-28 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-xl">
-              <span className="text-4xl font-light tracking-tight text-white">B</span>
+            <div className={`flex items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-xl ${centerSize}`}>
+              <span className="font-light tracking-tight text-white">B</span>
             </div>
           </motion.div>
 
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <motion.div
               key={i}
-              className="absolute flex h-10 w-10 items-center justify-center rounded-xl border border-amber-200/50 bg-white/90 shadow-md backdrop-blur-xs"
+              className={`absolute flex items-center justify-center rounded-xl border border-amber-200/50 bg-white/90 shadow-md backdrop-blur-xs ${iconSize}`}
               animate={{
-                x: [0, 80 * Math.cos(i * 60), 0],
-                y: [0, 80 * Math.sin(i * 60), 0],
+                x: [0, orbitDistance * Math.cos(i * 60), 0],
+                y: [0, orbitDistance * Math.sin(i * 60), 0],
                 rotate: [0, 360],
               }}
               transition={{
@@ -65,35 +145,37 @@ function Scene1({ onNext }: { onNext: () => void }) {
                 ease: "linear",
               }}
             >
-              <span className="text-lg font-light text-amber-600">B</span>
+              <span className={layout.tier === "compact" ? "text-base font-light text-amber-600" : "text-lg font-light text-amber-600"}>
+                B
+              </span>
             </motion.div>
           ))}
         </div>
 
-        <div className="px-1">
-          <h1 className="text-2xl font-semibold leading-tight tracking-tight text-zinc-900 sm:text-3xl">
-            Биржа Бонусов от OEM Tech
+        <div className="flex min-h-0 flex-1 flex-col px-1">
+          <h1 className={`font-semibold tracking-tight text-zinc-900 ${layout.titleClass}`}>
+            Р‘РёСЂР¶Р° Р‘РѕРЅСѓСЃРѕРІ РѕС‚ OEM Tech
           </h1>
 
-          <div className="my-4 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
+          <div className="my-3 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
 
-          <div className="mb-8 space-y-4">
-            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
-              Добро пожаловать в новую экономику лояльности.
+          <div className={`min-h-0 flex-1 ${layout.bodyGapClass}`}>
+            <p className={`text-zinc-600 ${layout.bodyClass}`}>
+              Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ РІ РЅРѕРІСѓСЋ СЌРєРѕРЅРѕРјРёРєСѓ Р»РѕСЏР»СЊРЅРѕСЃС‚Рё.
             </p>
-            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
-              Здесь бонусы это не просто баллы. Это актив, которым можно управлять.
+            <p className={`text-zinc-600 ${layout.bodyClass}`}>
+              Р—РґРµСЃСЊ Р±РѕРЅСѓСЃС‹ СЌС‚Рѕ РЅРµ РїСЂРѕСЃС‚Рѕ Р±Р°Р»Р»С‹. Р­С‚Рѕ Р°РєС‚РёРІ, РєРѕС‚РѕСЂС‹Рј РјРѕР¶РЅРѕ СѓРїСЂР°РІР»СЏС‚СЊ.
             </p>
           </div>
 
-          <div className="flex justify-center">
+          <div className="flex justify-center pt-4">
             <motion.button
               whileTap={{ scale: 0.97 }}
               transition={{ type: "spring", stiffness: 800, damping: 20 }}
               onClick={onNext}
-              className="h-12 w-40 rounded-xl bg-zinc-900 text-base font-medium text-white shadow-md transition-colors hover:bg-zinc-800"
+              className={`rounded-xl bg-zinc-900 font-medium text-white shadow-md transition-colors hover:bg-zinc-800 ${layout.buttonClass}`}
             >
-              Далее
+              Р”Р°Р»РµРµ
             </motion.button>
           </div>
         </div>
@@ -102,23 +184,31 @@ function Scene1({ onNext }: { onNext: () => void }) {
   );
 }
 
-function Scene2() {
+function Scene2({ layout }: { layout: SceneLayoutProps }) {
+  const qrSize = layout.tier === "roomy" ? "h-40 w-40" : layout.tier === "compact" ? "h-24 w-24" : "h-32 w-32";
+  const [rain] = useState(() => createCoinRain(6));
+  const [qrCells] = useState(() =>
+    Array.from({ length: 49 }, () => Math.random() > 0.6),
+  );
+
   return (
-    <div className="h-full w-full overflow-y-auto px-6 pt-8 pb-8 sm:pt-12">
-      <div className="mx-auto max-w-md">
-        <div className="relative mb-6 flex h-60 w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-emerald-50/80 to-green-100/80 shadow-sm sm:mb-8 sm:h-80">
+    <div className="h-full w-full overflow-hidden px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
+      <div className={`mx-auto flex h-full max-w-md flex-col ${layout.sectionGapClass}`}>
+        <div
+          className={`relative flex w-full flex-1 items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-emerald-50/80 to-green-100/80 shadow-sm ${layout.frameHeightClass}`}
+        >
           <motion.div
             className="relative"
             animate={{ scale: [1, 1.02, 1] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            <div className="h-28 w-28 rounded-2xl bg-white p-3 shadow-lg sm:h-36 sm:w-36">
+            <div className={`rounded-2xl bg-white p-3 shadow-lg ${qrSize}`}>
               <div className="grid grid-cols-7 gap-1">
-                {[...Array(49)].map((_, i) => (
+                {qrCells.map((isFilled, i) => (
                   <div
                     key={i}
-                    className={`h-2.5 w-2.5 rounded-xs ${
-                      Math.random() > 0.6 ? "bg-zinc-900" : "bg-transparent"
+                    className={`rounded-xs ${layout.tier === "roomy" ? "h-3 w-3" : "h-2.5 w-2.5"} ${
+                      isFilled ? "bg-zinc-900" : "bg-transparent"
                     }`}
                   />
                 ))}
@@ -135,35 +225,35 @@ function Scene2() {
             />
           </motion.div>
 
-          {[...Array(6)].map((_, i) => (
+          {rain.map((drop, i) => (
             <motion.div
               key={i}
               className="absolute h-6 w-6 rounded-full bg-gradient-to-br from-amber-400/60 to-amber-600/60"
-              initial={{ x: Math.random() * 200 + 50, y: -50 }}
+              initial={{ x: drop.x, y: -50 }}
               animate={{ y: 400, rotate: 360 }}
               transition={{
-                duration: 4 + Math.random() * 2,
+                duration: drop.duration,
                 repeat: Infinity,
-                delay: Math.random() * 2,
+                delay: drop.delay,
                 ease: "linear",
               }}
             />
           ))}
         </div>
 
-        <div className="px-1">
-          <h2 className="text-2xl font-semibold leading-tight tracking-tight text-zinc-900 sm:text-3xl">
-            Покупки приносят больше
+        <div className="flex min-h-0 flex-1 flex-col px-1">
+          <h2 className={`font-semibold tracking-tight text-zinc-900 ${layout.titleClass}`}>
+            РџРѕРєСѓРїРєРё РїСЂРёРЅРѕСЃСЏС‚ Р±РѕР»СЊС€Рµ
           </h2>
 
-          <div className="my-4 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
+          <div className="my-3 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
 
-          <div className="space-y-4">
-            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
-              Ваши повседневные траты превращаются в ценность.
+          <div className={`min-h-0 flex-1 ${layout.bodyGapClass}`}>
+            <p className={`text-zinc-600 ${layout.bodyClass}`}>
+              Р’Р°С€Рё РїРѕРІСЃРµРґРЅРµРІРЅС‹Рµ С‚СЂР°С‚С‹ РїСЂРµРІСЂР°С‰Р°СЋС‚СЃСЏ РІ С†РµРЅРЅРѕСЃС‚СЊ.
             </p>
-            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
-              Показывайте QR-код у партнёров и получайте бонусы, которые можно конвертировать и использовать выгодно.
+            <p className={`text-zinc-600 ${layout.bodyClass}`}>
+              РџРѕРєР°Р·С‹РІР°Р№С‚Рµ QR-РєРѕРґ Сѓ РїР°СЂС‚РЅС‘СЂРѕРІ Рё РїРѕР»СѓС‡Р°Р№С‚Рµ Р±РѕРЅСѓСЃС‹, РєРѕС‚РѕСЂС‹Рµ РјРѕР¶РЅРѕ РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ Рё РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РІС‹РіРѕРґРЅРѕ.
             </p>
           </div>
         </div>
@@ -172,21 +262,16 @@ function Scene2() {
   );
 }
 
-function Scene3() {
-  const candles = Array.from({ length: 40 }, () => ({
-    height: Math.floor(Math.random() * 90) + 15,
-    isGreen: Math.random() > 0.48,
-  }));
-
-  const chartData = Array.from({ length: 50 }, (_, i) => ({
-    x: i,
-    y: Math.floor(Math.random() * 100) + 20,
-  }));
+function Scene3({ layout }: { layout: SceneLayoutProps }) {
+  const [candles] = useState(() => createCandles(40));
+  const [chartData] = useState(() => createChartData(50));
 
   return (
-    <div className="h-full w-full overflow-y-auto px-6 pt-8 pb-8 sm:pt-12">
-      <div className="mx-auto max-w-md">
-        <div className="relative mb-6 flex h-60 w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-slate-50/80 to-slate-100/80 shadow-sm sm:mb-8 sm:h-80">
+    <div className="h-full w-full overflow-hidden px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
+      <div className={`mx-auto flex h-full max-w-md flex-col ${layout.sectionGapClass}`}>
+        <div
+          className={`relative flex w-full flex-1 items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-slate-50/80 to-slate-100/80 shadow-sm ${layout.frameHeightClass}`}
+        >
           <svg className="absolute inset-0 h-full w-full opacity-30" preserveAspectRatio="none">
             <motion.polyline
               points={chartData.map((p) => `${p.x * 8},${120 - p.y}`).join(" ")}
@@ -208,7 +293,11 @@ function Scene3() {
             />
           </svg>
 
-          <div className="relative z-10 flex h-40 w-full items-end gap-0.5 px-1 sm:h-48">
+          <div
+            className={`relative z-10 flex w-full items-end gap-0.5 px-1 ${
+              layout.tier === "roomy" ? "h-52" : layout.tier === "compact" ? "h-36" : "h-44"
+            }`}
+          >
             {candles.map((candle, i) => (
               <motion.div
                 key={i}
@@ -216,7 +305,7 @@ function Scene3() {
                 initial={{ height: 0 }}
                 animate={{ height: candle.height }}
                 transition={{
-                  duration: 1.5 + Math.random() * 3,
+                  duration: candle.duration,
                   delay: i * 0.03,
                   repeat: Infinity,
                   repeatType: "reverse",
@@ -241,25 +330,25 @@ function Scene3() {
               transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
             >
               <span className="px-4 text-xs font-light tracking-wider">
-                BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> • BON/WB <span className="text-emerald-400">+3.1%</span> • BON/FUEL <span className="text-rose-400">-0.8%</span> • BON/MG <span className="text-emerald-400">+1.9%</span> •
+                BON/VV <span className="text-emerald-400">+2.4%</span> вЂў BON/DODO <span className="text-rose-400">-1.2%</span> вЂў BON/CSKA <span className="text-emerald-400">+5.7%</span> вЂў BON/WB <span className="text-emerald-400">+3.1%</span> вЂў BON/FUEL <span className="text-rose-400">-0.8%</span> вЂў BON/MG <span className="text-emerald-400">+1.9%</span> вЂў
               </span>
             </motion.div>
           </div>
         </div>
 
-        <div className="px-1">
-          <h2 className="text-2xl font-semibold leading-tight tracking-tight text-zinc-900 sm:text-3xl">
-            Добро пожаловать на торги
+        <div className="flex min-h-0 flex-1 flex-col px-1">
+          <h2 className={`font-semibold tracking-tight text-zinc-900 ${layout.titleClass}`}>
+            Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ РЅР° С‚РѕСЂРіРё
           </h2>
 
-          <div className="my-4 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
+          <div className="my-3 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
 
-          <div className="space-y-4">
-            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
-              Здесь бонусы работают по законам рынка.
+          <div className={`min-h-0 flex-1 ${layout.bodyGapClass}`}>
+            <p className={`text-zinc-600 ${layout.bodyClass}`}>
+              Р—РґРµСЃСЊ Р±РѕРЅСѓСЃС‹ СЂР°Р±РѕС‚Р°СЋС‚ РїРѕ Р·Р°РєРѕРЅР°Рј СЂС‹РЅРєР°.
             </p>
-            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
-              Следите за спросом на бонусы партнёров. Выбирайте момент. Обменивайте с выгодой.
+            <p className={`text-zinc-600 ${layout.bodyClass}`}>
+              РЎР»РµРґРёС‚Рµ Р·Р° СЃРїСЂРѕСЃРѕРј РЅР° Р±РѕРЅСѓСЃС‹ РїР°СЂС‚РЅС‘СЂРѕРІ. Р’С‹Р±РёСЂР°Р№С‚Рµ РјРѕРјРµРЅС‚. РћР±РјРµРЅРёРІР°Р№С‚Рµ СЃ РІС‹РіРѕРґРѕР№.
             </p>
           </div>
         </div>
@@ -268,34 +357,46 @@ function Scene3() {
   );
 }
 
-function Scene4() {
+function Scene4({ layout }: { layout: SceneLayoutProps }) {
+  const orbitDistance = layout.tier === "roomy" ? 124 : layout.tier === "compact" ? 82 : 100;
+
   return (
-    <div className="h-full w-full overflow-y-auto px-6 pt-8 pb-8 sm:pt-12">
-      <div className="mx-auto max-w-md">
-        <div className="relative mb-6 flex h-60 w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-violet-50/80 to-purple-100/80 shadow-sm sm:mb-8 sm:h-80">
+    <div className="h-full w-full overflow-hidden px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
+      <div className={`mx-auto flex h-full max-w-md flex-col ${layout.sectionGapClass}`}>
+        <div
+          className={`relative flex w-full flex-1 items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-violet-50/80 to-purple-100/80 shadow-sm ${layout.frameHeightClass}`}
+        >
           <motion.div
             className="relative z-10"
             animate={{ rotate: 360 }}
             transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
           >
-            <div className="h-28 w-28 rounded-full border-2 border-violet-400/30 border-t-violet-500/70" />
+            <div
+              className={`rounded-full border-2 border-violet-400/30 border-t-violet-500/70 ${
+                layout.tier === "roomy" ? "h-32 w-32" : layout.tier === "compact" ? "h-24 w-24" : "h-28 w-28"
+              }`}
+            />
           </motion.div>
 
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <motion.div
               key={i}
-              className="absolute flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 shadow-md backdrop-blur-xs"
+              className={`absolute flex items-center justify-center rounded-xl bg-white/90 shadow-md backdrop-blur-xs ${
+                layout.tier === "roomy" ? "h-11 w-11" : "h-10 w-10"
+              }`}
               style={{
                 background: `linear-gradient(135deg, hsl(${i * 60}, 80%, 95%), hsl(${i * 60 + 30}, 80%, 92%))`,
               }}
               animate={{
-                x: [0, 100 * Math.cos(i * 60), 0],
-                y: [0, 100 * Math.sin(i * 60), 0],
+                x: [0, orbitDistance * Math.cos(i * 60), 0],
+                y: [0, orbitDistance * Math.sin(i * 60), 0],
                 rotate: [0, 360],
               }}
               transition={{ duration: 8, repeat: Infinity, delay: i * 0.4, ease: "linear" }}
             >
-              <span className="text-sm font-light text-zinc-700">B</span>
+              <span className={layout.tier === "compact" ? "text-xs font-light text-zinc-700" : "text-sm font-light text-zinc-700"}>
+                B
+              </span>
             </motion.div>
           ))}
 
@@ -313,19 +414,19 @@ function Scene4() {
           ))}
         </div>
 
-        <div className="px-1">
-          <h2 className="text-2xl font-semibold leading-tight tracking-tight text-zinc-900 sm:text-3xl">
-            Теперь лояльность работает на вас
+        <div className="flex min-h-0 flex-1 flex-col px-1">
+          <h2 className={`font-semibold tracking-tight text-zinc-900 ${layout.titleClass}`}>
+            РўРµРїРµСЂСЊ Р»РѕСЏР»СЊРЅРѕСЃС‚СЊ СЂР°Р±РѕС‚Р°РµС‚ РЅР° РІР°СЃ
           </h2>
 
-          <div className="my-4 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
+          <div className="my-3 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
 
-          <div className="space-y-4">
-            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
-              Вы управляете своими бонусами, а не наоборот.
+          <div className={`min-h-0 flex-1 ${layout.bodyGapClass}`}>
+            <p className={`text-zinc-600 ${layout.bodyClass}`}>
+              Р’С‹ СѓРїСЂР°РІР»СЏРµС‚Рµ СЃРІРѕРёРјРё Р±РѕРЅСѓСЃР°РјРё, Р° РЅРµ РЅР°РѕР±РѕСЂРѕС‚.
             </p>
-            <p className="text-lg leading-relaxed text-zinc-600 sm:text-xl">
-              Копите то, что нужно вам. Обменивайте то, что ценят другие.
+            <p className={`text-zinc-600 ${layout.bodyClass}`}>
+              РљРѕРїРёС‚Рµ С‚Рѕ, С‡С‚Рѕ РЅСѓР¶РЅРѕ РІР°Рј. РћР±РјРµРЅРёРІР°Р№С‚Рµ С‚Рѕ, С‡С‚Рѕ С†РµРЅСЏС‚ РґСЂСѓРіРёРµ.
             </p>
           </div>
         </div>
@@ -339,15 +440,128 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [direction, setDirection] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
   const [swipeOffset, setSwipeOffset] = useState(0);
+  const [viewportSize, setViewportSize] = useState({ width: 390, height: 844 });
   const swipeAreaRef = useRef<HTMLDivElement | null>(null);
   const isDoneRef = useRef(false);
   const swipeStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const isSwipeGestureRef = useRef(false);
   const activeSwipeInputRef = useRef<"pointer" | "touch" | null>(null);
 
-  useEffect(() => {
+  const next = useCallback(() => {
     setSwipeOffset(0);
+    setIndex((current) => {
+      if (current >= 4) return current;
+      setDirection(1);
+      haptic("light");
+      return current + 1;
+    });
+  }, []);
+
+  const prev = useCallback(() => {
+    setSwipeOffset(0);
+    setIndex((current) => {
+      if (current <= 0) return current;
+      setDirection(-1);
+      haptic("light");
+      return current - 1;
+    });
+  }, []);
+
+  const beginSwipe = useCallback((x: number, y: number) => {
+    swipeStartRef.current = {
+      x,
+      y,
+      t: Date.now(),
+    };
+    isSwipeGestureRef.current = false;
+  }, []);
+
+  const updateSwipe = useCallback((x: number, y: number): boolean => {
+    if (!swipeStartRef.current) return false;
+
+    const dx = x - swipeStartRef.current.x;
+    const dy = y - swipeStartRef.current.y;
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+
+    if (!isSwipeGestureRef.current && absX > 10 && absX > absY * 1.15) {
+      isSwipeGestureRef.current = true;
+    }
+
+    if (!isSwipeGestureRef.current) return false;
+
+    const blockedAtStart = index === 0 && dx > 0;
+    const blockedAtEnd = index === 4 && dx < 0;
+    if (blockedAtStart || blockedAtEnd) {
+      setSwipeOffset(0);
+      return true;
+    }
+
+    const resisted = Math.max(-86, Math.min(86, dx * 0.42));
+    setSwipeOffset(resisted);
+    return true;
   }, [index]);
+
+  const finalizeSwipe = useCallback((x: number, y: number) => {
+    if (isExiting || !swipeStartRef.current) {
+      swipeStartRef.current = null;
+      isSwipeGestureRef.current = false;
+      setSwipeOffset(0);
+      return;
+    }
+
+    const start = swipeStartRef.current;
+    swipeStartRef.current = null;
+
+    const dx = x - start.x;
+    const dy = y - start.y;
+    const dt = Date.now() - start.t;
+
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+    const velocity = absX / Math.max(dt, 1);
+
+    setSwipeOffset(0);
+
+    if (absX < 42 || absX < absY * 1.25 || velocity < 0.12) {
+      isSwipeGestureRef.current = false;
+      return;
+    }
+
+    if (dx < 0) {
+      next();
+    } else {
+      prev();
+    }
+
+    isSwipeGestureRef.current = false;
+  }, [isExiting, next, prev]);
+
+  const cancelSwipe = useCallback(() => {
+    swipeStartRef.current = null;
+    isSwipeGestureRef.current = false;
+    setSwipeOffset(0);
+    activeSwipeInputRef.current = null;
+  }, []);
+
+  useEffect(() => {
+    const updateViewport = () => {
+      const viewport = window.visualViewport;
+      setViewportSize({
+        width: Math.round(viewport?.width ?? window.innerWidth),
+        height: Math.round(viewport?.height ?? window.innerHeight),
+      });
+    };
+
+    updateViewport();
+    window.addEventListener("resize", updateViewport);
+    window.visualViewport?.addEventListener("resize", updateViewport);
+
+    return () => {
+      window.removeEventListener("resize", updateViewport);
+      window.visualViewport?.removeEventListener("resize", updateViewport);
+    };
+  }, []);
 
   useEffect(() => {
     const node = swipeAreaRef.current;
@@ -397,7 +611,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       node.removeEventListener("touchend", onTouchEnd);
       node.removeEventListener("touchcancel", onTouchCancel);
     };
-  }, [index, isExiting]);
+  }, [beginSwipe, cancelSwipe, finalizeSwipe, index, isExiting, updateSwipe]);
 
   const handleDone = () => {
     if (isDoneRef.current) return;
@@ -407,101 +621,6 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     setTimeout(() => {
       onDone();
     }, 300);
-  };
-
-  const next = () => {
-    if (index < 4) {
-      setDirection(1);
-      haptic("light");
-      setIndex(index + 1);
-    }
-  };
-
-  const prev = () => {
-    if (index > 0) {
-      setDirection(-1);
-      haptic("light");
-      setIndex(index - 1);
-    }
-  };
-
-  const beginSwipe = (x: number, y: number) => {
-    swipeStartRef.current = {
-      x,
-      y,
-      t: Date.now(),
-    };
-    isSwipeGestureRef.current = false;
-  };
-
-  const updateSwipe = (x: number, y: number): boolean => {
-    if (!swipeStartRef.current) return false;
-
-    const dx = x - swipeStartRef.current.x;
-    const dy = y - swipeStartRef.current.y;
-    const absX = Math.abs(dx);
-    const absY = Math.abs(dy);
-
-    if (!isSwipeGestureRef.current && absX > 10 && absX > absY * 1.15) {
-      isSwipeGestureRef.current = true;
-    }
-
-    if (!isSwipeGestureRef.current) return false;
-
-    const blockedAtStart = index === 0 && dx > 0;
-    const blockedAtEnd = index === 4 && dx < 0;
-    if (blockedAtStart || blockedAtEnd) {
-      setSwipeOffset(0);
-      return true;
-    }
-
-    // Subtle resistance to imitate native pull behavior.
-    const resisted = Math.max(-86, Math.min(86, dx * 0.42));
-    setSwipeOffset(resisted);
-    return true;
-  };
-
-  const finalizeSwipe = (x: number, y: number) => {
-    if (isExiting || !swipeStartRef.current) {
-      swipeStartRef.current = null;
-      isSwipeGestureRef.current = false;
-      setSwipeOffset(0);
-      return;
-    }
-
-    const start = swipeStartRef.current;
-    swipeStartRef.current = null;
-
-    const dx = x - start.x;
-    const dy = y - start.y;
-    const dt = Date.now() - start.t;
-
-    const absX = Math.abs(dx);
-    const absY = Math.abs(dy);
-    const velocity = absX / Math.max(dt, 1);
-
-    setSwipeOffset(0);
-
-    if (absX < 42 || absX < absY * 1.25 || velocity < 0.12) {
-      isSwipeGestureRef.current = false;
-      return;
-    }
-
-    // Native behavior: left swipe -> next, right swipe -> previous.
-    if (dx < 0) {
-      next();
-    } else {
-      prev();
-    }
-
-    isSwipeGestureRef.current = false;
-  };
-
-  const cancelSwipe = () => {
-    swipeStartRef.current = null;
-    isSwipeGestureRef.current = false;
-    setSwipeOffset(0);
-    activeSwipeInputRef.current = null;
   };
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -540,6 +659,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   };
 
   const showFooterNav = !isExiting && index > 0 && index < 4;
+  const sceneLayout = getSceneLayout(viewportSize.height, viewportSize.width);
 
   return (
     <motion.div
@@ -576,10 +696,10 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                   transition={{ type: "spring", stiffness: 420, damping: 36, mass: 0.5 }}
                   className="h-full"
                 >
-                  {index === 0 && <Scene1 onNext={next} />}
-                  {index === 1 && <Scene2 />}
-                  {index === 2 && <Scene3 />}
-                  {index === 3 && <Scene4 />}
+                  {index === 0 && <Scene1 onNext={next} layout={sceneLayout} />}
+                  {index === 1 && <Scene2 layout={sceneLayout} />}
+                  {index === 2 && <Scene3 layout={sceneLayout} />}
+                  {index === 3 && <Scene4 layout={sceneLayout} />}
                   {index === 4 && <LoginAccount onLogin={handleDone} onBack={prev} />}
                 </motion.div>
               </motion.div>
@@ -589,10 +709,10 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
         {showFooterNav && (
           <div
-            className="shrink-0 border-t border-zinc-100 bg-white/95 px-6 pt-4 backdrop-blur-sm"
-            style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 24px)" }}
+            className="shrink-0 border-t border-zinc-100 bg-white/95 px-5 pt-3 backdrop-blur-sm sm:px-6"
+            style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 20px)" }}
           >
-            <div className="mb-5 flex items-center justify-center gap-2">
+            <div className={`flex items-center justify-center gap-2 ${sceneLayout.tier === "compact" ? "mb-4" : "mb-5"}`}>
               {[0, 1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
@@ -608,18 +728,22 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 800, damping: 20 }}
                 onClick={prev}
-                className="h-12 w-28 rounded-xl border border-zinc-200 bg-white text-base font-medium text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50"
+                className={`rounded-xl border border-zinc-200 bg-white font-medium text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 ${
+                  sceneLayout.tier === "compact" ? "h-11 w-26 text-[0.95rem]" : "h-12 w-28 text-base"
+                }`}
               >
-                Назад
+                РќР°Р·Р°Рґ
               </motion.button>
 
               <motion.button
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 800, damping: 20 }}
                 onClick={next}
-                className="h-12 w-28 rounded-xl bg-zinc-900 text-base font-medium text-white shadow-md transition-colors hover:bg-zinc-800"
+                className={`rounded-xl bg-zinc-900 font-medium text-white shadow-md transition-colors hover:bg-zinc-800 ${
+                  sceneLayout.tier === "compact" ? "h-11 w-26 text-[0.95rem]" : "h-12 w-28 text-base"
+                }`}
               >
-                Далее
+                Р”Р°Р»РµРµ
               </motion.button>
             </div>
           </div>
