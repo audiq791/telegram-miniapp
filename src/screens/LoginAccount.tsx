@@ -219,7 +219,10 @@ function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
                 Единый вход
               </div>
               <div className="mt-2 flex items-center justify-center gap-3">
-                <div className={`grid place-items-center ${layout.centerTokenSize}`}>
+                <div
+                  className={`grid place-items-center rounded-[28px] ${layout.centerTokenSize}`}
+                  style={{ backgroundColor: "#183A35" }}
+                >
                   <svg
                     width={centerLogoSize}
                     height={centerLogoSize}
