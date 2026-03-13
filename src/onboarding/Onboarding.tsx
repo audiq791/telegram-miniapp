@@ -39,7 +39,8 @@ function FitToViewport({
       const naturalHeight = content.scrollHeight;
       if (!availableHeight || !naturalHeight) return;
 
-      const nextScale = Math.min(1, availableHeight / naturalHeight);
+      const rawScale = Math.min(1, availableHeight / naturalHeight);
+      const nextScale = rawScale > 0.985 ? 1 : rawScale;
       setScale(nextScale);
       setScaledHeight(naturalHeight * nextScale);
     };
@@ -49,7 +50,9 @@ function FitToViewport({
     const raf2 = window.requestAnimationFrame(() => {
       window.requestAnimationFrame(measure);
     });
-    const timeoutId = window.setTimeout(measure, 120);
+    const timeoutIds = [80, 180, 320, 520, 900].map((delay) =>
+      window.setTimeout(measure, delay),
+    );
 
     const observer = new ResizeObserver(measure);
     if (frameRef.current) observer.observe(frameRef.current);
@@ -63,7 +66,7 @@ function FitToViewport({
       observer.disconnect();
       window.cancelAnimationFrame(raf1);
       window.cancelAnimationFrame(raf2);
-      window.clearTimeout(timeoutId);
+      timeoutIds.forEach((id) => window.clearTimeout(id));
       window.visualViewport?.removeEventListener("resize", measure);
       window.removeEventListener("resize", measure);
       window.removeEventListener("orientationchange", measure);
