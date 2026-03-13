@@ -908,6 +908,8 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
   const rainCoinSize = layout.tier === "roomy" ? 34 : layout.tier === "compact" ? 24 : 28;
   const burstCoinSize = layout.tier === "roomy" ? 40 : layout.tier === "compact" ? 28 : 32;
   const qrPixelSize = layout.tier === "roomy" ? 160 : layout.tier === "compact" ? 96 : 128;
+  const sceneHalfWidth = layout.tier === "roomy" ? 150 : layout.tier === "compact" ? 108 : 128;
+  const sceneBottomReach = layout.tier === "roomy" ? 140 : layout.tier === "compact" ? 96 : 116;
 
   return (
     <FitToViewport contentClassName="px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
@@ -916,6 +918,43 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
           className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-emerald-50/80 to-green-100/80 shadow-sm ${layout.frameHeightClass}`}
         >
           <div className="absolute inset-x-10 bottom-6 h-10 rounded-full bg-emerald-200/40 blur-2xl" />
+
+          <div className="absolute inset-0 z-[1]">
+            {rain.map((drop, i) => (
+              <motion.div
+                key={`rain-${i}`}
+                className="absolute left-1/2 top-0"
+                initial={{ x: (i - 3) * 14, y: -12, rotate: -12 + i * 4 }}
+                animate={{
+                  x: [(i - 3) * 14, (i - 3) * 10, (i - 3) * 8],
+                  y: [-12, 42, 96, 138],
+                  rotate: [-12 + i * 4, -4 + i * 3, 4 + i * 2],
+                }}
+                transition={{
+                  duration: 3.1 + (i % 3) * 0.4,
+                  repeat: Infinity,
+                  delay: drop.delay,
+                  ease: "easeInOut",
+                }}
+              >
+                <div
+                  className="grid place-items-center rounded-full border border-amber-200/90 bg-gradient-to-br from-amber-200 via-amber-300 to-yellow-500 shadow-[0_10px_20px_rgba(161,98,7,0.24),inset_0_1px_0_rgba(255,255,255,0.7)]"
+                  style={{ width: rainCoinSize, height: rainCoinSize }}
+                >
+                  <div className="grid h-[72%] w-[72%] place-items-center rounded-full bg-gradient-to-br from-amber-100 to-amber-300/80 shadow-inner">
+                    <span
+                      className={`font-semibold text-amber-700/90 ${
+                        layout.tier === "roomy" ? "text-[1rem]" : layout.tier === "compact" ? "text-[0.8rem]" : "text-[0.9rem]"
+                      }`}
+                      style={{ textShadow: "0 1px 0 rgba(255,255,255,0.35)" }}
+                    >
+                      ₽
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
 
           <motion.div
             className="relative z-10"
@@ -926,46 +965,13 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
               className="relative"
               style={{ width: qrPixelSize, height: qrPixelSize }}
             >
-              {rain.map((drop, i) => (
-                <motion.div
-                  key={`rain-${i}`}
-                  className="absolute left-1/2 top-0 z-[1]"
-                  initial={{ x: (i - 3) * 12, y: -70, rotate: -14 + i * 5 }}
-                  animate={{
-                    x: [(i - 3) * 12, (i - 3) * 10, (i - 3) * 8],
-                    y: [-70, -24, 16, 42],
-                    rotate: [-14 + i * 5, -6 + i * 4, 6 + i * 3],
-                  }}
-                  transition={{
-                    duration: 2.6 + (i % 3) * 0.35,
-                    repeat: Infinity,
-                    delay: drop.delay,
-                    ease: "easeInOut",
-                  }}
-                >
-                  <div
-                    className="grid place-items-center rounded-full border border-amber-200/90 bg-gradient-to-br from-amber-200 via-amber-300 to-yellow-500 shadow-[0_10px_20px_rgba(161,98,7,0.24),inset_0_1px_0_rgba(255,255,255,0.7)]"
-                    style={{ width: rainCoinSize, height: rainCoinSize }}
-                  >
-                    <div className="grid h-[72%] w-[72%] place-items-center rounded-full bg-gradient-to-br from-amber-100 to-amber-300/80 shadow-inner">
-                      <span
-                        className={`font-semibold text-amber-700/90 ${
-                          layout.tier === "roomy" ? "text-[1rem]" : layout.tier === "compact" ? "text-[0.8rem]" : "text-[0.9rem]"
-                        }`}
-                        style={{ textShadow: "0 1px 0 rgba(255,255,255,0.35)" }}
-                      >
-                        ₽
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-
               {[...leftBurst, ...rightBurst].map((burst, index) => {
                 const coin = bonusCoins[index % bonusCoins.length];
                 const isLeft = index < leftBurst.length;
-                const targetX = isLeft ? burst.x * 1.05 : burst.x * 1.05;
-                const targetY = 42 + (index % 4) * 22;
+                const targetX = isLeft
+                  ? -sceneHalfWidth + (index % 3) * 12
+                  : sceneHalfWidth - (index % 3) * 12;
+                const targetY = sceneBottomReach - (index % 4) * 10;
 
                 return (
                   <motion.div
@@ -979,14 +985,14 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
                       opacity: 0,
                     }}
                     animate={{
-                      x: [isLeft ? -8 : 8, targetX * 0.42, targetX],
-                      y: [qrPixelSize * 0.18, qrPixelSize * 0.42, targetY + qrPixelSize * 0.34],
+                      x: [isLeft ? -8 : 8, targetX * 0.4, targetX],
+                      y: [qrPixelSize * 0.18, targetY * 0.58, targetY],
                       scale: [0.72, 0.96, 0.92],
                       rotate: [0, burst.rotate * 0.5, burst.rotate],
                       opacity: [0, 1, 1, 0],
                     }}
                     transition={{
-                      duration: 3.2 + (index % 3) * 0.35,
+                      duration: 3.8 + (index % 3) * 0.35,
                       repeat: Infinity,
                       delay: burst.delay,
                       ease: "easeOut",
