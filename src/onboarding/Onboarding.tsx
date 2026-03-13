@@ -159,6 +159,8 @@ const mascotPartnerCoins = [
   { src: "/logos/cofix.svg", alt: "Cofix", hue: "from-rose-100 to-orange-50" },
 ];
 
+// Legacy scene kept temporarily as reference during animation iteration.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ElephantMascot({ layout }: { layout: SceneLayoutProps }) {
   const figureScale = layout.tier === "roomy" ? 1.1 : layout.tier === "compact" ? 0.9 : 1;
   const coinSize = layout.tier === "roomy" ? 64 : layout.tier === "compact" ? 46 : 54;
@@ -346,6 +348,222 @@ function ElephantMascot({ layout }: { layout: SceneLayoutProps }) {
   );
 }
 
+const orbitHeroCoins = [
+  { src: "/logos/vkusvill.svg", alt: "VkusVill", hue: "from-emerald-100 to-emerald-50" },
+  { src: "/logos/dodo.svg", alt: "Dodo", hue: "from-orange-100 to-amber-50" },
+  { src: "/logos/cska.svg", alt: "CSKA", hue: "from-blue-100 to-sky-50" },
+  { src: "/logos/wildberries.svg", alt: "Wildberries", hue: "from-fuchsia-100 to-purple-50" },
+  { src: "/logos/cofix.svg", alt: "Cofix", hue: "from-rose-100 to-orange-50" },
+  { src: "/logos/logo1.svg", alt: "Partner", hue: "from-cyan-100 to-sky-50" },
+];
+
+function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
+  const figureScale = layout.tier === "roomy" ? 1.08 : layout.tier === "compact" ? 0.9 : 1;
+  const coinSize = layout.tier === "roomy" ? 58 : layout.tier === "compact" ? 42 : 50;
+  const orbits = [
+    {
+      width: layout.tier === "roomy" ? 292 : layout.tier === "compact" ? 208 : 244,
+      height: layout.tier === "roomy" ? 110 : layout.tier === "compact" ? 80 : 92,
+      rotate: 18,
+      duration: 11,
+      phase: 0,
+    },
+    {
+      width: layout.tier === "roomy" ? 164 : layout.tier === "compact" ? 124 : 142,
+      height: layout.tier === "roomy" ? 284 : layout.tier === "compact" ? 206 : 242,
+      rotate: 90,
+      duration: 12.5,
+      phase: Math.PI / 6,
+    },
+    {
+      width: layout.tier === "roomy" ? 278 : layout.tier === "compact" ? 198 : 232,
+      height: layout.tier === "roomy" ? 176 : layout.tier === "compact" ? 126 : 148,
+      rotate: -42,
+      duration: 10.8,
+      phase: Math.PI / 3,
+    },
+  ];
+  const orbitWidth = Math.max(...orbits.map((orbit) => orbit.width));
+  const orbitHeight = Math.max(...orbits.map((orbit) => orbit.height));
+
+  const orbitCoins = orbits.flatMap((orbit, orbitIndex) => {
+    const orbitCoinsForTrack = orbitHeroCoins.slice(orbitIndex * 2, orbitIndex * 2 + 2);
+    return orbitCoinsForTrack.map((coin, coinIndex) => {
+      const start = orbit.phase + coinIndex * Math.PI;
+      const radians = (orbit.rotate * Math.PI) / 180;
+      const frames = Array.from({ length: 15 }, (_, frameIndex) => {
+        const t = start + (frameIndex / 14) * Math.PI * 2;
+        const baseX = Math.cos(t) * orbit.width * 0.5;
+        const baseY = Math.sin(t) * orbit.height * 0.5;
+        const x = baseX * Math.cos(radians) - baseY * Math.sin(radians);
+        const y = baseX * Math.sin(radians) + baseY * Math.cos(radians);
+        const depth = (Math.sin(t) + 1) / 2;
+        return {
+          x,
+          y,
+          scale: 0.76 + depth * 0.34,
+          opacity: 0.52 + depth * 0.48,
+          blur: (1 - depth) * 1.2,
+          rotateY: -16 + depth * 32,
+          z: Math.round(depth * 100),
+        };
+      });
+
+      return {
+        ...coin,
+        key: `${coin.alt}-${orbitIndex}-${coinIndex}`,
+        orbit,
+        frames,
+      };
+    });
+  });
+
+  return (
+    <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,rgba(255,255,255,0.9),transparent_36%),radial-gradient(circle_at_50%_72%,rgba(251,191,36,0.16),transparent_48%),linear-gradient(180deg,rgba(255,255,255,0.18),transparent_100%)]" />
+      <motion.div
+        className="absolute rounded-full bg-amber-200/35 blur-3xl"
+        style={{
+          width: orbitWidth * 0.92,
+          height: orbitHeight * 0.82,
+        }}
+        animate={{ scale: [0.96, 1.04, 0.98], opacity: [0.26, 0.4, 0.3] }}
+        transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      <div className="absolute inset-0 [perspective:1400px]">
+        {orbits.map((orbit, index) => (
+          <div
+            key={index}
+            className="absolute left-1/2 top-1/2"
+            style={{
+              width: orbit.width,
+              height: orbit.height,
+              transform: `translate(-50%, -50%) rotateZ(${orbit.rotate}deg)`,
+            }}
+          >
+            <div className="absolute inset-0 rounded-full border-[2px] border-zinc-400/45 shadow-[0_0_0_1px_rgba(255,255,255,0.6)_inset]" />
+            <div className="absolute inset-[3px] rounded-full border border-white/55" />
+          </div>
+        ))}
+
+        {orbitCoins.map((coin) => (
+          <motion.div
+            key={coin.key}
+            className="absolute left-1/2 top-1/2"
+            style={{
+              marginLeft: -coinSize / 2,
+              marginTop: -coinSize / 2,
+              transformStyle: "preserve-3d",
+            }}
+            animate={{
+              x: coin.frames.map((frame) => frame.x),
+              y: coin.frames.map((frame) => frame.y),
+              scale: coin.frames.map((frame) => frame.scale),
+              opacity: coin.frames.map((frame) => frame.opacity),
+              filter: coin.frames.map((frame) => `blur(${frame.blur}px)`),
+              rotateY: coin.frames.map((frame) => frame.rotateY),
+              zIndex: coin.frames.map((frame) => frame.z),
+            }}
+            transition={{
+              duration: coin.orbit.duration,
+              ease: "linear",
+              repeat: Infinity,
+            }}
+          >
+            <motion.div
+              animate={{ rotate: [0, 6, 0, -6, 0] }}
+              transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+              className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br ${coin.hue}`}
+              style={{
+                width: coinSize,
+                height: coinSize,
+                boxShadow: "0 16px 28px rgba(24,24,27,0.12), inset 0 1px 0 rgba(255,255,255,0.85)",
+              }}
+            >
+              <div className="grid h-[74%] w-[74%] place-items-center rounded-full bg-white/95 shadow-inner">
+                <Image
+                  src={coin.src}
+                  alt={coin.alt}
+                  width={coinSize * 0.42}
+                  height={coinSize * 0.42}
+                  className="h-auto w-auto max-h-[62%] max-w-[62%] object-contain"
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        ))}
+      </div>
+
+      <motion.div
+        className="relative z-10"
+        animate={{ y: [4, -4, 4] }}
+        transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }}
+        style={{ scale: figureScale }}
+      >
+        <svg
+          width="240"
+          height="248"
+          viewBox="0 0 240 248"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="drop-shadow-[0_24px_40px_rgba(24,24,27,0.14)]"
+        >
+          <ellipse cx="120" cy="227" rx="42" ry="10" fill="rgba(24,24,27,0.08)" />
+          <g>
+            <path d="M101 63C101 52.5 109.5 44 120 44C130.5 44 139 52.5 139 63V76H101V63Z" fill="url(#heroHairGrad)" />
+            <ellipse cx="120" cy="70" rx="23" ry="26" fill="url(#heroSkinGrad)" />
+            <path d="M100 70C100 53 111 44 124 44C136 44 145 53 145 67C139 63 130 61 120 61C111 61 104 64 100 70Z" fill="url(#heroHairGrad)" />
+            <path d="M111 80C114 83 118 84.5 122 84.5C126 84.5 129.5 83 132 80" stroke="#C26B46" strokeWidth="2.5" strokeLinecap="round" />
+            <circle cx="112" cy="71" r="2.2" fill="#3F2A22" />
+            <circle cx="128" cy="71" r="2.2" fill="#3F2A22" />
+            <path d="M114 94H126" stroke="#EBC0A3" strokeWidth="10" strokeLinecap="round" />
+            <path d="M96 109C98 97 108 89 120 89C132 89 142 97 144 109L150 154H90L96 109Z" fill="url(#heroJacketGrad)" />
+            <path d="M109 95H131L135 154H105L109 95Z" fill="#F8FAFC" />
+            <path d="M118 95H122V154H118V95Z" fill="#CBD5E1" />
+            <path d="M95 111C84 118 77 130 75 143" stroke="#E8B18E" strokeWidth="11" strokeLinecap="round" />
+            <path d="M145 111C157 117 166 129 171 144" stroke="#E8B18E" strokeWidth="11" strokeLinecap="round" />
+            <path d="M167 141L186 129" stroke="#E8B18E" strokeWidth="11" strokeLinecap="round" />
+            <rect x="181" y="111" width="22" height="38" rx="7" fill="#0F172A" />
+            <rect x="184.5" y="115" width="15" height="28" rx="5" fill="url(#heroScreenGrad)" />
+            <circle cx="192" cy="145.5" r="1.8" fill="#CBD5E1" />
+            <path d="M93 154H147L156 209H84L93 154Z" fill="url(#heroPantsGrad)" />
+            <path d="M102 154L98 222" stroke="#2D3748" strokeWidth="13" strokeLinecap="round" />
+            <path d="M138 154L142 222" stroke="#2D3748" strokeWidth="13" strokeLinecap="round" />
+            <path d="M90 222H109" stroke="#0F172A" strokeWidth="10" strokeLinecap="round" />
+            <path d="M132 222H151" stroke="#0F172A" strokeWidth="10" strokeLinecap="round" />
+            <path d="M75 143L66 166" stroke="#E8B18E" strokeWidth="10" strokeLinecap="round" />
+            <path d="M66 166L82 173" stroke="#E8B18E" strokeWidth="10" strokeLinecap="round" />
+            <path d="M122 103L136 122L146 110" stroke="rgba(255,255,255,0.5)" strokeWidth="4" strokeLinecap="round" />
+          </g>
+          <defs>
+            <linearGradient id="heroSkinGrad" x1="120" y1="44" x2="120" y2="96" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#FFD9C2" />
+              <stop offset="1" stopColor="#F2B58E" />
+            </linearGradient>
+            <linearGradient id="heroHairGrad" x1="100" y1="44" x2="145" y2="84" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#2F2625" />
+              <stop offset="1" stopColor="#5A463F" />
+            </linearGradient>
+            <linearGradient id="heroJacketGrad" x1="84" y1="89" x2="156" y2="209" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#FB923C" />
+              <stop offset="1" stopColor="#EA580C" />
+            </linearGradient>
+            <linearGradient id="heroPantsGrad" x1="84" y1="154" x2="156" y2="209" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#475569" />
+              <stop offset="1" stopColor="#0F172A" />
+            </linearGradient>
+            <linearGradient id="heroScreenGrad" x1="192" y1="115" x2="192" y2="143" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#7DD3FC" />
+              <stop offset="1" stopColor="#1D4ED8" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </motion.div>
+    </div>
+  );
+}
+
 function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutProps }) {
   return (
     <FitToViewport contentClassName={`px-5 pb-6 pt-5 sm:px-6 sm:pt-7`}>
@@ -353,7 +571,7 @@ function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutPro
         <div
           className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-amber-50/80 to-orange-100/80 shadow-sm ${layout.frameHeightClass}`}
         >
-          <ElephantMascot layout={layout} />
+          <OrbitHero layout={layout} />
         </div>
 
         <div className="flex flex-col px-1">
