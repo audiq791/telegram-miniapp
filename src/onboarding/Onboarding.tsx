@@ -905,11 +905,33 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
     ],
     [],
   );
-  const rainCoinSize = layout.tier === "roomy" ? 38 : layout.tier === "compact" ? 28 : 32;
-  const burstCoinSize = layout.tier === "roomy" ? 42 : layout.tier === "compact" ? 30 : 34;
-  const qrPixelSize = layout.tier === "roomy" ? 320 : layout.tier === "compact" ? 192 : 256;
-  const sceneHalfWidth = layout.tier === "roomy" ? 206 : layout.tier === "compact" ? 138 : 172;
-  const sceneBottomReach = layout.tier === "roomy" ? 184 : layout.tier === "compact" ? 126 : 156;
+  const rainCoinSize = layout.tier === "roomy" ? 34 : layout.tier === "compact" ? 24 : 28;
+  const burstCoinSize = layout.tier === "roomy" ? 40 : layout.tier === "compact" ? 28 : 32;
+  const qrPixelSize = layout.tier === "roomy" ? 160 : layout.tier === "compact" ? 96 : 128;
+  const sceneHalfWidth = layout.tier === "roomy" ? 150 : layout.tier === "compact" ? 108 : 128;
+  const sceneBottomReach = layout.tier === "roomy" ? 140 : layout.tier === "compact" ? 96 : 116;
+  const bubbleSeeds = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, index) => {
+        const side = index % 2 === 0 ? -1 : 1;
+        const originRatio = 0.1 + ((index * 17) % 23) / 100;
+        const driftRatio = 0.72 + ((index * 13) % 17) / 100;
+        const downwardRatio = 0.84 + ((index * 11) % 9) / 100;
+
+        return {
+          id: `bubble-${index}`,
+          coin: bonusCoins[index % bonusCoins.length],
+          originX: side * qrPixelSize * originRatio,
+          originY: qrPixelSize * (0.34 + (index % 3) * 0.04),
+          targetX: side * sceneHalfWidth * driftRatio,
+          targetY: sceneBottomReach * downwardRatio,
+          delay: index * 0.18,
+          duration: 4.8 + (index % 4) * 0.35,
+          rotate: side * (12 + index * 4),
+        };
+      }),
+    [bonusCoins, qrPixelSize, sceneBottomReach, sceneHalfWidth],
+  );
 
   return (
     <FitToViewport contentClassName="px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
@@ -924,19 +946,19 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
               <motion.div
                 key={`rain-${i}`}
                 className="absolute left-1/2 top-0"
-                initial={{ x: (i - 3) * 16, y: -120, rotate: -8 + i * 2 }}
+                initial={{ x: (i - 3) * 14, y: -88, rotate: -10 + i * 3 }}
                 animate={{
                   x: [
-                    (i - 3) * 16,
-                    (i - 3) * 14 + Math.sin(i) * 4,
-                    (i - 3) * 10 + Math.cos(i) * 5,
-                    (i - 3) * 8,
+                    (i - 3) * 14,
+                    (i - 3) * 13 + Math.sin(i) * 2.5,
+                    (i - 3) * 11 + Math.cos(i) * 3,
+                    (i - 3) * 9,
                   ],
-                  y: [-120, -44, 36, 122, 202],
-                  rotate: [-8 + i * 2, -3 + i * 1.4, 2 + i * 0.8],
+                  y: [-88, -42, 12, 72, 126],
+                  rotate: [-10 + i * 3, -6 + i * 2.2, -1 + i * 1.2, 3 + i * 0.8],
                 }}
                 transition={{
-                  duration: 5 + (i % 3) * 0.55,
+                  duration: 4.8 + (i % 3) * 0.5,
                   repeat: Infinity,
                   delay: drop.delay,
                   ease: [0.2, 0.82, 0.24, 1],
@@ -970,58 +992,47 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
               className="relative"
               style={{ width: qrPixelSize, height: qrPixelSize }}
             >
-              {[...leftBurst, ...rightBurst].map((burst, index) => {
-                const coin = bonusCoins[index % bonusCoins.length];
-                const isLeft = index < leftBurst.length;
-                const targetX = isLeft
-                  ? -sceneHalfWidth + (index % 3) * 14
-                  : sceneHalfWidth - (index % 3) * 14;
-                const targetY = sceneBottomReach - (index % 4) * 12;
-                const originX = isLeft
-                  ? -qrPixelSize * (0.18 + (index % 3) * 0.09)
-                  : qrPixelSize * (0.18 + (index % 3) * 0.09);
-                const originY = qrPixelSize * (0.42 + (index % 2) * 0.04);
-
+              {bubbleSeeds.map((bubble) => {
                 return (
                   <motion.div
-                    key={burst.id}
+                    key={bubble.id}
                     className="absolute left-1/2 top-1/2 z-[2]"
                     initial={{
-                      x: originX,
-                      y: originY,
+                      x: bubble.originX,
+                      y: bubble.originY,
                       scale: 0.68,
-                      rotate: burst.rotate * 0.08,
+                      rotate: bubble.rotate * 0.05,
                     }}
                     animate={{
                       x: [
-                        originX,
-                        originX + targetX * 0.18,
-                        originX + targetX * 0.54,
-                        targetX,
+                        bubble.originX,
+                        bubble.originX + bubble.targetX * 0.18,
+                        bubble.originX + bubble.targetX * 0.56,
+                        bubble.targetX,
                       ],
                       y: [
-                        originY,
-                        originY + 22,
-                        originY + targetY * 0.42,
-                        targetY,
+                        bubble.originY,
+                        bubble.originY + 14,
+                        bubble.originY + bubble.targetY * 0.44,
+                        bubble.targetY,
                       ],
                       scale: [0.68, 0.8, 0.9, 0.96],
                       rotate: [
-                        burst.rotate * 0.04,
-                        burst.rotate * 0.16,
-                        burst.rotate * 0.38,
-                        burst.rotate * 0.58,
+                        bubble.rotate * 0.05,
+                        bubble.rotate * 0.16,
+                        bubble.rotate * 0.34,
+                        bubble.rotate * 0.54,
                       ],
                     }}
                     transition={{
-                      duration: 5.4 + (index % 3) * 0.5,
+                      duration: bubble.duration,
                       repeat: Infinity,
-                      delay: burst.delay,
+                      delay: bubble.delay,
                       ease: [0.16, 0.96, 0.2, 1],
                     }}
                   >
                     <div
-                      className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br ${coin.hue}`}
+                      className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br ${bubble.coin.hue}`}
                       style={{
                         width: burstCoinSize,
                         height: burstCoinSize,
@@ -1030,8 +1041,8 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
                     >
                       <div className="grid h-[74%] w-[74%] place-items-center rounded-full bg-white/95 shadow-inner">
                         <Image
-                          src={coin.src}
-                          alt={coin.alt}
+                          src={bubble.coin.src}
+                          alt={bubble.coin.alt}
                           width={burstCoinSize * 0.42}
                           height={burstCoinSize * 0.42}
                           className="h-auto w-auto max-h-[62%] max-w-[62%] object-contain"
