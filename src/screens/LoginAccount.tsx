@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -31,6 +31,73 @@ type ScreenLayout = {
   buttonClass: string;
   tertiaryButtonClass: string;
 };
+
+function FitToViewport({
+  children,
+  contentClassName = "",
+}: {
+  children: React.ReactNode;
+  contentClassName?: string;
+}) {
+  const frameRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = useState(1);
+  const [scaledHeight, setScaledHeight] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      const frame = frameRef.current;
+      const content = contentRef.current;
+      if (!frame || !content) return;
+
+      const availableHeight = frame.clientHeight;
+      const naturalHeight = content.scrollHeight;
+      if (!availableHeight || !naturalHeight) return;
+
+      const nextScale = Math.min(1, availableHeight / naturalHeight);
+      setScale(nextScale);
+      setScaledHeight(naturalHeight * nextScale);
+    };
+
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    if (frameRef.current) observer.observe(frameRef.current);
+    if (contentRef.current) observer.observe(contentRef.current);
+    window.visualViewport?.addEventListener("resize", measure);
+    window.addEventListener("resize", measure);
+
+    return () => {
+      observer.disconnect();
+      window.visualViewport?.removeEventListener("resize", measure);
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
+
+  return (
+    <div ref={frameRef} className="min-h-0 flex-1 overflow-hidden">
+      <div
+        className="mx-auto"
+        style={{
+          height: scaledHeight ?? undefined,
+          maxWidth: "28rem",
+        }}
+      >
+        <div
+          ref={contentRef}
+          className={contentClassName}
+          style={{
+            transform: `scale(${scale})`,
+            transformOrigin: "top center",
+            width: scale < 1 ? `${100 / scale}%` : "100%",
+          }}
+        >
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function getScreenLayout(viewportHeight: number, viewportWidth: number): ScreenLayout {
   const shortSide = Math.min(viewportHeight, viewportWidth);
@@ -213,13 +280,13 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
           </div>
         </div>
 
-        <div className={`mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col overflow-hidden ${layout.shellPadding}`}>
-          <div className={`flex min-h-0 flex-1 flex-col ${layout.contentGap}`}>
+        <FitToViewport contentClassName={layout.shellPadding}>
+          <div className={`mx-auto flex max-w-md flex-col ${layout.contentGap}`}>
             <div className="shrink-0">
               <FloatingBonuses layout={layout} />
             </div>
 
-            <div className={`flex min-h-0 flex-1 flex-col ${layout.cardGap}`}>
+            <div className={`flex flex-col ${layout.cardGap}`}>
               <div className="shrink-0">
                 <p className={`font-bold text-zinc-900 ${layout.titleClass}`}>
                   Войдите или зарегистрируйтесь
@@ -297,7 +364,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
               </div>
             </div>
           </div>
-        </div>
+        </FitToViewport>
 
         <AnimatePresence>
           {showToast && (

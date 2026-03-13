@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { haptic } from "../components/haptics";
 import LoginAccount from "../screens/LoginAccount";
@@ -16,6 +16,73 @@ type SceneLayoutProps = {
   sectionGapClass: string;
   buttonClass: string;
 };
+
+function FitToViewport({
+  children,
+  contentClassName = "",
+}: {
+  children: React.ReactNode;
+  contentClassName?: string;
+}) {
+  const frameRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = useState(1);
+  const [scaledHeight, setScaledHeight] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      const frame = frameRef.current;
+      const content = contentRef.current;
+      if (!frame || !content) return;
+
+      const availableHeight = frame.clientHeight;
+      const naturalHeight = content.scrollHeight;
+      if (!availableHeight || !naturalHeight) return;
+
+      const nextScale = Math.min(1, availableHeight / naturalHeight);
+      setScale(nextScale);
+      setScaledHeight(naturalHeight * nextScale);
+    };
+
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    if (frameRef.current) observer.observe(frameRef.current);
+    if (contentRef.current) observer.observe(contentRef.current);
+    window.visualViewport?.addEventListener("resize", measure);
+    window.addEventListener("resize", measure);
+
+    return () => {
+      observer.disconnect();
+      window.visualViewport?.removeEventListener("resize", measure);
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
+
+  return (
+    <div ref={frameRef} className="min-h-0 flex-1 overflow-hidden">
+      <div
+        className="mx-auto"
+        style={{
+          height: scaledHeight ?? undefined,
+          maxWidth: "28rem",
+        }}
+      >
+        <div
+          ref={contentRef}
+          className={contentClassName}
+          style={{
+            transform: `scale(${scale})`,
+            transformOrigin: "top center",
+            width: scale < 1 ? `${100 / scale}%` : "100%",
+          }}
+        >
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function getSceneLayout(viewportHeight: number, viewportWidth: number): SceneLayoutProps {
   const shortSide = Math.min(viewportHeight, viewportWidth);
@@ -85,10 +152,10 @@ function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutPro
   const [dots] = useState(() => createFloatingDots(20));
 
   return (
-    <div className="h-full w-full overflow-hidden px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
-      <div className={`mx-auto flex h-full max-w-md flex-col ${layout.sectionGapClass}`}>
+    <FitToViewport contentClassName={`px-5 pb-6 pt-5 sm:px-6 sm:pt-7`}>
+      <div className={`mx-auto flex flex-col ${layout.sectionGapClass}`}>
         <div
-          className={`relative flex w-full flex-1 items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-amber-50/80 to-orange-100/80 shadow-sm ${layout.frameHeightClass}`}
+          className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-amber-50/80 to-orange-100/80 shadow-sm ${layout.frameHeightClass}`}
         >
           {dots.map((dot, i) => (
             <motion.div
@@ -152,7 +219,7 @@ function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutPro
           ))}
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col px-1">
+        <div className="flex flex-col px-1">
           <h1 className={`font-semibold tracking-tight text-zinc-900 ${layout.titleClass}`}>
             Биржа Бонусов от OEM Tech
           </h1>
@@ -180,7 +247,7 @@ function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutPro
           </div>
         </div>
       </div>
-    </div>
+    </FitToViewport>
   );
 }
 
@@ -192,10 +259,10 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
   );
 
   return (
-    <div className="h-full w-full overflow-hidden px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
-      <div className={`mx-auto flex h-full max-w-md flex-col ${layout.sectionGapClass}`}>
+    <FitToViewport contentClassName="px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
+      <div className={`mx-auto flex flex-col ${layout.sectionGapClass}`}>
         <div
-          className={`relative flex w-full flex-1 items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-emerald-50/80 to-green-100/80 shadow-sm ${layout.frameHeightClass}`}
+          className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-emerald-50/80 to-green-100/80 shadow-sm ${layout.frameHeightClass}`}
         >
           <motion.div
             className="relative"
@@ -241,7 +308,7 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
           ))}
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col px-1">
+        <div className="flex flex-col px-1">
           <h2 className={`font-semibold tracking-tight text-zinc-900 ${layout.titleClass}`}>
             Покупки приносят больше
           </h2>
@@ -258,7 +325,7 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
           </div>
         </div>
       </div>
-    </div>
+    </FitToViewport>
   );
 }
 
@@ -267,10 +334,10 @@ function Scene3({ layout }: { layout: SceneLayoutProps }) {
   const [chartData] = useState(() => createChartData(50));
 
   return (
-    <div className="h-full w-full overflow-hidden px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
-      <div className={`mx-auto flex h-full max-w-md flex-col ${layout.sectionGapClass}`}>
+    <FitToViewport contentClassName="px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
+      <div className={`mx-auto flex flex-col ${layout.sectionGapClass}`}>
         <div
-          className={`relative flex w-full flex-1 items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-slate-50/80 to-slate-100/80 shadow-sm ${layout.frameHeightClass}`}
+          className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-slate-50/80 to-slate-100/80 shadow-sm ${layout.frameHeightClass}`}
         >
           <svg className="absolute inset-0 h-full w-full opacity-30" preserveAspectRatio="none">
             <motion.polyline
@@ -336,7 +403,7 @@ function Scene3({ layout }: { layout: SceneLayoutProps }) {
           </div>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col px-1">
+        <div className="flex flex-col px-1">
           <h2 className={`font-semibold tracking-tight text-zinc-900 ${layout.titleClass}`}>
             Добро пожаловать на торги
           </h2>
@@ -353,7 +420,7 @@ function Scene3({ layout }: { layout: SceneLayoutProps }) {
           </div>
         </div>
       </div>
-    </div>
+    </FitToViewport>
   );
 }
 
@@ -361,10 +428,10 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
   const orbitDistance = layout.tier === "roomy" ? 124 : layout.tier === "compact" ? 82 : 100;
 
   return (
-    <div className="h-full w-full overflow-hidden px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
-      <div className={`mx-auto flex h-full max-w-md flex-col ${layout.sectionGapClass}`}>
+    <FitToViewport contentClassName="px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
+      <div className={`mx-auto flex flex-col ${layout.sectionGapClass}`}>
         <div
-          className={`relative flex w-full flex-1 items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-violet-50/80 to-purple-100/80 shadow-sm ${layout.frameHeightClass}`}
+          className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-violet-50/80 to-purple-100/80 shadow-sm ${layout.frameHeightClass}`}
         >
           <motion.div
             className="relative z-10"
@@ -414,7 +481,7 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
           ))}
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col px-1">
+        <div className="flex flex-col px-1">
           <h2 className={`font-semibold tracking-tight text-zinc-900 ${layout.titleClass}`}>
             Теперь лояльность работает на вас
           </h2>
@@ -431,7 +498,7 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
           </div>
         </div>
       </div>
-    </div>
+    </FitToViewport>
   );
 }
 
