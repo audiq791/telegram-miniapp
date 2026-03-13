@@ -358,29 +358,29 @@ const orbitHeroCoins = [
 ];
 
 function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
-  const phoneScale = layout.tier === "roomy" ? 1.08 : layout.tier === "compact" ? 0.88 : 1;
+  const phoneScale = layout.tier === "roomy" ? 1.06 : layout.tier === "compact" ? 0.88 : 1;
   const coinSize = layout.tier === "roomy" ? 54 : layout.tier === "compact" ? 38 : 46;
   const orbits = [
     {
-      width: layout.tier === "roomy" ? 286 : layout.tier === "compact" ? 208 : 244,
-      height: layout.tier === "roomy" ? 118 : layout.tier === "compact" ? 86 : 98,
-      rotate: 18,
-      duration: 11.2,
+      width: layout.tier === "roomy" ? 154 : layout.tier === "compact" ? 116 : 136,
+      height: layout.tier === "roomy" ? 292 : layout.tier === "compact" ? 214 : 246,
+      rotate: 0,
+      duration: 11.8,
       phase: 0,
     },
     {
-      width: layout.tier === "roomy" ? 162 : layout.tier === "compact" ? 118 : 138,
-      height: layout.tier === "roomy" ? 292 : layout.tier === "compact" ? 214 : 246,
+      width: layout.tier === "roomy" ? 292 : layout.tier === "compact" ? 208 : 244,
+      height: layout.tier === "roomy" ? 124 : layout.tier === "compact" ? 90 : 102,
       rotate: 90,
-      duration: 12.8,
-      phase: Math.PI / 4,
+      duration: 12.6,
+      phase: Math.PI / 3,
     },
     {
       width: layout.tier === "roomy" ? 282 : layout.tier === "compact" ? 202 : 236,
-      height: layout.tier === "roomy" ? 172 : layout.tier === "compact" ? 124 : 144,
-      rotate: -42,
-      duration: 10.6,
-      phase: Math.PI / 3,
+      height: layout.tier === "roomy" ? 168 : layout.tier === "compact" ? 124 : 144,
+      rotate: -45,
+      duration: 10.9,
+      phase: Math.PI / 6,
     },
   ];
   const orbitWidth = Math.max(...orbits.map((orbit) => orbit.width));
@@ -391,21 +391,22 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
     return orbitCoinsForTrack.map((coin, coinIndex) => {
       const start = orbit.phase + coinIndex * Math.PI;
       const radians = (orbit.rotate * Math.PI) / 180;
-      const frames = Array.from({ length: 15 }, (_, frameIndex) => {
-        const t = start + (frameIndex / 14) * Math.PI * 2;
+      const frames = Array.from({ length: 17 }, (_, frameIndex) => {
+        const t = start + (frameIndex / 16) * Math.PI * 2;
         const baseX = Math.cos(t) * orbit.width * 0.5;
         const baseY = Math.sin(t) * orbit.height * 0.5;
         const x = baseX * Math.cos(radians) - baseY * Math.sin(radians);
         const y = baseX * Math.sin(radians) + baseY * Math.cos(radians);
         const depth = (Math.sin(t) + 1) / 2;
+        const front = depth > 0.5;
         return {
           x,
           y,
-          scale: 0.76 + depth * 0.34,
-          opacity: 0.52 + depth * 0.48,
-          blur: (1 - depth) * 1.2,
-          rotateY: -16 + depth * 32,
-          z: Math.round(depth * 100),
+          scale: 0.76 + depth * 0.3,
+          opacity: 0.48 + depth * 0.5,
+          blur: (1 - depth) * 1.1,
+          rotateY: -14 + depth * 28,
+          z: front ? 30 : 6,
         };
       });
 
@@ -418,43 +419,53 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
     });
   });
 
+  const orbitStroke = "rgba(82, 82, 91, 0.6)";
+  const orbitGlow = "rgba(255, 255, 255, 0.55)";
+
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,rgba(255,255,255,0.9),transparent_36%),radial-gradient(circle_at_50%_72%,rgba(251,191,36,0.16),transparent_48%),linear-gradient(180deg,rgba(255,255,255,0.18),transparent_100%)]" />
       <motion.div
-        className="absolute rounded-full bg-amber-200/35 blur-3xl"
-        style={{
-          width: orbitWidth * 0.92,
-          height: orbitHeight * 0.82,
-        }}
-        animate={{ scale: [0.96, 1.04, 0.98], opacity: [0.26, 0.4, 0.3] }}
+        className="absolute rounded-full bg-amber-200/30 blur-3xl"
+        style={{ width: orbitWidth * 0.9, height: orbitHeight * 0.62 }}
+        animate={{ scale: [0.96, 1.04, 0.98], opacity: [0.22, 0.34, 0.26] }}
         transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      <div className="absolute inset-0 [perspective:1400px]">
+      <div className="absolute inset-0">
         {orbits.map((orbit, index) => (
-          <div
-            key={index}
-            className="absolute left-1/2 top-1/2"
+          <svg
+            key={`back-${index}`}
+            className="absolute left-1/2 top-1/2 overflow-visible"
+            width={orbit.width}
+            height={orbit.height}
+            viewBox={`0 0 ${orbit.width} ${orbit.height}`}
             style={{
-              width: orbit.width,
-              height: orbit.height,
-              transform: `translate(-50%, -50%) rotateZ(${orbit.rotate}deg)`,
+              marginLeft: -orbit.width / 2,
+              marginTop: -orbit.height / 2,
+              transform: `rotate(${orbit.rotate}deg)`,
             }}
           >
-            <div className="absolute inset-0 rounded-full border-[1.2px] border-zinc-400/55 shadow-[0_0_0_1px_rgba(255,255,255,0.45)_inset]" />
-          </div>
+            <path
+              d={`M ${orbit.width / 2} 0 A ${orbit.width / 2} ${orbit.height / 2} 0 0 0 ${orbit.width / 2} ${orbit.height}`}
+              fill="none"
+              stroke={orbitGlow}
+              strokeWidth="0.8"
+            />
+            <path
+              d={`M ${orbit.width / 2} 0 A ${orbit.width / 2} ${orbit.height / 2} 0 0 0 ${orbit.width / 2} ${orbit.height}`}
+              fill="none"
+              stroke={orbitStroke}
+              strokeWidth="1.2"
+            />
+          </svg>
         ))}
 
         {orbitCoins.map((coin) => (
           <motion.div
             key={coin.key}
             className="absolute left-1/2 top-1/2"
-            style={{
-              marginLeft: -coinSize / 2,
-              marginTop: -coinSize / 2,
-              transformStyle: "preserve-3d",
-            }}
+            style={{ marginLeft: -coinSize / 2, marginTop: -coinSize / 2 }}
             animate={{
               x: coin.frames.map((frame) => frame.x),
               y: coin.frames.map((frame) => frame.y),
@@ -464,20 +475,16 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
               rotateY: coin.frames.map((frame) => frame.rotateY),
               zIndex: coin.frames.map((frame) => frame.z),
             }}
-            transition={{
-              duration: coin.orbit.duration,
-              ease: "linear",
-              repeat: Infinity,
-            }}
+            transition={{ duration: coin.orbit.duration, ease: "linear", repeat: Infinity }}
           >
             <motion.div
-              animate={{ rotate: [0, 6, 0, -6, 0] }}
+              animate={{ rotate: [0, 5, 0, -5, 0] }}
               transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
               className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br ${coin.hue}`}
               style={{
                 width: coinSize,
                 height: coinSize,
-                boxShadow: "0 16px 28px rgba(24,24,27,0.12), inset 0 1px 0 rgba(255,255,255,0.85)",
+                boxShadow: "0 14px 24px rgba(24,24,27,0.12), inset 0 1px 0 rgba(255,255,255,0.88)",
               }}
             >
               <div className="grid h-[74%] w-[74%] place-items-center rounded-full bg-white/95 shadow-inner">
@@ -501,51 +508,58 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
         style={{ scale: phoneScale, transformStyle: "preserve-3d" }}
       >
         <svg
-          width="176"
-          height="236"
-          viewBox="0 0 176 236"
+          width="188"
+          height="248"
+          viewBox="0 0 188 248"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="drop-shadow-[0_28px_42px_rgba(24,24,27,0.18)]"
+          className="drop-shadow-[0_28px_42px_rgba(24,24,27,0.16)]"
         >
-          <ellipse cx="88" cy="219" rx="34" ry="9" fill="rgba(24,24,27,0.09)" />
-          <g>
-            <path d="M44 36C44 21.64 55.64 10 70 10H112C126.36 10 138 21.64 138 36V180C138 194.36 126.36 206 112 206H70C55.64 206 44 194.36 44 180V36Z" fill="url(#phoneBodyGrad)" />
-            <path d="M49 40C49 28.95 57.95 20 69 20H113C124.05 20 133 28.95 133 40V176C133 187.05 124.05 196 113 196H69C57.95 196 49 187.05 49 176V40Z" fill="#0F172A" />
-            <path d="M53 43C53 33.06 61.06 25 71 25H111C120.94 25 129 33.06 129 43V173C129 182.94 120.94 191 111 191H71C61.06 191 53 182.94 53 173V43Z" fill="url(#phoneScreenGrad)" />
-            <path d="M76 18H106" stroke="#334155" strokeWidth="3.5" strokeLinecap="round" />
-            <circle cx="88" cy="178" r="6" fill="#111827" />
-            <circle cx="88" cy="178" r="3.2" fill="#374151" />
-            <path d="M118 30L65 182" stroke="rgba(255,255,255,0.22)" strokeWidth="8" strokeLinecap="round" />
-            <path d="M65 47C65 43.69 67.69 41 71 41H111C114.31 41 117 43.69 117 47V148C117 151.31 114.31 154 111 154H71C67.69 154 65 151.31 65 148V47Z" fill="url(#phoneGlassGrad)" opacity="0.55" />
-            <path d="M72 56H109" stroke="rgba(191,219,254,0.95)" strokeWidth="4" strokeLinecap="round" />
-            <path d="M72 70H102" stroke="rgba(191,219,254,0.7)" strokeWidth="3.5" strokeLinecap="round" />
-            <path d="M72 84H96" stroke="rgba(191,219,254,0.55)" strokeWidth="3.5" strokeLinecap="round" />
-            <path d="M71 116C78 108 86 104 95 104C105 104 114 110 120 121" stroke="rgba(56,189,248,0.8)" strokeWidth="5" strokeLinecap="round" />
-            <circle cx="116" cy="121" r="6" fill="#22D3EE" />
-            <path d="M138 56V88" stroke="#475569" strokeWidth="4" strokeLinecap="round" />
-            <path d="M138 99V124" stroke="#475569" strokeWidth="4" strokeLinecap="round" />
-            <path d="M42 62V96" stroke="#64748B" strokeWidth="3.5" strokeLinecap="round" />
+          <g transform="translate(18 10)">
+            <path d="M23 16C23 7.16 30.16 0 39 0H108C116.84 0 124 7.16 124 16V198C124 206.84 116.84 214 108 214H39C30.16 214 23 206.84 23 198V16Z" fill="#F8FAFC" stroke="#111827" strokeWidth="2.4" />
+            <path d="M17 23C17 12.51 25.51 4 36 4H42V210H36C25.51 210 17 201.49 17 191V23Z" fill="#E5E7EB" stroke="#111827" strokeWidth="2" />
+            <path d="M29 31C29 24.37 34.37 19 41 19H106C112.63 19 118 24.37 118 31V166C118 172.63 112.63 178 106 178H41C34.37 178 29 172.63 29 166V31Z" fill="white" stroke="#111827" strokeWidth="2" />
+            <path d="M43 34L101 172" stroke="rgba(148,163,184,0.35)" strokeWidth="2.2" strokeLinecap="round" />
+            <path d="M72 11H90" stroke="#111827" strokeWidth="2.3" strokeLinecap="round" />
+            <circle cx="60" cy="11" r="2.4" fill="#111827" />
+            <circle cx="72" cy="223" r="12" fill="white" stroke="#111827" strokeWidth="2.6" />
+            <path d="M17 49L11 49" stroke="#111827" strokeWidth="2" strokeLinecap="round" />
+            <path d="M17 71L11 71" stroke="#111827" strokeWidth="2" strokeLinecap="round" />
+            <path d="M17 93L11 93" stroke="#111827" strokeWidth="2" strokeLinecap="round" />
+            <path d="M124 78L130 78" stroke="#111827" strokeWidth="2" strokeLinecap="round" />
           </g>
-          <defs>
-            <linearGradient id="phoneBodyGrad" x1="44" y1="10" x2="138" y2="206" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#94A3B8" />
-              <stop offset="0.35" stopColor="#E2E8F0" />
-              <stop offset="0.72" stopColor="#64748B" />
-              <stop offset="1" stopColor="#0F172A" />
-            </linearGradient>
-            <linearGradient id="phoneScreenGrad" x1="91" y1="25" x2="91" y2="191" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#0F172A" />
-              <stop offset="0.42" stopColor="#1D4ED8" />
-              <stop offset="1" stopColor="#020617" />
-            </linearGradient>
-            <linearGradient id="phoneGlassGrad" x1="65" y1="41" x2="117" y2="154" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#FFFFFF" />
-              <stop offset="1" stopColor="rgba(255,255,255,0)" />
-            </linearGradient>
-          </defs>
         </svg>
       </motion.div>
+
+      <div className="absolute inset-0 pointer-events-none">
+        {orbits.map((orbit, index) => (
+          <svg
+            key={`front-${index}`}
+            className="absolute left-1/2 top-1/2 overflow-visible"
+            width={orbit.width}
+            height={orbit.height}
+            viewBox={`0 0 ${orbit.width} ${orbit.height}`}
+            style={{
+              marginLeft: -orbit.width / 2,
+              marginTop: -orbit.height / 2,
+              transform: `rotate(${orbit.rotate}deg)`,
+            }}
+          >
+            <path
+              d={`M ${orbit.width / 2} 0 A ${orbit.width / 2} ${orbit.height / 2} 0 0 1 ${orbit.width / 2} ${orbit.height}`}
+              fill="none"
+              stroke={orbitGlow}
+              strokeWidth="0.8"
+            />
+            <path
+              d={`M ${orbit.width / 2} 0 A ${orbit.width / 2} ${orbit.height / 2} 0 0 1 ${orbit.width / 2} ${orbit.height}`}
+              fill="none"
+              stroke={orbitStroke}
+              strokeWidth="1.2"
+            />
+          </svg>
+        ))}
+      </div>
     </div>
   );
 }
