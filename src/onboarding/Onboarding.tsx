@@ -891,12 +891,12 @@ function Scene1({ onNext, layout, isHeroActive }: { onNext: () => void; layout: 
 
 function Scene2({ layout }: { layout: SceneLayoutProps }) {
   const qrSize = layout.tier === "roomy" ? "h-40 w-40" : layout.tier === "compact" ? "h-24 w-24" : "h-32 w-32";
-  const [rain] = useState(() => createCoinRain(6));
+  const [rain] = useState(() => createCoinRain(7));
   const [qrCells] = useState(() =>
     Array.from({ length: 49 }, () => Math.random() > 0.6),
   );
-  const [leftBurst] = useState(() => createBonusBurst("left", 6));
-  const [rightBurst] = useState(() => createBonusBurst("right", 6));
+  const [leftBurst] = useState(() => createBonusBurst("left", 7));
+  const [rightBurst] = useState(() => createBonusBurst("right", 7));
   const bonusCoins = useMemo(
     () => [
       { src: "/logos/vkusvill.svg", alt: "VkusVill", hue: "from-emerald-100 to-emerald-50" },
@@ -924,102 +924,108 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
             animate={{ scale: [1, 1.02, 1] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            <div className={`rounded-2xl bg-white p-3 shadow-lg overflow-hidden ${qrSize}`}>
-              <div className="grid aspect-square w-full grid-cols-7 gap-[6%]">
-                {qrCells.map((isFilled, i) => (
-                  <div
-                    key={i}
-                    className={`aspect-square w-full rounded-[2px] ${
-                      isFilled ? "bg-zinc-900" : "bg-transparent"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <motion.div
-              className="absolute left-0 right-0 h-0.5 bg-emerald-400/70"
-              animate={{
-                top: ["10%", "90%", "10%"],
-                opacity: [0.3, 0.7, 0.3],
-              }}
-              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            />
-          </motion.div>
-
-          {rain.map((drop, i) => (
-            <motion.div
-              key={`rain-${i}`}
-              className="absolute z-[3]"
-              initial={{ x: drop.x, y: -50 }}
-              animate={{ y: [drop.x > 140 ? 320 : 300, 380], rotate: [0, 140, 220] }}
-              transition={{
-                duration: drop.duration,
-                repeat: Infinity,
-                delay: drop.delay,
-                ease: "linear",
-              }}
-            >
-              <div
-                className="grid place-items-center rounded-full border border-amber-200/80 bg-gradient-to-br from-amber-200 via-amber-300 to-yellow-500 shadow-[0_10px_20px_rgba(161,98,7,0.24),inset_0_1px_0_rgba(255,255,255,0.7)]"
-                style={{ width: rainCoinSize, height: rainCoinSize }}
-              >
-                <div className="grid h-[72%] w-[72%] place-items-center rounded-full bg-gradient-to-br from-amber-100 to-amber-300/80 shadow-inner">
-                  <span
-                    className={`font-semibold text-amber-700/90 ${
-                      layout.tier === "roomy" ? "text-[1rem]" : layout.tier === "compact" ? "text-[0.8rem]" : "text-[0.9rem]"
-                    }`}
-                    style={{ textShadow: "0 1px 0 rgba(255,255,255,0.35)" }}
-                  >
-                    ₽
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-
-          {[...leftBurst, ...rightBurst].map((burst, index) => {
-            const coin = bonusCoins[index % bonusCoins.length];
-            return (
-              <motion.div
-                key={burst.id}
-                className="absolute bottom-8 left-1/2 z-[2]"
-                initial={{ x: burst.x * 0.35, y: 0, scale: 0.72, rotate: 0, opacity: 0 }}
-                animate={{
-                  x: [burst.x * 0.35, burst.x, burst.x * 1.08],
-                  y: [10, -burst.y, -burst.y - 18],
-                  scale: [0.72, 1, 0.96],
-                  rotate: [0, burst.rotate],
-                  opacity: [0, 1, 1, 0],
-                }}
-                transition={{
-                  duration: burst.duration,
-                  repeat: Infinity,
-                  delay: burst.delay,
-                  ease: "easeOut",
-                }}
-              >
-                <div
-                  className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br ${coin.hue}`}
-                  style={{
-                    width: burstCoinSize,
-                    height: burstCoinSize,
-                    boxShadow: "0 14px 26px rgba(24,24,27,0.14), inset 0 1px 0 rgba(255,255,255,0.86)",
+            <div className="relative">
+              {rain.map((drop, i) => (
+                <motion.div
+                  key={`rain-${i}`}
+                  className="absolute left-1/2 top-0 z-[3]"
+                  initial={{ x: (i - 3) * 14, y: -64, rotate: -18 + i * 6 }}
+                  animate={{
+                    x: [(i - 3) * 14, (i - 3) * 10],
+                    y: [-64, -20, -6],
+                    rotate: [-18 + i * 6, 26 + i * 10, 14 + i * 6],
+                  }}
+                  transition={{
+                    duration: 1.6 + (i % 3) * 0.18,
+                    repeat: Infinity,
+                    delay: drop.delay,
+                    ease: [0.18, 0.82, 0.24, 1],
                   }}
                 >
-                  <div className="grid h-[74%] w-[74%] place-items-center rounded-full bg-white/95 shadow-inner">
-                    <Image
-                      src={coin.src}
-                      alt={coin.alt}
-                      width={burstCoinSize * 0.42}
-                      height={burstCoinSize * 0.42}
-                      className="h-auto w-auto max-h-[62%] max-w-[62%] object-contain"
-                    />
+                  <div
+                    className="grid place-items-center rounded-full border border-amber-200/90 bg-gradient-to-br from-amber-200 via-amber-300 to-yellow-500 shadow-[0_10px_20px_rgba(161,98,7,0.24),inset_0_1px_0_rgba(255,255,255,0.7)]"
+                    style={{ width: rainCoinSize, height: rainCoinSize }}
+                  >
+                    <div className="grid h-[72%] w-[72%] place-items-center rounded-full bg-gradient-to-br from-amber-100 to-amber-300/80 shadow-inner">
+                      <span
+                        className={`font-semibold text-amber-700/90 ${
+                          layout.tier === "roomy" ? "text-[1rem]" : layout.tier === "compact" ? "text-[0.8rem]" : "text-[0.9rem]"
+                        }`}
+                        style={{ textShadow: "0 1px 0 rgba(255,255,255,0.35)" }}
+                      >
+                        ₽
+                      </span>
+                    </div>
                   </div>
+                </motion.div>
+              ))}
+
+              <div className={`relative rounded-2xl bg-white p-3 shadow-lg overflow-hidden ${qrSize}`}>
+                <div className="grid aspect-square w-full grid-cols-7 gap-[6%]">
+                  {qrCells.map((isFilled, i) => (
+                    <div
+                      key={i}
+                      className={`aspect-square w-full rounded-[2px] ${
+                        isFilled ? "bg-zinc-900" : "bg-transparent"
+                      }`}
+                    />
+                  ))}
                 </div>
-              </motion.div>
-            );
-          })}
+              </div>
+
+              <motion.div
+                className="absolute left-0 right-0 h-0.5 bg-emerald-400/70"
+                animate={{
+                  top: ["10%", "90%", "10%"],
+                  opacity: [0.3, 0.7, 0.3],
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+              />
+
+              {[...leftBurst, ...rightBurst].map((burst, index) => {
+                const coin = bonusCoins[index % bonusCoins.length];
+                return (
+                  <motion.div
+                    key={burst.id}
+                    className="absolute left-1/2 top-full z-[4]"
+                    initial={{ x: burst.x * 0.12, y: -4, scale: 0.68, rotate: 0, opacity: 0 }}
+                    animate={{
+                      x: [burst.x * 0.12, burst.x * 0.72, burst.x],
+                      y: [-4, burst.y * 0.55, burst.y + 28],
+                      scale: [0.68, 1, 0.94],
+                      rotate: [0, burst.rotate],
+                      opacity: [0, 1, 1, 0],
+                    }}
+                    transition={{
+                      duration: burst.duration,
+                      repeat: Infinity,
+                      delay: burst.delay,
+                      ease: "easeOut",
+                    }}
+                  >
+                    <div
+                      className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br ${coin.hue}`}
+                      style={{
+                        width: burstCoinSize,
+                        height: burstCoinSize,
+                        boxShadow: "0 14px 26px rgba(24,24,27,0.14), inset 0 1px 0 rgba(255,255,255,0.86)",
+                      }}
+                    >
+                      <div className="grid h-[74%] w-[74%] place-items-center rounded-full bg-white/95 shadow-inner">
+                        <Image
+                          src={coin.src}
+                          alt={coin.alt}
+                          width={burstCoinSize * 0.42}
+                          height={burstCoinSize * 0.42}
+                          className="h-auto w-auto max-h-[62%] max-w-[62%] object-contain"
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
         </div>
 
         <div className="flex flex-col px-1">
