@@ -887,70 +887,36 @@ function Scene1({ onNext, layout, isHeroActive }: { onNext: () => void; layout: 
 }
 
 function Scene2({ layout }: { layout: SceneLayoutProps }) {
-  const qrSize = layout.tier === "roomy" ? "h-40 w-40" : layout.tier === "compact" ? "h-24 w-24" : "h-32 w-32";
+  const qrSize = layout.tier === "roomy" ? 154 : layout.tier === "compact" ? 108 : 132;
+  const orbitRadiusX = layout.tier === "roomy" ? 138 : layout.tier === "compact" ? 96 : 114;
+  const orbitRadiusY = layout.tier === "roomy" ? 74 : layout.tier === "compact" ? 50 : 60;
+  const coinSize = layout.tier === "roomy" ? 42 : layout.tier === "compact" ? 30 : 36;
+  const rewardWidth = layout.tier === "roomy" ? 170 : layout.tier === "compact" ? 130 : 148;
+  const rewardY = layout.tier === "roomy" ? 214 : layout.tier === "compact" ? 164 : 186;
   const [qrCells] = useState(() =>
-    Array.from({ length: 49 }, () => Math.random() > 0.6),
+    Array.from({ length: 49 }, (_, index) => [0, 1, 5, 6, 7, 13, 18, 21, 27, 30, 35, 41, 42, 43, 47, 48].includes(index) || Math.random() > 0.64),
   );
-  const bonusCoins = useMemo(
+  const partnerCoins = useMemo(
     () => [
-      { src: "/logos/vkusvill.svg", alt: "VkusVill", hue: "from-emerald-100 to-emerald-50" },
-      { src: "/logos/dodo.svg", alt: "Dodo", hue: "from-orange-100 to-amber-50" },
-      { src: "/logos/cska.svg", alt: "CSKA", hue: "from-blue-100 to-sky-50" },
-      { src: "/logos/wildberries.svg", alt: "Wildberries", hue: "from-fuchsia-100 to-purple-50" },
-      { src: "/logos/cofix.svg", alt: "Cofix", hue: "from-rose-100 to-orange-50" },
-      { src: "/logos/logo1.svg", alt: "Partner", hue: "from-cyan-100 to-sky-50" },
+      { src: "/logos/vkusvill.svg", alt: "VkusVill", hue: "from-emerald-100 to-emerald-50", side: -1, lane: 0 },
+      { src: "/logos/dodo.svg", alt: "Dodo", hue: "from-orange-100 to-amber-50", side: 1, lane: 0 },
+      { src: "/logos/cska.svg", alt: "CSKA", hue: "from-blue-100 to-sky-50", side: -1, lane: 1 },
+      { src: "/logos/wildberries.svg", alt: "Wildberries", hue: "from-fuchsia-100 to-purple-50", side: 1, lane: 1 },
+      { src: "/logos/cofix.svg", alt: "Cofix", hue: "from-rose-100 to-orange-50", side: -1, lane: 2 },
+      { src: "/logos/logo1.svg", alt: "Partner", hue: "from-cyan-100 to-sky-50", side: 1, lane: 2 },
     ],
     [],
   );
-  const rainCoinSize = layout.tier === "roomy" ? 34 : layout.tier === "compact" ? 24 : 28;
-  const burstCoinSize = layout.tier === "roomy" ? 40 : layout.tier === "compact" ? 28 : 32;
-  const qrPixelSize = layout.tier === "roomy" ? 160 : layout.tier === "compact" ? 96 : 128;
-  const sceneHalfWidth = layout.tier === "roomy" ? 150 : layout.tier === "compact" ? 108 : 128;
-  const sceneBottomReach = layout.tier === "roomy" ? 140 : layout.tier === "compact" ? 96 : 116;
-  const firstRainHitDelay = 1.45;
-  const rainStream = useMemo(
+  const rewardTokens = useMemo(
     () =>
-      Array.from({ length: 14 }, (_, index) => {
-        const lane = (index % 5) - 2;
-        const clusterOffset = Math.floor(index / 5) * 4;
-        const startX = lane * (layout.tier === "compact" ? 8 : 10) + clusterOffset - 4;
-
-        return {
-          id: `rain-stream-${index}`,
-          startX,
-          driftA: startX + (lane < 0 ? -5 : 5),
-          driftB: startX + (lane < 0 ? 4 : -4),
-          driftC: startX + (lane < 0 ? -2 : 2),
-          delay: index * 0.08,
-          duration: 2.25 + (index % 3) * 0.1,
-          rotateStart: lane * 2.4,
-          rotateEnd: lane * 1.1,
-        };
-      }),
-    [layout.tier],
+      [
+        { label: "+ BON", x: -56, delay: 0.6 },
+        { label: "VV", x: -14, delay: 0.9 },
+        { label: "DODO", x: 28, delay: 1.2 },
+        { label: "CSKA", x: 64, delay: 1.5 },
+      ],
+    [],
   );
-  const bubbleSeeds = useMemo(
-    () =>
-      Array.from({ length: 12 }, (_, index) => {
-        const side = index % 2 === 0 ? -1 : 1;
-        const originRatio = 0.1 + ((index * 17) % 23) / 100;
-        const driftRatio = 0.72 + ((index * 13) % 17) / 100;
-        const downwardRatio = 0.84 + ((index * 11) % 9) / 100;
-
-        return {
-          id: `bubble-${index}`,
-          coin: bonusCoins[index % bonusCoins.length],
-          originX: side * qrPixelSize * originRatio,
-          originY: qrPixelSize * (0.34 + (index % 3) * 0.04),
-            targetX: side * sceneHalfWidth * driftRatio,
-            targetY: sceneBottomReach * downwardRatio,
-            delay: firstRainHitDelay + index * 0.16,
-            duration: 4.8 + (index % 4) * 0.35,
-            rotate: side * (12 + index * 4),
-          };
-        }),
-      [bonusCoins, firstRainHitDelay, qrPixelSize, sceneBottomReach, sceneHalfWidth],
-    );
 
   return (
     <FitToViewport contentClassName="px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
@@ -958,139 +924,164 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
         <div
           className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-emerald-50/80 to-green-100/80 shadow-sm ${layout.frameHeightClass}`}
         >
-          <div className="absolute inset-x-10 bottom-6 h-10 rounded-full bg-emerald-200/40 blur-2xl" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.84),transparent_32%),radial-gradient(circle_at_50%_92%,rgba(16,185,129,0.16),transparent_36%)]" />
+          <div className="absolute inset-x-10 bottom-5 h-10 rounded-full bg-emerald-300/30 blur-2xl" />
 
-            <div className="absolute inset-0 z-[1]">
-              {rainStream.map((drop) => (
+          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 360 280" preserveAspectRatio="none">
+            <motion.path
+              d={`M 66 114 C 102 88, 128 86, 180 128`}
+              fill="none"
+              stroke="rgba(16,185,129,0.18)"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              animate={{ pathLength: [0.2, 1, 0.2], opacity: [0.16, 0.42, 0.16] }}
+              transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.path
+              d={`M 294 114 C 258 88, 232 86, 180 128`}
+              fill="none"
+              stroke="rgba(59,130,246,0.18)"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              animate={{ pathLength: [0.2, 1, 0.2], opacity: [0.14, 0.36, 0.14] }}
+              transition={{ duration: 4.9, repeat: Infinity, ease: "easeInOut", delay: 0.25 }}
+            />
+            <motion.path
+              d={`M 180 146 C 180 172, 180 184, 180 ${rewardY - 10}`}
+              fill="none"
+              stroke="rgba(16,185,129,0.2)"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              animate={{ pathLength: [0.1, 1, 0.1], opacity: [0.1, 0.28, 0.1] }}
+              transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </svg>
+
+          <div className="absolute inset-0 z-[2]">
+            {partnerCoins.map((coin, index) => {
+              const fromX = coin.side * (orbitRadiusX + 22 + coin.lane * 12);
+              const fromY = -28 + coin.lane * 26;
+              const midX = coin.side * (orbitRadiusX * 0.52);
+              const midY = -52 + coin.lane * 10;
+              const endX = coin.side * 18;
+              const endY = 8 + coin.lane * 4;
+
+              return (
                 <motion.div
-                  key={drop.id}
-                  className="absolute left-1/2 top-0"
-                  initial={{ x: drop.startX, y: -148, rotate: drop.rotateStart, opacity: 0 }}
+                  key={coin.alt}
+                  className="absolute left-1/2 top-1/2"
+                  initial={{ x: fromX, y: fromY, opacity: 0, scale: 0.76 }}
                   animate={{
-                    x: [drop.startX, drop.driftA, drop.driftB, drop.driftC, 0],
-                    y: [-148, -104, -56, -8, qrPixelSize * 0.02],
-                    rotate: [drop.rotateStart, drop.rotateStart * 0.7, drop.rotateEnd],
-                    opacity: [0, 0.92, 1, 1, 0.98],
-                    scale: [0.92, 0.98, 1, 1.02, 1],
+                    x: [fromX, midX, endX],
+                    y: [fromY, midY, endY],
+                    opacity: [0, 1, 0],
+                    scale: [0.76, 0.96, 0.72],
+                    rotate: [coin.side * -12, coin.side * 4, 0],
                   }}
                   transition={{
-                    duration: drop.duration,
+                    duration: 3.4,
                     repeat: Infinity,
-                    delay: drop.delay,
-                    times: [0, 0.18, 0.44, 0.76, 1],
-                    ease: "linear",
+                    delay: index * 0.34,
+                    ease: [0.22, 0.84, 0.22, 1],
                   }}
                 >
                   <div
-                  className="grid place-items-center rounded-full border border-amber-200/90 bg-gradient-to-br from-amber-200 via-amber-300 to-yellow-500 shadow-[0_10px_20px_rgba(161,98,7,0.24),inset_0_1px_0_rgba(255,255,255,0.7)]"
-                  style={{ width: rainCoinSize, height: rainCoinSize }}
-                >
-                  <div className="grid h-[72%] w-[72%] place-items-center rounded-full bg-gradient-to-br from-amber-100 to-amber-300/80 shadow-inner">
-                    <span
-                      className={`font-semibold text-amber-700/90 ${
-                        layout.tier === "roomy" ? "text-[1rem]" : layout.tier === "compact" ? "text-[0.8rem]" : "text-[0.9rem]"
-                      }`}
-                      style={{ textShadow: "0 1px 0 rgba(255,255,255,0.35)" }}
-                    >
-                      ₽
-                    </span>
+                    className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br ${coin.hue}`}
+                    style={{
+                      width: coinSize,
+                      height: coinSize,
+                      boxShadow: "0 14px 24px rgba(24,24,27,0.12), inset 0 1px 0 rgba(255,255,255,0.86)",
+                    }}
+                  >
+                    <div className="grid h-[74%] w-[74%] place-items-center rounded-full bg-white/95 shadow-inner">
+                      <Image
+                        src={coin.src}
+                        alt={coin.alt}
+                        width={coinSize * 0.42}
+                        height={coinSize * 0.42}
+                        className="h-auto w-auto max-h-[62%] max-w-[62%] object-contain"
+                      />
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
 
           <motion.div
-            className="relative z-10"
-            animate={{ scale: [1, 1.02, 1] }}
-            transition={{ duration: 3, repeat: Infinity }}
+            className="relative z-[4]"
+            animate={{ y: [0, -2, 0], rotate: [-2, 0, -2] }}
+            transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
           >
-            <div
-              className="relative"
-              style={{ width: qrPixelSize, height: qrPixelSize }}
-            >
-              {bubbleSeeds.map((bubble) => {
-                return (
-                  <motion.div
-                    key={bubble.id}
-                    className="absolute left-1/2 top-1/2 z-[2]"
-                    initial={{
-                      x: bubble.originX,
-                      y: bubble.originY,
-                      scale: 0.68,
-                      rotate: bubble.rotate * 0.05,
-                    }}
-                    animate={{
-                      x: [
-                        bubble.originX,
-                        bubble.originX + bubble.targetX * 0.18,
-                        bubble.originX + bubble.targetX * 0.56,
-                        bubble.targetX,
-                      ],
-                      y: [
-                        bubble.originY,
-                        bubble.originY + 14,
-                        bubble.originY + bubble.targetY * 0.44,
-                        bubble.targetY,
-                      ],
-                      scale: [0.68, 0.8, 0.9, 0.96],
-                      rotate: [
-                        bubble.rotate * 0.05,
-                        bubble.rotate * 0.16,
-                        bubble.rotate * 0.34,
-                        bubble.rotate * 0.54,
-                      ],
-                    }}
-                    transition={{
-                      duration: bubble.duration,
-                      repeat: Infinity,
-                      delay: bubble.delay,
-                      ease: [0.16, 0.96, 0.2, 1],
-                    }}
-                  >
-                    <div
-                      className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br ${bubble.coin.hue}`}
-                      style={{
-                        width: burstCoinSize,
-                        height: burstCoinSize,
-                        boxShadow: "0 14px 26px rgba(24,24,27,0.14), inset 0 1px 0 rgba(255,255,255,0.86)",
-                      }}
-                    >
-                      <div className="grid h-[74%] w-[74%] place-items-center rounded-full bg-white/95 shadow-inner">
-                        <Image
-                          src={bubble.coin.src}
-                          alt={bubble.coin.alt}
-                          width={burstCoinSize * 0.42}
-                          height={burstCoinSize * 0.42}
-                          className="h-auto w-auto max-h-[62%] max-w-[62%] object-contain"
-                        />
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
+            <div className="absolute left-1/2 top-1/2 h-[170%] w-[170%] -translate-x-1/2 -translate-y-1/2">
+              <motion.div
+                className="absolute inset-[22%] rounded-full border border-emerald-300/35"
+                animate={{ scale: [0.92, 1.08, 0.92], opacity: [0.16, 0.34, 0.16] }}
+                transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div
+                className="absolute inset-[14%] rounded-full border border-white/40"
+                animate={{ scale: [1.08, 0.96, 1.08], opacity: [0.08, 0.2, 0.08] }}
+                transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+              />
+            </div>
 
-              <div className={`relative z-[3] rounded-2xl bg-white p-3 shadow-lg overflow-hidden ${qrSize}`}>
-                <div className="grid aspect-square w-full grid-cols-7 gap-[6%]">
-                  {qrCells.map((isFilled, i) => (
-                    <div
-                      key={i}
-                      className={`aspect-square w-full rounded-[2px] ${
-                        isFilled ? "bg-zinc-900" : "bg-transparent"
-                      }`}
-                    />
-                  ))}
-                </div>
+            <div
+              className="relative z-[4] rounded-[28px] border border-white/80 bg-white/92 p-3 shadow-[0_24px_46px_rgba(6,95,70,0.16)]"
+              style={{ width: qrSize, height: qrSize }}
+            >
+              <div className="grid aspect-square w-full grid-cols-7 gap-[6%]">
+                {qrCells.map((isFilled, i) => (
+                  <div
+                    key={i}
+                    className={`aspect-square w-full rounded-[2px] ${isFilled ? "bg-zinc-900" : "bg-transparent"}`}
+                  />
+                ))}
               </div>
 
               <motion.div
-                className="absolute left-0 right-0 z-[4] h-0.5 bg-emerald-400/70"
-                animate={{
-                  top: ["10%", "90%", "10%"],
-                  opacity: [0.3, 0.7, 0.3],
-                }}
-                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                className="absolute left-3 right-3 z-[5] h-1 rounded-full bg-gradient-to-r from-transparent via-emerald-400/80 to-transparent"
+                animate={{ top: ["14%", "82%", "14%"], opacity: [0.2, 0.85, 0.2] }}
+                transition={{ duration: 3.2, repeat: Infinity, ease: "linear" }}
               />
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="absolute left-1/2 z-[5] -translate-x-1/2"
+            style={{ top: rewardY }}
+            animate={{ y: [0, -2, 0] }}
+            transition={{ duration: 4.4, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <div
+              className="rounded-[24px] border border-white/75 bg-white/88 px-3 py-2.5 shadow-[0_18px_34px_rgba(16,185,129,0.14)] backdrop-blur-md"
+              style={{ width: rewardWidth }}
+            >
+              <div className="text-center text-[0.5rem] font-medium uppercase tracking-[0.18em] text-emerald-600">
+                Бонусы за покупку
+              </div>
+              <div className="mt-2 flex h-10 items-center justify-center gap-1.5 overflow-hidden rounded-2xl bg-emerald-50 px-2">
+                {rewardTokens.map((token) => (
+                  <motion.div
+                    key={token.label}
+                    className="rounded-full bg-white px-2.5 py-1 text-[0.48rem] font-medium text-zinc-700 shadow-sm"
+                    initial={{ x: token.x, y: 12, opacity: 0 }}
+                    animate={{
+                      x: [token.x, token.x * 0.34, 0],
+                      y: [12, 4, 0],
+                      opacity: [0, 1, 1],
+                    }}
+                    transition={{
+                      duration: 3.2,
+                      repeat: Infinity,
+                      delay: token.delay,
+                      ease: [0.2, 0.86, 0.2, 1],
+                    }}
+                  >
+                    {token.label}
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </motion.div>
         </div>
