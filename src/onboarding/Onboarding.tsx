@@ -45,17 +45,28 @@ function FitToViewport({
     };
 
     measure();
+    const raf1 = window.requestAnimationFrame(measure);
+    const raf2 = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(measure);
+    });
+    const timeoutId = window.setTimeout(measure, 120);
 
     const observer = new ResizeObserver(measure);
     if (frameRef.current) observer.observe(frameRef.current);
     if (contentRef.current) observer.observe(contentRef.current);
     window.visualViewport?.addEventListener("resize", measure);
     window.addEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
+    document.fonts?.ready.then(measure).catch(() => {});
 
     return () => {
       observer.disconnect();
+      window.cancelAnimationFrame(raf1);
+      window.cancelAnimationFrame(raf2);
+      window.clearTimeout(timeoutId);
       window.visualViewport?.removeEventListener("resize", measure);
       window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
     };
   }, []);
 
