@@ -60,11 +60,78 @@ function getScreenLayout(viewportHeight: number, viewportWidth: number): ScreenL
 
 function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
   const heroCoins = [
-    { src: "/logos/vkusvill.svg", alt: "VkusVill", x: -110, y: -44, delay: 0, hue: "from-emerald-100 to-emerald-50" },
-    { src: "/logos/dodo.svg", alt: "Dodo", x: 110, y: -38, delay: 0.28, hue: "from-orange-100 to-amber-50" },
-    { src: "/logos/cska.svg", alt: "CSKA", x: 0, y: -72, delay: 0.52, hue: "from-blue-100 to-sky-50" },
-    { src: "/logos/wildberries.svg", alt: "Wildberries", x: -76, y: 26, delay: 0.8, hue: "from-fuchsia-100 to-purple-50" },
-    { src: "/logos/cofix.svg", alt: "Cofix", x: 78, y: 30, delay: 1.04, hue: "from-rose-100 to-orange-50" },
+    {
+      src: "/logos/vkusvill.svg",
+      alt: "VkusVill",
+      x: -118,
+      y: -54,
+      driftX: 22,
+      driftY: 12,
+      delay: 0,
+      duration: 8.4,
+      rotate: -8,
+      hue: "from-emerald-100 to-emerald-50",
+    },
+    {
+      src: "/logos/dodo.svg",
+      alt: "Dodo",
+      x: 116,
+      y: -46,
+      driftX: -24,
+      driftY: 18,
+      delay: 0.45,
+      duration: 9.2,
+      rotate: 10,
+      hue: "from-orange-100 to-amber-50",
+    },
+    {
+      src: "/logos/cska.svg",
+      alt: "CSKA",
+      x: 0,
+      y: -86,
+      driftX: 16,
+      driftY: 20,
+      delay: 0.9,
+      duration: 8.8,
+      rotate: -6,
+      hue: "from-blue-100 to-sky-50",
+    },
+    {
+      src: "/logos/wildberries.svg",
+      alt: "Wildberries",
+      x: -96,
+      y: 44,
+      driftX: 26,
+      driftY: -14,
+      delay: 0.6,
+      duration: 9.6,
+      rotate: 7,
+      hue: "from-fuchsia-100 to-purple-50",
+    },
+    {
+      src: "/logos/cofix.svg",
+      alt: "Cofix",
+      x: 102,
+      y: 52,
+      driftX: -20,
+      driftY: -18,
+      delay: 1.1,
+      duration: 8.6,
+      rotate: -9,
+      hue: "from-rose-100 to-orange-50",
+    },
+    {
+      src: "/logos/logo1.svg",
+      alt: "Partner",
+      x: -16,
+      y: 72,
+      driftX: 18,
+      driftY: -16,
+      delay: 1.35,
+      duration: 9.4,
+      rotate: 8,
+      hue: "from-cyan-100 to-sky-50",
+    },
   ];
   const centerLogoSize =
     layout.tier === "roomy" ? 82 : layout.tier === "compact" ? 56 : layout.tier === "micro" ? 46 : 68;
@@ -114,17 +181,17 @@ function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
             className="absolute"
             initial={{ opacity: 0, x: coin.x, y: coin.y, scale: 0.76 }}
             animate={{
-              opacity: [0, 1, 1, 0],
-              x: [coin.x, coin.x * 0.56, coin.x * 0.18, coin.x * 0.08],
-              y: [coin.y, coin.y * 0.52, coin.y * 0.2, -4],
-              scale: [0.76, 0.96, 0.88, 0.72],
-              rotate: [0, index % 2 === 0 ? 10 : -10, 0],
+              opacity: [0.34, 0.72, 0.62, 0.7, 0.34],
+              x: [coin.x, coin.x + coin.driftX, coin.x + coin.driftX * 0.45, coin.x - coin.driftX * 0.3, coin.x],
+              y: [coin.y, coin.y + coin.driftY, coin.y - coin.driftY * 0.24, coin.y + coin.driftY * 0.16, coin.y],
+              scale: [0.76, 0.82, 0.8, 0.84, 0.76],
+              rotate: [coin.rotate, coin.rotate * -0.3, coin.rotate * 0.4, coin.rotate],
             }}
             transition={{
-              duration: 4.8,
+              duration: coin.duration,
               delay: coin.delay,
               repeat: Infinity,
-              repeatDelay: 0.3,
+              repeatType: "mirror",
               ease: "easeInOut",
             }}
           >
