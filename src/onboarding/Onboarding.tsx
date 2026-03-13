@@ -154,17 +154,17 @@ function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutPro
 
         <div className="flex min-h-0 flex-1 flex-col px-1">
           <h1 className={`font-semibold tracking-tight text-zinc-900 ${layout.titleClass}`}>
-            Р‘РёСЂР¶Р° Р‘РѕРЅСѓСЃРѕРІ РѕС‚ OEM Tech
+            Биржа Бонусов от OEM Tech
           </h1>
 
           <div className="my-3 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
 
           <div className={`min-h-0 flex-1 ${layout.bodyGapClass}`}>
             <p className={`text-zinc-600 ${layout.bodyClass}`}>
-              Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ РІ РЅРѕРІСѓСЋ СЌРєРѕРЅРѕРјРёРєСѓ Р»РѕСЏР»СЊРЅРѕСЃС‚Рё.
+              Добро пожаловать в новую экономику лояльности.
             </p>
             <p className={`text-zinc-600 ${layout.bodyClass}`}>
-              Р—РґРµСЃСЊ Р±РѕРЅСѓСЃС‹ СЌС‚Рѕ РЅРµ РїСЂРѕСЃС‚Рѕ Р±Р°Р»Р»С‹. Р­С‚Рѕ Р°РєС‚РёРІ, РєРѕС‚РѕСЂС‹Рј РјРѕР¶РЅРѕ СѓРїСЂР°РІР»СЏС‚СЊ.
+              Здесь бонусы это не просто баллы. Это актив, которым можно управлять.
             </p>
           </div>
 
@@ -175,7 +175,7 @@ function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutPro
               onClick={onNext}
               className={`rounded-xl bg-zinc-900 font-medium text-white shadow-md transition-colors hover:bg-zinc-800 ${layout.buttonClass}`}
             >
-              Р”Р°Р»РµРµ
+              Далее
             </motion.button>
           </div>
         </div>
@@ -243,17 +243,17 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
 
         <div className="flex min-h-0 flex-1 flex-col px-1">
           <h2 className={`font-semibold tracking-tight text-zinc-900 ${layout.titleClass}`}>
-            РџРѕРєСѓРїРєРё РїСЂРёРЅРѕСЃСЏС‚ Р±РѕР»СЊС€Рµ
+            Покупки приносят больше
           </h2>
 
           <div className="my-3 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
 
           <div className={`min-h-0 flex-1 ${layout.bodyGapClass}`}>
             <p className={`text-zinc-600 ${layout.bodyClass}`}>
-              Р’Р°С€Рё РїРѕРІСЃРµРґРЅРµРІРЅС‹Рµ С‚СЂР°С‚С‹ РїСЂРµРІСЂР°С‰Р°СЋС‚СЃСЏ РІ С†РµРЅРЅРѕСЃС‚СЊ.
+              Ваши повседневные траты превращаются в ценность.
             </p>
             <p className={`text-zinc-600 ${layout.bodyClass}`}>
-              РџРѕРєР°Р·С‹РІР°Р№С‚Рµ QR-РєРѕРґ Сѓ РїР°СЂС‚РЅС‘СЂРѕРІ Рё РїРѕР»СѓС‡Р°Р№С‚Рµ Р±РѕРЅСѓСЃС‹, РєРѕС‚РѕСЂС‹Рµ РјРѕР¶РЅРѕ РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ Рё РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РІС‹РіРѕРґРЅРѕ.
+              Показывайте QR-код у партнёров и получайте бонусы, которые можно конвертировать и использовать выгодно.
             </p>
           </div>
         </div>
@@ -330,7 +330,7 @@ function Scene3({ layout }: { layout: SceneLayoutProps }) {
               transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
             >
               <span className="px-4 text-xs font-light tracking-wider">
-                BON/VV <span className="text-emerald-400">+2.4%</span> вЂў BON/DODO <span className="text-rose-400">-1.2%</span> вЂў BON/CSKA <span className="text-emerald-400">+5.7%</span> вЂў BON/WB <span className="text-emerald-400">+3.1%</span> вЂў BON/FUEL <span className="text-rose-400">-0.8%</span> вЂў BON/MG <span className="text-emerald-400">+1.9%</span> вЂў
+                BON/VV <span className="text-emerald-400">+2.4%</span> • BON/DODO <span className="text-rose-400">-1.2%</span> • BON/CSKA <span className="text-emerald-400">+5.7%</span> • BON/WB <span className="text-emerald-400">+3.1%</span> • BON/FUEL <span className="text-rose-400">-0.8%</span> • BON/MG <span className="text-emerald-400">+1.9%</span> •
               </span>
             </motion.div>
           </div>
@@ -338,17 +338,17 @@ function Scene3({ layout }: { layout: SceneLayoutProps }) {
 
         <div className="flex min-h-0 flex-1 flex-col px-1">
           <h2 className={`font-semibold tracking-tight text-zinc-900 ${layout.titleClass}`}>
-            Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ РЅР° С‚РѕСЂРіРё
+            Добро пожаловать на торги
           </h2>
 
           <div className="my-3 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
 
           <div className={`min-h-0 flex-1 ${layout.bodyGapClass}`}>
             <p className={`text-zinc-600 ${layout.bodyClass}`}>
-              Р—РґРµСЃСЊ Р±РѕРЅСѓСЃС‹ СЂР°Р±РѕС‚Р°СЋС‚ РїРѕ Р·Р°РєРѕРЅР°Рј СЂС‹РЅРєР°.
+              Здесь бонусы работают по законам рынка.
             </p>
             <p className={`text-zinc-600 ${layout.bodyClass}`}>
-              РЎР»РµРґРёС‚Рµ Р·Р° СЃРїСЂРѕСЃРѕРј РЅР° Р±РѕРЅСѓСЃС‹ РїР°СЂС‚РЅС‘СЂРѕРІ. Р’С‹Р±РёСЂР°Р№С‚Рµ РјРѕРјРµРЅС‚. РћР±РјРµРЅРёРІР°Р№С‚Рµ СЃ РІС‹РіРѕРґРѕР№.
+              Следите за спросом на бонусы партнёров. Выбирайте момент. Обменивайте с выгодой.
             </p>
           </div>
         </div>
@@ -416,17 +416,17 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
 
         <div className="flex min-h-0 flex-1 flex-col px-1">
           <h2 className={`font-semibold tracking-tight text-zinc-900 ${layout.titleClass}`}>
-            РўРµРїРµСЂСЊ Р»РѕСЏР»СЊРЅРѕСЃС‚СЊ СЂР°Р±РѕС‚Р°РµС‚ РЅР° РІР°СЃ
+            Теперь лояльность работает на вас
           </h2>
 
           <div className="my-3 h-px w-full bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
 
           <div className={`min-h-0 flex-1 ${layout.bodyGapClass}`}>
             <p className={`text-zinc-600 ${layout.bodyClass}`}>
-              Р’С‹ СѓРїСЂР°РІР»СЏРµС‚Рµ СЃРІРѕРёРјРё Р±РѕРЅСѓСЃР°РјРё, Р° РЅРµ РЅР°РѕР±РѕСЂРѕС‚.
+              Вы управляете своими бонусами, а не наоборот.
             </p>
             <p className={`text-zinc-600 ${layout.bodyClass}`}>
-              РљРѕРїРёС‚Рµ С‚Рѕ, С‡С‚Рѕ РЅСѓР¶РЅРѕ РІР°Рј. РћР±РјРµРЅРёРІР°Р№С‚Рµ С‚Рѕ, С‡С‚Рѕ С†РµРЅСЏС‚ РґСЂСѓРіРёРµ.
+              Копите то, что нужно вам. Обменивайте то, что ценят другие.
             </p>
           </div>
         </div>
@@ -732,7 +732,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                   sceneLayout.tier === "compact" ? "h-11 w-26 text-[0.95rem]" : "h-12 w-28 text-base"
                 }`}
               >
-                РќР°Р·Р°Рґ
+                Назад
               </motion.button>
 
               <motion.button
@@ -743,7 +743,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                   sceneLayout.tier === "compact" ? "h-11 w-26 text-[0.95rem]" : "h-12 w-28 text-base"
                 }`}
               >
-                Р”Р°Р»РµРµ
+                Далее
               </motion.button>
             </div>
           </div>

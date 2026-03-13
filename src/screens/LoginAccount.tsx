@@ -179,7 +179,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
         setShowToast(false);
       }, 2000);
     } catch {
-      alert(`РќР°С€ email: ${email}`);
+      alert(`Наш email: ${email}`);
     }
   };
 
@@ -194,7 +194,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
         <div className="shrink-0 border-b border-zinc-200 bg-white">
           <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3">
             <h1 className={layout.tier === "compact" ? "text-xl font-bold text-zinc-900" : "text-2xl font-bold text-zinc-900"}>
-              РџСЂРѕС„РёР»СЊ
+              Профиль
             </h1>
 
             {onBack && (
@@ -205,7 +205,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
                 className={`flex items-center justify-center rounded-full bg-zinc-100 transition-colors hover:bg-zinc-200 ${
                   layout.tier === "compact" ? "h-9 w-9" : "h-10 w-10"
                 }`}
-                aria-label="РќР°Р·Р°Рґ"
+                aria-label="Назад"
               >
                 <ArrowLeft size={layout.tier === "compact" ? 18 : 20} className="text-zinc-700" />
               </motion.button>
@@ -222,10 +222,10 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
             <div className={`flex min-h-0 flex-1 flex-col ${layout.cardGap}`}>
               <div className="shrink-0">
                 <p className={`font-bold text-zinc-900 ${layout.titleClass}`}>
-                  Р’РѕР№РґРёС‚Рµ РёР»Рё Р·Р°СЂРµРіРёСЃС‚СЂРёСЂСѓР№С‚РµСЃСЊ
+                  Войдите или зарегистрируйтесь
                 </p>
                 <p className={`mt-2 text-zinc-400 ${layout.hintClass}`}>
-                  Р’РІРµРґРёС‚Рµ РЅРѕРјРµСЂ С‚РµР»РµС„РѕРЅР°
+                  Введите номер телефона
                 </p>
               </div>
 
@@ -252,14 +252,14 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
                   className={`mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 font-medium text-white transition-colors hover:bg-zinc-800 ${layout.buttonClass}`}
                 >
                   <LogIn size={16} />
-                  Р’РѕР№С‚Рё
+                  Войти
                 </motion.button>
               </div>
 
               <div className={`shrink-0 ${layout.tier === "compact" ? "my-0.5" : "my-1"}`}>
                 <div className="flex items-center gap-4">
                   <div className="h-px flex-1 bg-zinc-200" />
-                  <span className="text-xs text-zinc-400">РёР»Рё</span>
+                  <span className="text-xs text-zinc-400">или</span>
                   <div className="h-px flex-1 bg-zinc-200" />
                 </div>
               </div>
@@ -271,7 +271,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
                 className={`shrink-0 flex w-full items-center justify-center gap-2 rounded-xl bg-[#54A9EB] font-medium text-white transition-colors hover:bg-[#4098E0] ${layout.buttonClass}`}
               >
                 <Send size={16} className="text-white" />
-                Р’РѕР№С‚Рё С‡РµСЂРµР· Telegram
+                Войти через Telegram
               </motion.button>
 
               <div className={`grid shrink-0 ${layout.tier === "compact" ? "gap-2" : "gap-2.5"}`}>
@@ -282,7 +282,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
                   className={`flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white font-medium transition-colors hover:bg-zinc-50 ${layout.tertiaryButtonClass}`}
                 >
                   <Headphones size={16} className="text-zinc-600" />
-                  РўРµС…РЅРёС‡РµСЃРєР°СЏ РџРѕРґРґРµСЂР¶РєР°
+                  Техническая поддержка
                 </motion.button>
 
                 <motion.button
@@ -292,7 +292,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
                   className={`flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white font-medium transition-colors hover:bg-zinc-50 ${layout.tertiaryButtonClass}`}
                 >
                   <Building2 size={16} className="text-zinc-600" />
-                  Рћ РєРѕРјРїР°РЅРёРё
+                  О компании
                 </motion.button>
               </div>
             </div>
@@ -311,7 +311,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
               <p className="flex-1 text-sm font-medium leading-relaxed">
-                РђРґСЂРµСЃ СЌР»РµРєС‚СЂРѕРЅРЅРѕР№ РїРѕС‡С‚С‹ СЃРєРѕРїРёСЂРѕРІР°РЅ
+                Адрес электронной почты скопирован
               </p>
             </motion.div>
           )}
