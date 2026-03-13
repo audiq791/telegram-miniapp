@@ -136,6 +136,20 @@ function createCoinRain(count: number) {
   }));
 }
 
+function createBonusBurst(side: "left" | "right", count: number) {
+  return Array.from({ length: count }, (_, index) => {
+    const direction = side === "left" ? -1 : 1;
+    return {
+      id: `${side}-${index}`,
+      x: direction * (42 + index * 12),
+      y: 24 + (index % 3) * 18,
+      delay: index * 0.14,
+      duration: 2.8 + (index % 3) * 0.35,
+      rotate: direction * (24 + index * 8),
+    };
+  });
+}
+
 function createCandles(count: number) {
   return Array.from({ length: count }, () => ({
     height: Math.floor(Math.random() * 90) + 15,
@@ -885,6 +899,21 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
   const [qrCells] = useState(() =>
     Array.from({ length: 49 }, () => Math.random() > 0.6),
   );
+  const [leftBurst] = useState(() => createBonusBurst("left", 6));
+  const [rightBurst] = useState(() => createBonusBurst("right", 6));
+  const bonusCoins = useMemo(
+    () => [
+      { src: "/logos/vkusvill.svg", alt: "VkusVill", hue: "from-emerald-100 to-emerald-50" },
+      { src: "/logos/dodo.svg", alt: "Dodo", hue: "from-orange-100 to-amber-50" },
+      { src: "/logos/cska.svg", alt: "CSKA", hue: "from-blue-100 to-sky-50" },
+      { src: "/logos/wildberries.svg", alt: "Wildberries", hue: "from-fuchsia-100 to-purple-50" },
+      { src: "/logos/cofix.svg", alt: "Cofix", hue: "from-rose-100 to-orange-50" },
+      { src: "/logos/logo1.svg", alt: "Partner", hue: "from-cyan-100 to-sky-50" },
+    ],
+    [],
+  );
+  const rainCoinSize = layout.tier === "roomy" ? 34 : layout.tier === "compact" ? 24 : 28;
+  const burstCoinSize = layout.tier === "roomy" ? 40 : layout.tier === "compact" ? 28 : 32;
 
   return (
     <FitToViewport contentClassName="px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
@@ -892,8 +921,10 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
         <div
           className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-emerald-50/80 to-green-100/80 shadow-sm ${layout.frameHeightClass}`}
         >
+          <div className="absolute inset-x-10 bottom-6 h-10 rounded-full bg-emerald-200/40 blur-2xl" />
+
           <motion.div
-            className="relative"
+            className="relative z-10"
             animate={{ scale: [1, 1.02, 1] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
@@ -922,18 +953,77 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
 
           {rain.map((drop, i) => (
             <motion.div
-              key={i}
-              className="absolute h-6 w-6 rounded-full bg-gradient-to-br from-amber-400/60 to-amber-600/60"
+              key={`rain-${i}`}
+              className="absolute z-[3]"
               initial={{ x: drop.x, y: -50 }}
-              animate={{ y: 400, rotate: 360 }}
+              animate={{ y: [drop.x > 140 ? 320 : 300, 380], rotate: [0, 140, 220] }}
               transition={{
                 duration: drop.duration,
                 repeat: Infinity,
                 delay: drop.delay,
                 ease: "linear",
               }}
-            />
+            >
+              <div
+                className="grid place-items-center rounded-full border border-amber-200/80 bg-gradient-to-br from-amber-200 via-amber-300 to-yellow-500 shadow-[0_10px_20px_rgba(161,98,7,0.24),inset_0_1px_0_rgba(255,255,255,0.7)]"
+                style={{ width: rainCoinSize, height: rainCoinSize }}
+              >
+                <div className="grid h-[72%] w-[72%] place-items-center rounded-full bg-gradient-to-br from-amber-100 to-amber-300/80 shadow-inner">
+                  <span
+                    className={`font-semibold text-amber-700/90 ${
+                      layout.tier === "roomy" ? "text-[1rem]" : layout.tier === "compact" ? "text-[0.8rem]" : "text-[0.9rem]"
+                    }`}
+                    style={{ textShadow: "0 1px 0 rgba(255,255,255,0.35)" }}
+                  >
+                    ₽
+                  </span>
+                </div>
+              </div>
+            </motion.div>
           ))}
+
+          {[...leftBurst, ...rightBurst].map((burst, index) => {
+            const coin = bonusCoins[index % bonusCoins.length];
+            return (
+              <motion.div
+                key={burst.id}
+                className="absolute bottom-8 left-1/2 z-[2]"
+                initial={{ x: burst.x * 0.35, y: 0, scale: 0.72, rotate: 0, opacity: 0 }}
+                animate={{
+                  x: [burst.x * 0.35, burst.x, burst.x * 1.08],
+                  y: [10, -burst.y, -burst.y - 18],
+                  scale: [0.72, 1, 0.96],
+                  rotate: [0, burst.rotate],
+                  opacity: [0, 1, 1, 0],
+                }}
+                transition={{
+                  duration: burst.duration,
+                  repeat: Infinity,
+                  delay: burst.delay,
+                  ease: "easeOut",
+                }}
+              >
+                <div
+                  className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br ${coin.hue}`}
+                  style={{
+                    width: burstCoinSize,
+                    height: burstCoinSize,
+                    boxShadow: "0 14px 26px rgba(24,24,27,0.14), inset 0 1px 0 rgba(255,255,255,0.86)",
+                  }}
+                >
+                  <div className="grid h-[74%] w-[74%] place-items-center rounded-full bg-white/95 shadow-inner">
+                    <Image
+                      src={coin.src}
+                      alt={coin.alt}
+                      width={burstCoinSize * 0.42}
+                      height={burstCoinSize * 0.42}
+                      className="h-auto w-auto max-h-[62%] max-w-[62%] object-contain"
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
         <div className="flex flex-col px-1">
