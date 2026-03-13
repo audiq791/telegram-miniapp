@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { haptic } from "../components/haptics";
 import LoginAccount from "../screens/LoginAccount";
@@ -363,70 +363,77 @@ const orbitHeroCoins = [
 function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: boolean }) {
   const phoneScale = layout.tier === "roomy" ? 0.92 : layout.tier === "compact" ? 0.76 : 0.84;
   const coinSize = layout.tier === "roomy" ? 54 : layout.tier === "compact" ? 38 : 46;
-  const orbits = [
-    {
-      width: layout.tier === "roomy" ? 158 : layout.tier === "compact" ? 118 : 140,
-      height: layout.tier === "roomy" ? 294 : layout.tier === "compact" ? 216 : 248,
-      rotate: 0,
-      duration: 11.8,
-      phase: 0,
-    },
-    {
-      width: layout.tier === "roomy" ? 294 : layout.tier === "compact" ? 216 : 248,
-      height: layout.tier === "roomy" ? 126 : layout.tier === "compact" ? 92 : 104,
-      rotate: 0,
-      duration: 12.6,
-      phase: Math.PI / 3,
-    },
-    {
-      width: layout.tier === "roomy" ? 286 : layout.tier === "compact" ? 208 : 240,
-      height: layout.tier === "roomy" ? 126 : layout.tier === "compact" ? 92 : 104,
-      rotate: -45,
-      duration: 10.9,
-      phase: Math.PI / 6,
-    },
-  ];
+  const orbits = useMemo(
+    () => [
+      {
+        width: layout.tier === "roomy" ? 158 : layout.tier === "compact" ? 118 : 140,
+        height: layout.tier === "roomy" ? 294 : layout.tier === "compact" ? 216 : 248,
+        rotate: 0,
+        duration: 11.8,
+        phase: 0,
+      },
+      {
+        width: layout.tier === "roomy" ? 294 : layout.tier === "compact" ? 216 : 248,
+        height: layout.tier === "roomy" ? 126 : layout.tier === "compact" ? 92 : 104,
+        rotate: 0,
+        duration: 12.6,
+        phase: Math.PI / 3,
+      },
+      {
+        width: layout.tier === "roomy" ? 286 : layout.tier === "compact" ? 208 : 240,
+        height: layout.tier === "roomy" ? 126 : layout.tier === "compact" ? 92 : 104,
+        rotate: -45,
+        duration: 10.9,
+        phase: Math.PI / 6,
+      },
+    ],
+    [layout.tier],
+  );
   const orbitWidth = Math.max(...orbits.map((orbit) => orbit.width));
   const orbitHeight = Math.max(...orbits.map((orbit) => orbit.height));
   const orbitStroke = "rgba(82, 82, 91, 0.45)";
   const orbitGlow = "rgba(255, 255, 255, 0.38)";
 
   const coinsPerOrbit = orbitHeroCoins.length / orbits.length;
-  const orbitCoins = orbits.flatMap((orbit, orbitIndex) => {
-    const orbitCoinsForTrack = orbitHeroCoins.slice(
-      orbitIndex * coinsPerOrbit,
-      orbitIndex * coinsPerOrbit + coinsPerOrbit,
-    );
-    return orbitCoinsForTrack.map((coin, coinIndex) => {
-      const totalCoins = orbitCoinsForTrack.length;
-      const frames = Array.from({ length: 21 }, (_, frameIndex) => {
-        const progress = frameIndex / 20;
-        const theta = orbit.phase + ((coinIndex + progress) / totalCoins) * Math.PI * 2;
-        const rawX = Math.cos(theta) * (orbit.width / 2);
-        const rawY = Math.sin(theta) * (orbit.height / 2);
-        const rotateRad = (orbit.rotate * Math.PI) / 180;
-        const x = rawX * Math.cos(rotateRad) - rawY * Math.sin(rotateRad);
-        const y = rawX * Math.sin(rotateRad) + rawY * Math.cos(rotateRad);
-        const depth = (Math.sin(theta) + 1) / 2;
-        return {
-          x,
-          y,
-          scale: 0.78 + depth * 0.32,
-          opacity: 0.5 + depth * 0.5,
-          z: depth > 0.5 ? 4 : 1,
-          blur: (1 - depth) * 1.2,
-        };
-      });
+  const orbitCoins = useMemo(
+    () =>
+      orbits.flatMap((orbit, orbitIndex) => {
+        const orbitCoinsForTrack = orbitHeroCoins.slice(
+          orbitIndex * coinsPerOrbit,
+          orbitIndex * coinsPerOrbit + coinsPerOrbit,
+        );
+        return orbitCoinsForTrack.map((coin, coinIndex) => {
+          const totalCoins = orbitCoinsForTrack.length;
+          const frames = Array.from({ length: 21 }, (_, frameIndex) => {
+            const progress = frameIndex / 20;
+            const theta = orbit.phase + ((coinIndex + progress) / totalCoins) * Math.PI * 2;
+            const rawX = Math.cos(theta) * (orbit.width / 2);
+            const rawY = Math.sin(theta) * (orbit.height / 2);
+            const rotateRad = (orbit.rotate * Math.PI) / 180;
+            const x = rawX * Math.cos(rotateRad) - rawY * Math.sin(rotateRad);
+            const y = rawX * Math.sin(rotateRad) + rawY * Math.cos(rotateRad);
+            const depth = (Math.sin(theta) + 1) / 2;
+            return {
+              x,
+              y,
+              scale: 0.78 + depth * 0.32,
+              opacity: 0.5 + depth * 0.5,
+              z: depth > 0.5 ? 4 : 1,
+              blur: (1 - depth) * 1.2,
+            };
+          });
 
-      return {
-        ...coin,
-        key: `${coin.alt}-${orbitIndex}-${coinIndex}`,
-        orbit,
-        offsetIndex: coinIndex,
-        frames,
-      };
-    });
-  });
+          return {
+            ...coin,
+            key: `${coin.alt}-${orbitIndex}-${coinIndex}`,
+            orbit,
+            offsetIndex: coinIndex,
+            frames,
+          };
+        });
+      }),
+    [coinsPerOrbit, orbits],
+  );
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
