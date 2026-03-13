@@ -21,16 +21,19 @@ function FitToViewport({
   children,
   contentClassName = "",
   settleDelayMs = 0,
+  remountAfterMs = 0,
 }: {
   children: React.ReactNode;
   contentClassName?: string;
   settleDelayMs?: number;
+  remountAfterMs?: number;
 }) {
   const frameRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(1);
   const [scaledHeight, setScaledHeight] = useState<number | null>(null);
-  const [isReady, setIsReady] = useState(settleDelayMs === 0);
+  const [isReady, setIsReady] = useState(settleDelayMs === 0 && remountAfterMs === 0);
+  const [contentKey, setContentKey] = useState(0);
 
   useLayoutEffect(() => {
     const measure = () => {
@@ -66,11 +69,23 @@ function FitToViewport({
     document.fonts?.ready.then(measure).catch(() => {});
 
     let readyTimer: number | null = null;
+    let remountTimer: number | null = null;
+    let postRemountReadyTimer: number | null = null;
     if (settleDelayMs > 0) {
       readyTimer = window.setTimeout(() => {
         measure();
         setIsReady(true);
       }, settleDelayMs);
+    }
+
+    if (remountAfterMs > 0) {
+      remountTimer = window.setTimeout(() => {
+        setContentKey((current) => current + 1);
+        postRemountReadyTimer = window.setTimeout(() => {
+          measure();
+          setIsReady(true);
+        }, 120);
+      }, remountAfterMs);
     }
 
     return () => {
@@ -81,11 +96,17 @@ function FitToViewport({
       if (readyTimer !== null) {
         window.clearTimeout(readyTimer);
       }
+      if (remountTimer !== null) {
+        window.clearTimeout(remountTimer);
+      }
+      if (postRemountReadyTimer !== null) {
+        window.clearTimeout(postRemountReadyTimer);
+      }
       window.visualViewport?.removeEventListener("resize", measure);
       window.removeEventListener("resize", measure);
       window.removeEventListener("orientationchange", measure);
     };
-  }, [settleDelayMs]);
+  }, [remountAfterMs, settleDelayMs]);
 
   return (
     <div ref={frameRef} className="min-h-0 flex-1 overflow-hidden">
@@ -97,6 +118,7 @@ function FitToViewport({
         }}
       >
         <div
+          key={contentKey}
           ref={contentRef}
           className={contentClassName}
           style={{
@@ -182,7 +204,11 @@ function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutPro
   const [dots] = useState(() => createFloatingDots(20));
 
   return (
-    <FitToViewport contentClassName={`px-5 pb-6 pt-5 sm:px-6 sm:pt-7`} settleDelayMs={220}>
+    <FitToViewport
+      contentClassName={`px-5 pb-6 pt-5 sm:px-6 sm:pt-7`}
+      settleDelayMs={360}
+      remountAfterMs={180}
+    >
       <div className={`mx-auto flex flex-col ${layout.sectionGapClass}`}>
         <div
           className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-amber-50/80 to-orange-100/80 shadow-sm ${layout.frameHeightClass}`}
