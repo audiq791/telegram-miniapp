@@ -522,8 +522,10 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [isExiting, setIsExiting] = useState(false);
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [viewportSize, setViewportSize] = useState({ width: 390, height: 844 });
+  const [firstSceneNonce, setFirstSceneNonce] = useState(0);
   const swipeAreaRef = useRef<HTMLDivElement | null>(null);
   const isDoneRef = useRef(false);
+  const didStabilizeFirstSceneRef = useRef(false);
   const swipeStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const isSwipeGestureRef = useRef(false);
   const activeSwipeInputRef = useRef<"pointer" | "touch" | null>(null);
@@ -645,6 +647,25 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   }, []);
 
   useEffect(() => {
+    if (index !== 0 || didStabilizeFirstSceneRef.current) return;
+
+    const timers = [120, 260, 480].map((delay) =>
+      window.setTimeout(() => {
+        setFirstSceneNonce((current) => current + 1);
+      }, delay),
+    );
+
+    const doneTimer = window.setTimeout(() => {
+      didStabilizeFirstSceneRef.current = true;
+    }, 700);
+
+    return () => {
+      timers.forEach((timer) => window.clearTimeout(timer));
+      window.clearTimeout(doneTimer);
+    };
+  }, [index]);
+
+  useEffect(() => {
     const node = swipeAreaRef.current;
     if (!node) return;
 
@@ -763,7 +784,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           >
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
-                key={index}
+                key={index === 0 ? `scene-${index}-${firstSceneNonce}` : index}
                 custom={direction}
                 variants={variants}
                 initial="enter"
