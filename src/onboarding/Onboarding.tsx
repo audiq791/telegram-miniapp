@@ -427,8 +427,9 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         const x = rawX * Math.cos(rotateRad) - rawY * Math.sin(rotateRad);
         const y = rawX * Math.sin(rotateRad) + rawY * Math.cos(rotateRad);
         const depth = (Math.sin(theta) + 1) / 2;
-        const frontOpacity = depth > 0.52 ? 0.62 + (depth - 0.52) * 0.82 : 0;
-        const backOpacity = depth <= 0.52 ? 0.34 + (0.52 - depth) * 0.7 : 0;
+        const isFrontVisible = depth > 0.52;
+        const frontOpacity = isFrontVisible ? 1 : 0;
+        const backOpacity = isFrontVisible ? 0 : 1;
 
         return {
           ...coin,

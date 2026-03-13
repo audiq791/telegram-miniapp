@@ -16,6 +16,7 @@
 
 ✓ Starting...
 Creating turbopack project { dir: 'C:\\Users\\Levan\\Desktop\\tg-miniapp\\web', testMode: true }
-✓ Ready in 517ms
- GET / 200 in 348ms (compile: 191ms, render: 157ms)
+⚠ Turbopack's filesystem cache has been deleted because we previously detected an internal error in Turbopack. Builds or page loads may be slower as a result.
+✓ Ready in 638ms
+ GET / 200 in 1681ms (compile: 1539ms, render: 142ms)
 ^C^C
