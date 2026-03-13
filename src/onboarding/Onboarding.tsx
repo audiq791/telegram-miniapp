@@ -924,17 +924,17 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
               <motion.div
                 key={`rain-${i}`}
                 className="absolute left-1/2 top-0"
-                initial={{ x: (i - 3) * 14, y: -12, rotate: -12 + i * 4 }}
+                initial={{ x: (i - 3) * 14, y: -88, rotate: -10 + i * 3 }}
                 animate={{
-                  x: [(i - 3) * 14, (i - 3) * 10, (i - 3) * 8],
-                  y: [-12, 42, 96, 138],
-                  rotate: [-12 + i * 4, -4 + i * 3, 4 + i * 2],
+                  x: [(i - 3) * 14, (i - 3) * 12, (i - 3) * 9],
+                  y: [-88, -28, 32, 126],
+                  rotate: [-10 + i * 3, -3 + i * 2, 4 + i],
                 }}
                 transition={{
-                  duration: 3.1 + (i % 3) * 0.4,
+                  duration: 3.6 + (i % 3) * 0.45,
                   repeat: Infinity,
                   delay: drop.delay,
-                  ease: "easeInOut",
+                  ease: [0.22, 0.84, 0.28, 1],
                 }}
               >
                 <div
@@ -972,30 +972,32 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
                   ? -sceneHalfWidth + (index % 3) * 12
                   : sceneHalfWidth - (index % 3) * 12;
                 const targetY = sceneBottomReach - (index % 4) * 10;
+                const originX = isLeft
+                  ? -qrPixelSize * (0.18 + (index % 3) * 0.08)
+                  : qrPixelSize * (0.18 + (index % 3) * 0.08);
+                const originY = qrPixelSize * (0.34 + (index % 2) * 0.05);
 
                 return (
                   <motion.div
                     key={burst.id}
                     className="absolute left-1/2 top-1/2 z-[2]"
                     initial={{
-                      x: isLeft ? -8 : 8,
-                      y: qrPixelSize * 0.18,
-                      scale: 0.72,
-                      rotate: 0,
-                      opacity: 0,
+                      x: originX,
+                      y: originY,
+                      scale: 0.68,
+                      rotate: burst.rotate * 0.08,
                     }}
                     animate={{
-                      x: [isLeft ? -8 : 8, targetX * 0.4, targetX],
-                      y: [qrPixelSize * 0.18, targetY * 0.58, targetY],
-                      scale: [0.72, 0.96, 0.92],
-                      rotate: [0, burst.rotate * 0.5, burst.rotate],
-                      opacity: [0, 1, 1, 0],
+                      x: [originX, originX + targetX * 0.34, targetX],
+                      y: [originY, originY + targetY * 0.46, targetY],
+                      scale: [0.68, 0.88, 0.96],
+                      rotate: [burst.rotate * 0.08, burst.rotate * 0.42, burst.rotate * 0.72],
                     }}
                     transition={{
-                      duration: 3.8 + (index % 3) * 0.35,
+                      duration: 4.2 + (index % 3) * 0.45,
                       repeat: Infinity,
                       delay: burst.delay,
-                      ease: "easeOut",
+                      ease: [0.19, 1, 0.22, 1],
                     }}
                   >
                     <div
