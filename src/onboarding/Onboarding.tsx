@@ -441,9 +441,6 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         const x = rawX * Math.cos(rotateRad) - rawY * Math.sin(rotateRad);
         const y = rawX * Math.sin(rotateRad) + rawY * Math.cos(rotateRad);
         const depth = (Math.sin(theta) + 1) / 2;
-        const isFrontVisible = depth > 0.52;
-        const frontOpacity = isFrontVisible ? 1 : 0;
-        const backOpacity = isFrontVisible ? 0 : 1;
 
         return {
           ...coin,
@@ -451,15 +448,16 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
           orbit,
           x,
           y,
+          isFrontVisible: depth > 0.52,
           scale: 0.8 + depth * 0.26,
           blur: (1 - depth) * 1.05,
-          frontOpacity,
-          backOpacity,
           shadowOpacity: 0.16 + depth * 0.24,
         };
       }),
     [coinsPerOrbit, fixedCoinAssignments, isActive, orbitTime, orbits],
   );
+  const backCoins = orbitCoins.filter((coin) => !coin.isFrontVisible);
+  const frontCoins = orbitCoins.filter((coin) => coin.isFrontVisible);
 
   const renderCoinFace = (coin: (typeof orbitCoins)[number]) => (
     <div
@@ -599,7 +597,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
       </div>
 
       <div className="absolute inset-0 z-[2] pointer-events-none">
-        {orbitCoins.map((coin) => (
+        {backCoins.map((coin) => (
           <div
             key={`${coin.key}-back`}
             className="absolute left-1/2 top-1/2"
@@ -609,7 +607,6 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
               marginLeft: -coinSize / 2,
               marginTop: -coinSize / 2,
               transform: `translate(${coin.x}px, ${coin.y}px) scale(${coin.scale})`,
-              opacity: coin.backOpacity,
               filter: `blur(${coin.blur}px)`,
             }}
           >
@@ -823,7 +820,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
       </div>
 
       <div className="absolute inset-0 z-[6] pointer-events-none">
-        {orbitCoins.map((coin) => (
+        {frontCoins.map((coin) => (
           <div
             key={`${coin.key}-front`}
             className="absolute left-1/2 top-1/2"
@@ -833,7 +830,6 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
               marginLeft: -coinSize / 2,
               marginTop: -coinSize / 2,
               transform: `translate(${coin.x}px, ${coin.y}px) scale(${coin.scale})`,
-              opacity: coin.frontOpacity,
               filter: `blur(${coin.blur}px)`,
             }}
           >
