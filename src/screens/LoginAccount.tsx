@@ -214,8 +214,11 @@ function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
 
           <div className="relative">
             <div className="absolute inset-x-6 bottom-[-10px] h-8 rounded-full bg-violet-400/18 blur-xl" />
-            <div className="relative rounded-[28px] border border-white/70 bg-white/88 px-4 py-3 shadow-[0_22px_42px_rgba(76,29,149,0.16)] backdrop-blur-md">
-              <div className="text-center text-[0.56rem] font-medium uppercase tracking-[0.2em] text-violet-500">
+            <div
+              className="relative rounded-[28px] border border-white/20 px-4 py-3 shadow-[0_22px_42px_rgba(24,58,53,0.22)] backdrop-blur-md"
+              style={{ backgroundColor: "#183A35" }}
+            >
+              <div className="text-center text-[0.56rem] font-medium uppercase tracking-[0.2em] text-white">
                 Единый вход
               </div>
               <div className="mt-2 flex items-center justify-center gap-3">
@@ -239,13 +242,13 @@ function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
                 </div>
               </div>
             <div className="mt-3 flex items-center justify-center gap-2">
-              <div className="rounded-full bg-violet-50 px-3 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-violet-600">
-                Phone
+                <div className="rounded-full bg-violet-50 px-3 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-violet-600">
+                  Phone
+                </div>
+                <div className="rounded-full bg-sky-50 px-3 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-sky-600">
+                  Telegram
+                </div>
               </div>
-              <div className="rounded-full bg-sky-50 px-3 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-sky-600">
-                Telegram
-              </div>
-            </div>
           </div>
           </div>
       </motion.div>
