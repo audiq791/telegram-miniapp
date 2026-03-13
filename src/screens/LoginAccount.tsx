@@ -134,7 +134,7 @@ function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
     },
   ];
   const centerLogoSize =
-    layout.tier === "roomy" ? 82 : layout.tier === "compact" ? 56 : layout.tier === "micro" ? 46 : 68;
+    layout.tier === "roomy" ? 120 : layout.tier === "compact" ? 82 : layout.tier === "micro" ? 68 : 98;
 
   return (
     <div className={`relative w-full overflow-hidden ${layout.heroHeight}`}>
@@ -212,47 +212,29 @@ function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
           </motion.div>
         ))}
 
-        <motion.div
-          animate={{
-            y: [0, -3, 0],
-            scale: [1, 1.015, 1],
-            rotateY: [0, 35, -70, 70, -70],
-          }}
-          transition={{
-            duration: 9.6,
-            repeat: Infinity,
-            times: [0, 0.14, 0.42, 0.7, 1],
-            ease: "easeInOut",
-          }}
-          className="relative"
-          style={{ transformStyle: "preserve-3d", perspective: 1200 }}
-        >
-          <div className="absolute inset-x-6 bottom-[-10px] h-8 rounded-full bg-violet-400/18 blur-xl" />
-          <div className="relative rounded-[28px] border border-white/70 bg-white/88 px-4 py-3 shadow-[0_22px_42px_rgba(76,29,149,0.16)] backdrop-blur-md">
-            <div className="text-center text-[0.56rem] font-medium uppercase tracking-[0.2em] text-violet-500">
-              Единый вход
-            </div>
-            <div className="mt-2 flex items-center justify-center gap-3">
-              <div className={`grid place-items-center rounded-3xl bg-[#41e5b8] shadow-xl ${layout.centerTokenSize}`}>
-                <svg
-                  width={centerLogoSize}
-                  height={centerLogoSize}
-                  viewBox="0 0 64 64"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M14 20.5L25.5 9H48V20.5H36.5V43H25.5H14V20.5Z"
-                    fill="#102A26"
-                  />
-                  <path
-                    d="M36.5 43L48 31.5V20.5H59V43H36.5Z"
-                    fill="#102A26"
-                  />
-                </svg>
+          <div className="relative">
+            <div className="absolute inset-x-6 bottom-[-10px] h-8 rounded-full bg-violet-400/18 blur-xl" />
+            <div className="relative rounded-[28px] border border-white/70 bg-white/88 px-4 py-3 shadow-[0_22px_42px_rgba(76,29,149,0.16)] backdrop-blur-md">
+              <div className="text-center text-[0.56rem] font-medium uppercase tracking-[0.2em] text-violet-500">
+                Единый вход
               </div>
-            </div>
+              <div className="mt-2 flex items-center justify-center gap-3">
+                <div className={`grid place-items-center ${layout.centerTokenSize}`}>
+                  <svg
+                    width={centerLogoSize}
+                    height={centerLogoSize}
+                    viewBox="0 0 1093 959"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M 421.00 916.37 C396.38,915.63 362.28,912.11 339.00,907.91 C290.62,899.17 238.20,875.69 195.06,843.43 C174.66,828.17 157.10,811.43 135.36,786.50 C123.94,773.40 102.77,741.46 94.14,724.29 C76.04,688.28 63.77,650.95 58.03,614.50 C53.88,588.13 53.80,585.93 53.30,492.59 C52.81,400.23 53.22,383.07 56.56,357.44 C63.28,305.92 79.11,261.78 107.48,215.50 C123.61,189.18 137.40,171.86 159.66,149.97 C192.48,117.70 224.30,96.26 270.50,75.27 C289.88,66.47 322.65,56.65 351.00,51.15 C381.57,45.21 372.23,45.50 535.00,45.50 C673.58,45.50 686.73,45.64 701.00,47.30 C748.94,52.87 774.31,58.91 812.00,73.73 C836.18,83.23 864.20,99.67 893.50,121.55 C907.70,132.16 939.30,163.52 952.90,180.51 C970.92,203.02 988.35,231.39 998.96,255.50 C1015.67,293.47 1023.27,319.49 1028.75,357.50 L 1031.35 375.50 L 1031.75 472.00 C1032.02,537.55 1031.79,573.15 1031.02,583.00 C1026.90,636.40 1012.00,685.56 985.96,731.68 C952.89,790.24 910.76,833.29 851.14,869.42 C818.51,889.19 776.80,904.32 736.59,910.97 C702.87,916.54 711.89,916.25 566.00,916.46 C491.48,916.57 426.23,916.53 421.00,916.37 ZM 640.32 721.88 C642.84,720.59 657.71,706.12 721.25,643.16 L 767.00 597.83 L 767.00 467.56 L 767.00 337.29 L 759.35 336.65 C755.14,336.29 733.57,336.00 711.41,336.00 L 671.12 336.00 L 670.58 331.75 C670.28,329.41 669.91,308.07 669.77,284.33 C669.62,260.59 669.12,240.79 668.67,240.33 C667.69,239.35 416.05,239.51 408.18,240.50 L 402.83 241.16 L 342.17 301.17 C308.80,334.18 281.00,362.15 280.38,363.34 C278.76,366.46 277.75,719.71 279.36,720.76 C282.21,722.61 636.73,723.72 640.32,721.88 ZM 863.80 294.00 C863.97,271.17 863.82,249.69 863.47,246.25 L 862.84 240.00 L 814.92 240.00 L 767.00 240.00 L 767.00 287.75 L 767.00 335.50 L 815.25 335.50 L 863.50 335.50 L 863.80 294.00 ZM 375.62 623.88 C375.28,622.16 375.00,572.63 375.00,513.83 C375.00,422.91 375.21,406.50 376.43,404.20 C377.73,401.76 408.52,370.81 434.61,345.72 L 444.72 336.00 L 557.36 336.00 L 670.00 336.00 L 670.00 447.03 L 670.00 558.05 L 645.25 582.28 C631.64,595.60 615.75,611.11 609.94,616.75 L 599.39 627.00 L 487.82 627.00 L 376.25 627.00 L 375.62 623.88 Z"
+                      fill="#DCF806"
+                    />
+                  </svg>
+                </div>
+              </div>
             <div className="mt-3 flex items-center justify-center gap-2">
               <div className="rounded-full bg-violet-50 px-3 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-violet-600">
                 Phone
@@ -262,7 +244,7 @@ function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
               </div>
             </div>
           </div>
-        </motion.div>
+          </div>
       </motion.div>
 
       <motion.div
