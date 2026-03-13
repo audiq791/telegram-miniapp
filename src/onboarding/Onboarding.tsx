@@ -424,9 +424,9 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
               y,
               scale: 0.8 + depth * 0.26,
               blur: (1 - depth) * 1.05,
-              frontOpacity,
-              backOpacity,
-            };
+              opacity: 0.74 + depth * 0.26,
+              shadowOpacity: 0.16 + depth * 0.24,
+              };
           });
 
           return {
@@ -518,36 +518,6 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         ))}
       </div>
 
-      <div className="absolute inset-0 z-[2]">
-        {orbitCoins.map((coin) => (
-          <motion.div
-            key={`${coin.key}-back`}
-            className="absolute left-1/2 top-1/2"
-            style={{ width: coinSize, height: coinSize, marginLeft: -coinSize / 2, marginTop: -coinSize / 2 }}
-            animate={
-              isActive
-                ? {
-                    x: coin.frames.map((frame) => frame.x),
-                    y: coin.frames.map((frame) => frame.y),
-                    scale: coin.frames.map((frame) => frame.scale),
-                    opacity: coin.frames.map((frame) => frame.backOpacity),
-                    filter: coin.frames.map((frame) => `blur(${frame.blur}px)`),
-                  }
-                : {
-                    x: coin.frames[0].x,
-                    y: coin.frames[0].y,
-                    scale: coin.frames[0].scale,
-                    opacity: coin.frames[0].backOpacity,
-                    filter: `blur(${coin.frames[0].blur}px)`,
-                  }
-            }
-            transition={{ duration: coin.orbit.duration, ease: "linear", repeat: isActive ? Infinity : 0 }}
-          >
-            {renderCoinFace(coin)}
-          </motion.div>
-        ))}
-      </div>
-
       <motion.div
         className="relative z-[4]"
         animate={
@@ -582,22 +552,51 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
           }}
         >
           <div
-            className="absolute inset-y-[12px] -right-[7px] rounded-r-[30px] bg-[linear-gradient(180deg,#475569_0%,#0f172a_60%,#020617_100%)]"
+            className="absolute inset-[4px] rounded-[30px] bg-[linear-gradient(180deg,#0f172a_0%,#020617_100%)]"
             style={{
-              width: 9,
-              transform: "translateZ(-7px)",
-              boxShadow: "inset -1px 0 0 rgba(255,255,255,0.18)",
+              transform: "translateZ(-9px)",
+              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.05), 0 16px 24px rgba(2,6,23,0.25)",
             }}
           />
           <div
-            className="absolute inset-x-[10px] -top-[7px] rounded-t-[28px] bg-[linear-gradient(180deg,#334155_0%,#0f172a_100%)]"
+            className="absolute inset-y-[10px] -right-[8px] rounded-r-[30px] bg-[linear-gradient(180deg,#64748b_0%,#1e293b_18%,#0f172a_58%,#020617_100%)]"
             style={{
-              height: 8,
-              transform: "translateZ(-7px)",
+              width: 10,
+              transform: "rotateY(90deg) translateZ(4px)",
+              transformOrigin: "right center",
+              boxShadow: "inset -1px 0 0 rgba(255,255,255,0.14)",
+            }}
+          />
+          <div
+            className="absolute inset-y-[10px] -left-[8px] rounded-l-[30px] bg-[linear-gradient(180deg,#475569_0%,#0f172a_28%,#020617_100%)]"
+            style={{
+              width: 10,
+              transform: "rotateY(-90deg) translateZ(4px)",
+              transformOrigin: "left center",
+              boxShadow: "inset 1px 0 0 rgba(255,255,255,0.1)",
+            }}
+          />
+          <div
+            className="absolute inset-x-[12px] -top-[8px] rounded-t-[26px] bg-[linear-gradient(180deg,#94a3b8_0%,#334155_22%,#0f172a_100%)]"
+            style={{
+              height: 10,
+              transform: "rotateX(90deg) translateZ(4px)",
+              transformOrigin: "top center",
+            }}
+          />
+          <div
+            className="absolute inset-x-[12px] -bottom-[8px] rounded-b-[26px] bg-[linear-gradient(180deg,#0f172a_0%,#020617_100%)]"
+            style={{
+              height: 10,
+              transform: "rotateX(-90deg) translateZ(4px)",
+              transformOrigin: "bottom center",
             }}
           />
           <div className="absolute inset-0 rounded-[34px] bg-[radial-gradient(circle_at_18%_14%,rgba(255,255,255,0.22),transparent_24%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent_42%,rgba(255,255,255,0.02)_68%,transparent_100%)]" />
-          <div className="absolute inset-[5px] rounded-[29px] border border-white/8 bg-[linear-gradient(180deg,#020617_0%,#000000_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+          <div
+            className="absolute inset-[5px] rounded-[29px] border border-white/8 bg-[linear-gradient(180deg,#020617_0%,#000000_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]"
+            style={{ transform: "translateZ(8px)" }}
+          >
             <div className="absolute inset-x-0 top-0 z-20 flex justify-center pt-2.5">
               <div className="h-1.5 w-16 rounded-full bg-black/65 shadow-[0_1px_0_rgba(255,255,255,0.06)]" />
             </div>
@@ -731,29 +730,41 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
       <div className="absolute inset-0 z-[6] pointer-events-none">
         {orbitCoins.map((coin) => (
           <motion.div
-            key={`${coin.key}-front`}
+            key={coin.key}
             className="absolute left-1/2 top-1/2"
-            style={{ width: coinSize, height: coinSize, marginLeft: -coinSize / 2, marginTop: -coinSize / 2 }}
             animate={
               isActive
                 ? {
                     x: coin.frames.map((frame) => frame.x),
                     y: coin.frames.map((frame) => frame.y),
                     scale: coin.frames.map((frame) => frame.scale),
-                    opacity: coin.frames.map((frame) => frame.frontOpacity),
+                    opacity: coin.frames.map((frame) => frame.opacity),
                     filter: coin.frames.map((frame) => `blur(${frame.blur}px)`),
                   }
                 : {
                     x: coin.frames[0].x,
                     y: coin.frames[0].y,
                     scale: coin.frames[0].scale,
-                    opacity: coin.frames[0].frontOpacity,
+                    opacity: coin.frames[0].opacity,
                     filter: `blur(${coin.frames[0].blur}px)`,
                   }
             }
             transition={{ duration: coin.orbit.duration, ease: "linear", repeat: isActive ? Infinity : 0 }}
+            whileHover={undefined}
+            style={{
+              width: coinSize,
+              height: coinSize,
+              marginLeft: -coinSize / 2,
+              marginTop: -coinSize / 2,
+            }}
           >
-            {renderCoinFace(coin)}
+            <div
+              style={{
+                filter: `drop-shadow(0 10px 16px rgba(24,24,27,${coin.frames[0].shadowOpacity}))`,
+              }}
+            >
+              {renderCoinFace(coin)}
+            </div>
           </motion.div>
         ))}
       </div>
