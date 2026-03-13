@@ -216,13 +216,16 @@ function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
           animate={{
             y: [0, -3, 0],
             scale: [1, 1.015, 1],
+            rotateY: [0, 35, -70, 70, -70],
           }}
           transition={{
-            duration: 4.8,
+            duration: 9.6,
             repeat: Infinity,
+            times: [0, 0.14, 0.42, 0.7, 1],
             ease: "easeInOut",
           }}
           className="relative"
+          style={{ transformStyle: "preserve-3d", perspective: 1200 }}
         >
           <div className="absolute inset-x-6 bottom-[-10px] h-8 rounded-full bg-violet-400/18 blur-xl" />
           <div className="relative rounded-[28px] border border-white/70 bg-white/88 px-4 py-3 shadow-[0_22px_42px_rgba(76,29,149,0.16)] backdrop-blur-md">
