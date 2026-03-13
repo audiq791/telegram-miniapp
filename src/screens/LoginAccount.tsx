@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -58,53 +59,121 @@ function getScreenLayout(viewportHeight: number, viewportWidth: number): ScreenL
 }
 
 function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
+  const heroCoins = [
+    { src: "/logos/vkusvill.svg", alt: "VkusVill", x: -110, y: -44, delay: 0, hue: "from-emerald-100 to-emerald-50" },
+    { src: "/logos/dodo.svg", alt: "Dodo", x: 110, y: -38, delay: 0.28, hue: "from-orange-100 to-amber-50" },
+    { src: "/logos/cska.svg", alt: "CSKA", x: 0, y: -72, delay: 0.52, hue: "from-blue-100 to-sky-50" },
+    { src: "/logos/wildberries.svg", alt: "Wildberries", x: -76, y: 26, delay: 0.8, hue: "from-fuchsia-100 to-purple-50" },
+    { src: "/logos/cofix.svg", alt: "Cofix", x: 78, y: 30, delay: 1.04, hue: "from-rose-100 to-orange-50" },
+  ];
+
   return (
     <div className={`relative w-full overflow-hidden ${layout.heroHeight}`}>
-      <div className="absolute inset-0 opacity-[0.15] bg-[radial-gradient(#00000012_1px,transparent_1px)] [background-size:18px_18px]" />
+      <div className="absolute inset-0 rounded-[28px] bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.95),transparent_32%),linear-gradient(135deg,rgba(250,245,255,0.88),rgba(238,242,255,0.88))]" />
+      <div className="absolute inset-0 opacity-[0.12] bg-[radial-gradient(#00000012_1px,transparent_1px)] [background-size:18px_18px]" />
+      <div className="absolute inset-x-10 bottom-2 h-10 rounded-full bg-violet-300/20 blur-2xl" />
+      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 360 220" preserveAspectRatio="none">
+        <motion.path
+          d="M 86 58 C 126 78, 146 96, 180 110"
+          fill="none"
+          stroke="rgba(139,92,246,0.18)"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          animate={{ pathLength: [0.15, 1, 0.15], opacity: [0.18, 0.44, 0.18] }}
+          transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.path
+          d="M 274 58 C 234 78, 214 96, 180 110"
+          fill="none"
+          stroke="rgba(59,130,246,0.18)"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          animate={{ pathLength: [0.15, 1, 0.15], opacity: [0.16, 0.4, 0.16] }}
+          transition={{ duration: 5.1, repeat: Infinity, ease: "easeInOut", delay: 0.25 }}
+        />
+        <motion.path
+          d="M 180 24 C 180 56, 180 82, 180 110"
+          fill="none"
+          stroke="rgba(244,114,182,0.16)"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          animate={{ pathLength: [0.15, 1, 0.15], opacity: [0.14, 0.34, 0.14] }}
+          transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+        />
+      </svg>
 
       <motion.div
         className="absolute left-1/2 top-1/2"
         style={{ x: "-50%", y: "-50%" }}
       >
-        {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+        {heroCoins.map((coin, index) => (
           <motion.div
-            key={i}
+            key={coin.alt}
             className="absolute"
-            initial={{ opacity: 0, y: 40, scale: 0.8 }}
+            initial={{ opacity: 0, x: coin.x, y: coin.y, scale: 0.76 }}
             animate={{
               opacity: [0, 1, 1, 0],
-              y: [40, 0, -40, -80],
-              x: [0, (i - 3.5) * 20, (i - 3.5) * 25, (i - 3.5) * 15],
-              scale: [0.8, 1, 0.9, 0.7],
-              rotate: [0, 180, 360],
+              x: [coin.x, coin.x * 0.56, coin.x * 0.18, coin.x * 0.08],
+              y: [coin.y, coin.y * 0.52, coin.y * 0.2, -4],
+              scale: [0.76, 0.96, 0.88, 0.72],
+              rotate: [0, index % 2 === 0 ? 10 : -10, 0],
             }}
             transition={{
-              duration: 3,
-              delay: i * 0.15,
+              duration: 4.8,
+              delay: coin.delay,
               repeat: Infinity,
-              repeatDelay: 1,
+              repeatDelay: 0.3,
               ease: "easeInOut",
             }}
           >
-            <div className={`flex items-center justify-center rounded-2xl border-2 border-zinc-200 bg-white shadow-lg ${layout.coinSize}`}>
-              <span className="font-bold text-zinc-900">B</span>
+            <div
+              className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br shadow-lg ${coin.hue} ${layout.coinSize}`}
+              style={{ boxShadow: "0 12px 24px rgba(24,24,27,0.12), inset 0 1px 0 rgba(255,255,255,0.86)" }}
+            >
+              <div className="grid h-[72%] w-[72%] place-items-center rounded-full bg-white/95 shadow-inner">
+                <Image
+                  src={coin.src}
+                  alt={coin.alt}
+                  width={28}
+                  height={28}
+                  className="h-auto w-auto max-h-[60%] max-w-[60%] object-contain"
+                />
+              </div>
             </div>
           </motion.div>
         ))}
 
         <motion.div
           animate={{
-            scale: [1, 1.1, 1],
-            rotate: [0, 360],
+            y: [0, -3, 0],
+            scale: [1, 1.015, 1],
           }}
           transition={{
-            duration: 8,
+            duration: 4.8,
             repeat: Infinity,
-            ease: "linear",
+            ease: "easeInOut",
           }}
-          className={`flex items-center justify-center rounded-3xl bg-linear-to-br from-zinc-800 to-zinc-900 shadow-2xl ${layout.centerTokenSize}`}
+          className="relative"
         >
-          <span className="font-bold text-white">B</span>
+          <div className="absolute inset-x-6 bottom-[-10px] h-8 rounded-full bg-violet-400/18 blur-xl" />
+          <div className="relative rounded-[28px] border border-white/70 bg-white/88 px-4 py-3 shadow-[0_22px_42px_rgba(76,29,149,0.16)] backdrop-blur-md">
+            <div className="text-center text-[0.56rem] font-medium uppercase tracking-[0.2em] text-violet-500">
+              Единый вход
+            </div>
+            <div className="mt-2 flex items-center justify-center gap-3">
+              <div className={`grid place-items-center rounded-3xl bg-gradient-to-br from-zinc-900 to-zinc-700 shadow-xl ${layout.centerTokenSize}`}>
+                <span className="font-bold text-white">B</span>
+              </div>
+            </div>
+            <div className="mt-3 flex items-center justify-center gap-2">
+              <div className="rounded-full bg-violet-50 px-3 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-violet-600">
+                BON ID
+              </div>
+              <div className="rounded-full bg-sky-50 px-3 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-sky-600">
+                Telegram
+              </div>
+            </div>
+          </div>
         </motion.div>
       </motion.div>
 
@@ -112,16 +181,16 @@ function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
         className={`absolute left-1/2 top-1/2 rounded-full ${layout.glowSize}`}
         style={{ x: "-50%", y: "-50%" }}
         animate={{
-          opacity: [0.1, 0.3, 0.1],
-          scale: [0.8, 1.2, 0.8],
+          opacity: [0.12, 0.28, 0.12],
+          scale: [0.88, 1.16, 0.88],
         }}
         transition={{
-          duration: 3,
+          duration: 4.2,
           repeat: Infinity,
           ease: "easeInOut",
         }}
       >
-        <div className="h-full w-full rounded-full bg-[radial-gradient(circle_at_center,#00000020,transparent_70%)]" />
+        <div className="h-full w-full rounded-full bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.18),transparent_70%)]" />
       </motion.div>
     </div>
   );
