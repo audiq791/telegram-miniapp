@@ -565,46 +565,13 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
 }
 
 function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutProps }) {
-  const [heroMountKey, setHeroMountKey] = useState(0);
-
-  useEffect(() => {
-    const restartHero = () => {
-      setHeroMountKey((current) => current + 1);
-    };
-
-    const raf1 = window.requestAnimationFrame(restartHero);
-    const raf2 = window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(restartHero);
-    });
-    const timeoutIds = [120, 260, 520].map((delay) => window.setTimeout(restartHero, delay));
-
-    const onVisible = () => {
-      if (document.visibilityState === "visible") {
-        restartHero();
-      }
-    };
-
-    window.addEventListener("pageshow", restartHero);
-    window.addEventListener("focus", restartHero);
-    document.addEventListener("visibilitychange", onVisible);
-
-    return () => {
-      window.cancelAnimationFrame(raf1);
-      window.cancelAnimationFrame(raf2);
-      timeoutIds.forEach((id) => window.clearTimeout(id));
-      window.removeEventListener("pageshow", restartHero);
-      window.removeEventListener("focus", restartHero);
-      document.removeEventListener("visibilitychange", onVisible);
-    };
-  }, []);
-
   return (
     <FitToViewport contentClassName={`px-5 pb-6 pt-5 sm:px-6 sm:pt-7`}>
       <div className={`mx-auto flex flex-col ${layout.sectionGapClass}`}>
         <div
           className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-amber-50/80 to-orange-100/80 shadow-sm ${layout.frameHeightClass}`}
         >
-          <OrbitHero key={heroMountKey} layout={layout} />
+          <OrbitHero layout={layout} />
         </div>
 
         <div className="flex flex-col px-1">
@@ -897,6 +864,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [viewportSize, setViewportSize] = useState({ width: 390, height: 844 });
   const [isFirstSceneReady, setIsFirstSceneReady] = useState(false);
+  const [firstSceneRenderKey, setFirstSceneRenderKey] = useState(0);
   const swipeAreaRef = useRef<HTMLDivElement | null>(null);
   const isDoneRef = useRef(false);
   const firstViewportHeightRef = useRef<number | null>(null);
@@ -1058,6 +1026,39 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   }, [index]);
 
   useEffect(() => {
+    if (index !== 0 || !isFirstSceneReady) return;
+
+    const restartScene = () => {
+      setFirstSceneRenderKey((current) => current + 1);
+    };
+
+    const raf1 = window.requestAnimationFrame(restartScene);
+    const raf2 = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(restartScene);
+    });
+    const timeoutIds = [120, 260, 520].map((delay) => window.setTimeout(restartScene, delay));
+
+    const handleVisible = () => {
+      if (document.visibilityState === "visible") {
+        restartScene();
+      }
+    };
+
+    window.addEventListener("pageshow", restartScene);
+    window.addEventListener("focus", restartScene);
+    document.addEventListener("visibilitychange", handleVisible);
+
+    return () => {
+      window.cancelAnimationFrame(raf1);
+      window.cancelAnimationFrame(raf2);
+      timeoutIds.forEach((id) => window.clearTimeout(id));
+      window.removeEventListener("pageshow", restartScene);
+      window.removeEventListener("focus", restartScene);
+      document.removeEventListener("visibilitychange", handleVisible);
+    };
+  }, [index, isFirstSceneReady]);
+
+  useEffect(() => {
     const node = swipeAreaRef.current;
     if (!node) return;
 
@@ -1192,7 +1193,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 >
                   {index === 0 &&
                     (isFirstSceneReady ? (
-                      <Scene1 onNext={next} layout={sceneLayout} />
+                      <Scene1 key={firstSceneRenderKey} onNext={next} layout={sceneLayout} />
                     ) : (
                       <div className="h-full w-full bg-white" />
                     ))}
