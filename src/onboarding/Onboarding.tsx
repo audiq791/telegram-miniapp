@@ -1197,22 +1197,30 @@ function Scene3({ layout }: { layout: SceneLayoutProps }) {
 function Scene4({ layout }: { layout: SceneLayoutProps }) {
   const incomingCoins = useMemo(
     () => [
-      { src: "/logos/vkusvill.svg", alt: "VkusVill", startX: -126, startY: -70, delay: 0 },
-      { src: "/logos/dodo.svg", alt: "Dodo", startX: 124, startY: -64, delay: 0.35 },
-      { src: "/logos/cska.svg", alt: "CSKA", startX: -112, startY: 18, delay: 0.7 },
-      { src: "/logos/wildberries.svg", alt: "Wildberries", startX: 118, startY: 12, delay: 1.05 },
-      { src: "/logos/cofix.svg", alt: "Cofix", startX: 0, startY: -94, delay: 1.4 },
+      { src: "/logos/vkusvill.svg", alt: "VkusVill", startX: -126, startY: -82, delay: 0 },
+      { src: "/logos/dodo.svg", alt: "Dodo", startX: 126, startY: -78, delay: 0.34 },
+      { src: "/logos/cska.svg", alt: "CSKA", startX: 0, startY: -110, delay: 0.68 },
     ],
     [],
   );
-  const coinSize = layout.tier === "roomy" ? 42 : layout.tier === "compact" ? 28 : 34;
-  const hubWidth = layout.tier === "roomy" ? 184 : layout.tier === "compact" ? 138 : 160;
-  const hubHeight = layout.tier === "roomy" ? 120 : layout.tier === "compact" ? 92 : 104;
-  const targetCardWidth = layout.tier === "roomy" ? 112 : layout.tier === "compact" ? 86 : 96;
-  const targetCardHeight = layout.tier === "roomy" ? 86 : layout.tier === "compact" ? 68 : 76;
-  const bottomOffset = layout.tier === "roomy" ? 82 : layout.tier === "compact" ? 58 : 68;
-  const sideOffset = layout.tier === "roomy" ? 108 : layout.tier === "compact" ? 78 : 92;
-  const hubTopOffset = layout.tier === "roomy" ? -18 : layout.tier === "compact" ? -10 : -14;
+  const isCompact = layout.tier === "compact";
+  const isRoomy = layout.tier === "roomy";
+  const coinSize = isRoomy ? 38 : isCompact ? 28 : 32;
+  const hubWidth = isRoomy ? 196 : isCompact ? 164 : 178;
+  const hubHeight = isRoomy ? 92 : isCompact ? 78 : 84;
+  const gearSize = isRoomy ? 44 : isCompact ? 34 : 38;
+  const statusPillWidth = isRoomy ? 120 : isCompact ? 104 : 112;
+  const lowerCardWidth = isRoomy ? 134 : isCompact ? 114 : 124;
+  const lowerCardHeight = isRoomy ? 92 : isCompact ? 76 : 84;
+  const topY = isRoomy ? 34 : isCompact ? 26 : 30;
+  const gearY = isRoomy ? 138 : isCompact ? 120 : 128;
+  const statusY = isRoomy ? 188 : isCompact ? 168 : 176;
+  const lowerY = isRoomy ? 220 : isCompact ? 204 : 210;
+  const sideOffset = isRoomy ? 94 : isCompact ? 78 : 86;
+  const lowerArcStartY = topY + hubHeight - 2;
+  const lowerArcEndY = lowerY + 18;
+  const leftCardX = 180 - sideOffset - lowerCardWidth / 2;
+  const rightCardX = 180 + sideOffset - lowerCardWidth / 2;
 
   return (
     <FitToViewport contentClassName="px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
@@ -1220,83 +1228,65 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
         <div
           className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-violet-50/80 to-purple-100/80 shadow-sm ${layout.frameHeightClass}`}
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_22%,rgba(255,255,255,0.75),transparent_32%),radial-gradient(circle_at_50%_88%,rgba(167,139,250,0.18),transparent_38%)]" />
-          <div className="absolute inset-x-12 bottom-7 h-14 rounded-full bg-violet-300/20 blur-3xl" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.82),transparent_30%),radial-gradient(circle_at_50%_84%,rgba(167,139,250,0.16),transparent_36%)]" />
+          <div className="absolute inset-x-12 bottom-8 h-14 rounded-full bg-violet-300/18 blur-3xl" />
 
           <svg className="absolute inset-0 h-full w-full" viewBox="0 0 360 280" preserveAspectRatio="none">
             <motion.path
-              d="M 92 76 C 132 92, 146 118, 162 134"
+              d={`M 92 64 C 128 80, 152 98, 170 ${topY + 52}`}
               fill="none"
               stroke="rgba(139,92,246,0.24)"
               strokeWidth="2.5"
               strokeLinecap="round"
               animate={{ pathLength: [0.2, 1, 0.2], opacity: [0.16, 0.42, 0.16] }}
-              transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+              transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }}
             />
             <motion.path
-              d="M 268 72 C 228 90, 216 116, 198 134"
+              d={`M 268 64 C 232 80, 208 98, 190 ${topY + 52}`}
               fill="none"
               stroke="rgba(59,130,246,0.22)"
               strokeWidth="2.5"
               strokeLinecap="round"
-              animate={{ pathLength: [0.2, 1, 0.2], opacity: [0.14, 0.36, 0.14] }}
-              transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+              animate={{ pathLength: [0.2, 1, 0.2], opacity: [0.16, 0.38, 0.16] }}
+              transition={{ duration: 5.4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
             />
             <motion.path
-              d="M 180 40 C 180 76, 180 104, 180 134"
+              d={`M 180 28 C 180 62, 180 88, 180 ${topY + 52}`}
               fill="none"
               stroke="rgba(244,114,182,0.22)"
               strokeWidth="2.5"
               strokeLinecap="round"
-              animate={{ pathLength: [0.2, 1, 0.2], opacity: [0.12, 0.34, 0.12] }}
-              transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.55 }}
+              animate={{ pathLength: [0.2, 1, 0.2], opacity: [0.14, 0.36, 0.14] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.55 }}
             />
             <motion.path
-              d="M 180 170 C 154 194, 126 210, 92 228"
-              fill="none"
-              stroke="rgba(16,185,129,0.24)"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              animate={{ pathLength: [0.15, 1, 0.15], opacity: [0.16, 0.42, 0.16] }}
-              transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.path
-              d="M 180 170 C 208 194, 236 210, 268 228"
-              fill="none"
-              stroke="rgba(249,115,22,0.24)"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              animate={{ pathLength: [0.15, 1, 0.15], opacity: [0.16, 0.42, 0.16] }}
-              transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 0.35 }}
-            />
-            <motion.path
-              d="M 178 188 C 150 206, 124 218, 94 234"
+              d={`M 180 ${lowerArcStartY} C 154 ${lowerArcStartY + 28}, 126 ${lowerArcStartY + 44}, ${leftCardX + lowerCardWidth / 2} ${lowerArcEndY}`}
               fill="none"
               stroke="rgba(34,197,94,0.3)"
               strokeWidth="2.7"
               strokeLinecap="round"
-              animate={{ pathLength: [0.2, 1, 0.2], opacity: [0.18, 0.46, 0.18] }}
-              transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.15 }}
+              animate={{ pathLength: [0.18, 1, 0.18], opacity: [0.18, 0.46, 0.18] }}
+              transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.1 }}
             />
             <motion.path
-              d="M 182 188 C 210 206, 236 218, 266 234"
+              d={`M 180 ${lowerArcStartY} C 206 ${lowerArcStartY + 28}, 234 ${lowerArcStartY + 44}, ${rightCardX + lowerCardWidth / 2} ${lowerArcEndY}`}
               fill="none"
               stroke="rgba(249,115,22,0.3)"
               strokeWidth="2.7"
               strokeLinecap="round"
-              animate={{ pathLength: [0.2, 1, 0.2], opacity: [0.18, 0.46, 0.18] }}
-              transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.45 }}
+              animate={{ pathLength: [0.18, 1, 0.18], opacity: [0.18, 0.46, 0.18] }}
+              transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
             />
           </svg>
 
-          {incomingCoins.map((coin, index) => (
+          {incomingCoins.map((coin) => (
             <motion.div
               key={coin.alt}
               className="absolute z-[2]"
               initial={{ x: coin.startX, y: coin.startY, scale: 0.76, opacity: 0 }}
               animate={{
-                x: [coin.startX, coin.startX * 0.45, coin.startX * 0.14],
-                y: [coin.startY, coin.startY * 0.4, -6],
+                x: [coin.startX, coin.startX * 0.44, coin.startX * 0.12],
+                y: [coin.startY, coin.startY * 0.42, topY - 6],
                 scale: [0.76, 0.92, 0.7],
                 opacity: [0, 1, 0],
               }}
@@ -1324,79 +1314,97 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
             </motion.div>
           ))}
 
-          <motion.div
-            className="relative z-[3]"
-            animate={{ y: [0, -3, 0], scale: [1, 1.01, 1] }}
-            transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-            style={{ marginTop: hubTopOffset }}
+            <motion.div
+              className="absolute left-1/2 z-[3] -translate-x-1/2"
+              style={{ top: topY }}
+              animate={{ y: [0, -2, 0], scale: [1, 1.008, 1] }}
+              transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
           >
             <div
-              className="rounded-[28px] border border-white/60 bg-white/88 p-4 shadow-[0_28px_46px_rgba(76,29,149,0.14)] backdrop-blur-md"
+              className="rounded-[28px] border border-white/60 bg-white/88 px-4 py-3 shadow-[0_28px_46px_rgba(76,29,149,0.14)] backdrop-blur-md"
               style={{ width: hubWidth, height: hubHeight }}
-            >
-              <div className="text-[0.52rem] font-medium uppercase tracking-[0.24em] text-violet-500">
-                Ваш центр управления
-              </div>
-              <div className="mt-2 text-[1.15rem] font-semibold tracking-tight text-zinc-900">
-                BON - Кошелек
-              </div>
-              <div className="mt-1 text-[0.56rem] font-medium uppercase tracking-[0.22em] text-violet-400">
-                BON PLATFORM
-              </div>
-              <div className="mt-3 flex items-start justify-between gap-4">
-                <div className="flex flex-1 flex-col items-center">
-                  <motion.div
-                    className="relative h-10 w-10"
-                    animate={{ rotate: -360 }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                  >
-                    <div className="absolute inset-0 rounded-full border-[3px] border-violet-300/70" />
-                    <div className="absolute left-1/2 top-1 h-3 w-1.5 -translate-x-1/2 rounded-full bg-violet-400" />
-                    <div className="absolute bottom-1 left-1/2 h-3 w-1.5 -translate-x-1/2 rounded-full bg-violet-400" />
-                    <div className="absolute left-1 top-1/2 h-1.5 w-3 -translate-y-1/2 rounded-full bg-violet-400" />
-                    <div className="absolute right-1 top-1/2 h-1.5 w-3 -translate-y-1/2 rounded-full bg-violet-400" />
-                    <div className="absolute inset-[9px] rounded-full bg-white" />
-                  </motion.div>
-                  <div className="mt-2 rounded-full bg-violet-50 px-3 py-1 text-[0.48rem] font-medium uppercase tracking-[0.16em] text-violet-600">
-                    Автонакопление
-                  </div>
+              >
+                <div className="text-center text-[0.48rem] font-medium uppercase tracking-[0.2em] text-violet-500">
+                  Ваш центр управления
                 </div>
-                <div className="flex flex-1 flex-col items-center">
+                <div className="mt-2 text-center text-[1.08rem] font-semibold tracking-tight text-zinc-900">
+                  BON - Кошелек
+                </div>
+                <div className="mt-1 text-center text-[0.54rem] font-medium uppercase tracking-[0.2em] text-violet-400">
+                  BON PLATFORM
+                </div>
+              </div>
+            </motion.div>
+
+            <div className="absolute left-1/2 z-[3] -translate-x-1/2" style={{ top: gearY }}>
+              <div className="flex items-center gap-16">
+                <div className="flex flex-col items-center">
                   <motion.div
-                    className="relative h-10 w-10"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                  >
-                    <div className="absolute inset-0 rounded-full border-[3px] border-amber-300/70" />
-                    <div className="absolute left-1/2 top-1 h-3 w-1.5 -translate-x-1/2 rounded-full bg-amber-400" />
-                    <div className="absolute bottom-1 left-1/2 h-3 w-1.5 -translate-x-1/2 rounded-full bg-amber-400" />
-                    <div className="absolute left-1 top-1/2 h-1.5 w-3 -translate-y-1/2 rounded-full bg-amber-400" />
-                    <div className="absolute right-1 top-1/2 h-1.5 w-3 -translate-y-1/2 rounded-full bg-amber-400" />
-                    <div className="absolute inset-[9px] rounded-full bg-white" />
-                  </motion.div>
-                  <div className="mt-2 rounded-full bg-amber-50 px-3 py-1 text-[0.48rem] font-medium uppercase tracking-[0.16em] text-amber-600">
-                    Готово к обмену
-                  </div>
+                    className="relative"
+                  style={{ width: gearSize, height: gearSize }}
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                >
+                  <div className="absolute inset-0 rounded-full border-[3px] border-violet-300/70" />
+                  <div className="absolute left-1/2 top-0.5 h-3 w-1.5 -translate-x-1/2 rounded-full bg-violet-400" />
+                  <div className="absolute bottom-0.5 left-1/2 h-3 w-1.5 -translate-x-1/2 rounded-full bg-violet-400" />
+                  <div className="absolute left-0.5 top-1/2 h-1.5 w-3 -translate-y-1/2 rounded-full bg-violet-400" />
+                  <div className="absolute right-0.5 top-1/2 h-1.5 w-3 -translate-y-1/2 rounded-full bg-violet-400" />
+                  <div className="absolute inset-[9px] rounded-full bg-white" />
+                </motion.div>
+              </div>
+              <div className="flex flex-col items-center">
+                <motion.div
+                  className="relative"
+                  style={{ width: gearSize, height: gearSize }}
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                >
+                  <div className="absolute inset-0 rounded-full border-[3px] border-amber-300/70" />
+                  <div className="absolute left-1/2 top-0.5 h-3 w-1.5 -translate-x-1/2 rounded-full bg-amber-400" />
+                  <div className="absolute bottom-0.5 left-1/2 h-3 w-1.5 -translate-x-1/2 rounded-full bg-amber-400" />
+                  <div className="absolute left-0.5 top-1/2 h-1.5 w-3 -translate-y-1/2 rounded-full bg-amber-400" />
+                  <div className="absolute right-0.5 top-1/2 h-1.5 w-3 -translate-y-1/2 rounded-full bg-amber-400" />
+                  <div className="absolute inset-[9px] rounded-full bg-white" />
+                </motion.div>
+              </div>
+            </div>
+          </div>
+
+            <div className="absolute left-1/2 z-[3] -translate-x-1/2" style={{ top: statusY }}>
+              <div className="flex items-center gap-8">
+                <div
+                  className="rounded-full bg-violet-50 px-3 py-2 text-center text-[0.5rem] font-medium uppercase tracking-[0.14em] text-violet-600 shadow-sm"
+                  style={{ width: statusPillWidth }}
+                >
+                  Автонакопление
+                </div>
+                <div
+                  className="rounded-full bg-amber-50 px-3 py-2 text-center text-[0.5rem] font-medium uppercase tracking-[0.14em] text-amber-600 shadow-sm"
+                  style={{ width: statusPillWidth }}
+                >
+                  Готово к обмену
                 </div>
               </div>
             </div>
-          </motion.div>
 
-          <motion.div
-            className="absolute z-[2]"
-            style={{ left: `calc(50% - ${sideOffset + targetCardWidth / 2}px)`, top: `calc(50% + ${bottomOffset - targetCardHeight / 2}px)` }}
-            animate={{ y: [0, -2, 0] }}
-            transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
-          >
+            <motion.div
+              className="absolute z-[2]"
+              style={{ left: leftCardX, top: lowerY }}
+              animate={{ y: [0, -2, 0] }}
+              transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
+            >
             <div
               className="rounded-[22px] border border-white/70 bg-white/88 p-3 shadow-[0_18px_34px_rgba(16,185,129,0.14)]"
-              style={{ width: targetCardWidth, height: targetCardHeight }}
-            >
-              <div className="text-[0.46rem] font-medium uppercase tracking-[0.18em] text-emerald-600">Копите</div>
-              <div className="mt-2 h-10 rounded-2xl bg-emerald-50 p-1.5">
-                <div className="flex h-full items-end gap-1.5">
-                  {[28, 44, 62].map((height, index) => (
-                    <motion.div
+              style={{ width: lowerCardWidth, height: lowerCardHeight }}
+              >
+                <div className="text-center text-[0.48rem] font-medium uppercase tracking-[0.16em] text-emerald-600">
+                  Копите
+                </div>
+                <div className="mt-2 h-11 rounded-2xl bg-emerald-50 p-2">
+                  <div className="flex h-full items-end gap-1.5">
+                    {[28, 44, 62].map((height, index) => (
+                      <motion.div
                       key={index}
                       className="flex-1 rounded-full bg-emerald-400/80"
                       animate={{ height: [`${height - 14}%`, `${height}%`, `${height - 6}%`] }}
@@ -1408,26 +1416,28 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
             </div>
           </motion.div>
 
-          <motion.div
-            className="absolute z-[2]"
-            style={{ left: `calc(50% + ${sideOffset - targetCardWidth / 2}px)`, top: `calc(50% + ${bottomOffset - targetCardHeight / 2}px)` }}
-            animate={{ y: [0, -2, 0] }}
-            transition={{ duration: 4.1, repeat: Infinity, ease: "easeInOut", delay: 0.25 }}
-          >
+            <motion.div
+              className="absolute z-[2]"
+              style={{ left: rightCardX, top: lowerY }}
+              animate={{ y: [0, -2, 0] }}
+              transition={{ duration: 4.1, repeat: Infinity, ease: "easeInOut", delay: 0.25 }}
+            >
             <div
               className="rounded-[22px] border border-white/70 bg-white/88 p-3 shadow-[0_18px_34px_rgba(249,115,22,0.14)]"
-              style={{ width: targetCardWidth, height: targetCardHeight }}
-            >
-              <div className="text-[0.46rem] font-medium uppercase tracking-[0.18em] text-orange-600">Обменивайте</div>
-              <div className="mt-2 flex h-10 items-center justify-between rounded-2xl bg-orange-50 px-2.5">
-                <div className="rounded-full bg-white px-2 py-1 text-[0.46rem] font-medium text-zinc-700 shadow-sm">
-                  VV
+              style={{ width: lowerCardWidth, height: lowerCardHeight }}
+              >
+                <div className="text-center text-[0.48rem] font-medium uppercase tracking-[0.16em] text-orange-600">
+                  Обменивайте
                 </div>
-                <motion.div
-                  className="text-orange-500"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                >
+                <div className="mt-2 flex h-11 items-center justify-between rounded-2xl bg-orange-50 px-2.5">
+                  <div className="rounded-full bg-white px-2 py-1 text-[0.46rem] font-medium text-zinc-700 shadow-sm">
+                    VV
+                  </div>
+                  <motion.div
+                    className="text-[0.8rem] text-orange-500"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  >
                   ↻
                 </motion.div>
                 <div className="rounded-full bg-white px-2 py-1 text-[0.46rem] font-medium text-zinc-700 shadow-sm">
