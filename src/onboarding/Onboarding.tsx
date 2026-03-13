@@ -910,21 +910,21 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
   const firstRainHitDelay = 1.05;
   const rainStream = useMemo(
     () =>
-      Array.from({ length: 22 }, (_, index) => {
-        const lane = (index % 6) - 2.5;
-        const clusterOffset = Math.floor(index / 6) * 3;
-        const startX = lane * (layout.tier === "compact" ? 7 : 9) + clusterOffset;
+      Array.from({ length: 14 }, (_, index) => {
+        const lane = (index % 5) - 2;
+        const clusterOffset = Math.floor(index / 5) * 4;
+        const startX = lane * (layout.tier === "compact" ? 8 : 10) + clusterOffset - 4;
 
         return {
           id: `rain-stream-${index}`,
           startX,
-          driftA: startX + (lane < 0 ? -3.5 : 3.5),
-          driftB: startX + (lane < 0 ? 2.5 : -2.5),
-          driftC: startX + (lane < 0 ? -1.5 : 1.5),
-          delay: index * 0.05,
-          duration: 2.75 + (index % 4) * 0.08,
-          rotateStart: lane * 1.8,
-          rotateEnd: lane * 0.8,
+          driftA: startX + (lane < 0 ? -5 : 5),
+          driftB: startX + (lane < 0 ? 4 : -4),
+          driftC: startX + (lane < 0 ? -2 : 2),
+          delay: index * 0.08,
+          duration: 2.25 + (index % 3) * 0.1,
+          rotateStart: lane * 2.4,
+          rotateEnd: lane * 1.1,
         };
       }),
     [layout.tier],
@@ -965,19 +965,19 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
               <motion.div
                 key={drop.id}
                 className="absolute left-1/2 top-0"
-                initial={{ x: drop.startX, y: -172, rotate: drop.rotateStart, opacity: 0 }}
+                initial={{ x: drop.startX, y: -148, rotate: drop.rotateStart, opacity: 0 }}
                 animate={{
-                  x: [drop.startX, drop.driftA, drop.driftB, drop.driftC, drop.driftC * 0.6],
-                  y: [-172, -132, -86, -30, qrPixelSize * -0.02, qrPixelSize * 0.28],
+                  x: [drop.startX, drop.driftA, drop.driftB, drop.driftC, 0],
+                  y: [-156, -120, -74, -26, qrPixelSize * -0.02, qrPixelSize * 0.18],
                   rotate: [drop.rotateStart, drop.rotateStart * 0.7, drop.rotateEnd],
-                  opacity: [0, 0.92, 1, 0.96, 0.42, 0],
-                  scale: [0.9, 0.96, 1, 1.02, 0.98, 0.92],
+                  opacity: [0, 0.9, 1, 0.84, 0.18, 0],
+                  scale: [0.92, 0.98, 1, 1.02, 0.98, 0.94],
                 }}
                 transition={{
-                  duration: drop.duration,
+                  duration: drop.duration + 0.18,
                   repeat: Infinity,
                   delay: drop.delay,
-                  times: [0, 0.16, 0.38, 0.58, 0.78, 1],
+                  times: [0, 0.14, 0.36, 0.58, 0.8, 1],
                   ease: [0.2, 0.86, 0.2, 1],
                 }}
               >
