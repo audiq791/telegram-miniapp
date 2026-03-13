@@ -349,12 +349,15 @@ function ElephantMascot({ layout }: { layout: SceneLayoutProps }) {
 }
 
 const orbitHeroCoins = [
-  { src: "/logos/vkusvill.svg", alt: "VkusVill", hue: "from-emerald-100 to-emerald-50" },
-  { src: "/logos/dodo.svg", alt: "Dodo", hue: "from-orange-100 to-amber-50" },
-  { src: "/logos/cska.svg", alt: "CSKA", hue: "from-blue-100 to-sky-50" },
-  { src: "/logos/wildberries.svg", alt: "Wildberries", hue: "from-fuchsia-100 to-purple-50" },
-  { src: "/logos/cofix.svg", alt: "Cofix", hue: "from-rose-100 to-orange-50" },
-  { src: "/logos/logo1.svg", alt: "Partner", hue: "from-cyan-100 to-sky-50" },
+  { kind: "bonus" as const, src: "/logos/vkusvill.svg", alt: "VkusVill", hue: "from-emerald-100 to-emerald-50" },
+  { kind: "bonus" as const, src: "/logos/dodo.svg", alt: "Dodo", hue: "from-orange-100 to-amber-50" },
+  { kind: "bonus" as const, src: "/logos/cska.svg", alt: "CSKA", hue: "from-blue-100 to-sky-50" },
+  { kind: "bonus" as const, src: "/logos/wildberries.svg", alt: "Wildberries", hue: "from-fuchsia-100 to-purple-50" },
+  { kind: "bonus" as const, src: "/logos/cofix.svg", alt: "Cofix", hue: "from-rose-100 to-orange-50" },
+  { kind: "bonus" as const, src: "/logos/logo1.svg", alt: "Partner", hue: "from-cyan-100 to-sky-50" },
+  { kind: "ruble" as const, alt: "Ruble 1", hue: "from-amber-100 to-yellow-50" },
+  { kind: "ruble" as const, alt: "Ruble 2", hue: "from-lime-100 to-emerald-50" },
+  { kind: "ruble" as const, alt: "Ruble 3", hue: "from-sky-100 to-cyan-50" },
 ];
 
 function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
@@ -386,8 +389,13 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
   const orbitWidth = Math.max(...orbits.map((orbit) => orbit.width));
   const orbitHeight = Math.max(...orbits.map((orbit) => orbit.height));
 
+  const coinsPerOrbit = orbitHeroCoins.length / orbits.length;
+
   const orbitCoins = orbits.flatMap((orbit, orbitIndex) => {
-    const orbitCoinsForTrack = orbitHeroCoins.slice(orbitIndex * 2, orbitIndex * 2 + 2);
+    const orbitCoinsForTrack = orbitHeroCoins.slice(
+      orbitIndex * coinsPerOrbit,
+      orbitIndex * coinsPerOrbit + coinsPerOrbit,
+    );
     return orbitCoinsForTrack.map((coin, coinIndex) => {
       return {
         ...coin,
@@ -398,8 +406,8 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
     });
   });
 
-  const orbitStroke = "rgba(82, 82, 91, 0.6)";
-  const orbitGlow = "rgba(255, 255, 255, 0.55)";
+  const orbitStroke = "rgba(82, 82, 91, 0.45)";
+  const orbitGlow = "rgba(255, 255, 255, 0.38)";
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
@@ -431,13 +439,13 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
               d={`M ${orbit.width / 2} 0 A ${orbit.width / 2} ${orbit.height / 2} 0 0 0 ${orbit.width / 2} ${orbit.height}`}
               fill="none"
               stroke={orbitGlow}
-              strokeWidth="0.8"
+              strokeWidth="0.45"
             />
             <path
               d={`M ${orbit.width / 2} 0 A ${orbit.width / 2} ${orbit.height / 2} 0 0 0 ${orbit.width / 2} ${orbit.height}`}
               fill="none"
               stroke={orbitStroke}
-              strokeWidth="1.2"
+              strokeWidth="0.75"
             />
           </svg>
         ))}
@@ -467,13 +475,23 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
               }}
             >
               <div className="grid h-[74%] w-[74%] place-items-center rounded-full bg-white/95 shadow-inner">
-                <Image
-                  src={coin.src}
-                  alt={coin.alt}
-                  width={coinSize * 0.42}
-                  height={coinSize * 0.42}
-                  className="h-auto w-auto max-h-[62%] max-w-[62%] object-contain"
-                />
+                {coin.kind === "bonus" ? (
+                  <Image
+                    src={coin.src}
+                    alt={coin.alt}
+                    width={coinSize * 0.42}
+                    height={coinSize * 0.42}
+                    className="h-auto w-auto max-h-[62%] max-w-[62%] object-contain"
+                  />
+                ) : (
+                  <span
+                    className={`font-semibold text-zinc-700 ${
+                      layout.tier === "roomy" ? "text-[1.2rem]" : layout.tier === "compact" ? "text-[0.9rem]" : "text-[1rem]"
+                    }`}
+                  >
+                    ₽
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -530,13 +548,13 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
               d={`M ${orbit.width / 2} 0 A ${orbit.width / 2} ${orbit.height / 2} 0 0 1 ${orbit.width / 2} ${orbit.height}`}
               fill="none"
               stroke={orbitGlow}
-              strokeWidth="0.8"
+              strokeWidth="0.45"
             />
             <path
               d={`M ${orbit.width / 2} 0 A ${orbit.width / 2} ${orbit.height / 2} 0 0 1 ${orbit.width / 2} ${orbit.height}`}
               fill="none"
               stroke={orbitStroke}
-              strokeWidth="1.2"
+              strokeWidth="0.75"
             />
           </svg>
         ))}
@@ -845,7 +863,6 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [viewportSize, setViewportSize] = useState({ width: 390, height: 844 });
   const [isFirstSceneReady, setIsFirstSceneReady] = useState(false);
-  const [firstSceneRenderKey, setFirstSceneRenderKey] = useState(0);
   const swipeAreaRef = useRef<HTMLDivElement | null>(null);
   const isDoneRef = useRef(false);
   const firstViewportHeightRef = useRef<number | null>(null);
@@ -1007,39 +1024,6 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   }, [index]);
 
   useEffect(() => {
-    if (index !== 0 || !isFirstSceneReady) return;
-
-    const restartScene = () => {
-      setFirstSceneRenderKey((current) => current + 1);
-    };
-
-    const raf1 = window.requestAnimationFrame(restartScene);
-    const raf2 = window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(restartScene);
-    });
-    const timeoutIds = [120, 260, 520].map((delay) => window.setTimeout(restartScene, delay));
-
-    const handleVisible = () => {
-      if (document.visibilityState === "visible") {
-        restartScene();
-      }
-    };
-
-    window.addEventListener("pageshow", restartScene);
-    window.addEventListener("focus", restartScene);
-    document.addEventListener("visibilitychange", handleVisible);
-
-    return () => {
-      window.cancelAnimationFrame(raf1);
-      window.cancelAnimationFrame(raf2);
-      timeoutIds.forEach((id) => window.clearTimeout(id));
-      window.removeEventListener("pageshow", restartScene);
-      window.removeEventListener("focus", restartScene);
-      document.removeEventListener("visibilitychange", handleVisible);
-    };
-  }, [index, isFirstSceneReady]);
-
-  useEffect(() => {
     const node = swipeAreaRef.current;
     if (!node) return;
 
@@ -1174,7 +1158,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 >
                   {index === 0 &&
                     (isFirstSceneReady ? (
-                      <Scene1 key={firstSceneRenderKey} onNext={next} layout={sceneLayout} />
+                      <Scene1 onNext={next} layout={sceneLayout} />
                     ) : (
                       <div className="h-full w-full bg-white" />
                     ))}
