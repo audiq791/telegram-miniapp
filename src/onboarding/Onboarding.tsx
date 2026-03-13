@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import { haptic } from "../components/haptics";
 import LoginAccount from "../screens/LoginAccount";
 
@@ -349,15 +349,15 @@ function ElephantMascot({ layout }: { layout: SceneLayoutProps }) {
 }
 
 const orbitHeroCoins = [
-  { kind: "bonus" as const, src: "/logos/vkusvill.svg", alt: "VkusVill", hue: "from-emerald-100 to-emerald-50" },
-  { kind: "bonus" as const, src: "/logos/dodo.svg", alt: "Dodo", hue: "from-orange-100 to-amber-50" },
-  { kind: "bonus" as const, src: "/logos/cska.svg", alt: "CSKA", hue: "from-blue-100 to-sky-50" },
-  { kind: "bonus" as const, src: "/logos/wildberries.svg", alt: "Wildberries", hue: "from-fuchsia-100 to-purple-50" },
-  { kind: "bonus" as const, src: "/logos/cofix.svg", alt: "Cofix", hue: "from-rose-100 to-orange-50" },
-  { kind: "bonus" as const, src: "/logos/logo1.svg", alt: "Partner", hue: "from-cyan-100 to-sky-50" },
-  { kind: "ruble" as const, alt: "Ruble 1", hue: "from-amber-100 to-yellow-50" },
-  { kind: "ruble" as const, alt: "Ruble 2", hue: "from-lime-100 to-emerald-50" },
-  { kind: "ruble" as const, alt: "Ruble 3", hue: "from-sky-100 to-cyan-50" },
+  { id: "vv", kind: "bonus" as const, src: "/logos/vkusvill.svg", alt: "VkusVill", hue: "from-emerald-100 to-emerald-50" },
+  { id: "dodo", kind: "bonus" as const, src: "/logos/dodo.svg", alt: "Dodo", hue: "from-orange-100 to-amber-50" },
+  { id: "cska", kind: "bonus" as const, src: "/logos/cska.svg", alt: "CSKA", hue: "from-blue-100 to-sky-50" },
+  { id: "wb", kind: "bonus" as const, src: "/logos/wildberries.svg", alt: "Wildberries", hue: "from-fuchsia-100 to-purple-50" },
+  { id: "cofix", kind: "bonus" as const, src: "/logos/cofix.svg", alt: "Cofix", hue: "from-rose-100 to-orange-50" },
+  { id: "partner", kind: "bonus" as const, src: "/logos/logo1.svg", alt: "Partner", hue: "from-cyan-100 to-sky-50" },
+  { id: "rub-1", kind: "ruble" as const, alt: "Ruble 1", hue: "from-amber-100 to-yellow-50" },
+  { id: "rub-2", kind: "ruble" as const, alt: "Ruble 2", hue: "from-lime-100 to-emerald-50" },
+  { id: "rub-3", kind: "ruble" as const, alt: "Ruble 3", hue: "from-sky-100 to-cyan-50" },
 ];
 
 function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: boolean }) {
@@ -396,29 +396,31 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
   const coinsPerOrbit = orbitHeroCoins.length / orbits.length;
   const [marketChart] = useState(() => createChartData(18));
   const [marketCandles] = useState(() => createCandles(14));
-  const [phoneIntroDone, setPhoneIntroDone] = useState(false);
+  const phoneYawControls = useAnimationControls();
+  const fixedCoinAssignments = useMemo(
+    () =>
+      orbitHeroCoins.map((coin, index) => ({
+        ...coin,
+        orbitIndex: Math.floor(index / coinsPerOrbit),
+        slotIndex: index % coinsPerOrbit,
+      })),
+    [coinsPerOrbit],
+  );
 
   const orbitCoins = useMemo(
     () =>
-      orbits.flatMap((orbit, orbitIndex) => {
-        const orbitCoinsForTrack = orbitHeroCoins.slice(
-          orbitIndex * coinsPerOrbit,
-          orbitIndex * coinsPerOrbit + coinsPerOrbit,
-        );
-
-        return orbitCoinsForTrack.map((coin, coinIndex) => {
-          const totalCoins = orbitCoinsForTrack.length;
+      fixedCoinAssignments.map((coin) => {
+          const orbit = orbits[coin.orbitIndex];
+          const totalCoins = coinsPerOrbit;
           const frames = Array.from({ length: 25 }, (_, frameIndex) => {
             const progress = frameIndex / 24;
-            const theta = orbit.phase + ((coinIndex + progress) / totalCoins) * Math.PI * 2;
+            const theta = orbit.phase + ((coin.slotIndex + progress) / totalCoins) * Math.PI * 2;
             const rawX = Math.cos(theta) * (orbit.width / 2);
             const rawY = Math.sin(theta) * (orbit.height / 2);
             const rotateRad = (orbit.rotate * Math.PI) / 180;
             const x = rawX * Math.cos(rotateRad) - rawY * Math.sin(rotateRad);
             const y = rawX * Math.sin(rotateRad) + rawY * Math.cos(rotateRad);
             const depth = (Math.sin(theta) + 1) / 2;
-            const frontOpacity = depth > 0.52 ? 0.58 + (depth - 0.52) * 0.95 : 0;
-            const backOpacity = depth <= 0.52 ? 0.36 + (0.52 - depth) * 0.55 : 0;
 
             return {
               x,
@@ -432,19 +434,16 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
 
           return {
             ...coin,
-            key: `${coin.alt}-${orbitIndex}-${coinIndex}`,
+            key: coin.id,
             orbit,
             frames,
           };
-        });
-      }),
-    [coinsPerOrbit, orbits],
+        }),
+    [coinsPerOrbit, fixedCoinAssignments, orbits],
   );
 
   const renderCoinFace = (coin: (typeof orbitCoins)[number]) => (
-    <motion.div
-      animate={isActive ? { rotate: [0, -10, 0, 10, 0] } : { rotate: 0 }}
-      transition={{ duration: 3.6, repeat: isActive ? Infinity : 0, ease: "easeInOut" }}
+    <div
       className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br ${coin.hue}`}
       style={{
         width: coinSize,
@@ -471,17 +470,51 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
           </span>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 
   const phoneWidth = layout.tier === "roomy" ? 124 : layout.tier === "compact" ? 92 : 108;
   const phoneHeight = layout.tier === "roomy" ? 226 : layout.tier === "compact" ? 168 : 196;
 
   useEffect(() => {
-    if (!isActive) {
-      setPhoneIntroDone(false);
-    }
-  }, [isActive]);
+    let cancelled = false;
+
+    const runPhoneLoop = async () => {
+      phoneYawControls.stop();
+
+      if (!isActive) {
+        await phoneYawControls.start({
+          rotateY: 0,
+          transition: { duration: 0.35, ease: "easeOut" },
+        });
+        return;
+      }
+
+      await phoneYawControls.start({
+        rotateY: 35,
+        transition: { duration: 1.8, ease: [0.22, 1, 0.36, 1] },
+      });
+
+      while (!cancelled) {
+        await phoneYawControls.start({
+          rotateY: -70,
+          transition: { duration: 4.2, ease: "easeInOut" },
+        });
+        if (cancelled) break;
+        await phoneYawControls.start({
+          rotateY: 70,
+          transition: { duration: 4.2, ease: "easeInOut" },
+        });
+      }
+    };
+
+    void runPhoneLoop();
+
+    return () => {
+      cancelled = true;
+      phoneYawControls.stop();
+    };
+  }, [isActive, phoneYawControls]);
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
@@ -548,33 +581,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         }}
       >
         <motion.div
-          animate={
-            isActive
-              ? phoneIntroDone
-                ? { rotateY: [35, -70, 70, -70, 70] }
-                : { rotateY: [0, 35] }
-              : { rotateY: 0 }
-          }
-          transition={
-            isActive
-              ? phoneIntroDone
-                ? {
-                    duration: 11.5,
-                    ease: "easeInOut",
-                    repeat: Infinity,
-                    times: [0, 0.25, 0.5, 0.75, 1],
-                  }
-                : {
-                    duration: 1.8,
-                    ease: [0.22, 1, 0.36, 1],
-                  }
-              : { duration: 0.4, ease: "easeOut" }
-          }
-          onAnimationComplete={() => {
-            if (isActive && !phoneIntroDone) {
-              setPhoneIntroDone(true);
-            }
-          }}
+          animate={phoneYawControls}
           className="relative"
           style={{ transformStyle: "preserve-3d" }}
         >
@@ -622,21 +629,21 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
               <div className="h-1.5 w-16 rounded-full bg-black/65 shadow-[0_1px_0_rgba(255,255,255,0.06)]" />
             </div>
             <div className="absolute left-1/2 top-4 z-20 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-slate-700 shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_0_10px_rgba(14,165,233,0.2)]" />
-            <div className="absolute inset-[7px] overflow-hidden rounded-[25px] bg-[linear-gradient(180deg,#07111f_0%,#0f172a_22%,#020617_100%)]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_12%,rgba(255,255,255,0.18),transparent_24%),linear-gradient(120deg,rgba(255,255,255,0.08),transparent_30%,rgba(255,255,255,0.03)_68%,transparent_100%)]" />
-              <div className="absolute inset-x-0 top-0 h-10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),transparent)]" />
-              <div className="absolute inset-x-[10px] top-[14px] z-10 rounded-[18px] border border-sky-300/16 bg-[linear-gradient(180deg,rgba(14,165,233,0.12),rgba(15,23,42,0.08))] px-3 pb-3 pt-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+            <div className="absolute inset-[7px] overflow-hidden rounded-[25px] bg-white">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_12%,rgba(255,255,255,0.5),transparent_24%),linear-gradient(120deg,rgba(255,255,255,0.2),transparent_30%,rgba(148,163,184,0.08)_68%,transparent_100%)]" />
+              <div className="absolute inset-x-0 top-0 h-10 bg-[linear-gradient(180deg,rgba(255,255,255,0.75),transparent)]" />
+              <div className="absolute inset-x-[10px] top-[14px] z-10 rounded-[18px] border border-slate-200 bg-white px-3 pb-3 pt-2.5 shadow-[0_10px_24px_rgba(15,23,42,0.08)]">
                 <div className="mb-2 flex items-center justify-between">
                   <div>
-                    <div className="text-[0.42rem] font-medium uppercase tracking-[0.22em] text-slate-400">
+                    <div className="text-[0.42rem] font-medium uppercase tracking-[0.22em] text-slate-500">
                       BON / OEM
                     </div>
-                    <div className="mt-0.5 text-[0.8rem] font-semibold text-white">
+                    <div className="mt-0.5 text-[0.8rem] font-semibold text-slate-900">
                       +12.4%
                     </div>
                   </div>
-                  <div className="rounded-full border border-emerald-400/30 bg-emerald-400/12 px-2 py-0.5 text-[0.42rem] font-medium uppercase tracking-[0.18em] text-emerald-300">
-                    Market
+                  <div className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[0.42rem] font-medium uppercase tracking-[0.18em] text-emerald-600">
+                    Profit
                   </div>
                 </div>
 
@@ -661,7 +668,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
                       .map((point, index) => `${index * 7},${48 - point.y * 0.28}`)
                       .join(" L ")}`}
                     fill="none"
-                    stroke="#67e8f9"
+                    stroke="#0ea5e9"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -688,10 +695,10 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
                         delay: index * 0.04,
                       }}
                     >
-                      <div className="absolute bottom-0 left-1/2 w-px -translate-x-1/2 bg-white/18" style={{ height: "100%" }} />
+                      <div className="absolute bottom-0 left-1/2 w-px -translate-x-1/2 bg-slate-200" style={{ height: "100%" }} />
                       <div
                         className={`absolute bottom-0 left-0 right-0 rounded-[2px] ${
-                          candle.isGreen ? "bg-emerald-400/78" : "bg-rose-400/78"
+                          candle.isGreen ? "bg-emerald-500/78" : "bg-rose-500/78"
                         }`}
                         style={{ height: "70%" }}
                       />
@@ -699,17 +706,17 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
                   ))}
                 </div>
 
-                <div className="mt-3 rounded-[14px] border border-white/8 bg-white/5 px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-                  <div className="text-[0.62rem] font-semibold tracking-[0.18em] text-white/94">
+                <div className="mt-3 rounded-[14px] border border-slate-200 bg-slate-50 px-3 py-2">
+                  <div className="text-[0.62rem] font-semibold tracking-[0.18em] text-slate-900">
                     Биржа Бонусов
                   </div>
-                  <div className="mt-1 text-[0.44rem] font-medium uppercase tracking-[0.16em] text-slate-400">
+                  <div className="mt-1 text-[0.44rem] font-medium uppercase tracking-[0.16em] text-slate-500">
                     Торги бонусами партнеров
                   </div>
                 </div>
               </div>
-              <div className="absolute -left-7 top-10 h-28 w-16 rotate-[14deg] rounded-full bg-white/8 blur-2xl" />
-              <div className="absolute -right-4 bottom-7 h-20 w-20 rounded-full bg-cyan-400/10 blur-2xl" />
+              <div className="absolute -left-7 top-10 h-28 w-16 rotate-[14deg] rounded-full bg-slate-100/80 blur-2xl" />
+              <div className="absolute -right-4 bottom-7 h-20 w-20 rounded-full bg-sky-100/70 blur-2xl" />
             </div>
           </div>
           <div className="absolute left-[1px] top-14 h-9 w-[2px] rounded-full bg-white/12" />
