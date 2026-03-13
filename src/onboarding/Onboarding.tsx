@@ -360,7 +360,7 @@ const orbitHeroCoins = [
   { kind: "ruble" as const, alt: "Ruble 3", hue: "from-sky-100 to-cyan-50" },
 ];
 
-function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
+function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: boolean }) {
   const phoneScale = layout.tier === "roomy" ? 0.92 : layout.tier === "compact" ? 0.76 : 0.84;
   const coinSize = layout.tier === "roomy" ? 54 : layout.tier === "compact" ? 38 : 46;
   const orbits = [
@@ -444,7 +444,7 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
         {orbits.map((orbit, index) => (
           <svg
             key={`back-${index}`}
-            className="absolute left-1/2 top-1/2 overflow-visible"
+            className="absolute left-1/2 top-1/2 z-[1] overflow-visible"
             width={orbit.width}
             height={orbit.height}
             viewBox={`0 0 ${orbit.width} ${orbit.height}`}
@@ -473,19 +473,36 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
           <motion.div
             key={coin.key}
             className="absolute left-1/2 top-1/2"
-            style={{ width: coinSize, height: coinSize, marginLeft: -coinSize / 2, marginTop: -coinSize / 2 }}
-            animate={{
-              x: coin.frames.map((frame) => frame.x),
-              y: coin.frames.map((frame) => frame.y),
-              scale: coin.frames.map((frame) => frame.scale),
-              opacity: coin.frames.map((frame) => frame.opacity),
-              zIndex: coin.frames.map((frame) => frame.z),
-              filter: coin.frames.map((frame) => `blur(${frame.blur}px)`),
+            style={{
+              width: coinSize,
+              height: coinSize,
+              marginLeft: -coinSize / 2,
+              marginTop: -coinSize / 2,
+              zIndex: coin.frames[0].z,
             }}
+            animate={
+              isActive
+                ? {
+                    x: coin.frames.map((frame) => frame.x),
+                    y: coin.frames.map((frame) => frame.y),
+                    scale: coin.frames.map((frame) => frame.scale),
+                    opacity: coin.frames.map((frame) => frame.opacity),
+                    zIndex: coin.frames.map((frame) => frame.z),
+                    filter: coin.frames.map((frame) => `blur(${frame.blur}px)`),
+                  }
+                : {
+                    x: coin.frames[0].x,
+                    y: coin.frames[0].y,
+                    scale: coin.frames[0].scale,
+                    opacity: coin.frames[0].opacity,
+                    zIndex: coin.frames[0].z,
+                    filter: `blur(${coin.frames[0].blur}px)`,
+                  }
+            }
             transition={{
               duration: coin.orbit.duration,
               ease: "linear",
-              repeat: Infinity,
+              repeat: isActive ? Infinity : 0,
             }}
           >
             <motion.div
@@ -523,8 +540,9 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
       </div>
 
       <div
-        className="relative z-10"
+        className="relative"
         style={{
+          zIndex: 3,
           transformStyle: "preserve-3d",
           ["--phone-scale" as string]: String(phoneScale),
           animation: "orbit-hero-phone 9.2s ease-in-out infinite",
@@ -554,7 +572,7 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
         </svg>
       </div>
 
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 z-[6] pointer-events-none">
         {orbits.map((orbit, index) => (
           <svg
             key={`front-${index}`}
@@ -587,14 +605,14 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
   );
 }
 
-function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutProps }) {
+function Scene1({ onNext, layout, isHeroActive }: { onNext: () => void; layout: SceneLayoutProps; isHeroActive: boolean }) {
   return (
     <FitToViewport contentClassName={`px-5 pb-6 pt-5 sm:px-6 sm:pt-7`}>
       <div className={`mx-auto flex flex-col ${layout.sectionGapClass}`}>
         <div
           className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-amber-50/80 to-orange-100/80 shadow-sm ${layout.frameHeightClass}`}
         >
-          <OrbitHero layout={layout} />
+          <OrbitHero layout={layout} isActive={isHeroActive} />
         </div>
 
         <div className="flex flex-col px-1">
@@ -887,6 +905,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [viewportSize, setViewportSize] = useState({ width: 390, height: 844 });
   const [isFirstSceneReady, setIsFirstSceneReady] = useState(false);
+  const [isFirstSceneAnimationActive, setIsFirstSceneAnimationActive] = useState(false);
   const swipeAreaRef = useRef<HTMLDivElement | null>(null);
   const isDoneRef = useRef(false);
   const firstViewportHeightRef = useRef<number | null>(null);
@@ -1048,6 +1067,26 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   }, [index]);
 
   useEffect(() => {
+    if (index !== 0 || !isFirstSceneReady) {
+      setIsFirstSceneAnimationActive(false);
+      return;
+    }
+
+    let raf1 = 0;
+    let raf2 = 0;
+    raf1 = window.requestAnimationFrame(() => {
+      raf2 = window.requestAnimationFrame(() => {
+        setIsFirstSceneAnimationActive(true);
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(raf1);
+      window.cancelAnimationFrame(raf2);
+    };
+  }, [index, isFirstSceneReady]);
+
+  useEffect(() => {
     const node = swipeAreaRef.current;
     if (!node) return;
 
@@ -1182,7 +1221,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
                 >
                   {index === 0 &&
                     (isFirstSceneReady ? (
-                      <Scene1 onNext={next} layout={sceneLayout} />
+                      <Scene1 onNext={next} layout={sceneLayout} isHeroActive={isFirstSceneAnimationActive} />
                     ) : (
                       <div className="h-full w-full bg-white" />
                     ))}
