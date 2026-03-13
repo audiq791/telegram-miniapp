@@ -62,7 +62,7 @@ function FitToViewport({
   return (
     <div ref={frameRef} className="min-h-0 flex-1 overflow-hidden">
       <div
-        className="mx-auto"
+        className="mx-auto flex w-full justify-center"
         style={{
           height: scaledHeight ?? undefined,
           maxWidth: "28rem",
@@ -74,7 +74,7 @@ function FitToViewport({
           style={{
             transform: `scale(${scale})`,
             transformOrigin: "top center",
-            width: scale < 1 ? `${100 / scale}%` : "100%",
+            width: "100%",
           }}
         >
           {children}
@@ -269,12 +269,12 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
             animate={{ scale: [1, 1.02, 1] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            <div className={`rounded-2xl bg-white p-3 shadow-lg ${qrSize}`}>
-              <div className="grid grid-cols-7 gap-1">
+            <div className={`rounded-2xl bg-white p-3 shadow-lg overflow-hidden ${qrSize}`}>
+              <div className="grid aspect-square w-full grid-cols-7 gap-[6%]">
                 {qrCells.map((isFilled, i) => (
                   <div
                     key={i}
-                    className={`rounded-xs ${layout.tier === "roomy" ? "h-3 w-3" : "h-2.5 w-2.5"} ${
+                    className={`aspect-square w-full rounded-[2px] ${
                       isFilled ? "bg-zinc-900" : "bg-transparent"
                     }`}
                   />

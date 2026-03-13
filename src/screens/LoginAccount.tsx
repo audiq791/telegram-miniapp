@@ -77,7 +77,7 @@ function FitToViewport({
   return (
     <div ref={frameRef} className="min-h-0 flex-1 overflow-hidden">
       <div
-        className="mx-auto"
+        className="mx-auto flex w-full justify-center"
         style={{
           height: scaledHeight ?? undefined,
           maxWidth: "28rem",
@@ -89,7 +89,7 @@ function FitToViewport({
           style={{
             transform: `scale(${scale})`,
             transformOrigin: "top center",
-            width: scale < 1 ? `${100 / scale}%` : "100%",
+            width: "100%",
           }}
         >
           {children}
