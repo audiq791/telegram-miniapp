@@ -907,6 +907,7 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
   const qrPixelSize = layout.tier === "roomy" ? 160 : layout.tier === "compact" ? 96 : 128;
   const sceneHalfWidth = layout.tier === "roomy" ? 150 : layout.tier === "compact" ? 108 : 128;
   const sceneBottomReach = layout.tier === "roomy" ? 140 : layout.tier === "compact" ? 96 : 116;
+  const firstRainHitDelay = 1.45;
   const rainStream = useMemo(
     () =>
       Array.from({ length: 14 }, (_, index) => {
@@ -920,8 +921,8 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
           driftA: startX + (lane < 0 ? -5 : 5),
           driftB: startX + (lane < 0 ? 4 : -4),
           driftC: startX + (lane < 0 ? -2 : 2),
-          delay: index * 0.2,
-          duration: 4.4 + (index % 3) * 0.18,
+          delay: index * 0.08,
+          duration: 2.25 + (index % 3) * 0.1,
           rotateStart: lane * 2.4,
           rotateEnd: lane * 1.1,
         };
@@ -941,15 +942,15 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
           coin: bonusCoins[index % bonusCoins.length],
           originX: side * qrPixelSize * originRatio,
           originY: qrPixelSize * (0.34 + (index % 3) * 0.04),
-          targetX: side * sceneHalfWidth * driftRatio,
-          targetY: sceneBottomReach * downwardRatio,
-          delay: index * 0.18,
-          duration: 4.8 + (index % 4) * 0.35,
-          rotate: side * (12 + index * 4),
-        };
-      }),
-    [bonusCoins, qrPixelSize, sceneBottomReach, sceneHalfWidth],
-  );
+            targetX: side * sceneHalfWidth * driftRatio,
+            targetY: sceneBottomReach * downwardRatio,
+            delay: firstRainHitDelay + index * 0.16,
+            duration: 4.8 + (index % 4) * 0.35,
+            rotate: side * (12 + index * 4),
+          };
+        }),
+      [bonusCoins, firstRainHitDelay, qrPixelSize, sceneBottomReach, sceneHalfWidth],
+    );
 
   return (
     <FitToViewport contentClassName="px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
@@ -967,7 +968,7 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
                   initial={{ x: drop.startX, y: -148, rotate: drop.rotateStart, opacity: 0 }}
                   animate={{
                     x: [drop.startX, drop.driftA, drop.driftB, drop.driftC, 0],
-                    y: [-148, -114, -72, -24, qrPixelSize * 0.08],
+                    y: [-148, -104, -56, -8, qrPixelSize * 0.02],
                     rotate: [drop.rotateStart, drop.rotateStart * 0.7, drop.rotateEnd],
                     opacity: [0, 0.92, 1, 1, 0.98],
                     scale: [0.92, 0.98, 1, 1.02, 1],
