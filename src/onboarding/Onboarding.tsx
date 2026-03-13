@@ -503,8 +503,8 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
 
       <motion.div
         className="relative z-10"
-        animate={{ rotateY: [30, 0, -30, 0, 30], rotateX: [4, 0, -4, 0, 4], y: [2, -3, 2] }}
-        transition={{ duration: 9.5, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ rotateY: [30, 30, -90, -90, 30], rotateX: [3, 0, -2, 0, 3], y: [2, -3, 2] }}
+        transition={{ duration: 10.8, repeat: Infinity, ease: "easeInOut" }}
         style={{ scale: phoneScale, transformStyle: "preserve-3d" }}
       >
         <svg
@@ -516,19 +516,14 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
           className="drop-shadow-[0_28px_42px_rgba(24,24,27,0.16)]"
         >
           <g transform="translate(26 10)">
-            <path d="M7 20C7 8.95 15.95 0 27 0H65C76.05 0 85 8.95 85 20V168C85 179.05 76.05 188 65 188H27C15.95 188 7 179.05 7 168V20Z" fill="#F5F5F5" stroke="#111827" strokeWidth="2.4" />
-            <path d="M3 24C3 13.51 11.51 5 22 5H27V183H22C11.51 183 3 174.49 3 164V24Z" fill="#E5E7EB" stroke="#111827" strokeWidth="1.9" />
-            <path d="M12 24C12 15.72 18.72 9 27 9H65C73.28 9 80 15.72 80 24V164C80 172.28 73.28 179 65 179H27C18.72 179 12 172.28 12 164V24Z" fill="white" stroke="#111827" strokeWidth="1.8" />
-            <path d="M41 10H51C54 10 56.43 12.43 56.43 15.43C56.43 16.54 55.54 17.43 54.43 17.43H37.57C36.46 17.43 35.57 16.54 35.57 15.43C35.57 12.43 38 10 41 10Z" fill="#111827" />
-            <path d="M22 14C22 12.34 23.34 11 25 11C26.66 11 28 12.34 28 14C28 15.66 26.66 17 25 17C23.34 17 22 15.66 22 14Z" fill="#111827" />
-            <path d="M63 14C63 12.67 64.07 11.6 65.4 11.6C66.73 11.6 67.8 12.67 67.8 14C67.8 15.33 66.73 16.4 65.4 16.4C64.07 16.4 63 15.33 63 14Z" fill="#111827" />
-            <path d="M18 29C18 26.24 20.24 24 23 24H69C71.76 24 74 26.24 74 29V156C74 158.76 71.76 161 69 161H23C20.24 161 18 158.76 18 156V29Z" fill="#FFFFFF" />
-            <path d="M31 31L61 154" stroke="rgba(148,163,184,0.28)" strokeWidth="1.7" strokeLinecap="round" />
-            <path d="M56 44L69 92" stroke="rgba(148,163,184,0.2)" strokeWidth="1.4" strokeLinecap="round" />
-            <path d="M3 46L-2 46" stroke="#111827" strokeWidth="1.8" strokeLinecap="round" />
-            <path d="M3 60L-2 60" stroke="#111827" strokeWidth="1.8" strokeLinecap="round" />
-            <path d="M3 74L-2 74" stroke="#111827" strokeWidth="1.8" strokeLinecap="round" />
-            <path d="M85 64L90 64" stroke="#111827" strokeWidth="1.8" strokeLinecap="round" />
+            <path d="M9 18C9 8.06 17.06 0 27 0H64C73.94 0 82 8.06 82 18V168C82 177.94 73.94 186 64 186H27C17.06 186 9 177.94 9 168V18Z" fill="#F8F8F8" stroke="#111827" strokeWidth="2.2" />
+            <path d="M13 22C13 14.27 19.27 8 27 8H64C71.73 8 78 14.27 78 22V164C78 171.73 71.73 178 64 178H27C19.27 178 13 171.73 13 164V22Z" fill="#FFFFFF" stroke="#111827" strokeWidth="1.6" />
+            <path d="M38 11H53C56.31 11 59 13.69 59 17C59 18.1 58.1 19 57 19H34C32.9 19 32 18.1 32 17C32 13.69 34.69 11 38 11Z" fill="#111827" />
+            <path d="M25 14.5C25 12.84 26.34 11.5 28 11.5C29.66 11.5 31 12.84 31 14.5C31 16.16 29.66 17.5 28 17.5C26.34 17.5 25 16.16 25 14.5Z" fill="#111827" />
+            <path d="M62 14.5C62 13.17 63.07 12.1 64.4 12.1C65.73 12.1 66.8 13.17 66.8 14.5C66.8 15.83 65.73 16.9 64.4 16.9C63.07 16.9 62 15.83 62 14.5Z" fill="#111827" />
+            <path d="M17 26C17 23.79 18.79 22 21 22H70C72.21 22 74 23.79 74 26V160C74 162.21 72.21 164 70 164H21C18.79 164 17 162.21 17 160V26Z" fill="#FFFFFF" />
+            <path d="M30 28L60 152" stroke="rgba(148,163,184,0.22)" strokeWidth="1.4" strokeLinecap="round" />
+            <path d="M53 42L66 88" stroke="rgba(148,163,184,0.16)" strokeWidth="1.1" strokeLinecap="round" />
           </g>
         </svg>
       </motion.div>
@@ -567,13 +562,35 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
 }
 
 function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutProps }) {
+  const [heroMountKey, setHeroMountKey] = useState(0);
+
+  useEffect(() => {
+    let restarted = false;
+
+    const restartHero = () => {
+      if (restarted) return;
+      restarted = true;
+      setHeroMountKey(1);
+    };
+
+    const raf = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(restartHero);
+    });
+    const timeoutId = window.setTimeout(restartHero, 180);
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
+
   return (
     <FitToViewport contentClassName={`px-5 pb-6 pt-5 sm:px-6 sm:pt-7`}>
       <div className={`mx-auto flex flex-col ${layout.sectionGapClass}`}>
         <div
           className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-amber-50/80 to-orange-100/80 shadow-sm ${layout.frameHeightClass}`}
         >
-          <OrbitHero layout={layout} />
+          <OrbitHero key={heroMountKey} layout={layout} />
         </div>
 
         <div className="flex flex-col px-1">
