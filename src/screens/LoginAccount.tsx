@@ -63,7 +63,6 @@ function FitToViewport({
 
     const observer = new ResizeObserver(measure);
     if (frameRef.current) observer.observe(frameRef.current);
-    if (contentRef.current) observer.observe(contentRef.current);
     window.visualViewport?.addEventListener("resize", measure);
     window.addEventListener("resize", measure);
 
@@ -90,6 +89,7 @@ function FitToViewport({
             transform: `scale(${scale})`,
             transformOrigin: "top center",
             width: "100%",
+            willChange: "transform",
           }}
         >
           {children}
