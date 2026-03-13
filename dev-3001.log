@@ -17,3 +17,4 @@
 ✓ Starting...
 Creating turbopack project { dir: 'C:\\Users\\Levan\\Desktop\\tg-miniapp\\web', testMode: true }
 ✓ Ready in 492ms
+ GET / 200 in 1085ms (compile: 738ms, render: 347ms)
