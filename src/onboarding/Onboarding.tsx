@@ -160,30 +160,51 @@ const mascotPartnerCoins = [
 ];
 
 function ElephantMascot({ layout }: { layout: SceneLayoutProps }) {
-  const elephantScale = layout.tier === "roomy" ? 1.12 : layout.tier === "compact" ? 0.9 : 1;
-  const orbitWidth = layout.tier === "roomy" ? 270 : layout.tier === "compact" ? 190 : 228;
-  const orbitHeight = layout.tier === "roomy" ? 128 : layout.tier === "compact" ? 90 : 108;
-  const coinSize = layout.tier === "roomy" ? 66 : layout.tier === "compact" ? 48 : 56;
-  const mascotY = layout.tier === "compact" ? 10 : 4;
+  const figureScale = layout.tier === "roomy" ? 1.1 : layout.tier === "compact" ? 0.9 : 1;
+  const coinSize = layout.tier === "roomy" ? 64 : layout.tier === "compact" ? 46 : 54;
+  const orbits = [
+    {
+      width: layout.tier === "roomy" ? 270 : layout.tier === "compact" ? 190 : 224,
+      height: layout.tier === "roomy" ? 122 : layout.tier === "compact" ? 84 : 100,
+      rotate: -14,
+      duration: 10.5,
+      offset: 0,
+    },
+    {
+      width: layout.tier === "roomy" ? 238 : layout.tier === "compact" ? 168 : 198,
+      height: layout.tier === "roomy" ? 168 : layout.tier === "compact" ? 118 : 140,
+      rotate: 56,
+      duration: 12.2,
+      offset: Math.PI / 3,
+    },
+    {
+      width: layout.tier === "roomy" ? 228 : layout.tier === "compact" ? 160 : 188,
+      height: layout.tier === "roomy" ? 88 : layout.tier === "compact" ? 62 : 74,
+      rotate: 90,
+      duration: 9.4,
+      offset: Math.PI / 6,
+    },
+  ];
 
-  const orbitConfigs = mascotPartnerCoins.map((coin, index) => {
-    const phase = (index / mascotPartnerCoins.length) * Math.PI * 2;
-    const duration = 10 + index * 0.9;
-    const frames = Array.from({ length: 9 }, (_, frameIndex) => {
-      const t = phase + (frameIndex / 8) * Math.PI * 2;
+  const orbitCoins = mascotPartnerCoins.map((coin, index) => {
+    const orbit = orbits[index % orbits.length];
+    const phase = orbit.offset + (index / mascotPartnerCoins.length) * Math.PI * 2;
+    const frames = Array.from({ length: 11 }, (_, frameIndex) => {
+      const t = phase + (frameIndex / 10) * Math.PI * 2;
       const depth = (Math.sin(t) + 1) / 2;
       return {
-        x: Math.cos(t) * orbitWidth * 0.5,
-        y: Math.sin(t) * orbitHeight * 0.5,
-        scale: 0.72 + depth * 0.48,
-        opacity: 0.42 + depth * 0.58,
-        blur: (1 - depth) * 1.4,
-        shadow: 0.14 + depth * 0.16,
+        x: Math.cos(t) * orbit.width * 0.5,
+        y: Math.sin(t) * orbit.height * 0.5,
+        scale: 0.7 + depth * 0.5,
+        opacity: 0.38 + depth * 0.62,
+        blur: (1 - depth) * 1.6,
         z: Math.round(depth * 100),
+        shadowOpacity: 0.12 + depth * 0.22,
+        rotateY: -22 + depth * 44,
       };
     });
 
-    return { ...coin, duration, frames };
+    return { ...coin, orbit, frames };
   });
 
   return (
@@ -223,24 +244,27 @@ function ElephantMascot({ layout }: { layout: SceneLayoutProps }) {
         transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      <div className="absolute inset-0 [perspective:1200px]">
-        <div
-          className="absolute left-1/2 top-1/2"
-          style={{
-            width: orbitWidth,
-            height: orbitHeight,
-            transform: "translate(-50%, -50%) rotateX(68deg)",
-            transformStyle: "preserve-3d",
-          }}
-        >
-          <div className="absolute inset-0 rounded-full border border-amber-300/35" />
-        </div>
+      <div className="absolute inset-0 [perspective:1400px]">
+        {orbits.map((orbit, index) => (
+          <div
+            key={index}
+            className="absolute left-1/2 top-1/2"
+            style={{
+              width: orbit.width,
+              height: orbit.height,
+              transform: `translate(-50%, -50%) rotateX(70deg) rotateZ(${orbit.rotate}deg)`,
+              transformStyle: "preserve-3d",
+            }}
+          >
+            <div className="absolute inset-0 rounded-full border border-amber-300/28" />
+          </div>
+        ))}
 
-        {orbitConfigs.map((coin) => (
+        {orbitCoins.map((coin) => (
           <motion.div
             key={coin.alt}
             className="absolute left-1/2 top-1/2"
-            style={{ marginLeft: -coinSize / 2, marginTop: -coinSize / 2 }}
+            style={{ marginLeft: -coinSize / 2, marginTop: -coinSize / 2, transformStyle: "preserve-3d" }}
             animate={{
               x: coin.frames.map((frame) => frame.x),
               y: coin.frames.map((frame) => frame.y),
@@ -248,9 +272,10 @@ function ElephantMascot({ layout }: { layout: SceneLayoutProps }) {
               opacity: coin.frames.map((frame) => frame.opacity),
               filter: coin.frames.map((frame) => `blur(${frame.blur}px)`),
               zIndex: coin.frames.map((frame) => frame.z),
+              rotateY: coin.frames.map((frame) => frame.rotateY),
             }}
             transition={{
-              duration: coin.duration,
+              duration: coin.orbit.duration,
               ease: "linear",
               repeat: Infinity,
             }}
@@ -281,83 +306,36 @@ function ElephantMascot({ layout }: { layout: SceneLayoutProps }) {
 
       <motion.div
         className="relative z-10"
-        animate={{ y: [mascotY, mascotY - 8, mascotY], rotate: [0, -1.2, 0, 1.2, 0] }}
+        animate={{ y: [4, -4, 4], rotate: [0, -1.2, 0, 1.2, 0] }}
         transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
-        style={{ scale: elephantScale }}
+        style={{ scale: figureScale }}
       >
-        <svg width="236" height="230" viewBox="0 0 236 230" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_26px_46px_rgba(24,24,27,0.16)]">
-          <ellipse cx="118" cy="206" rx="58" ry="14" fill="rgba(24,24,27,0.08)" />
-          <ellipse cx="176" cy="86" rx="42" ry="48" fill="#D7E3F6" stroke="#B5C4DE" strokeWidth="4" />
-          <ellipse cx="83" cy="92" rx="50" ry="58" fill="#E7EEF9" stroke="#B5C4DE" strokeWidth="4" />
-          <path d="M89 82C89 51.62 113.62 27 144 27C174.38 27 199 51.62 199 82V120C199 159.21 167.21 191 128 191H113C80.42 191 54 164.58 54 132V117C54 95.46 71.46 78 93 78H97C111.91 78 124 90.09 124 105V131C124 145.36 112.36 157 98 157C83.64 157 72 145.36 72 131V118" fill="#DDE7F7" />
-          <path d="M89 82C89 51.62 113.62 27 144 27C174.38 27 199 51.62 199 82V120C199 159.21 167.21 191 128 191H113C80.42 191 54 164.58 54 132V117C54 95.46 71.46 78 93 78H97C111.91 78 124 90.09 124 105V131C124 145.36 112.36 157 98 157C83.64 157 72 145.36 72 131V118" stroke="#B5C4DE" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M106 80C106 59.57 122.57 43 143 43C163.43 43 180 59.57 180 80V104C180 124.43 163.43 141 143 141H124C113.51 141 105 132.49 105 122V99C105 88.51 113.51 80 124 80H106Z" fill="url(#elephantBodyLight)" />
-          <ellipse cx="97" cy="96" rx="43" ry="50" fill="#EEF4FD" stroke="#B5C4DE" strokeWidth="4" />
-          <motion.path
-            d="M70 78C63 72 54 69 44 68"
-            stroke="#A0B0C9"
-            strokeWidth="4"
-            strokeLinecap="round"
-            animate={{ rotate: [0, -7, 0], transformOrigin: "70px 78px" }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <path d="M105 115C105 104.51 113.51 96 124 96H126C136.49 96 145 104.51 145 115V137C145 150.81 133.81 162 120 162C106.19 162 95 150.81 95 137V134" fill="#DDE7F7" stroke="#B5C4DE" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M99 133C99 133 107 146 120 146C133 146 141 133 141 133" stroke="#B5C4DE" strokeWidth="4" strokeLinecap="round" />
-          <motion.path
-            d="M124 111C124 111 119 131 120 145C121 158 130 164 138 164C148 164 155 156 155 146C155 136 148 128 139 128H133"
-            fill="none"
-            stroke="#A8B7D0"
-            strokeWidth="8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            animate={{ d: [
-              "M124 111C124 111 119 131 120 145C121 158 130 164 138 164C148 164 155 156 155 146C155 136 148 128 139 128H133",
-              "M124 111C124 111 118 133 120 148C122 161 131 167 139 167C149 167 157 159 157 149C157 139 149 131 140 131H134",
-              "M124 111C124 111 119 131 120 145C121 158 130 164 138 164C148 164 155 156 155 146C155 136 148 128 139 128H133",
-            ] }}
-            transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <circle cx="148" cy="94" r="8" fill="#273142" />
-          <circle cx="151" cy="91" r="2.4" fill="white" />
-          <circle cx="135" cy="117" r="3" fill="#F4B7C2" opacity="0.65" />
-          <motion.path
-            d="M143 108C148.33 112.67 156.67 112.67 162 108"
-            stroke="#273142"
-            strokeWidth="4"
-            strokeLinecap="round"
-            animate={{
-              d: [
-                "M143 108C148.33 112.67 156.67 112.67 162 108",
-                "M143 110C148.33 115 156.67 115 162 110",
-                "M143 108C148.33 112.67 156.67 112.67 162 108",
-              ],
-            }}
-            transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <path d="M86 170L84 200" stroke="#AAB8CF" strokeWidth="7" strokeLinecap="round" />
-          <path d="M112 174L111 204" stroke="#AAB8CF" strokeWidth="7" strokeLinecap="round" />
-          <path d="M150 174L151 204" stroke="#AAB8CF" strokeWidth="7" strokeLinecap="round" />
-          <path d="M176 168L180 198" stroke="#AAB8CF" strokeWidth="7" strokeLinecap="round" />
-          <motion.path
-            d="M93 128C101 135 109 139 118 140"
-            stroke="#93A3BC"
-            strokeWidth="4"
-            strokeLinecap="round"
-            animate={{ opacity: [0.55, 0.95, 0.55] }}
-            transition={{ duration: 2.6, repeat: Infinity }}
-          />
-          <motion.path
-            d="M170 78C176 74 180 68 181 61"
-            stroke="#93A3BC"
-            strokeWidth="4"
-            strokeLinecap="round"
-            animate={{ y: [0, -2, 0] }}
-            transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
-          />
+        <svg width="222" height="226" viewBox="0 0 222 226" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_26px_46px_rgba(24,24,27,0.16)]">
+          <ellipse cx="111" cy="206" rx="50" ry="12" fill="rgba(24,24,27,0.08)" />
+          <motion.g animate={{ y: [0, -2, 0] }} transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}>
+            <circle cx="111" cy="44" r="20" fill="#FFD9B8" />
+            <path d="M91 43C91 28 100 19 112 19C123 19 132 27 132 42V48H91V43Z" fill="#1F2937" />
+            <circle cx="103.5" cy="43.5" r="2.5" fill="#1F2937" />
+            <circle cx="118.5" cy="43.5" r="2.5" fill="#1F2937" />
+            <path d="M104 52C108 56 114 56 118 52" stroke="#B45309" strokeWidth="3" strokeLinecap="round" />
+            <path d="M95 67L84 97" stroke="#FFC7A1" strokeWidth="7" strokeLinecap="round" />
+            <path d="M127 67L138 97" stroke="#FFC7A1" strokeWidth="7" strokeLinecap="round" />
+            <path d="M111 64V129" stroke="#FFC7A1" strokeWidth="8" strokeLinecap="round" />
+            <path d="M82 94C82 82.95 90.95 74 102 74H120C131.05 74 140 82.95 140 94V143C140 154.05 131.05 163 120 163H102C90.95 163 82 154.05 82 143V94Z" fill="#0F172A" />
+            <path d="M92 86C92 83.79 93.79 82 96 82H126C128.21 82 130 83.79 130 86V145C130 147.21 128.21 149 126 149H96C93.79 149 92 147.21 92 145V86Z" fill="url(#phoneScreen)" />
+            <path d="M100 93H122" stroke="#93C5FD" strokeWidth="3" strokeLinecap="round" opacity="0.8" />
+            <path d="M100 104H118" stroke="#BFDBFE" strokeWidth="3" strokeLinecap="round" opacity="0.7" />
+            <path d="M100 115H114" stroke="#BFDBFE" strokeWidth="3" strokeLinecap="round" opacity="0.55" />
+            <circle cx="111" cy="138.5" r="4.5" fill="#E2E8F0" />
+            <path d="M94 165L87 198" stroke="#1F2937" strokeWidth="8" strokeLinecap="round" />
+            <path d="M128 165L135 198" stroke="#1F2937" strokeWidth="8" strokeLinecap="round" />
+            <path d="M84 97L70 127" stroke="#FFC7A1" strokeWidth="7" strokeLinecap="round" />
+            <path d="M138 97L152 127" stroke="#FFC7A1" strokeWidth="7" strokeLinecap="round" />
+          </motion.g>
           <defs>
-            <linearGradient id="elephantBodyLight" x1="143" y1="43" x2="143" y2="141" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#F7FAFF" />
-              <stop offset="1" stopColor="#D8E3F5" />
+            <linearGradient id="phoneScreen" x1="111" y1="82" x2="111" y2="149" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#1D4ED8" />
+              <stop offset="1" stopColor="#0F172A" />
             </linearGradient>
           </defs>
         </svg>
