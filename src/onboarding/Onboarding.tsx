@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { haptic } from "../components/haptics";
@@ -127,15 +128,6 @@ function getSceneLayout(viewportHeight: number, viewportWidth: number): SceneLay
   };
 }
 
-function createFloatingDots(count: number) {
-  return Array.from({ length: count }, () => ({
-    x: Math.random() * 300,
-    y: Math.random() * 300,
-    duration: 5 + Math.random() * 3,
-    delay: Math.random() * 2,
-  }));
-}
-
 function createCoinRain(count: number) {
   return Array.from({ length: count }, () => ({
     x: Math.random() * 200 + 50,
@@ -159,78 +151,150 @@ function createChartData(count: number) {
   }));
 }
 
-function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutProps }) {
-  const orbitDistance = layout.tier === "roomy" ? 104 : layout.tier === "compact" ? 70 : 84;
-  const iconSize = layout.tier === "roomy" ? "h-11 w-11" : "h-10 w-10";
-  const centerSize = layout.tier === "roomy" ? "h-32 w-32 text-[2.65rem]" : layout.tier === "compact" ? "h-24 w-24 text-3xl" : "h-28 w-28 text-4xl";
-  const [dots] = useState(() => createFloatingDots(20));
+const mascotPartnerCoins = [
+  { src: "/logos/vkusvill.svg", alt: "ВкусВилл", hue: "from-emerald-100 to-emerald-50" },
+  { src: "/logos/dodo.svg", alt: "Додо Пицца", hue: "from-orange-100 to-amber-50" },
+  { src: "/logos/cska.svg", alt: "ЦСКА", hue: "from-blue-100 to-sky-50" },
+  { src: "/logos/wildberries.svg", alt: "Wildberries", hue: "from-fuchsia-100 to-purple-50" },
+  { src: "/logos/cofix.svg", alt: "Cofix", hue: "from-rose-100 to-orange-50" },
+];
 
+function ElephantMascot({ layout }: { layout: SceneLayoutProps }) {
+  const elephantScale = layout.tier === "roomy" ? 1.12 : layout.tier === "compact" ? 0.9 : 1;
+  const orbitSize = layout.tier === "roomy" ? 240 : layout.tier === "compact" ? 172 : 204;
+  const coinSize = layout.tier === "roomy" ? 62 : layout.tier === "compact" ? 46 : 54;
+
+  return (
+    <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.75),transparent_42%),radial-gradient(circle_at_50%_100%,rgba(245,158,11,0.14),transparent_48%)]" />
+
+      {[...Array(10)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute h-2.5 w-2.5 rounded-full bg-amber-300/40"
+          initial={{
+            x: (i - 4.5) * 24,
+            y: 70 + (i % 3) * 18,
+            opacity: 0,
+          }}
+          animate={{
+            y: [null, -18, 10, -12],
+            opacity: [0.15, 0.5, 0.2],
+          }}
+          transition={{
+            duration: 4 + i * 0.22,
+            repeat: Infinity,
+            repeatType: "mirror",
+            delay: i * 0.15,
+          }}
+        />
+      ))}
+
+      <motion.div
+        className="absolute rounded-full bg-amber-200/35 blur-3xl"
+        style={{
+          width: orbitSize * 0.9,
+          height: orbitSize * 0.5,
+        }}
+        animate={{ scale: [0.92, 1.04, 0.96], opacity: [0.3, 0.48, 0.34] }}
+        transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      <motion.div
+        className="absolute rounded-full border border-amber-300/35"
+        style={{
+          width: orbitSize,
+          height: orbitSize,
+        }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
+      >
+        {mascotPartnerCoins.map((coin, i) => {
+          const angle = (Math.PI * 2 * i) / mascotPartnerCoins.length - Math.PI / 2;
+          const radius = orbitSize / 2;
+          const x = Math.cos(angle) * radius;
+          const y = Math.sin(angle) * radius;
+
+          return (
+            <motion.div
+              key={coin.alt}
+              className="absolute left-1/2 top-1/2"
+              style={{
+                x: `calc(-50% + ${x}px)`,
+                y: `calc(-50% + ${y}px)`,
+              }}
+              animate={{ rotate: -360 }}
+              transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
+            >
+              <div
+                className={`grid place-items-center rounded-full border border-white/80 bg-gradient-to-br ${coin.hue} shadow-[0_12px_28px_rgba(245,158,11,0.18)]`}
+                style={{ width: coinSize, height: coinSize }}
+              >
+                <div className="grid h-[72%] w-[72%] place-items-center rounded-full bg-white shadow-inner">
+                  <Image src={coin.src} alt={coin.alt} width={coinSize * 0.42} height={coinSize * 0.42} className="h-auto w-auto max-h-[60%] max-w-[60%] object-contain" />
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </motion.div>
+
+      <motion.div
+        className="relative z-10"
+        animate={{ y: [0, -8, 0], rotate: [0, -1.2, 0, 1.2, 0] }}
+        transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+        style={{ scale: elephantScale }}
+      >
+        <svg width="210" height="210" viewBox="0 0 210 210" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_18px_36px_rgba(24,24,27,0.12)]">
+          <ellipse cx="105" cy="184" rx="46" ry="12" fill="rgba(24,24,27,0.08)" />
+          <path d="M67 90C67 60.7 90.7 37 120 37C149.3 37 173 60.7 173 90V120C173 149.3 149.3 173 120 173H97C68.8 173 46 150.2 46 122V115C46 94 63 77 84 77H92C104.7 77 115 87.3 115 100V127C115 137.5 106.5 146 96 146C85.5 146 77 137.5 77 127V116" fill="#DDE5F4" />
+          <path d="M67 90C67 60.7 90.7 37 120 37C149.3 37 173 60.7 173 90V120C173 149.3 149.3 173 120 173H97C68.8 173 46 150.2 46 122V115C46 94 63 77 84 77H92C104.7 77 115 87.3 115 100V127C115 137.5 106.5 146 96 146C85.5 146 77 137.5 77 127V116" stroke="#B8C4D9" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M142 99C161.33 99 177 83.33 177 64C177 44.67 161.33 29 142 29C122.67 29 107 44.67 107 64C107 83.33 122.67 99 142 99Z" fill="#E8EEF9" stroke="#B8C4D9" strokeWidth="4" />
+          <path d="M112 107C92.12 107 76 90.88 76 71C76 51.12 92.12 35 112 35C127.89 35 141.37 45.3 146.08 59.56C148.06 65.54 143.28 71 136.98 71H111.5C101.28 71 93 79.28 93 89.5V96C93 102.08 98.24 106.92 104.28 106.44L112 107Z" fill="#F1F5FB" stroke="#B8C4D9" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="137" cy="86" r="7" fill="#2F3640" />
+          <circle cx="139.5" cy="83.5" r="2" fill="white" />
+          <motion.path
+            d="M121 102C126.33 106.67 134.67 106.67 140 102"
+            stroke="#2F3640"
+            strokeWidth="4"
+            strokeLinecap="round"
+            animate={{ d: ["M121 102C126.33 106.67 134.67 106.67 140 102", "M121 104C126.33 109.33 134.67 109.33 140 104", "M121 102C126.33 106.67 134.67 106.67 140 102"] }}
+            transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <path d="M63 138L61 170" stroke="#B8C4D9" strokeWidth="6" strokeLinecap="round" />
+          <path d="M93 142L92 174" stroke="#B8C4D9" strokeWidth="6" strokeLinecap="round" />
+          <path d="M127 144L126 176" stroke="#B8C4D9" strokeWidth="6" strokeLinecap="round" />
+          <path d="M157 139L159 171" stroke="#B8C4D9" strokeWidth="6" strokeLinecap="round" />
+          <motion.path
+            d="M84 112C84 112 92 120 103 120C114 120 120 111 120 111"
+            stroke="#93A3BC"
+            strokeWidth="4"
+            strokeLinecap="round"
+            animate={{ opacity: [0.75, 1, 0.75] }}
+            transition={{ duration: 2.4, repeat: Infinity }}
+          />
+          <motion.path
+            d="M78 74C75 69 70 66 64 65"
+            stroke="#93A3BC"
+            strokeWidth="4"
+            strokeLinecap="round"
+            animate={{ rotate: [0, -5, 0], transformOrigin: "78px 74px" }}
+            transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </svg>
+      </motion.div>
+    </div>
+  );
+}
+
+function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutProps }) {
   return (
     <FitToViewport contentClassName={`px-5 pb-6 pt-5 sm:px-6 sm:pt-7`}>
       <div className={`mx-auto flex flex-col ${layout.sectionGapClass}`}>
         <div
           className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-amber-50/80 to-orange-100/80 shadow-sm ${layout.frameHeightClass}`}
         >
-          {dots.map((dot, i) => (
-            <motion.div
-              key={i}
-              className="absolute h-2 w-2 rounded-full bg-amber-400/60"
-              initial={{
-                x: dot.x,
-                y: dot.y,
-                opacity: 0.2,
-              }}
-              animate={{
-                y: [null, -30, 30, -30],
-                x: [null, 20, -20, 20],
-                opacity: [0.2, 0.5, 0.2],
-              }}
-              transition={{
-                duration: dot.duration,
-                repeat: Infinity,
-                delay: dot.delay,
-              }}
-            />
-          ))}
-
-          <motion.div
-            className="relative z-10"
-            animate={{
-              scale: [1, 1.08, 1],
-              rotate: [0, 3, -3, 0],
-            }}
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          >
-            <div className={`flex items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-xl ${centerSize}`}>
-              <span className="font-light tracking-tight text-white">B</span>
-            </div>
-          </motion.div>
-
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <motion.div
-              key={i}
-              className={`absolute flex items-center justify-center rounded-xl border border-amber-200/50 bg-white/90 shadow-md backdrop-blur-xs ${iconSize}`}
-              animate={{
-                x: [0, orbitDistance * Math.cos(i * 60), 0],
-                y: [0, orbitDistance * Math.sin(i * 60), 0],
-                rotate: [0, 360],
-              }}
-              transition={{
-                duration: 10,
-                repeat: Infinity,
-                delay: i * 0.6,
-                ease: "linear",
-              }}
-            >
-              <span className={layout.tier === "compact" ? "text-base font-light text-amber-600" : "text-lg font-light text-amber-600"}>
-                B
-              </span>
-            </motion.div>
-          ))}
+          <ElephantMascot layout={layout} />
         </div>
 
         <div className="flex flex-col px-1">
