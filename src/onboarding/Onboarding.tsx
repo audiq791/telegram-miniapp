@@ -1212,6 +1212,7 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
   const targetCardHeight = layout.tier === "roomy" ? 86 : layout.tier === "compact" ? 68 : 76;
   const bottomOffset = layout.tier === "roomy" ? 82 : layout.tier === "compact" ? 58 : 68;
   const sideOffset = layout.tier === "roomy" ? 108 : layout.tier === "compact" ? 78 : 92;
+  const hubTopOffset = layout.tier === "roomy" ? -18 : layout.tier === "compact" ? -10 : -14;
 
   return (
     <FitToViewport contentClassName="px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
@@ -1268,6 +1269,24 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
               animate={{ pathLength: [0.15, 1, 0.15], opacity: [0.16, 0.42, 0.16] }}
               transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 0.35 }}
             />
+            <motion.path
+              d="M 178 188 C 150 206, 124 218, 94 234"
+              fill="none"
+              stroke="rgba(34,197,94,0.3)"
+              strokeWidth="2.7"
+              strokeLinecap="round"
+              animate={{ pathLength: [0.2, 1, 0.2], opacity: [0.18, 0.46, 0.18] }}
+              transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.15 }}
+            />
+            <motion.path
+              d="M 182 188 C 210 206, 236 218, 266 234"
+              fill="none"
+              stroke="rgba(249,115,22,0.3)"
+              strokeWidth="2.7"
+              strokeLinecap="round"
+              animate={{ pathLength: [0.2, 1, 0.2], opacity: [0.18, 0.46, 0.18] }}
+              transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.45 }}
+            />
           </svg>
 
           {incomingCoins.map((coin, index) => (
@@ -1309,6 +1328,7 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
             className="relative z-[3]"
             animate={{ y: [0, -3, 0], scale: [1, 1.01, 1] }}
             transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+            style={{ marginTop: hubTopOffset }}
           >
             <div
               className="rounded-[28px] border border-white/60 bg-white/88 p-4 shadow-[0_28px_46px_rgba(76,29,149,0.14)] backdrop-blur-md"
@@ -1317,34 +1337,46 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
               <div className="text-[0.52rem] font-medium uppercase tracking-[0.24em] text-violet-500">
                 Ваш центр управления
               </div>
-              <div className="mt-2 text-[1.55rem] font-semibold tracking-tight text-zinc-900">
-                12 480 BON
+              <div className="mt-2 text-[1.15rem] font-semibold tracking-tight text-zinc-900">
+                BON - Кошелек
               </div>
               <div className="mt-1 text-[0.56rem] font-medium uppercase tracking-[0.22em] text-violet-400">
-                Loyalty OS
+                BON PLATFORM
               </div>
-              <div className="mt-1 flex items-center gap-2">
-                <div className="h-2 flex-1 overflow-hidden rounded-full bg-violet-100">
+              <div className="mt-3 flex items-start justify-between gap-4">
+                <div className="flex flex-1 flex-col items-center">
                   <motion.div
-                    className="h-full rounded-full bg-[linear-gradient(90deg,#8b5cf6,#ec4899,#22c55e)]"
-                    animate={{ width: ["34%", "78%", "54%"] }}
-                    transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
-                  />
+                    className="relative h-10 w-10"
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                  >
+                    <div className="absolute inset-0 rounded-full border-[3px] border-violet-300/70" />
+                    <div className="absolute left-1/2 top-1 h-3 w-1.5 -translate-x-1/2 rounded-full bg-violet-400" />
+                    <div className="absolute bottom-1 left-1/2 h-3 w-1.5 -translate-x-1/2 rounded-full bg-violet-400" />
+                    <div className="absolute left-1 top-1/2 h-1.5 w-3 -translate-y-1/2 rounded-full bg-violet-400" />
+                    <div className="absolute right-1 top-1/2 h-1.5 w-3 -translate-y-1/2 rounded-full bg-violet-400" />
+                    <div className="absolute inset-[9px] rounded-full bg-white" />
+                  </motion.div>
+                  <div className="mt-2 rounded-full bg-violet-50 px-3 py-1 text-[0.48rem] font-medium uppercase tracking-[0.16em] text-violet-600">
+                    Автонакопление
+                  </div>
                 </div>
-                <motion.span
-                  className="text-[0.62rem] font-medium text-emerald-600"
-                  animate={{ opacity: [0.45, 1, 0.45], y: [0, -1, 0] }}
-                  transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  +3.2%
-                </motion.span>
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-2 text-[0.6rem]">
-                <div className="rounded-2xl bg-violet-50 px-3 py-2 text-violet-700">
-                  Автонакопление
-                </div>
-                <div className="rounded-2xl bg-amber-50 px-3 py-2 text-amber-700">
-                  Готово к обмену
+                <div className="flex flex-1 flex-col items-center">
+                  <motion.div
+                    className="relative h-10 w-10"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                  >
+                    <div className="absolute inset-0 rounded-full border-[3px] border-amber-300/70" />
+                    <div className="absolute left-1/2 top-1 h-3 w-1.5 -translate-x-1/2 rounded-full bg-amber-400" />
+                    <div className="absolute bottom-1 left-1/2 h-3 w-1.5 -translate-x-1/2 rounded-full bg-amber-400" />
+                    <div className="absolute left-1 top-1/2 h-1.5 w-3 -translate-y-1/2 rounded-full bg-amber-400" />
+                    <div className="absolute right-1 top-1/2 h-1.5 w-3 -translate-y-1/2 rounded-full bg-amber-400" />
+                    <div className="absolute inset-[9px] rounded-full bg-white" />
+                  </motion.div>
+                  <div className="mt-2 rounded-full bg-amber-50 px-3 py-1 text-[0.48rem] font-medium uppercase tracking-[0.16em] text-amber-600">
+                    Готово к обмену
+                  </div>
                 </div>
               </div>
             </div>
@@ -1388,27 +1420,19 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
             >
               <div className="text-[0.46rem] font-medium uppercase tracking-[0.18em] text-orange-600">Обменивайте</div>
               <div className="mt-2 flex h-10 items-center justify-between rounded-2xl bg-orange-50 px-2.5">
-                <motion.div
-                  className="rounded-full bg-white px-2 py-1 text-[0.46rem] font-medium text-zinc-700 shadow-sm"
-                  animate={{ x: [0, 10, 0] }}
-                  transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                >
+                <div className="rounded-full bg-white px-2 py-1 text-[0.46rem] font-medium text-zinc-700 shadow-sm">
                   VV
-                </motion.div>
+                </div>
                 <motion.div
                   className="text-orange-500"
-                  animate={{ opacity: [0.35, 1, 0.35], x: [-2, 2, -2] }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                 >
-                  →
+                  ↻
                 </motion.div>
-                <motion.div
-                  className="rounded-full bg-white px-2 py-1 text-[0.46rem] font-medium text-zinc-700 shadow-sm"
-                  animate={{ x: [0, -10, 0] }}
-                  transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
-                >
+                <div className="rounded-full bg-white px-2 py-1 text-[0.46rem] font-medium text-zinc-700 shadow-sm">
                   CSKA
-                </motion.div>
+                </div>
               </div>
             </div>
           </motion.div>
