@@ -1320,6 +1320,9 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
               <div className="mt-2 text-[1.55rem] font-semibold tracking-tight text-zinc-900">
                 12 480 BON
               </div>
+              <div className="mt-1 text-[0.56rem] font-medium uppercase tracking-[0.22em] text-violet-400">
+                Loyalty OS
+              </div>
               <div className="mt-1 flex items-center gap-2">
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-violet-100">
                   <motion.div
