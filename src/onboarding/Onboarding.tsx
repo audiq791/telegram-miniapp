@@ -905,11 +905,11 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
     ],
     [],
   );
-  const rainCoinSize = layout.tier === "roomy" ? 34 : layout.tier === "compact" ? 24 : 28;
-  const burstCoinSize = layout.tier === "roomy" ? 40 : layout.tier === "compact" ? 28 : 32;
-  const qrPixelSize = layout.tier === "roomy" ? 160 : layout.tier === "compact" ? 96 : 128;
-  const sceneHalfWidth = layout.tier === "roomy" ? 150 : layout.tier === "compact" ? 108 : 128;
-  const sceneBottomReach = layout.tier === "roomy" ? 140 : layout.tier === "compact" ? 96 : 116;
+  const rainCoinSize = layout.tier === "roomy" ? 38 : layout.tier === "compact" ? 28 : 32;
+  const burstCoinSize = layout.tier === "roomy" ? 42 : layout.tier === "compact" ? 30 : 34;
+  const qrPixelSize = layout.tier === "roomy" ? 320 : layout.tier === "compact" ? 192 : 256;
+  const sceneHalfWidth = layout.tier === "roomy" ? 206 : layout.tier === "compact" ? 138 : 172;
+  const sceneBottomReach = layout.tier === "roomy" ? 184 : layout.tier === "compact" ? 126 : 156;
 
   return (
     <FitToViewport contentClassName="px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
@@ -924,17 +924,22 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
               <motion.div
                 key={`rain-${i}`}
                 className="absolute left-1/2 top-0"
-                initial={{ x: (i - 3) * 14, y: -88, rotate: -10 + i * 3 }}
+                initial={{ x: (i - 3) * 16, y: -120, rotate: -8 + i * 2 }}
                 animate={{
-                  x: [(i - 3) * 14, (i - 3) * 12, (i - 3) * 9],
-                  y: [-88, -28, 32, 126],
-                  rotate: [-10 + i * 3, -3 + i * 2, 4 + i],
+                  x: [
+                    (i - 3) * 16,
+                    (i - 3) * 14 + Math.sin(i) * 4,
+                    (i - 3) * 10 + Math.cos(i) * 5,
+                    (i - 3) * 8,
+                  ],
+                  y: [-120, -44, 36, 122, 202],
+                  rotate: [-8 + i * 2, -3 + i * 1.4, 2 + i * 0.8],
                 }}
                 transition={{
-                  duration: 3.6 + (i % 3) * 0.45,
+                  duration: 5 + (i % 3) * 0.55,
                   repeat: Infinity,
                   delay: drop.delay,
-                  ease: [0.22, 0.84, 0.28, 1],
+                  ease: [0.2, 0.82, 0.24, 1],
                 }}
               >
                 <div
@@ -969,13 +974,13 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
                 const coin = bonusCoins[index % bonusCoins.length];
                 const isLeft = index < leftBurst.length;
                 const targetX = isLeft
-                  ? -sceneHalfWidth + (index % 3) * 12
-                  : sceneHalfWidth - (index % 3) * 12;
-                const targetY = sceneBottomReach - (index % 4) * 10;
+                  ? -sceneHalfWidth + (index % 3) * 14
+                  : sceneHalfWidth - (index % 3) * 14;
+                const targetY = sceneBottomReach - (index % 4) * 12;
                 const originX = isLeft
-                  ? -qrPixelSize * (0.18 + (index % 3) * 0.08)
-                  : qrPixelSize * (0.18 + (index % 3) * 0.08);
-                const originY = qrPixelSize * (0.34 + (index % 2) * 0.05);
+                  ? -qrPixelSize * (0.18 + (index % 3) * 0.09)
+                  : qrPixelSize * (0.18 + (index % 3) * 0.09);
+                const originY = qrPixelSize * (0.42 + (index % 2) * 0.04);
 
                 return (
                   <motion.div
@@ -988,16 +993,31 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
                       rotate: burst.rotate * 0.08,
                     }}
                     animate={{
-                      x: [originX, originX + targetX * 0.34, targetX],
-                      y: [originY, originY + targetY * 0.46, targetY],
-                      scale: [0.68, 0.88, 0.96],
-                      rotate: [burst.rotate * 0.08, burst.rotate * 0.42, burst.rotate * 0.72],
+                      x: [
+                        originX,
+                        originX + targetX * 0.18,
+                        originX + targetX * 0.54,
+                        targetX,
+                      ],
+                      y: [
+                        originY,
+                        originY + 22,
+                        originY + targetY * 0.42,
+                        targetY,
+                      ],
+                      scale: [0.68, 0.8, 0.9, 0.96],
+                      rotate: [
+                        burst.rotate * 0.04,
+                        burst.rotate * 0.16,
+                        burst.rotate * 0.38,
+                        burst.rotate * 0.58,
+                      ],
                     }}
                     transition={{
-                      duration: 4.2 + (index % 3) * 0.45,
+                      duration: 5.4 + (index % 3) * 0.5,
                       repeat: Infinity,
                       delay: burst.delay,
-                      ease: [0.19, 1, 0.22, 1],
+                      ease: [0.16, 0.96, 0.2, 1],
                     }}
                   >
                     <div
