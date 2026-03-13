@@ -588,45 +588,29 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
                 "0 34px 70px rgba(15,23,42,0.32), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -10px 28px rgba(0,0,0,0.42)",
             }}
           >
-            <div
-            className="absolute inset-[4px] rounded-[30px] bg-[linear-gradient(180deg,#0f172a_0%,#020617_100%)]"
+          <div
+            className="absolute inset-[3px] rounded-[31px] bg-[linear-gradient(180deg,#334155_0%,#111827_18%,#0f172a_55%,#020617_100%)]"
             style={{
               transform: "translateZ(-9px)",
-              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.05), 0 16px 24px rgba(2,6,23,0.25)",
+              boxShadow:
+                "inset 0 0 0 1px rgba(255,255,255,0.06), inset 0 10px 18px rgba(255,255,255,0.05), inset 0 -16px 22px rgba(0,0,0,0.34), 0 16px 24px rgba(2,6,23,0.25)",
             }}
           />
           <div
-            className="absolute inset-y-[10px] -right-[8px] rounded-r-[30px] bg-[linear-gradient(180deg,#64748b_0%,#1e293b_18%,#0f172a_58%,#020617_100%)]"
+            className="absolute inset-[1px] rounded-[33px]"
             style={{
-              width: 10,
-              transform: "rotateY(90deg) translateZ(4px)",
-              transformOrigin: "right center",
-              boxShadow: "inset -1px 0 0 rgba(255,255,255,0.14)",
+              background:
+                "linear-gradient(135deg, rgba(255,255,255,0.12), transparent 22%, transparent 74%, rgba(255,255,255,0.06) 100%)",
+              boxShadow:
+                "inset 1px 0 0 rgba(255,255,255,0.08), inset -1px 0 0 rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.25)",
             }}
           />
           <div
-            className="absolute inset-y-[10px] -left-[8px] rounded-l-[30px] bg-[linear-gradient(180deg,#475569_0%,#0f172a_28%,#020617_100%)]"
+            className="absolute inset-[6px] rounded-[28px] border border-white/8"
             style={{
-              width: 10,
-              transform: "rotateY(-90deg) translateZ(4px)",
-              transformOrigin: "left center",
-              boxShadow: "inset 1px 0 0 rgba(255,255,255,0.1)",
-            }}
-          />
-          <div
-            className="absolute inset-x-[12px] -top-[8px] rounded-t-[26px] bg-[linear-gradient(180deg,#94a3b8_0%,#334155_22%,#0f172a_100%)]"
-            style={{
-              height: 10,
-              transform: "rotateX(90deg) translateZ(4px)",
-              transformOrigin: "top center",
-            }}
-          />
-          <div
-            className="absolute inset-x-[12px] -bottom-[8px] rounded-b-[26px] bg-[linear-gradient(180deg,#0f172a_0%,#020617_100%)]"
-            style={{
-              height: 10,
-              transform: "rotateX(-90deg) translateZ(4px)",
-              transformOrigin: "bottom center",
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01) 28%, rgba(0,0,0,0.12) 100%)",
+              transform: "translateZ(1px)",
             }}
           />
           <div className="absolute inset-0 rounded-[34px] bg-[radial-gradient(circle_at_18%_14%,rgba(255,255,255,0.22),transparent_24%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent_42%,rgba(255,255,255,0.02)_68%,transparent_100%)]" />
@@ -728,10 +712,10 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
               <div className="absolute -right-4 bottom-7 h-20 w-20 rounded-full bg-cyan-400/10 blur-2xl" />
             </div>
           </div>
-          <div className="absolute -left-[4px] top-14 h-9 w-[3px] rounded-full bg-slate-500/80" />
-          <div className="absolute -left-[4px] top-24 h-14 w-[3px] rounded-full bg-slate-500/80" />
-          <div className="absolute -right-[4px] top-20 h-16 w-[3px] rounded-full bg-slate-500/85" />
-          </div>
+          <div className="absolute left-[1px] top-14 h-9 w-[2px] rounded-full bg-white/12" />
+          <div className="absolute left-[1px] top-24 h-14 w-[2px] rounded-full bg-white/10" />
+          <div className="absolute right-[1px] top-20 h-16 w-[2px] rounded-full bg-white/12" />
+        </div>
         </motion.div>
       </motion.div>
 
