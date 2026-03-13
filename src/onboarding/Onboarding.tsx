@@ -358,28 +358,28 @@ const orbitHeroCoins = [
 ];
 
 function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
-  const figureScale = layout.tier === "roomy" ? 1.08 : layout.tier === "compact" ? 0.9 : 1;
-  const coinSize = layout.tier === "roomy" ? 58 : layout.tier === "compact" ? 42 : 50;
+  const phoneScale = layout.tier === "roomy" ? 1.08 : layout.tier === "compact" ? 0.88 : 1;
+  const coinSize = layout.tier === "roomy" ? 54 : layout.tier === "compact" ? 38 : 46;
   const orbits = [
     {
-      width: layout.tier === "roomy" ? 292 : layout.tier === "compact" ? 208 : 244,
-      height: layout.tier === "roomy" ? 110 : layout.tier === "compact" ? 80 : 92,
+      width: layout.tier === "roomy" ? 286 : layout.tier === "compact" ? 208 : 244,
+      height: layout.tier === "roomy" ? 118 : layout.tier === "compact" ? 86 : 98,
       rotate: 18,
-      duration: 11,
+      duration: 11.2,
       phase: 0,
     },
     {
-      width: layout.tier === "roomy" ? 164 : layout.tier === "compact" ? 124 : 142,
-      height: layout.tier === "roomy" ? 284 : layout.tier === "compact" ? 206 : 242,
+      width: layout.tier === "roomy" ? 162 : layout.tier === "compact" ? 118 : 138,
+      height: layout.tier === "roomy" ? 292 : layout.tier === "compact" ? 214 : 246,
       rotate: 90,
-      duration: 12.5,
-      phase: Math.PI / 6,
+      duration: 12.8,
+      phase: Math.PI / 4,
     },
     {
-      width: layout.tier === "roomy" ? 278 : layout.tier === "compact" ? 198 : 232,
-      height: layout.tier === "roomy" ? 176 : layout.tier === "compact" ? 126 : 148,
+      width: layout.tier === "roomy" ? 282 : layout.tier === "compact" ? 202 : 236,
+      height: layout.tier === "roomy" ? 172 : layout.tier === "compact" ? 124 : 144,
       rotate: -42,
-      duration: 10.8,
+      duration: 10.6,
       phase: Math.PI / 3,
     },
   ];
@@ -442,8 +442,7 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
               transform: `translate(-50%, -50%) rotateZ(${orbit.rotate}deg)`,
             }}
           >
-            <div className="absolute inset-0 rounded-full border-[2px] border-zinc-400/45 shadow-[0_0_0_1px_rgba(255,255,255,0.6)_inset]" />
-            <div className="absolute inset-[3px] rounded-full border border-white/55" />
+            <div className="absolute inset-0 rounded-full border-[1.2px] border-zinc-400/55 shadow-[0_0_0_1px_rgba(255,255,255,0.45)_inset]" />
           </div>
         ))}
 
@@ -497,65 +496,52 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
 
       <motion.div
         className="relative z-10"
-        animate={{ y: [4, -4, 4] }}
-        transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }}
-        style={{ scale: figureScale }}
+        animate={{ rotateY: [30, 0, -30, 0, 30], rotateX: [4, 0, -4, 0, 4], y: [2, -3, 2] }}
+        transition={{ duration: 9.5, repeat: Infinity, ease: "easeInOut" }}
+        style={{ scale: phoneScale, transformStyle: "preserve-3d" }}
       >
         <svg
-          width="240"
-          height="248"
-          viewBox="0 0 240 248"
+          width="176"
+          height="236"
+          viewBox="0 0 176 236"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="drop-shadow-[0_24px_40px_rgba(24,24,27,0.14)]"
+          className="drop-shadow-[0_28px_42px_rgba(24,24,27,0.18)]"
         >
-          <ellipse cx="120" cy="227" rx="42" ry="10" fill="rgba(24,24,27,0.08)" />
+          <ellipse cx="88" cy="219" rx="34" ry="9" fill="rgba(24,24,27,0.09)" />
           <g>
-            <path d="M101 63C101 52.5 109.5 44 120 44C130.5 44 139 52.5 139 63V76H101V63Z" fill="url(#heroHairGrad)" />
-            <ellipse cx="120" cy="70" rx="23" ry="26" fill="url(#heroSkinGrad)" />
-            <path d="M100 70C100 53 111 44 124 44C136 44 145 53 145 67C139 63 130 61 120 61C111 61 104 64 100 70Z" fill="url(#heroHairGrad)" />
-            <path d="M111 80C114 83 118 84.5 122 84.5C126 84.5 129.5 83 132 80" stroke="#C26B46" strokeWidth="2.5" strokeLinecap="round" />
-            <circle cx="112" cy="71" r="2.2" fill="#3F2A22" />
-            <circle cx="128" cy="71" r="2.2" fill="#3F2A22" />
-            <path d="M114 94H126" stroke="#EBC0A3" strokeWidth="10" strokeLinecap="round" />
-            <path d="M96 109C98 97 108 89 120 89C132 89 142 97 144 109L150 154H90L96 109Z" fill="url(#heroJacketGrad)" />
-            <path d="M109 95H131L135 154H105L109 95Z" fill="#F8FAFC" />
-            <path d="M118 95H122V154H118V95Z" fill="#CBD5E1" />
-            <path d="M95 111C84 118 77 130 75 143" stroke="#E8B18E" strokeWidth="11" strokeLinecap="round" />
-            <path d="M145 111C157 117 166 129 171 144" stroke="#E8B18E" strokeWidth="11" strokeLinecap="round" />
-            <path d="M167 141L186 129" stroke="#E8B18E" strokeWidth="11" strokeLinecap="round" />
-            <rect x="181" y="111" width="22" height="38" rx="7" fill="#0F172A" />
-            <rect x="184.5" y="115" width="15" height="28" rx="5" fill="url(#heroScreenGrad)" />
-            <circle cx="192" cy="145.5" r="1.8" fill="#CBD5E1" />
-            <path d="M93 154H147L156 209H84L93 154Z" fill="url(#heroPantsGrad)" />
-            <path d="M102 154L98 222" stroke="#2D3748" strokeWidth="13" strokeLinecap="round" />
-            <path d="M138 154L142 222" stroke="#2D3748" strokeWidth="13" strokeLinecap="round" />
-            <path d="M90 222H109" stroke="#0F172A" strokeWidth="10" strokeLinecap="round" />
-            <path d="M132 222H151" stroke="#0F172A" strokeWidth="10" strokeLinecap="round" />
-            <path d="M75 143L66 166" stroke="#E8B18E" strokeWidth="10" strokeLinecap="round" />
-            <path d="M66 166L82 173" stroke="#E8B18E" strokeWidth="10" strokeLinecap="round" />
-            <path d="M122 103L136 122L146 110" stroke="rgba(255,255,255,0.5)" strokeWidth="4" strokeLinecap="round" />
+            <path d="M44 36C44 21.64 55.64 10 70 10H112C126.36 10 138 21.64 138 36V180C138 194.36 126.36 206 112 206H70C55.64 206 44 194.36 44 180V36Z" fill="url(#phoneBodyGrad)" />
+            <path d="M49 40C49 28.95 57.95 20 69 20H113C124.05 20 133 28.95 133 40V176C133 187.05 124.05 196 113 196H69C57.95 196 49 187.05 49 176V40Z" fill="#0F172A" />
+            <path d="M53 43C53 33.06 61.06 25 71 25H111C120.94 25 129 33.06 129 43V173C129 182.94 120.94 191 111 191H71C61.06 191 53 182.94 53 173V43Z" fill="url(#phoneScreenGrad)" />
+            <path d="M76 18H106" stroke="#334155" strokeWidth="3.5" strokeLinecap="round" />
+            <circle cx="88" cy="178" r="6" fill="#111827" />
+            <circle cx="88" cy="178" r="3.2" fill="#374151" />
+            <path d="M118 30L65 182" stroke="rgba(255,255,255,0.22)" strokeWidth="8" strokeLinecap="round" />
+            <path d="M65 47C65 43.69 67.69 41 71 41H111C114.31 41 117 43.69 117 47V148C117 151.31 114.31 154 111 154H71C67.69 154 65 151.31 65 148V47Z" fill="url(#phoneGlassGrad)" opacity="0.55" />
+            <path d="M72 56H109" stroke="rgba(191,219,254,0.95)" strokeWidth="4" strokeLinecap="round" />
+            <path d="M72 70H102" stroke="rgba(191,219,254,0.7)" strokeWidth="3.5" strokeLinecap="round" />
+            <path d="M72 84H96" stroke="rgba(191,219,254,0.55)" strokeWidth="3.5" strokeLinecap="round" />
+            <path d="M71 116C78 108 86 104 95 104C105 104 114 110 120 121" stroke="rgba(56,189,248,0.8)" strokeWidth="5" strokeLinecap="round" />
+            <circle cx="116" cy="121" r="6" fill="#22D3EE" />
+            <path d="M138 56V88" stroke="#475569" strokeWidth="4" strokeLinecap="round" />
+            <path d="M138 99V124" stroke="#475569" strokeWidth="4" strokeLinecap="round" />
+            <path d="M42 62V96" stroke="#64748B" strokeWidth="3.5" strokeLinecap="round" />
           </g>
           <defs>
-            <linearGradient id="heroSkinGrad" x1="120" y1="44" x2="120" y2="96" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#FFD9C2" />
-              <stop offset="1" stopColor="#F2B58E" />
-            </linearGradient>
-            <linearGradient id="heroHairGrad" x1="100" y1="44" x2="145" y2="84" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#2F2625" />
-              <stop offset="1" stopColor="#5A463F" />
-            </linearGradient>
-            <linearGradient id="heroJacketGrad" x1="84" y1="89" x2="156" y2="209" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#FB923C" />
-              <stop offset="1" stopColor="#EA580C" />
-            </linearGradient>
-            <linearGradient id="heroPantsGrad" x1="84" y1="154" x2="156" y2="209" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#475569" />
+            <linearGradient id="phoneBodyGrad" x1="44" y1="10" x2="138" y2="206" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#94A3B8" />
+              <stop offset="0.35" stopColor="#E2E8F0" />
+              <stop offset="0.72" stopColor="#64748B" />
               <stop offset="1" stopColor="#0F172A" />
             </linearGradient>
-            <linearGradient id="heroScreenGrad" x1="192" y1="115" x2="192" y2="143" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#7DD3FC" />
-              <stop offset="1" stopColor="#1D4ED8" />
+            <linearGradient id="phoneScreenGrad" x1="91" y1="25" x2="91" y2="191" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#0F172A" />
+              <stop offset="0.42" stopColor="#1D4ED8" />
+              <stop offset="1" stopColor="#020617" />
+            </linearGradient>
+            <linearGradient id="phoneGlassGrad" x1="65" y1="41" x2="117" y2="154" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#FFFFFF" />
+              <stop offset="1" stopColor="rgba(255,255,255,0)" />
             </linearGradient>
           </defs>
         </svg>
