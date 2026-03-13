@@ -371,6 +371,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         rotate: 0,
         duration: 11.8,
         phase: 0,
+        frontHalf: "right" as const,
       },
       {
         width: layout.tier === "roomy" ? 306 : layout.tier === "compact" ? 224 : 254,
@@ -378,6 +379,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         rotate: 0,
         duration: 12.6,
         phase: Math.PI / 3,
+        frontHalf: "bottom" as const,
       },
       {
         width: layout.tier === "roomy" ? 298 : layout.tier === "compact" ? 214 : 246,
@@ -385,6 +387,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         rotate: -42,
         duration: 10.9,
         phase: Math.PI / 6,
+        frontHalf: "left" as const,
       },
     ],
     [layout.tier],
@@ -476,6 +479,23 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
 
   const phoneWidth = layout.tier === "roomy" ? 124 : layout.tier === "compact" ? 92 : 108;
   const phoneHeight = layout.tier === "roomy" ? 226 : layout.tier === "compact" ? 168 : 196;
+
+  const getFrontArcPath = useCallback((orbit: (typeof orbits)[number]) => {
+    const rx = orbit.width / 2;
+    const ry = orbit.height / 2;
+    const cx = orbit.width / 2;
+    const cy = orbit.height / 2;
+
+    switch (orbit.frontHalf) {
+      case "bottom":
+        return `M 0 ${cy} A ${rx} ${ry} 0 0 1 ${orbit.width} ${cy}`;
+      case "left":
+        return `M ${cx} 0 A ${rx} ${ry} 0 0 0 ${cx} ${orbit.height}`;
+      case "right":
+      default:
+        return `M ${cx} 0 A ${rx} ${ry} 0 0 1 ${cx} ${orbit.height}`;
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -772,13 +792,13 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
             }}
           >
             <path
-              d={`M ${orbit.width / 2} 0 A ${orbit.width / 2} ${orbit.height / 2} 0 0 1 ${orbit.width / 2} ${orbit.height}`}
+              d={getFrontArcPath(orbit)}
               fill="none"
               stroke={orbitGlow}
               strokeWidth="0.4"
             />
             <path
-              d={`M ${orbit.width / 2} 0 A ${orbit.width / 2} ${orbit.height / 2} 0 0 1 ${orbit.width / 2} ${orbit.height}`}
+              d={getFrontArcPath(orbit)}
               fill="none"
               stroke={orbitStroke}
               strokeWidth="0.7"
