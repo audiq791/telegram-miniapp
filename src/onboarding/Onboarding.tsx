@@ -396,6 +396,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
   const coinsPerOrbit = orbitHeroCoins.length / orbits.length;
   const [marketChart] = useState(() => createChartData(18));
   const [marketCandles] = useState(() => createCandles(14));
+  const [phoneIntroDone, setPhoneIntroDone] = useState(false);
 
   const orbitCoins = useMemo(
     () =>
@@ -476,6 +477,12 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
   const phoneWidth = layout.tier === "roomy" ? 124 : layout.tier === "compact" ? 92 : 108;
   const phoneHeight = layout.tier === "roomy" ? 226 : layout.tier === "compact" ? 168 : 196;
 
+  useEffect(() => {
+    if (!isActive) {
+      setPhoneIntroDone(false);
+    }
+  }, [isActive]);
+
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,rgba(255,255,255,0.92),transparent_36%),radial-gradient(circle_at_50%_72%,rgba(251,191,36,0.14),transparent_48%),linear-gradient(180deg,rgba(255,255,255,0.18),transparent_100%)]" />
@@ -523,11 +530,10 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         animate={
           isActive
             ? {
-                rotateY: [0, 35, -70, 70, -70, 70],
-                rotateX: [0, -2, 1.5, -1.5, 1.5, -1.5],
                 y: [2, -2, 1, -1, 1, -1],
+                rotateX: [15, 14.2, 15.6, 14.6, 15.6, 14.6],
               }
-            : { rotateY: 0, rotateX: 0, y: 0 }
+            : { rotateX: 15, y: 0 }
         }
         transition={{
           duration: 14,
@@ -541,17 +547,48 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
           perspective: 1800,
         }}
       >
-        <div
-          className="relative rounded-[34px] border border-white/18 bg-[linear-gradient(180deg,#1e293b_0%,#111827_22%,#0f172a_70%,#020617_100%)] shadow-[0_34px_70px_rgba(15,23,42,0.34)]"
-          style={{
-            width: phoneWidth,
-            height: phoneHeight,
-            transformStyle: "preserve-3d",
-            boxShadow:
-              "0 34px 70px rgba(15,23,42,0.32), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -10px 28px rgba(0,0,0,0.42)",
+        <motion.div
+          animate={
+            isActive
+              ? phoneIntroDone
+                ? { rotateY: [35, -70, 70, -70, 70] }
+                : { rotateY: [0, 35] }
+              : { rotateY: 0 }
+          }
+          transition={
+            isActive
+              ? phoneIntroDone
+                ? {
+                    duration: 11.5,
+                    ease: "easeInOut",
+                    repeat: Infinity,
+                    times: [0, 0.25, 0.5, 0.75, 1],
+                  }
+                : {
+                    duration: 1.8,
+                    ease: [0.22, 1, 0.36, 1],
+                  }
+              : { duration: 0.4, ease: "easeOut" }
+          }
+          onAnimationComplete={() => {
+            if (isActive && !phoneIntroDone) {
+              setPhoneIntroDone(true);
+            }
           }}
+          className="relative"
+          style={{ transformStyle: "preserve-3d" }}
         >
           <div
+            className="relative rounded-[34px] border border-white/18 bg-[linear-gradient(180deg,#1e293b_0%,#111827_22%,#0f172a_70%,#020617_100%)] shadow-[0_34px_70px_rgba(15,23,42,0.34)]"
+            style={{
+              width: phoneWidth,
+              height: phoneHeight,
+              transformStyle: "preserve-3d",
+              boxShadow:
+                "0 34px 70px rgba(15,23,42,0.32), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -10px 28px rgba(0,0,0,0.42)",
+            }}
+          >
+            <div
             className="absolute inset-[4px] rounded-[30px] bg-[linear-gradient(180deg,#0f172a_0%,#020617_100%)]"
             style={{
               transform: "translateZ(-9px)",
@@ -694,7 +731,8 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
           <div className="absolute -left-[4px] top-14 h-9 w-[3px] rounded-full bg-slate-500/80" />
           <div className="absolute -left-[4px] top-24 h-14 w-[3px] rounded-full bg-slate-500/80" />
           <div className="absolute -right-[4px] top-20 h-16 w-[3px] rounded-full bg-slate-500/85" />
-        </div>
+          </div>
+        </motion.div>
       </motion.div>
 
       <div className="absolute inset-0 z-[5] pointer-events-none">
