@@ -888,12 +888,9 @@ function Scene1({ onNext, layout, isHeroActive }: { onNext: () => void; layout: 
 
 function Scene2({ layout }: { layout: SceneLayoutProps }) {
   const qrSize = layout.tier === "roomy" ? "h-40 w-40" : layout.tier === "compact" ? "h-24 w-24" : "h-32 w-32";
-  const [rain] = useState(() => createCoinRain(7));
   const [qrCells] = useState(() =>
     Array.from({ length: 49 }, () => Math.random() > 0.6),
   );
-  const [leftBurst] = useState(() => createBonusBurst("left", 7));
-  const [rightBurst] = useState(() => createBonusBurst("right", 7));
   const bonusCoins = useMemo(
     () => [
       { src: "/logos/vkusvill.svg", alt: "VkusVill", hue: "from-emerald-100 to-emerald-50" },
@@ -910,6 +907,27 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
   const qrPixelSize = layout.tier === "roomy" ? 160 : layout.tier === "compact" ? 96 : 128;
   const sceneHalfWidth = layout.tier === "roomy" ? 150 : layout.tier === "compact" ? 108 : 128;
   const sceneBottomReach = layout.tier === "roomy" ? 140 : layout.tier === "compact" ? 96 : 116;
+  const rainStream = useMemo(
+    () =>
+      Array.from({ length: 14 }, (_, index) => {
+        const lane = (index % 5) - 2;
+        const clusterOffset = Math.floor(index / 5) * 4;
+        const startX = lane * (layout.tier === "compact" ? 8 : 10) + clusterOffset - 4;
+
+        return {
+          id: `rain-stream-${index}`,
+          startX,
+          driftA: startX + (lane < 0 ? -5 : 5),
+          driftB: startX + (lane < 0 ? 4 : -4),
+          driftC: startX + (lane < 0 ? -2 : 2),
+          delay: index * 0.2,
+          duration: 4.4 + (index % 3) * 0.18,
+          rotateStart: lane * 2.4,
+          rotateEnd: lane * 1.1,
+        };
+      }),
+    [layout.tier],
+  );
   const bubbleSeeds = useMemo(
     () =>
       Array.from({ length: 12 }, (_, index) => {
@@ -941,30 +959,28 @@ function Scene2({ layout }: { layout: SceneLayoutProps }) {
         >
           <div className="absolute inset-x-10 bottom-6 h-10 rounded-full bg-emerald-200/40 blur-2xl" />
 
-          <div className="absolute inset-0 z-[1]">
-            {rain.map((drop, i) => (
-              <motion.div
-                key={`rain-${i}`}
-                className="absolute left-1/2 top-0"
-                initial={{ x: (i - 3) * 14, y: -88, rotate: -10 + i * 3 }}
-                animate={{
-                  x: [
-                    (i - 3) * 14,
-                    (i - 3) * 13 + Math.sin(i) * 2.5,
-                    (i - 3) * 11 + Math.cos(i) * 3,
-                    (i - 3) * 9,
-                  ],
-                  y: [-88, -42, 12, 72, 126],
-                  rotate: [-10 + i * 3, -6 + i * 2.2, -1 + i * 1.2, 3 + i * 0.8],
-                }}
-                transition={{
-                  duration: 4.8 + (i % 3) * 0.5,
-                  repeat: Infinity,
-                  delay: drop.delay,
-                  ease: [0.2, 0.82, 0.24, 1],
-                }}
-              >
-                <div
+            <div className="absolute inset-0 z-[1]">
+              {rainStream.map((drop) => (
+                <motion.div
+                  key={drop.id}
+                  className="absolute left-1/2 top-0"
+                  initial={{ x: drop.startX, y: -148, rotate: drop.rotateStart, opacity: 0 }}
+                  animate={{
+                    x: [drop.startX, drop.driftA, drop.driftB, drop.driftC, 0],
+                    y: [-148, -114, -72, -24, qrPixelSize * 0.08],
+                    rotate: [drop.rotateStart, drop.rotateStart * 0.7, drop.rotateEnd],
+                    opacity: [0, 0.92, 1, 1, 0.98],
+                    scale: [0.92, 0.98, 1, 1.02, 1],
+                  }}
+                  transition={{
+                    duration: drop.duration,
+                    repeat: Infinity,
+                    delay: drop.delay,
+                    times: [0, 0.18, 0.44, 0.76, 1],
+                    ease: "linear",
+                  }}
+                >
+                  <div
                   className="grid place-items-center rounded-full border border-amber-200/90 bg-gradient-to-br from-amber-200 via-amber-300 to-yellow-500 shadow-[0_10px_20px_rgba(161,98,7,0.24),inset_0_1px_0_rgba(255,255,255,0.7)]"
                   style={{ width: rainCoinSize, height: rainCoinSize }}
                 >
