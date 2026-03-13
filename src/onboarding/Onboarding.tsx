@@ -412,8 +412,8 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
       fixedCoinAssignments.map((coin) => {
           const orbit = orbits[coin.orbitIndex];
           const totalCoins = coinsPerOrbit;
-          const frames = Array.from({ length: 25 }, (_, frameIndex) => {
-            const progress = frameIndex / 24;
+          const frames = Array.from({ length: 49 }, (_, frameIndex) => {
+            const progress = frameIndex / 48;
             const theta = orbit.phase + ((coin.slotIndex + progress) / totalCoins) * Math.PI * 2;
             const rawX = Math.cos(theta) * (orbit.width / 2);
             const rawY = Math.sin(theta) * (orbit.height / 2);
@@ -421,6 +421,8 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
             const x = rawX * Math.cos(rotateRad) - rawY * Math.sin(rotateRad);
             const y = rawX * Math.sin(rotateRad) + rawY * Math.cos(rotateRad);
             const depth = (Math.sin(theta) + 1) / 2;
+            const frontOpacity = depth > 0.52 ? 0.58 + (depth - 0.52) * 0.9 : 0;
+            const backOpacity = depth <= 0.52 ? 0.34 + (0.52 - depth) * 0.65 : 0;
 
             return {
               x,
@@ -428,8 +430,10 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
               scale: 0.8 + depth * 0.26,
               blur: (1 - depth) * 1.05,
               opacity: 0.74 + depth * 0.26,
+              frontOpacity,
+              backOpacity,
               shadowOpacity: 0.16 + depth * 0.24,
-              };
+            };
           });
 
           return {
@@ -542,6 +546,15 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
               transform: `rotate(${orbit.rotate}deg)`,
             }}
           >
+            <ellipse
+              cx={orbit.width / 2}
+              cy={orbit.height / 2}
+              rx={orbit.width / 2}
+              ry={orbit.height / 2}
+              fill="none"
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth="0.45"
+            />
             <path
               d={`M ${orbit.width / 2} 0 A ${orbit.width / 2} ${orbit.height / 2} 0 0 0 ${orbit.width / 2} ${orbit.height}`}
               fill="none"
@@ -555,6 +568,47 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
               strokeWidth="0.7"
             />
           </svg>
+        ))}
+      </div>
+
+      <div className="absolute inset-0 z-[2] pointer-events-none">
+        {orbitCoins.map((coin) => (
+          <motion.div
+            key={`${coin.key}-back`}
+            className="absolute left-1/2 top-1/2"
+            animate={
+              isActive
+                ? {
+                    x: coin.frames.map((frame) => frame.x),
+                    y: coin.frames.map((frame) => frame.y),
+                    scale: coin.frames.map((frame) => frame.scale),
+                    opacity: coin.frames.map((frame) => frame.backOpacity),
+                    filter: coin.frames.map((frame) => `blur(${frame.blur}px)`),
+                  }
+                : {
+                    x: coin.frames[0].x,
+                    y: coin.frames[0].y,
+                    scale: coin.frames[0].scale,
+                    opacity: coin.frames[0].backOpacity,
+                    filter: `blur(${coin.frames[0].blur}px)`,
+                  }
+            }
+            transition={{ duration: coin.orbit.duration, ease: "linear", repeat: isActive ? Infinity : 0 }}
+            style={{
+              width: coinSize,
+              height: coinSize,
+              marginLeft: -coinSize / 2,
+              marginTop: -coinSize / 2,
+            }}
+          >
+            <div
+              style={{
+                filter: `drop-shadow(0 8px 14px rgba(24,24,27,${coin.frames[0].shadowOpacity * 0.75}))`,
+              }}
+            >
+              {renderCoinFace(coin)}
+            </div>
+          </motion.div>
         ))}
       </div>
 
@@ -759,7 +813,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
       <div className="absolute inset-0 z-[6] pointer-events-none">
         {orbitCoins.map((coin) => (
           <motion.div
-            key={coin.key}
+            key={`${coin.key}-front`}
             className="absolute left-1/2 top-1/2"
             animate={
               isActive
@@ -767,19 +821,18 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
                     x: coin.frames.map((frame) => frame.x),
                     y: coin.frames.map((frame) => frame.y),
                     scale: coin.frames.map((frame) => frame.scale),
-                    opacity: coin.frames.map((frame) => frame.opacity),
+                    opacity: coin.frames.map((frame) => frame.frontOpacity),
                     filter: coin.frames.map((frame) => `blur(${frame.blur}px)`),
                   }
                 : {
                     x: coin.frames[0].x,
                     y: coin.frames[0].y,
                     scale: coin.frames[0].scale,
-                    opacity: coin.frames[0].opacity,
+                    opacity: coin.frames[0].frontOpacity,
                     filter: `blur(${coin.frames[0].blur}px)`,
                   }
             }
             transition={{ duration: coin.orbit.duration, ease: "linear", repeat: isActive ? Infinity : 0 }}
-            whileHover={undefined}
             style={{
               width: coinSize,
               height: coinSize,
