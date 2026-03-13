@@ -450,7 +450,6 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
           y,
           isFrontVisible: depth > 0.52,
           scale: 0.8 + depth * 0.26,
-          blur: (1 - depth) * 1.05,
           shadowOpacity: 0.16 + depth * 0.24,
         };
       }),
@@ -607,7 +606,6 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
               marginLeft: -coinSize / 2,
               marginTop: -coinSize / 2,
               transform: `translate(${coin.x}px, ${coin.y}px) scale(${coin.scale})`,
-              filter: `blur(${coin.blur}px)`,
             }}
           >
             <div
@@ -830,7 +828,6 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
               marginLeft: -coinSize / 2,
               marginTop: -coinSize / 2,
               transform: `translate(${coin.x}px, ${coin.y}px) scale(${coin.scale})`,
-              filter: `blur(${coin.blur}px)`,
             }}
           >
             <div
