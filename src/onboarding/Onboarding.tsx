@@ -358,26 +358,26 @@ const orbitHeroCoins = [
 ];
 
 function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
-  const phoneScale = layout.tier === "roomy" ? 1.06 : layout.tier === "compact" ? 0.88 : 1;
+  const phoneScale = layout.tier === "roomy" ? 0.92 : layout.tier === "compact" ? 0.76 : 0.84;
   const coinSize = layout.tier === "roomy" ? 54 : layout.tier === "compact" ? 38 : 46;
   const orbits = [
     {
-      width: layout.tier === "roomy" ? 154 : layout.tier === "compact" ? 116 : 136,
-      height: layout.tier === "roomy" ? 292 : layout.tier === "compact" ? 214 : 246,
+      width: layout.tier === "roomy" ? 158 : layout.tier === "compact" ? 118 : 140,
+      height: layout.tier === "roomy" ? 294 : layout.tier === "compact" ? 216 : 248,
       rotate: 0,
       duration: 11.8,
       phase: 0,
     },
     {
-      width: layout.tier === "roomy" ? 292 : layout.tier === "compact" ? 208 : 244,
-      height: layout.tier === "roomy" ? 124 : layout.tier === "compact" ? 90 : 102,
-      rotate: 90,
+      width: layout.tier === "roomy" ? 294 : layout.tier === "compact" ? 216 : 248,
+      height: layout.tier === "roomy" ? 126 : layout.tier === "compact" ? 92 : 104,
+      rotate: 0,
       duration: 12.6,
       phase: Math.PI / 3,
     },
     {
-      width: layout.tier === "roomy" ? 282 : layout.tier === "compact" ? 202 : 236,
-      height: layout.tier === "roomy" ? 168 : layout.tier === "compact" ? 124 : 144,
+      width: layout.tier === "roomy" ? 286 : layout.tier === "compact" ? 208 : 240,
+      height: layout.tier === "roomy" ? 126 : layout.tier === "compact" ? 92 : 104,
       rotate: -45,
       duration: 10.9,
       phase: Math.PI / 6,
@@ -508,25 +508,27 @@ function OrbitHero({ layout }: { layout: SceneLayoutProps }) {
         style={{ scale: phoneScale, transformStyle: "preserve-3d" }}
       >
         <svg
-          width="188"
-          height="248"
-          viewBox="0 0 188 248"
+          width="144"
+          height="212"
+          viewBox="0 0 144 212"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="drop-shadow-[0_28px_42px_rgba(24,24,27,0.16)]"
         >
-          <g transform="translate(18 10)">
-            <path d="M23 16C23 7.16 30.16 0 39 0H108C116.84 0 124 7.16 124 16V198C124 206.84 116.84 214 108 214H39C30.16 214 23 206.84 23 198V16Z" fill="#F8FAFC" stroke="#111827" strokeWidth="2.4" />
-            <path d="M17 23C17 12.51 25.51 4 36 4H42V210H36C25.51 210 17 201.49 17 191V23Z" fill="#E5E7EB" stroke="#111827" strokeWidth="2" />
-            <path d="M29 31C29 24.37 34.37 19 41 19H106C112.63 19 118 24.37 118 31V166C118 172.63 112.63 178 106 178H41C34.37 178 29 172.63 29 166V31Z" fill="white" stroke="#111827" strokeWidth="2" />
-            <path d="M43 34L101 172" stroke="rgba(148,163,184,0.35)" strokeWidth="2.2" strokeLinecap="round" />
-            <path d="M72 11H90" stroke="#111827" strokeWidth="2.3" strokeLinecap="round" />
-            <circle cx="60" cy="11" r="2.4" fill="#111827" />
-            <circle cx="72" cy="223" r="12" fill="white" stroke="#111827" strokeWidth="2.6" />
-            <path d="M17 49L11 49" stroke="#111827" strokeWidth="2" strokeLinecap="round" />
-            <path d="M17 71L11 71" stroke="#111827" strokeWidth="2" strokeLinecap="round" />
-            <path d="M17 93L11 93" stroke="#111827" strokeWidth="2" strokeLinecap="round" />
-            <path d="M124 78L130 78" stroke="#111827" strokeWidth="2" strokeLinecap="round" />
+          <g transform="translate(26 10)">
+            <path d="M7 20C7 8.95 15.95 0 27 0H65C76.05 0 85 8.95 85 20V168C85 179.05 76.05 188 65 188H27C15.95 188 7 179.05 7 168V20Z" fill="#F5F5F5" stroke="#111827" strokeWidth="2.4" />
+            <path d="M3 24C3 13.51 11.51 5 22 5H27V183H22C11.51 183 3 174.49 3 164V24Z" fill="#E5E7EB" stroke="#111827" strokeWidth="1.9" />
+            <path d="M12 24C12 15.72 18.72 9 27 9H65C73.28 9 80 15.72 80 24V164C80 172.28 73.28 179 65 179H27C18.72 179 12 172.28 12 164V24Z" fill="white" stroke="#111827" strokeWidth="1.8" />
+            <path d="M41 10H51C54 10 56.43 12.43 56.43 15.43C56.43 16.54 55.54 17.43 54.43 17.43H37.57C36.46 17.43 35.57 16.54 35.57 15.43C35.57 12.43 38 10 41 10Z" fill="#111827" />
+            <path d="M22 14C22 12.34 23.34 11 25 11C26.66 11 28 12.34 28 14C28 15.66 26.66 17 25 17C23.34 17 22 15.66 22 14Z" fill="#111827" />
+            <path d="M63 14C63 12.67 64.07 11.6 65.4 11.6C66.73 11.6 67.8 12.67 67.8 14C67.8 15.33 66.73 16.4 65.4 16.4C64.07 16.4 63 15.33 63 14Z" fill="#111827" />
+            <path d="M18 29C18 26.24 20.24 24 23 24H69C71.76 24 74 26.24 74 29V156C74 158.76 71.76 161 69 161H23C20.24 161 18 158.76 18 156V29Z" fill="#FFFFFF" />
+            <path d="M31 31L61 154" stroke="rgba(148,163,184,0.28)" strokeWidth="1.7" strokeLinecap="round" />
+            <path d="M56 44L69 92" stroke="rgba(148,163,184,0.2)" strokeWidth="1.4" strokeLinecap="round" />
+            <path d="M3 46L-2 46" stroke="#111827" strokeWidth="1.8" strokeLinecap="round" />
+            <path d="M3 60L-2 60" stroke="#111827" strokeWidth="1.8" strokeLinecap="round" />
+            <path d="M3 74L-2 74" stroke="#111827" strokeWidth="1.8" strokeLinecap="round" />
+            <path d="M85 64L90 64" stroke="#111827" strokeWidth="1.8" strokeLinecap="round" />
           </g>
         </svg>
       </motion.div>
