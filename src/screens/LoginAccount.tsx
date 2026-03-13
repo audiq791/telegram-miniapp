@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -15,16 +15,17 @@ interface LoginAccountProps {
   onBack?: () => void;
 }
 
-type LayoutTier = "compact" | "regular" | "roomy";
+type LayoutTier = "micro" | "compact" | "regular" | "roomy";
 
 type ScreenLayout = {
   tier: LayoutTier;
   shellPadding: string;
-  contentGap: string;
-  cardGap: string;
+  topGap: string;
+  formGap: string;
   heroHeight: string;
   coinSize: string;
   centerTokenSize: string;
+  glowSize: string;
   titleClass: string;
   hintClass: string;
   fieldClass: string;
@@ -32,98 +33,33 @@ type ScreenLayout = {
   tertiaryButtonClass: string;
 };
 
-function FitToViewport({
-  children,
-  contentClassName = "",
-}: {
-  children: React.ReactNode;
-  contentClassName?: string;
-}) {
-  const frameRef = useRef<HTMLDivElement | null>(null);
-  const contentRef = useRef<HTMLDivElement | null>(null);
-  const [scale, setScale] = useState(1);
-  const [scaledHeight, setScaledHeight] = useState<number | null>(null);
-
-  useLayoutEffect(() => {
-    const measure = () => {
-      const frame = frameRef.current;
-      const content = contentRef.current;
-      if (!frame || !content) return;
-
-      const availableHeight = frame.clientHeight;
-      const naturalHeight = content.scrollHeight;
-      if (!availableHeight || !naturalHeight) return;
-
-      const nextScale = Math.min(1, availableHeight / naturalHeight);
-      setScale(nextScale);
-      setScaledHeight(naturalHeight * nextScale);
-    };
-
-    measure();
-
-    const observer = new ResizeObserver(measure);
-    if (frameRef.current) observer.observe(frameRef.current);
-    window.visualViewport?.addEventListener("resize", measure);
-    window.addEventListener("resize", measure);
-
-    return () => {
-      observer.disconnect();
-      window.visualViewport?.removeEventListener("resize", measure);
-      window.removeEventListener("resize", measure);
-    };
-  }, []);
-
-  return (
-    <div ref={frameRef} className="min-h-0 flex-1 overflow-hidden">
-      <div
-        className="mx-auto flex w-full justify-center"
-        style={{
-          height: scaledHeight ?? undefined,
-          maxWidth: "28rem",
-        }}
-      >
-        <div
-          ref={contentRef}
-          className={contentClassName}
-          style={{
-            transform: `scale(${scale})`,
-            transformOrigin: "top center",
-            width: "100%",
-            willChange: "transform",
-          }}
-        >
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function getScreenLayout(viewportHeight: number, viewportWidth: number): ScreenLayout {
   const shortSide = Math.min(viewportHeight, viewportWidth);
-  const compact = viewportHeight <= 740 || shortSide <= 350;
+  const micro = viewportHeight <= 690 || shortSide <= 330;
+  const compact = !micro && (viewportHeight <= 740 || shortSide <= 350);
   const roomy = viewportHeight >= 860 && shortSide >= 390;
-  const tier: LayoutTier = compact ? "compact" : roomy ? "roomy" : "regular";
+  const tier: LayoutTier = micro ? "micro" : compact ? "compact" : roomy ? "roomy" : "regular";
 
   return {
     tier,
-    shellPadding: compact ? "px-4 pt-4 pb-4" : roomy ? "px-5 pt-6 pb-5" : "px-4.5 pt-5 pb-4.5",
-    contentGap: compact ? "gap-3" : roomy ? "gap-6" : "gap-4",
-    cardGap: compact ? "gap-3" : roomy ? "gap-5" : "gap-4",
-    heroHeight: compact ? "h-[140px]" : roomy ? "h-[220px]" : "h-[180px]",
-    coinSize: compact ? "h-10 w-10 text-lg" : roomy ? "h-14 w-14 text-2xl" : "h-12 w-12 text-xl",
-    centerTokenSize: compact ? "h-20 w-20 text-3xl" : roomy ? "h-28 w-28 text-5xl" : "h-24 w-24 text-4xl",
-    titleClass: compact ? "text-[1.55rem] leading-[1.05]" : roomy ? "text-[2.15rem] leading-[1.02]" : "text-[1.8rem] leading-[1.04]",
-    hintClass: compact ? "text-[0.72rem]" : "text-xs",
-    fieldClass: compact ? "h-11 text-[0.95rem]" : "h-12 text-base",
-    buttonClass: compact ? "h-11 text-[0.95rem]" : "h-12 text-base",
-    tertiaryButtonClass: compact ? "h-10 text-[0.9rem]" : "h-11 text-[0.95rem]",
+    shellPadding: micro ? "px-4 pt-3 pb-3" : compact ? "px-4 pt-4 pb-4" : roomy ? "px-5 pt-6 pb-5" : "px-4.5 pt-5 pb-4.5",
+    topGap: micro ? "gap-2" : compact ? "gap-3" : roomy ? "gap-6" : "gap-4",
+    formGap: micro ? "gap-2.5" : compact ? "gap-3" : roomy ? "gap-5" : "gap-4",
+    heroHeight: micro ? "h-[104px]" : compact ? "h-[140px]" : roomy ? "h-[220px]" : "h-[180px]",
+    coinSize: micro ? "h-8 w-8 text-sm" : compact ? "h-10 w-10 text-lg" : roomy ? "h-14 w-14 text-2xl" : "h-12 w-12 text-xl",
+    centerTokenSize: micro ? "h-16 w-16 text-2xl" : compact ? "h-20 w-20 text-3xl" : roomy ? "h-28 w-28 text-5xl" : "h-24 w-24 text-4xl",
+    glowSize: micro ? "h-20 w-20" : compact ? "h-24 w-24" : roomy ? "h-36 w-36" : "h-32 w-32",
+    titleClass: micro ? "text-[1.25rem] leading-[1.02]" : compact ? "text-[1.55rem] leading-[1.05]" : roomy ? "text-[2.15rem] leading-[1.02]" : "text-[1.8rem] leading-[1.04]",
+    hintClass: micro ? "text-[0.68rem]" : compact ? "text-[0.72rem]" : "text-xs",
+    fieldClass: micro ? "h-10 text-[0.92rem]" : compact ? "h-11 text-[0.95rem]" : "h-12 text-base",
+    buttonClass: micro ? "h-10 text-[0.92rem]" : compact ? "h-11 text-[0.95rem]" : "h-12 text-base",
+    tertiaryButtonClass: micro ? "h-9 text-[0.82rem]" : compact ? "h-10 text-[0.9rem]" : "h-11 text-[0.95rem]",
   };
 }
 
 function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
   return (
-    <div className={`relative w-full ${layout.heroHeight}`}>
+    <div className={`relative w-full overflow-hidden ${layout.heroHeight}`}>
       <div className="absolute inset-0 opacity-[0.15] bg-[radial-gradient(#00000012_1px,transparent_1px)] [background-size:18px_18px]" />
 
       <motion.div
@@ -150,9 +86,7 @@ function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
               ease: "easeInOut",
             }}
           >
-            <div
-              className={`flex items-center justify-center rounded-2xl border-2 border-zinc-200 bg-white shadow-lg ${layout.coinSize}`}
-            >
+            <div className={`flex items-center justify-center rounded-2xl border-2 border-zinc-200 bg-white shadow-lg ${layout.coinSize}`}>
               <span className="font-bold text-zinc-900">B</span>
             </div>
           </motion.div>
@@ -175,7 +109,7 @@ function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
       </motion.div>
 
       <motion.div
-        className={`absolute left-1/2 top-1/2 rounded-full ${layout.tier === "roomy" ? "h-36 w-36" : layout.tier === "compact" ? "h-24 w-24" : "h-32 w-32"}`}
+        className={`absolute left-1/2 top-1/2 rounded-full ${layout.glowSize}`}
         style={{ x: "-50%", y: "-50%" }}
         animate={{
           opacity: [0.1, 0.3, 0.1],
@@ -260,7 +194,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
       <div className="flex h-full min-h-0 flex-col overflow-hidden">
         <div className="shrink-0 border-b border-zinc-200 bg-white">
           <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3">
-            <h1 className={layout.tier === "compact" ? "text-xl font-bold text-zinc-900" : "text-2xl font-bold text-zinc-900"}>
+            <h1 className={layout.tier === "micro" || layout.tier === "compact" ? "text-xl font-bold text-zinc-900" : "text-2xl font-bold text-zinc-900"}>
               Профиль
             </h1>
 
@@ -270,101 +204,101 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
                 transition={{ type: "spring", stiffness: 800, damping: 20 }}
                 onClick={onBack}
                 className={`flex items-center justify-center rounded-full bg-zinc-100 transition-colors hover:bg-zinc-200 ${
-                  layout.tier === "compact" ? "h-9 w-9" : "h-10 w-10"
+                  layout.tier === "micro" || layout.tier === "compact" ? "h-9 w-9" : "h-10 w-10"
                 }`}
                 aria-label="Назад"
               >
-                <ArrowLeft size={layout.tier === "compact" ? 18 : 20} className="text-zinc-700" />
+                <ArrowLeft size={layout.tier === "micro" || layout.tier === "compact" ? 18 : 20} className="text-zinc-700" />
               </motion.button>
             )}
           </div>
         </div>
 
-        <FitToViewport contentClassName={layout.shellPadding}>
-          <div className={`mx-auto flex max-w-md flex-col ${layout.contentGap}`}>
-            <div className="shrink-0">
+        <div className={`mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col overflow-hidden ${layout.shellPadding}`}>
+          <div className="flex min-h-0 flex-1 flex-col justify-between">
+            <div className={`shrink-0 flex flex-col ${layout.topGap}`}>
               <FloatingBonuses layout={layout} />
-            </div>
 
-            <div className={`flex flex-col ${layout.cardGap}`}>
-              <div className="shrink-0">
-                <p className={`font-bold text-zinc-900 ${layout.titleClass}`}>
-                  Войдите или зарегистрируйтесь
-                </p>
-                <p className={`mt-2 text-zinc-400 ${layout.hintClass}`}>
-                  Введите номер телефона
-                </p>
-              </div>
+              <div className={`flex flex-col ${layout.formGap}`}>
+                <div className="shrink-0">
+                  <p className={`font-bold text-zinc-900 ${layout.titleClass}`}>
+                    Войдите или зарегистрируйтесь
+                  </p>
+                  <p className={`mt-2 text-zinc-400 ${layout.hintClass}`}>
+                    Введите номер телефона
+                  </p>
+                </div>
 
-              <div className="shrink-0">
-                <div className="relative">
-                  <div className="pointer-events-none absolute left-4 top-1/2 flex -translate-y-1/2 items-center">
-                    <span className="text-base text-zinc-400">+7</span>
+                <div className="shrink-0">
+                  <div className="relative">
+                    <div className="pointer-events-none absolute left-4 top-1/2 flex -translate-y-1/2 items-center">
+                      <span className="text-base text-zinc-400">+7</span>
+                    </div>
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={phoneNumber}
+                      onChange={handlePhoneChange}
+                      placeholder=""
+                      className={`w-full rounded-xl border border-zinc-200 bg-white pl-12 pr-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
+                      inputMode="numeric"
+                    />
                   </div>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={phoneNumber}
-                    onChange={handlePhoneChange}
-                    placeholder=""
-                    className={`w-full rounded-xl border border-zinc-200 bg-white pl-12 pr-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
-                    inputMode="numeric"
-                  />
+
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 800, damping: 20 }}
+                    onClick={handleLogin}
+                    className={`mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 font-medium text-white transition-colors hover:bg-zinc-800 ${layout.buttonClass}`}
+                  >
+                    <LogIn size={16} />
+                    Войти
+                  </motion.button>
+                </div>
+
+                <div className={`shrink-0 ${layout.tier === "micro" ? "my-0" : layout.tier === "compact" ? "my-0.5" : "my-1"}`}>
+                  <div className="flex items-center gap-4">
+                    <div className="h-px flex-1 bg-zinc-200" />
+                    <span className="text-xs text-zinc-400">или</span>
+                    <div className="h-px flex-1 bg-zinc-200" />
+                  </div>
                 </div>
 
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 800, damping: 20 }}
                   onClick={handleLogin}
-                  className={`mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 font-medium text-white transition-colors hover:bg-zinc-800 ${layout.buttonClass}`}
+                  className={`shrink-0 flex w-full items-center justify-center gap-2 rounded-xl bg-[#54A9EB] font-medium text-white transition-colors hover:bg-[#4098E0] ${layout.buttonClass}`}
                 >
-                  <LogIn size={16} />
-                  Войти
+                  <Send size={16} className="text-white" />
+                  Войти через Telegram
                 </motion.button>
               </div>
+            </div>
 
-              <div className={`shrink-0 ${layout.tier === "compact" ? "my-0.5" : "my-1"}`}>
-                <div className="flex items-center gap-4">
-                  <div className="h-px flex-1 bg-zinc-200" />
-                  <span className="text-xs text-zinc-400">или</span>
-                  <div className="h-px flex-1 bg-zinc-200" />
-                </div>
-              </div>
+            <div className={`grid shrink-0 pt-2 ${layout.tier === "micro" ? "gap-1.5" : layout.tier === "compact" ? "gap-2" : "gap-2.5"}`}>
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 800, damping: 20 }}
+                onClick={handleSupportClick}
+                className={`flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white font-medium transition-colors hover:bg-zinc-50 ${layout.tertiaryButtonClass}`}
+              >
+                <Headphones size={16} className="text-zinc-600" />
+                Техническая поддержка
+              </motion.button>
 
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 800, damping: 20 }}
-                onClick={handleLogin}
-                className={`shrink-0 flex w-full items-center justify-center gap-2 rounded-xl bg-[#54A9EB] font-medium text-white transition-colors hover:bg-[#4098E0] ${layout.buttonClass}`}
+                onClick={handleCompanyClick}
+                className={`flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white font-medium transition-colors hover:bg-zinc-50 ${layout.tertiaryButtonClass}`}
               >
-                <Send size={16} className="text-white" />
-                Войти через Telegram
+                <Building2 size={16} className="text-zinc-600" />
+                О компании
               </motion.button>
-
-              <div className={`grid shrink-0 ${layout.tier === "compact" ? "gap-2" : "gap-2.5"}`}>
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 800, damping: 20 }}
-                  onClick={handleSupportClick}
-                  className={`flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white font-medium transition-colors hover:bg-zinc-50 ${layout.tertiaryButtonClass}`}
-                >
-                  <Headphones size={16} className="text-zinc-600" />
-                  Техническая поддержка
-                </motion.button>
-
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 800, damping: 20 }}
-                  onClick={handleCompanyClick}
-                  className={`flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white font-medium transition-colors hover:bg-zinc-50 ${layout.tertiaryButtonClass}`}
-                >
-                  <Building2 size={16} className="text-zinc-600" />
-                  О компании
-                </motion.button>
-              </div>
             </div>
           </div>
-        </FitToViewport>
+        </div>
 
         <AnimatePresence>
           {showToast && (
