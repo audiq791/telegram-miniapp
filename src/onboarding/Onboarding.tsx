@@ -1216,11 +1216,6 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
   const gearY = isRoomy ? 138 : isCompact ? 120 : 128;
   const statusY = isRoomy ? 188 : isCompact ? 168 : 176;
   const lowerY = isRoomy ? 220 : isCompact ? 204 : 210;
-  const sideOffset = isRoomy ? 94 : isCompact ? 78 : 86;
-  const lowerArcStartY = topY + hubHeight - 2;
-  const lowerArcEndY = lowerY + 18;
-  const leftCardX = 180 - sideOffset - lowerCardWidth / 2;
-  const rightCardX = 180 + sideOffset - lowerCardWidth / 2;
 
   return (
     <FitToViewport contentClassName="px-5 pb-6 pt-5 sm:px-6 sm:pt-7">
@@ -1258,24 +1253,6 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
               strokeLinecap="round"
               animate={{ pathLength: [0.2, 1, 0.2], opacity: [0.14, 0.36, 0.14] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.55 }}
-            />
-            <motion.path
-              d={`M 180 ${lowerArcStartY} C 154 ${lowerArcStartY + 28}, 126 ${lowerArcStartY + 44}, ${leftCardX + lowerCardWidth / 2} ${lowerArcEndY}`}
-              fill="none"
-              stroke="rgba(34,197,94,0.3)"
-              strokeWidth="2.7"
-              strokeLinecap="round"
-              animate={{ pathLength: [0.18, 1, 0.18], opacity: [0.18, 0.46, 0.18] }}
-              transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.1 }}
-            />
-            <motion.path
-              d={`M 180 ${lowerArcStartY} C 206 ${lowerArcStartY + 28}, 234 ${lowerArcStartY + 44}, ${rightCardX + lowerCardWidth / 2} ${lowerArcEndY}`}
-              fill="none"
-              stroke="rgba(249,115,22,0.3)"
-              strokeWidth="2.7"
-              strokeLinecap="round"
-              animate={{ pathLength: [0.18, 1, 0.18], opacity: [0.18, 0.46, 0.18] }}
-              transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
             />
           </svg>
 
@@ -1390,7 +1367,7 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
 
             <motion.div
               className="absolute z-[2]"
-              style={{ left: leftCardX, top: lowerY }}
+              style={{ left: `calc(50% - ${lowerCardWidth + 10}px)`, top: lowerY }}
               animate={{ y: [0, -2, 0] }}
               transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
             >
@@ -1418,7 +1395,7 @@ function Scene4({ layout }: { layout: SceneLayoutProps }) {
 
             <motion.div
               className="absolute z-[2]"
-              style={{ left: rightCardX, top: lowerY }}
+              style={{ left: `calc(50% + 10px)`, top: lowerY }}
               animate={{ y: [0, -2, 0] }}
               transition={{ duration: 4.1, repeat: Infinity, ease: "easeInOut", delay: 0.25 }}
             >
