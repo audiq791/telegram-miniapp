@@ -20,14 +20,17 @@ type SceneLayoutProps = {
 function FitToViewport({
   children,
   contentClassName = "",
+  settleDelayMs = 0,
 }: {
   children: React.ReactNode;
   contentClassName?: string;
+  settleDelayMs?: number;
 }) {
   const frameRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(1);
   const [scaledHeight, setScaledHeight] = useState<number | null>(null);
+  const [isReady, setIsReady] = useState(settleDelayMs === 0);
 
   useLayoutEffect(() => {
     const measure = () => {
@@ -62,16 +65,27 @@ function FitToViewport({
     window.addEventListener("orientationchange", measure);
     document.fonts?.ready.then(measure).catch(() => {});
 
+    let readyTimer: number | null = null;
+    if (settleDelayMs > 0) {
+      readyTimer = window.setTimeout(() => {
+        measure();
+        setIsReady(true);
+      }, settleDelayMs);
+    }
+
     return () => {
       observer.disconnect();
       window.cancelAnimationFrame(raf1);
       window.cancelAnimationFrame(raf2);
       timeoutIds.forEach((id) => window.clearTimeout(id));
+      if (readyTimer !== null) {
+        window.clearTimeout(readyTimer);
+      }
       window.visualViewport?.removeEventListener("resize", measure);
       window.removeEventListener("resize", measure);
       window.removeEventListener("orientationchange", measure);
     };
-  }, []);
+  }, [settleDelayMs]);
 
   return (
     <div ref={frameRef} className="min-h-0 flex-1 overflow-hidden">
@@ -89,6 +103,8 @@ function FitToViewport({
             transform: `scale(${scale})`,
             transformOrigin: "top center",
             width: "100%",
+            opacity: isReady ? 1 : 0,
+            transition: isReady ? "opacity 120ms ease-out" : undefined,
           }}
         >
           {children}
@@ -166,7 +182,7 @@ function Scene1({ onNext, layout }: { onNext: () => void; layout: SceneLayoutPro
   const [dots] = useState(() => createFloatingDots(20));
 
   return (
-    <FitToViewport contentClassName={`px-5 pb-6 pt-5 sm:px-6 sm:pt-7`}>
+    <FitToViewport contentClassName={`px-5 pb-6 pt-5 sm:px-6 sm:pt-7`} settleDelayMs={220}>
       <div className={`mx-auto flex flex-col ${layout.sectionGapClass}`}>
         <div
           className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-amber-50/80 to-orange-100/80 shadow-sm ${layout.frameHeightClass}`}
@@ -522,10 +538,8 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [isExiting, setIsExiting] = useState(false);
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [viewportSize, setViewportSize] = useState({ width: 390, height: 844 });
-  const [firstSceneNonce, setFirstSceneNonce] = useState(0);
   const swipeAreaRef = useRef<HTMLDivElement | null>(null);
   const isDoneRef = useRef(false);
-  const didStabilizeFirstSceneRef = useRef(false);
   const swipeStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const isSwipeGestureRef = useRef(false);
   const activeSwipeInputRef = useRef<"pointer" | "touch" | null>(null);
@@ -647,25 +661,6 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   }, []);
 
   useEffect(() => {
-    if (index !== 0 || didStabilizeFirstSceneRef.current) return;
-
-    const timers = [120, 260, 480].map((delay) =>
-      window.setTimeout(() => {
-        setFirstSceneNonce((current) => current + 1);
-      }, delay),
-    );
-
-    const doneTimer = window.setTimeout(() => {
-      didStabilizeFirstSceneRef.current = true;
-    }, 700);
-
-    return () => {
-      timers.forEach((timer) => window.clearTimeout(timer));
-      window.clearTimeout(doneTimer);
-    };
-  }, [index]);
-
-  useEffect(() => {
     const node = swipeAreaRef.current;
     if (!node) return;
 
@@ -784,7 +779,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           >
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
-                key={index === 0 ? `scene-${index}-${firstSceneNonce}` : index}
+                key={index}
                 custom={direction}
                 variants={variants}
                 initial="enter"
