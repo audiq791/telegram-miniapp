@@ -66,6 +66,8 @@ function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
     { src: "/logos/wildberries.svg", alt: "Wildberries", x: -76, y: 26, delay: 0.8, hue: "from-fuchsia-100 to-purple-50" },
     { src: "/logos/cofix.svg", alt: "Cofix", x: 78, y: 30, delay: 1.04, hue: "from-rose-100 to-orange-50" },
   ];
+  const centerLogoSize =
+    layout.tier === "roomy" ? 58 : layout.tier === "compact" ? 40 : layout.tier === "micro" ? 34 : 48;
 
   return (
     <div className={`relative w-full overflow-hidden ${layout.heroHeight}`}>
@@ -161,13 +163,29 @@ function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
               Единый вход
             </div>
             <div className="mt-2 flex items-center justify-center gap-3">
-              <div className={`grid place-items-center rounded-3xl bg-gradient-to-br from-zinc-900 to-zinc-700 shadow-xl ${layout.centerTokenSize}`}>
-                <span className="font-bold text-white">B</span>
+              <div className={`grid place-items-center rounded-3xl bg-[#41e5b8] shadow-xl ${layout.centerTokenSize}`}>
+                <svg
+                  width={centerLogoSize}
+                  height={centerLogoSize}
+                  viewBox="0 0 64 64"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M14 20.5L25.5 9H48V20.5H36.5V43H25.5H14V20.5Z"
+                    fill="#102A26"
+                  />
+                  <path
+                    d="M36.5 43L48 31.5V20.5H59V43H36.5Z"
+                    fill="#102A26"
+                  />
+                </svg>
               </div>
             </div>
             <div className="mt-3 flex items-center justify-center gap-2">
               <div className="rounded-full bg-violet-50 px-3 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-violet-600">
-                BON ID
+                Phone
               </div>
               <div className="rounded-full bg-sky-50 px-3 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-sky-600">
                 Telegram
