@@ -6,6 +6,7 @@ import { IconButton } from "../components/ui";
 import ActivityScreen from "./ActivityScreen";
 import SpendSettingsScreen from "./SpendSettingsScreen";
 import DeepseekChatScreen from "./DeepseekChatScreen";
+import FuelMapScreen from "./FuelMapScreen";
 
 export default function BlackScreen({
   title,
@@ -35,6 +36,11 @@ export default function BlackScreen({
   // Deepseek чат
   if (title === "GPT Помощник") {
     return <DeepseekChatScreen onBack={onBack} />;
+  }
+
+  // Карта заправок
+  if (title === "Заправка") {
+    return <FuelMapScreen onBack={onBack} />;
   }
 
   // Для остальных второстепенных экранов

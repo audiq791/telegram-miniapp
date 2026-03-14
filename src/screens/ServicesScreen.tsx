@@ -97,7 +97,7 @@ interface ServicesScreenProps {
 
 export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) {
   const handleServiceClick = (service: typeof services[0]) => {
-    if (service.id === "gpt") {
+    if (service.id === "gpt" || service.id === "fuel") {
       if (onServiceClick) {
         onServiceClick(service.title);
       }
