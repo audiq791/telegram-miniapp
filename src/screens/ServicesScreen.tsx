@@ -97,7 +97,20 @@ interface ServicesScreenProps {
 
 export default function ServicesScreen({ onServiceClick }: ServicesScreenProps) {
   const handleServiceClick = (service: typeof services[0]) => {
-    if (service.id === "gpt" || service.id === "fuel") {
+    if (service.id === "fuel") {
+      const mapUrl = "https://yandex.ru/maps/?mode=search&text=%D0%90%D0%97%D0%A1";
+      const tg = (window as any).Telegram?.WebApp;
+
+      if (tg?.openLink) {
+        tg.openLink(mapUrl);
+      } else {
+        window.open(mapUrl, "_blank", "noopener,noreferrer");
+      }
+
+      return;
+    }
+
+    if (service.id === "gpt") {
       if (onServiceClick) {
         onServiceClick(service.title);
       }
