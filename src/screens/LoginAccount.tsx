@@ -6,277 +6,135 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
   Building2,
+  ChevronDown,
+  ChevronUp,
   Headphones,
   LogIn,
+  Mail,
   Send,
+  ShieldCheck,
 } from "lucide-react";
+import { clearTelegramSession, writeTelegramSession } from "@/lib/auth/storage";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 interface LoginAccountProps {
   onLogin?: () => void;
   onBack?: () => void;
 }
 
-type LayoutTier = "micro" | "compact" | "regular" | "roomy";
+type LayoutTier = "micro" | "compact" | "regular";
 
-type ScreenLayout = {
-  tier: LayoutTier;
-  shellPadding: string;
-  topGap: string;
-  formGap: string;
-  heroHeight: string;
-  coinSize: string;
-  centerTokenSize: string;
-  glowSize: string;
-  titleClass: string;
-  hintClass: string;
-  fieldClass: string;
-  buttonClass: string;
-  tertiaryButtonClass: string;
-};
+type AuthMessage = {
+  type: "error" | "success";
+  text: string;
+} | null;
 
-function getScreenLayout(viewportHeight: number, viewportWidth: number): ScreenLayout {
+function getLayout(viewportHeight: number, viewportWidth: number) {
   const shortSide = Math.min(viewportHeight, viewportWidth);
-  const micro = viewportHeight <= 690 || shortSide <= 330;
-  const compact = !micro && (viewportHeight <= 740 || shortSide <= 350);
-  const roomy = viewportHeight >= 860 && shortSide >= 390;
-  const tier: LayoutTier = micro ? "micro" : compact ? "compact" : roomy ? "roomy" : "regular";
+  const tier: LayoutTier =
+    viewportHeight <= 700 || shortSide <= 350 ? "micro" : viewportHeight <= 780 ? "compact" : "regular";
 
   return {
     tier,
-    shellPadding: micro ? "px-4 pt-3 pb-3" : compact ? "px-4 pt-4 pb-4" : roomy ? "px-5 pt-6 pb-5" : "px-4.5 pt-5 pb-4.5",
-    topGap: micro ? "gap-2" : compact ? "gap-3" : roomy ? "gap-6" : "gap-4",
-    formGap: micro ? "gap-2.5" : compact ? "gap-3" : roomy ? "gap-5" : "gap-4",
-    heroHeight: micro ? "h-[104px]" : compact ? "h-[140px]" : roomy ? "h-[220px]" : "h-[180px]",
-    coinSize: micro ? "h-8 w-8 text-sm" : compact ? "h-10 w-10 text-lg" : roomy ? "h-14 w-14 text-2xl" : "h-12 w-12 text-xl",
-    centerTokenSize: micro ? "h-16 w-16 text-2xl" : compact ? "h-20 w-20 text-3xl" : roomy ? "h-28 w-28 text-5xl" : "h-24 w-24 text-4xl",
-    glowSize: micro ? "h-20 w-20" : compact ? "h-24 w-24" : roomy ? "h-36 w-36" : "h-32 w-32",
-    titleClass: micro ? "text-[1.25rem] leading-[1.02]" : compact ? "text-[1.55rem] leading-[1.05]" : roomy ? "text-[2.15rem] leading-[1.02]" : "text-[1.8rem] leading-[1.04]",
-    hintClass: micro ? "text-[0.68rem]" : compact ? "text-[0.72rem]" : "text-xs",
-    fieldClass: micro ? "h-10 text-[0.92rem]" : compact ? "h-11 text-[0.95rem]" : "h-12 text-base",
-    buttonClass: micro ? "h-10 text-[0.92rem]" : compact ? "h-11 text-[0.95rem]" : "h-12 text-base",
-    tertiaryButtonClass: micro ? "h-9 text-[0.82rem]" : compact ? "h-10 text-[0.9rem]" : "h-11 text-[0.95rem]",
+    shellPadding: tier === "micro" ? "px-4 pt-3 pb-3" : tier === "compact" ? "px-4 pt-4 pb-4" : "px-5 pt-5 pb-5",
+    gap: tier === "micro" ? "gap-3" : "gap-4",
+    titleClass: tier === "micro" ? "text-[1.35rem]" : tier === "compact" ? "text-[1.6rem]" : "text-[1.8rem]",
+    fieldClass: tier === "micro" ? "h-10 text-[0.92rem]" : "h-12 text-base",
+    buttonClass: tier === "micro" ? "h-10 text-[0.92rem]" : "h-12 text-base",
+    tertiaryButtonClass: tier === "micro" ? "h-9 text-[0.82rem]" : "h-11 text-[0.95rem]",
   };
 }
 
-function FloatingBonuses({ layout }: { layout: ScreenLayout }) {
-  const heroCoins = [
-    {
-      src: "/logos/vkusvill.svg",
-      alt: "VkusVill",
-      x: -118,
-      y: -54,
-      driftX: 22,
-      driftY: 12,
-      delay: 0,
-      duration: 8.4,
-      rotate: -8,
-      hue: "from-emerald-100 to-emerald-50",
-    },
-    {
-      src: "/logos/dodo.svg",
-      alt: "Dodo",
-      x: 116,
-      y: -46,
-      driftX: -24,
-      driftY: 18,
-      delay: 0.45,
-      duration: 9.2,
-      rotate: 10,
-      hue: "from-orange-100 to-amber-50",
-    },
-    {
-      src: "/logos/cska.svg",
-      alt: "CSKA",
-      x: 0,
-      y: -86,
-      driftX: 16,
-      driftY: 20,
-      delay: 0.9,
-      duration: 8.8,
-      rotate: -6,
-      hue: "from-blue-100 to-sky-50",
-    },
-    {
-      src: "/logos/wildberries.svg",
-      alt: "Wildberries",
-      x: -96,
-      y: 44,
-      driftX: 26,
-      driftY: -14,
-      delay: 0.6,
-      duration: 9.6,
-      rotate: 7,
-      hue: "from-fuchsia-100 to-purple-50",
-    },
-    {
-      src: "/logos/cofix.svg",
-      alt: "Cofix",
-      x: 102,
-      y: 52,
-      driftX: -20,
-      driftY: -18,
-      delay: 1.1,
-      duration: 8.6,
-      rotate: -9,
-      hue: "from-rose-100 to-orange-50",
-    },
-    {
-      src: "/logos/logo1.svg",
-      alt: "Partner",
-      x: -16,
-      y: 72,
-      driftX: 18,
-      driftY: -16,
-      delay: 1.35,
-      duration: 9.4,
-      rotate: 8,
-      hue: "from-cyan-100 to-sky-50",
-    },
+function Hero() {
+  const coins = [
+    { src: "/logos/vkusvill.svg", x: -120, y: -28, delay: 0, hue: "from-emerald-100 to-emerald-50" },
+    { src: "/logos/dodo.svg", x: 110, y: -36, delay: 0.3, hue: "from-orange-100 to-orange-50" },
+    { src: "/logos/cska.svg", x: 0, y: -90, delay: 0.55, hue: "from-blue-100 to-sky-50" },
+    { src: "/logos/wildberries.svg", x: -94, y: 44, delay: 0.8, hue: "from-fuchsia-100 to-purple-50" },
+    { src: "/logos/cofix.svg", x: 100, y: 52, delay: 1.1, hue: "from-rose-100 to-orange-50" },
   ];
-  const centerLogoSize =
-    layout.tier === "roomy" ? 120 : layout.tier === "compact" ? 82 : layout.tier === "micro" ? 68 : 98;
 
   return (
-    <div className={`relative w-full overflow-hidden ${layout.heroHeight}`}>
-      <div className="absolute inset-0 rounded-[28px] bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.95),transparent_32%),linear-gradient(135deg,rgba(250,245,255,0.88),rgba(238,242,255,0.88))]" />
+    <div className="relative h-[180px] overflow-hidden rounded-[28px] bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.95),transparent_32%),linear-gradient(135deg,rgba(250,245,255,0.88),rgba(238,242,255,0.88))]">
       <div className="absolute inset-0 opacity-[0.12] bg-[radial-gradient(#00000012_1px,transparent_1px)] [background-size:18px_18px]" />
       <div className="absolute inset-x-10 bottom-2 h-10 rounded-full bg-violet-300/20 blur-2xl" />
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 360 220" preserveAspectRatio="none">
-        <motion.path
-          d="M 86 58 C 126 78, 146 96, 180 110"
-          fill="none"
-          stroke="rgba(139,92,246,0.18)"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          animate={{ pathLength: [0.15, 1, 0.15], opacity: [0.18, 0.44, 0.18] }}
-          transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.path
-          d="M 274 58 C 234 78, 214 96, 180 110"
-          fill="none"
-          stroke="rgba(59,130,246,0.18)"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          animate={{ pathLength: [0.15, 1, 0.15], opacity: [0.16, 0.4, 0.16] }}
-          transition={{ duration: 5.1, repeat: Infinity, ease: "easeInOut", delay: 0.25 }}
-        />
-        <motion.path
-          d="M 180 24 C 180 56, 180 82, 180 110"
-          fill="none"
-          stroke="rgba(244,114,182,0.16)"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          animate={{ pathLength: [0.15, 1, 0.15], opacity: [0.14, 0.34, 0.14] }}
-          transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
-        />
-      </svg>
 
-      <motion.div
-        className="absolute left-1/2 top-1/2"
-        style={{ x: "-50%", y: "-50%" }}
-      >
-        {heroCoins.map((coin, index) => (
+      <motion.div className="absolute left-1/2 top-1/2" style={{ x: "-50%", y: "-50%" }}>
+        {coins.map((coin) => (
           <motion.div
-            key={coin.alt}
+            key={coin.src}
             className="absolute"
-            initial={{ opacity: 0, x: coin.x, y: coin.y, scale: 0.76 }}
+            initial={{ x: coin.x, y: coin.y, opacity: 0.35, scale: 0.82 }}
             animate={{
-              opacity: [0.34, 0.72, 0.62, 0.7, 0.34],
-              x: [coin.x, coin.x + coin.driftX, coin.x + coin.driftX * 0.45, coin.x - coin.driftX * 0.3, coin.x],
-              y: [coin.y, coin.y + coin.driftY, coin.y - coin.driftY * 0.24, coin.y + coin.driftY * 0.16, coin.y],
-              scale: [0.76, 0.82, 0.8, 0.84, 0.76],
-              rotate: [coin.rotate, coin.rotate * -0.3, coin.rotate * 0.4, coin.rotate],
+              x: [coin.x, coin.x + 18, coin.x - 12, coin.x],
+              y: [coin.y, coin.y + 14, coin.y - 8, coin.y],
+              opacity: [0.35, 0.75, 0.45, 0.35],
             }}
             transition={{
-              duration: coin.duration,
+              duration: 8,
               delay: coin.delay,
               repeat: Infinity,
-              repeatType: "mirror",
               ease: "easeInOut",
             }}
           >
             <div
-              className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br shadow-lg ${coin.hue} ${layout.coinSize}`}
+              className={`grid h-12 w-12 place-items-center rounded-full border border-white/90 bg-gradient-to-br shadow-lg ${coin.hue}`}
               style={{ boxShadow: "0 12px 24px rgba(24,24,27,0.12), inset 0 1px 0 rgba(255,255,255,0.86)" }}
             >
               <div className="grid h-[72%] w-[72%] place-items-center rounded-full bg-white/95 shadow-inner">
-                <Image
-                  src={coin.src}
-                  alt={coin.alt}
-                  width={28}
-                  height={28}
-                  className="h-auto w-auto max-h-[60%] max-w-[60%] object-contain"
-                />
+                <Image src={coin.src} alt="" width={24} height={24} className="h-auto w-auto max-h-[60%] max-w-[60%] object-contain" />
               </div>
             </div>
           </motion.div>
         ))}
 
-          <div className="relative">
-            <div className="absolute inset-x-6 bottom-[-10px] h-8 rounded-full bg-violet-400/18 blur-xl" />
-            <div
-              className="relative rounded-[28px] border border-white/20 px-4 py-3 shadow-[0_22px_42px_rgba(24,58,53,0.22)] backdrop-blur-md"
-              style={{ backgroundColor: "#183A35" }}
-            >
-              <div className="text-center text-[0.56rem] font-medium uppercase tracking-[0.2em] text-white">
-                Единый вход
-              </div>
-              <div className="mt-2 flex items-center justify-center gap-3">
-                <div
-                  className={`grid place-items-center rounded-[28px] ${layout.centerTokenSize}`}
-                  style={{ backgroundColor: "#183A35" }}
-                >
-                  <svg
-                    width={centerLogoSize}
-                    height={centerLogoSize}
-                    viewBox="0 0 1093 959"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M 421.00 916.37 C396.38,915.63 362.28,912.11 339.00,907.91 C290.62,899.17 238.20,875.69 195.06,843.43 C174.66,828.17 157.10,811.43 135.36,786.50 C123.94,773.40 102.77,741.46 94.14,724.29 C76.04,688.28 63.77,650.95 58.03,614.50 C53.88,588.13 53.80,585.93 53.30,492.59 C52.81,400.23 53.22,383.07 56.56,357.44 C63.28,305.92 79.11,261.78 107.48,215.50 C123.61,189.18 137.40,171.86 159.66,149.97 C192.48,117.70 224.30,96.26 270.50,75.27 C289.88,66.47 322.65,56.65 351.00,51.15 C381.57,45.21 372.23,45.50 535.00,45.50 C673.58,45.50 686.73,45.64 701.00,47.30 C748.94,52.87 774.31,58.91 812.00,73.73 C836.18,83.23 864.20,99.67 893.50,121.55 C907.70,132.16 939.30,163.52 952.90,180.51 C970.92,203.02 988.35,231.39 998.96,255.50 C1015.67,293.47 1023.27,319.49 1028.75,357.50 L 1031.35 375.50 L 1031.75 472.00 C1032.02,537.55 1031.79,573.15 1031.02,583.00 C1026.90,636.40 1012.00,685.56 985.96,731.68 C952.89,790.24 910.76,833.29 851.14,869.42 C818.51,889.19 776.80,904.32 736.59,910.97 C702.87,916.54 711.89,916.25 566.00,916.46 C491.48,916.57 426.23,916.53 421.00,916.37 ZM 640.32 721.88 C642.84,720.59 657.71,706.12 721.25,643.16 L 767.00 597.83 L 767.00 467.56 L 767.00 337.29 L 759.35 336.65 C755.14,336.29 733.57,336.00 711.41,336.00 L 671.12 336.00 L 670.58 331.75 C670.28,329.41 669.91,308.07 669.77,284.33 C669.62,260.59 669.12,240.79 668.67,240.33 C667.69,239.35 416.05,239.51 408.18,240.50 L 402.83 241.16 L 342.17 301.17 C308.80,334.18 281.00,362.15 280.38,363.34 C278.76,366.46 277.75,719.71 279.36,720.76 C282.21,722.61 636.73,723.72 640.32,721.88 ZM 863.80 294.00 C863.97,271.17 863.82,249.69 863.47,246.25 L 862.84 240.00 L 814.92 240.00 L 767.00 240.00 L 767.00 287.75 L 767.00 335.50 L 815.25 335.50 L 863.50 335.50 L 863.80 294.00 ZM 375.62 623.88 C375.28,622.16 375.00,572.63 375.00,513.83 C375.00,422.91 375.21,406.50 376.43,404.20 C377.73,401.76 408.52,370.81 434.61,345.72 L 444.72 336.00 L 557.36 336.00 L 670.00 336.00 L 670.00 447.03 L 670.00 558.05 L 645.25 582.28 C631.64,595.60 615.75,611.11 609.94,616.75 L 599.39 627.00 L 487.82 627.00 L 376.25 627.00 L 375.62 623.88 Z"
-                      fill="#DCF806"
-                    />
-                  </svg>
-                </div>
-              </div>
-            <div className="mt-3 flex items-center justify-center gap-2">
-                <div className="rounded-full bg-violet-50 px-3 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-violet-600">
-                  Phone
-                </div>
-                <div className="rounded-full bg-sky-50 px-3 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-sky-600">
-                  Telegram
-                </div>
-              </div>
+        <div className="relative rounded-[28px] border border-white/20 px-4 py-3 shadow-[0_22px_42px_rgba(24,58,53,0.22)] backdrop-blur-md" style={{ backgroundColor: "#183A35" }}>
+          <div className="text-center text-[0.56rem] font-medium uppercase tracking-[0.2em] text-white">
+            Единый вход
           </div>
+          <div className="mt-2 flex justify-center">
+            <div className="grid h-24 w-24 place-items-center rounded-[28px]" style={{ backgroundColor: "#183A35" }}>
+              <svg width="98" height="98" viewBox="0 0 1093 959" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path
+                  d="M 421.00 916.37 C396.38,915.63 362.28,912.11 339.00,907.91 C290.62,899.17 238.20,875.69 195.06,843.43 C174.66,828.17 157.10,811.43 135.36,786.50 C123.94,773.40 102.77,741.46 94.14,724.29 C76.04,688.28 63.77,650.95 58.03,614.50 C53.88,588.13 53.80,585.93 53.30,492.59 C52.81,400.23 53.22,383.07 56.56,357.44 C63.28,305.92 79.11,261.78 107.48,215.50 C123.61,189.18 137.40,171.86 159.66,149.97 C192.48,117.70 224.30,96.26 270.50,75.27 C289.88,66.47 322.65,56.65 351.00,51.15 C381.57,45.21 372.23,45.50 535.00,45.50 C673.58,45.50 686.73,45.64 701.00,47.30 C748.94,52.87 774.31,58.91 812.00,73.73 C836.18,83.23 864.20,99.67 893.50,121.55 C907.70,132.16 939.30,163.52 952.90,180.51 C970.92,203.02 988.35,231.39 998.96,255.50 C1015.67,293.47 1023.27,319.49 1028.75,357.50 L 1031.35 375.50 L 1031.75 472.00 C1032.02,537.55 1031.79,573.15 1031.02,583.00 C1026.90,636.40 1012.00,685.56 985.96,731.68 C952.89,790.24 910.76,833.29 851.14,869.42 C818.51,889.19 776.80,904.32 736.59,910.97 C702.87,916.54 711.89,916.25 566.00,916.46 C491.48,916.57 426.23,916.53 421.00,916.37 ZM 640.32 721.88 C642.84,720.59 657.71,706.12 721.25,643.16 L 767.00 597.83 L 767.00 467.56 L 767.00 337.29 L 759.35 336.65 C755.14,336.29 733.57,336.00 711.41,336.00 L 671.12 336.00 L 670.58 331.75 C670.28,329.41 669.91,308.07 669.77,284.33 C669.62,260.59 669.12,240.79 668.67,240.33 C667.69,239.35 416.05,239.51 408.18,240.50 L 402.83 241.16 L 342.17 301.17 C308.80,334.18 281.00,362.15 280.38,363.34 C278.76,366.46 277.75,719.71 279.36,720.76 C282.21,722.61 636.73,723.72 640.32,721.88 ZM 863.80 294.00 C863.97,271.17 863.82,249.69 863.47,246.25 L 862.84 240.00 L 814.92 240.00 L 767.00 240.00 L 767.00 287.75 L 767.00 335.50 L 815.25 335.50 L 863.50 335.50 L 863.80 294.00 ZM 375.62 623.88 C375.28,622.16 375.00,572.63 375.00,513.83 C375.00,422.91 375.21,406.50 376.43,404.20 C377.73,401.76 408.52,370.81 434.61,345.72 L 444.72 336.00 L 557.36 336.00 L 670.00 336.00 L 670.00 447.03 L 670.00 558.05 L 645.25 582.28 C631.64,595.60 615.75,611.11 609.94,616.75 L 599.39 627.00 L 487.82 627.00 L 376.25 627.00 L 375.62 623.88 Z"
+                  fill="#DCF806"
+                />
+              </svg>
+            </div>
           </div>
-      </motion.div>
-
-      <motion.div
-        className={`absolute left-1/2 top-1/2 rounded-full ${layout.glowSize}`}
-        style={{ x: "-50%", y: "-50%" }}
-        animate={{
-          opacity: [0.12, 0.28, 0.12],
-          scale: [0.88, 1.16, 0.88],
-        }}
-        transition={{
-          duration: 4.2,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      >
-        <div className="h-full w-full rounded-full bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.18),transparent_70%)]" />
+          <div className="mt-3 flex items-center justify-center gap-2">
+            <div className="rounded-full bg-violet-50 px-3 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-violet-600">
+              Phone
+            </div>
+            <div className="rounded-full bg-sky-50 px-3 py-1 text-[0.58rem] font-medium uppercase tracking-[0.14em] text-sky-600">
+              Telegram
+            </div>
+          </div>
+        </div>
       </motion.div>
     </div>
   );
 }
 
 export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [emailModeOpen, setEmailModeOpen] = useState(false);
+  const [emailFlowMode, setEmailFlowMode] = useState<"login" | "register">("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [phone, setPhone] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
+  const [codeSent, setCodeSent] = useState(false);
+  const [codeVerified, setCodeVerified] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authMessage, setAuthMessage] = useState<AuthMessage>(null);
   const [viewportSize, setViewportSize] = useState({ width: 390, height: 844 });
-  const inputRef = useRef<HTMLInputElement>(null);
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const supabase = getSupabaseBrowserClient();
+  const layout = getLayout(viewportSize.height, viewportSize.width);
 
   useEffect(() => {
     const updateViewport = () => {
@@ -297,63 +155,278 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
     };
   }, []);
 
-  const layout = getScreenLayout(viewportSize.height, viewportSize.width);
+  const requireSupabase = () => {
+    if (!supabase) {
+      throw new Error("Для E-Mail авторизации нужно настроить Supabase в .env.local.");
+    }
 
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, "");
-    if (value.length <= 10) {
-      setPhoneNumber(value);
+    return supabase;
+  };
+
+  const persistProfile = async (accessToken: string) => {
+    const response = await fetch("/api/auth/profile", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        email: email.trim(),
+        phone: phone.trim() || null,
+        age: age.trim() ? Number(age) : null,
+        gender: gender || null,
+      }),
+    });
+
+    const payload = (await response.json()) as { error?: string };
+    if (!response.ok) {
+      throw new Error(payload.error ?? "Не удалось сохранить профиль.");
     }
   };
 
-  const handleLogin = () => {
-    onLogin?.();
+  const openEmailMode = () => {
+    setEmailModeOpen((current) => !current);
+    setAuthMessage(null);
+    window.setTimeout(() => emailInputRef.current?.focus(), 120);
   };
 
-  const handleCompanyClick = () => {
-    window.open("https://oemservice.tech/", "_blank");
+  const handleSwitchEmailFlow = (mode: "login" | "register") => {
+    setEmailFlowMode(mode);
+    setAuthMessage(null);
+    setPassword("");
+    setConfirmPassword("");
+    setVerificationCode("");
+    setCodeSent(false);
+    setCodeVerified(false);
+  };
+
+  const handleEmailPasswordLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      setAuthMessage({ type: "error", text: "Введите E-Mail и пароль." });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setAuthMessage(null);
+
+    try {
+      const client = requireSupabase();
+      const { data, error } = await client.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+
+      if (error || !data.session) {
+        throw new Error("Неверная почта или пароль.");
+      }
+
+      clearTelegramSession();
+      await persistProfile(data.session.access_token);
+      onLogin?.();
+    } catch (error) {
+      setAuthMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Неверная почта или пароль.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSendEmailCode = async () => {
+    if (!email.trim()) {
+      setAuthMessage({ type: "error", text: "Сначала введите E-Mail." });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setAuthMessage(null);
+
+    try {
+      const client = requireSupabase();
+      const { error } = await client.auth.signInWithOtp({
+        email: email.trim(),
+        options: { shouldCreateUser: true },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setCodeSent(true);
+      setCodeVerified(false);
+      setAuthMessage({
+        type: "success",
+        text: "Код отправлен на почту. Введите его ниже и подтвердите адрес.",
+      });
+    } catch (error) {
+      setAuthMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Не удалось отправить код на почту.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleVerifyEmailCode = async () => {
+    if (!email.trim() || !verificationCode.trim()) {
+      setAuthMessage({ type: "error", text: "Введите E-Mail и код из письма." });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setAuthMessage(null);
+
+    try {
+      const client = requireSupabase();
+      const { error } = await client.auth.verifyOtp({
+        email: email.trim(),
+        token: verificationCode.trim(),
+        type: "email",
+      });
+
+      if (error) {
+        throw new Error("Код не верный.");
+      }
+
+      setCodeVerified(true);
+      setAuthMessage({
+        type: "success",
+        text: "Код подтверждён. Теперь придумайте пароль и завершите регистрацию.",
+      });
+    } catch (error) {
+      setAuthMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Код не верный.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCompleteRegistration = async () => {
+    if (!codeVerified) {
+      setAuthMessage({ type: "error", text: "Сначала подтвердите код из письма." });
+      return;
+    }
+
+    if (!password.trim() || password.length < 6) {
+      setAuthMessage({ type: "error", text: "Пароль должен содержать минимум 6 символов." });
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setAuthMessage({ type: "error", text: "Пароли не совпадают." });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setAuthMessage(null);
+
+    try {
+      const client = requireSupabase();
+      const { data: sessionData } = await client.auth.getSession();
+      if (!sessionData.session) {
+        throw new Error("Сессия после подтверждения почты не найдена.");
+      }
+
+      const { error } = await client.auth.updateUser({ password });
+      if (error) {
+        throw error;
+      }
+
+      clearTelegramSession();
+      await persistProfile(sessionData.session.access_token);
+      onLogin?.();
+    } catch (error) {
+      setAuthMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Не удалось завершить регистрацию.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleTelegramLogin = async () => {
+    setIsSubmitting(true);
+    setAuthMessage(null);
+
+    try {
+      const telegram = (
+        window as typeof window & {
+          Telegram?: {
+            WebApp?: {
+              initData?: string;
+              ready?: () => void;
+            };
+          };
+        }
+      ).Telegram?.WebApp;
+
+      telegram?.ready?.();
+
+      if (!telegram?.initData) {
+        throw new Error("Вход через Telegram доступен только внутри Telegram Mini App.");
+      }
+
+      const response = await fetch("/api/auth/telegram", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ initData: telegram.initData }),
+      });
+
+      const payload = (await response.json()) as {
+        error?: string;
+        session?: Parameters<typeof writeTelegramSession>[0];
+      };
+
+      if (!response.ok || !payload.session) {
+        throw new Error(payload.error ?? "Не удалось войти через Telegram.");
+      }
+
+      writeTelegramSession(payload.session);
+      onLogin?.();
+    } catch (error) {
+      setAuthMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Не удалось войти через Telegram.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSupportClick = async () => {
-    const email = "info@oe-media.ru";
+    const supportEmail = "info@oe-media.ru";
 
     try {
-      await navigator.clipboard.writeText(email);
+      await navigator.clipboard.writeText(supportEmail);
       setShowToast(true);
-
-      setTimeout(() => {
-        setShowToast(false);
-      }, 2000);
+      window.setTimeout(() => setShowToast(false), 2000);
     } catch {
-      alert(`Наш email: ${email}`);
+      alert(`Наш email: ${supportEmail}`);
     }
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="h-full bg-zinc-50"
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full bg-zinc-50">
       <div className="flex h-full min-h-0 flex-col overflow-hidden">
         <div className="shrink-0 border-b border-zinc-200 bg-white">
           <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3">
-            <h1 className={layout.tier === "micro" || layout.tier === "compact" ? "text-xl font-bold text-zinc-900" : "text-2xl font-bold text-zinc-900"}>
+            <h1 className={layout.tier === "micro" ? "text-xl font-bold text-zinc-900" : "text-2xl font-bold text-zinc-900"}>
               Профиль
             </h1>
-
             {onBack && (
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 800, damping: 20 }}
                 onClick={onBack}
-                className={`flex items-center justify-center rounded-full bg-zinc-100 transition-colors hover:bg-zinc-200 ${
-                  layout.tier === "micro" || layout.tier === "compact" ? "h-9 w-9" : "h-10 w-10"
-                }`}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 transition-colors hover:bg-zinc-200"
                 aria-label="Назад"
               >
-                <ArrowLeft size={layout.tier === "micro" || layout.tier === "compact" ? 18 : 20} className="text-zinc-700" />
+                <ArrowLeft size={20} className="text-zinc-700" />
               </motion.button>
             )}
           </div>
@@ -361,67 +434,207 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
 
         <div className={`mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col overflow-hidden ${layout.shellPadding}`}>
           <div className="flex min-h-0 flex-1 flex-col justify-between">
-            <div className={`shrink-0 flex flex-col ${layout.topGap}`}>
-              <FloatingBonuses layout={layout} />
+            <div className={`flex flex-col ${layout.gap}`}>
+              <Hero />
 
-              <div className={`flex flex-col ${layout.formGap}`}>
-                <div className="shrink-0">
-                  <p className={`font-bold text-zinc-900 ${layout.titleClass}`}>
-                    Войдите или зарегистрируйтесь
+              <div className={`flex flex-col ${layout.gap}`}>
+                <div>
+                  <p className={`font-bold text-zinc-900 ${layout.titleClass}`}>Войдите или зарегистрируйтесь</p>
+                  <p className="mt-2 text-xs text-zinc-400">
+                    Telegram-вход работает внутри Mini App. Для E-Mail входа используйте код из письма и пароль.
                   </p>
-                  <p className={`mt-2 text-zinc-400 ${layout.hintClass}`}>
-                    Введите номер телефона
-                  </p>
-                </div>
-
-                <div className="shrink-0">
-                  <div className="relative">
-                    <div className="pointer-events-none absolute left-4 top-1/2 flex -translate-y-1/2 items-center">
-                      <span className="text-base text-zinc-400">+7</span>
-                    </div>
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      value={phoneNumber}
-                      onChange={handlePhoneChange}
-                      placeholder=""
-                      className={`w-full rounded-xl border border-zinc-200 bg-white pl-12 pr-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
-                      inputMode="numeric"
-                    />
-                  </div>
-
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ type: "spring", stiffness: 800, damping: 20 }}
-                    onClick={handleLogin}
-                    className={`mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 font-medium text-white transition-colors hover:bg-zinc-800 ${layout.buttonClass}`}
-                  >
-                    <LogIn size={16} />
-                    Войти
-                  </motion.button>
-                </div>
-
-                <div className={`shrink-0 ${layout.tier === "micro" ? "my-0" : layout.tier === "compact" ? "my-0.5" : "my-1"}`}>
-                  <div className="flex items-center gap-4">
-                    <div className="h-px flex-1 bg-zinc-200" />
-                    <span className="text-xs text-zinc-400">или</span>
-                    <div className="h-px flex-1 bg-zinc-200" />
-                  </div>
                 </div>
 
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 800, damping: 20 }}
-                  onClick={handleLogin}
-                  className={`shrink-0 flex w-full items-center justify-center gap-2 rounded-xl bg-[#54A9EB] font-medium text-white transition-colors hover:bg-[#4098E0] ${layout.buttonClass}`}
+                  onClick={handleTelegramLogin}
+                  disabled={isSubmitting}
+                  className={`flex w-full items-center justify-center gap-2 rounded-xl bg-[#54A9EB] font-medium text-white transition-colors hover:bg-[#4098E0] disabled:opacity-60 ${layout.buttonClass}`}
                 >
                   <Send size={16} className="text-white" />
                   Войти через Telegram
                 </motion.button>
+
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 800, damping: 20 }}
+                  onClick={openEmailMode}
+                  className={`flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white font-medium text-zinc-900 transition-colors hover:bg-zinc-50 ${layout.buttonClass}`}
+                >
+                  <Mail size={16} />
+                  Вход по E-Mail
+                  {emailModeOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </motion.button>
+
+                <AnimatePresence initial={false}>
+                  {emailModeOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0, y: -8 }}
+                      animate={{ opacity: 1, height: "auto", y: 0 }}
+                      exit={{ opacity: 0, height: 0, y: -8 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="rounded-2xl border border-zinc-200 bg-white p-3.5 shadow-sm">
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleSwitchEmailFlow("login")}
+                            className={`rounded-xl px-3 py-2 text-sm font-medium transition-colors ${emailFlowMode === "login" ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600"}`}
+                          >
+                            Вход
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleSwitchEmailFlow("register")}
+                            className={`rounded-xl px-3 py-2 text-sm font-medium transition-colors ${emailFlowMode === "register" ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600"}`}
+                          >
+                            Регистрация
+                          </button>
+                        </div>
+
+                        <div className="mt-3 grid gap-3">
+                          <input
+                            ref={emailInputRef}
+                            type="email"
+                            value={email}
+                            onChange={(event) => setEmail(event.target.value)}
+                            placeholder="E-Mail"
+                            className={`w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
+                            autoCapitalize="none"
+                            autoCorrect="off"
+                          />
+
+                          {emailFlowMode === "login" ? (
+                            <>
+                              <input
+                                type="password"
+                                value={password}
+                                onChange={(event) => setPassword(event.target.value)}
+                                placeholder="Пароль"
+                                className={`w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
+                              />
+                              <button
+                                type="button"
+                                onClick={handleEmailPasswordLogin}
+                                disabled={isSubmitting}
+                                className={`flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-60 ${layout.buttonClass}`}
+                              >
+                                <LogIn size={16} />
+                                Войти
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                type="button"
+                                onClick={handleSendEmailCode}
+                                disabled={isSubmitting}
+                                className={`flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-60 ${layout.buttonClass}`}
+                              >
+                                <Mail size={16} />
+                                Отправить код
+                              </button>
+
+                              {codeSent && (
+                                <>
+                                  <input
+                                    type="text"
+                                    value={verificationCode}
+                                    onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
+                                    placeholder="Код из письма"
+                                    className={`w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
+                                    inputMode="numeric"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={handleVerifyEmailCode}
+                                    disabled={isSubmitting}
+                                    className={`flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white font-medium text-zinc-900 transition-colors hover:bg-zinc-50 disabled:opacity-60 ${layout.buttonClass}`}
+                                  >
+                                    <ShieldCheck size={16} />
+                                    Подтвердить код
+                                  </button>
+                                </>
+                              )}
+
+                              {codeVerified && (
+                                <>
+                                  <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(event) => setPassword(event.target.value)}
+                                    placeholder="Придумайте пароль"
+                                    className={`w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
+                                  />
+                                  <input
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(event) => setConfirmPassword(event.target.value)}
+                                    placeholder="Повторите пароль"
+                                    className={`w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
+                                  />
+                                  <input
+                                    type="tel"
+                                    value={phone}
+                                    onChange={(event) => setPhone(event.target.value)}
+                                    placeholder="Телефон (необязательно)"
+                                    className={`w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
+                                  />
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <input
+                                      type="number"
+                                      value={age}
+                                      onChange={(event) => setAge(event.target.value)}
+                                      placeholder="Возраст"
+                                      className={`w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
+                                    />
+                                    <select
+                                      value={gender}
+                                      onChange={(event) => setGender(event.target.value)}
+                                      className={`w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
+                                    >
+                                      <option value="">Пол</option>
+                                      <option value="male">Мужской</option>
+                                      <option value="female">Женский</option>
+                                      <option value="other">Другой</option>
+                                    </select>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={handleCompleteRegistration}
+                                    disabled={isSubmitting}
+                                    className={`flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-60 ${layout.buttonClass}`}
+                                  >
+                                    <ShieldCheck size={16} />
+                                    Создать аккаунт
+                                  </button>
+                                </>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <AnimatePresence>
+                  {authMessage && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 8 }}
+                      className={`rounded-2xl border px-4 py-3 text-sm ${authMessage.type === "error" ? "border-rose-200 bg-rose-50 text-rose-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"}`}
+                    >
+                      {authMessage.text}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
 
-            <div className={`grid shrink-0 pt-2 ${layout.tier === "micro" ? "gap-1.5" : layout.tier === "compact" ? "gap-2" : "gap-2.5"}`}>
+            <div className={`grid shrink-0 pt-2 ${layout.gap}`}>
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 800, damping: 20 }}
@@ -435,7 +648,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 800, damping: 20 }}
-                onClick={handleCompanyClick}
+                onClick={() => window.open("https://oemservice.tech/", "_blank")}
                 className={`flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white font-medium transition-colors hover:bg-zinc-50 ${layout.tertiaryButtonClass}`}
               >
                 <Building2 size={16} className="text-zinc-600" />
@@ -456,9 +669,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
               <svg className="h-5 w-5 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              <p className="flex-1 text-sm font-medium leading-relaxed">
-                Адрес электронной почты скопирован
-              </p>
+              <p className="flex-1 text-sm font-medium leading-relaxed">Адрес электронной почты скопирован</p>
             </motion.div>
           )}
         </AnimatePresence>
