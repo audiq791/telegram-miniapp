@@ -394,6 +394,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         rotate: 0,
         duration: 12.6,
         phase: Math.PI / 3,
+        // Horizontal orbit: upper arc stays behind the phone, lower arc stays in front.
         frontHalf: "bottom" as OrbitFrontHalf,
       },
       {
@@ -525,7 +526,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
       case "top":
         return `M 0 ${cy} A ${rx} ${ry} 0 0 1 ${orbit.width} ${cy}`;
       case "bottom":
-        return `M ${orbit.width} ${cy} A ${rx} ${ry} 0 0 1 0 ${cy}`;
+        return `M ${orbit.width} ${cy} A ${rx} ${ry} 0 0 0 0 ${cy}`;
       case "left":
         return `M ${cx} ${orbit.height} A ${rx} ${ry} 0 0 0 ${cx} 0`;
       case "right":
