@@ -45,6 +45,14 @@ function getFriendlyAuthErrorMessage(error: unknown, fallback: string) {
     return "Данный E-Mail уже зарегистрирован. Войдите через пароль.";
   }
 
+  if (normalized.includes("e-mail введён неверно") || normalized.includes("email is invalid")) {
+    return "E-Mail введён неверно.";
+  }
+
+  if (normalized.includes("не удалось отправить письмо")) {
+    return "Не удалось отправить письмо с кодом. Попробуйте ещё раз позже.";
+  }
+
   if (normalized.includes("invalid credentials") || normalized.includes("неверная почта")) {
     return "Неверная почта или пароль.";
   }
@@ -58,6 +66,10 @@ function getFriendlyAuthErrorMessage(error: unknown, fallback: string) {
   }
 
   return raw || fallback;
+}
+
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
 function getLayout(viewportHeight: number, viewportWidth: number) {
@@ -219,6 +231,11 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
       return;
     }
 
+    if (!isValidEmail(email)) {
+      setAuthMessage({ type: "error", text: "E-Mail введён неверно." });
+      return;
+    }
+
     setIsSubmitting(true);
     setAuthMessage(null);
 
@@ -253,6 +270,11 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
   const handleSendEmailCode = async () => {
     if (!email.trim()) {
       setAuthMessage({ type: "error", text: "Сначала введите E-Mail." });
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setAuthMessage({ type: "error", text: "E-Mail введён неверно." });
       return;
     }
 
@@ -295,6 +317,11 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
   const handleVerifyEmailCode = async () => {
     if (!email.trim() || !verificationCode.trim()) {
       setAuthMessage({ type: "error", text: "Введите E-Mail и код из письма." });
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setAuthMessage({ type: "error", text: "E-Mail введён неверно." });
       return;
     }
 

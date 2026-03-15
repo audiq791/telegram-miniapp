@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { canResendCode, findLatestCode, issueEmailCode } from "@/lib/auth/email-otp";
 import { normalizeEmail, updateDb, createTimestamp, createId, type StoredUser } from "@/lib/auth/local-db";
 
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 function buildPlaceholderUser(email: string, region: string | null): StoredUser {
   const now = createTimestamp();
   return {
@@ -36,6 +40,10 @@ export async function POST(request: Request) {
 
     if (!normalizedEmail) {
       return NextResponse.json({ error: "Введите E-Mail." }, { status: 400 });
+    }
+
+    if (!isValidEmail(normalizedEmail)) {
+      return NextResponse.json({ error: "E-Mail введён неверно." }, { status: 400 });
     }
 
     await updateDb(async (db) => {
@@ -74,6 +82,13 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Письмо уже было недавно отправлено. Попробуйте ещё раз чуть позже." },
         { status: 429 },
+      );
+    }
+
+    if (message === "EMAIL_SEND_FAILED") {
+      return NextResponse.json(
+        { error: "Не удалось отправить письмо с кодом. Попробуйте ещё раз позже." },
+        { status: 502 },
       );
     }
 

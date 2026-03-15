@@ -88,12 +88,17 @@ export async function issueEmailCode(db: LocalAuthDb, email: string) {
 
   const text = `Регистрация в Бирже Бонусов. Пожалуйста, введите этот код в поле для ввода кода в приложении: ${code}`;
 
-  await sendEmail({
-    to: normalizedEmail,
-    subject,
-    html,
-    text,
-  });
+  try {
+    await sendEmail({
+      to: normalizedEmail,
+      subject,
+      html,
+      text,
+    });
+  } catch {
+    db.verificationCodes = db.verificationCodes.filter((item) => item.id !== record.id);
+    throw new Error("EMAIL_SEND_FAILED");
+  }
 }
 
 export function verifyEmailCode(db: LocalAuthDb, email: string, code: string) {

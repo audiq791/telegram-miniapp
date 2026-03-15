@@ -11,3 +11,5 @@
 Creating turbopack project { dir: 'C:\\Users\\Levan\\Desktop\\tg-miniapp\\web', testMode: true }
 ✓ Ready in 546ms
  GET / 200 in 642ms (compile: 516ms, render: 126ms)
+  Reload env: .env.local
+  Reload env: .env.local
