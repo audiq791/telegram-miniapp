@@ -1,6 +1,42 @@
 import { NextResponse } from "next/server";
-import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { validateTelegramInitData } from "@/lib/auth/telegram";
+import { createId, createTimestamp, updateDb, type StoredUser } from "@/lib/auth/local-db";
+import { attachAuthSessionCookie, clearRegistrationCookie, createAuthSession } from "@/lib/auth/server-session";
+import { toClientUser } from "@/lib/auth/user-profile";
+
+function buildTelegramUser(params: {
+  telegramId: number;
+  telegramUsername: string | null;
+  telegramUrl: string | null;
+  firstName: string;
+  lastName: string | null;
+  photoUrl: string | null;
+}): StoredUser {
+  const now = createTimestamp();
+  return {
+    id: createId(),
+    email: null,
+    passwordHash: null,
+    phone: null,
+    age: null,
+    gender: null,
+    region: null,
+    telegramId: params.telegramId,
+    telegramUsername: params.telegramUsername,
+    telegramUrl: params.telegramUrl,
+    firstName: params.firstName,
+    lastName: params.lastName,
+    vkUrl: null,
+    instagramUrl: null,
+    xUrl: null,
+    photoUrl: params.photoUrl,
+    authProvider: "telegram",
+    emailVerified: true,
+    passwordReady: false,
+    createdAt: now,
+    updatedAt: now,
+  };
+}
 
 export async function POST(request: Request) {
   try {
@@ -23,45 +59,42 @@ export async function POST(request: Request) {
       ? `https://t.me/${validated.user.username}`
       : null;
 
-    const supabase = getSupabaseAdminClient();
-    const { data, error } = await supabase
-      .from("app_users")
-      .upsert(
-        {
-          telegram_id: validated.user.id,
-          telegram_username: validated.user.username ?? null,
-          telegram_url: telegramUrl,
-          first_name: validated.user.first_name,
-          last_name: validated.user.last_name ?? null,
-          photo_url: validated.user.photo_url ?? null,
-          auth_provider: "telegram",
-          email_verified: true,
-        },
-        {
-          onConflict: "telegram_id",
-        },
-      )
-      .select("id, telegram_id, telegram_username, telegram_url, first_name, last_name, photo_url")
-      .single();
+    const result = await updateDb((db) => {
+      let user = db.users.find((item) => item.telegramId === validated.user.id) ?? null;
 
-    if (error || !data) {
-      return NextResponse.json(
-        { error: error?.message ?? "Failed to persist Telegram user." },
-        { status: 500 },
-      );
-    }
+      if (!user) {
+        user = buildTelegramUser({
+          telegramId: validated.user.id,
+          telegramUsername: validated.user.username ?? null,
+          telegramUrl,
+          firstName: validated.user.first_name,
+          lastName: validated.user.last_name ?? null,
+          photoUrl: validated.user.photo_url ?? null,
+        });
+        db.users.push(user);
+      } else {
+        user.telegramUsername = validated.user.username ?? null;
+        user.telegramUrl = telegramUrl;
+        user.firstName = validated.user.first_name;
+        user.lastName = validated.user.last_name ?? null;
+        user.photoUrl = validated.user.photo_url ?? null;
+        user.authProvider = "telegram";
+        user.emailVerified = true;
+        user.updatedAt = createTimestamp();
+      }
 
-    return NextResponse.json({
-      session: {
-        appUserId: data.id,
-        telegramId: data.telegram_id,
-        telegramUsername: data.telegram_username,
-        telegramUrl: data.telegram_url,
-        firstName: data.first_name,
-        lastName: data.last_name,
-        photoUrl: data.photo_url,
-      },
+      const sessionToken = createAuthSession(db, user.id);
+
+      return {
+        user: toClientUser(user),
+        sessionToken,
+      };
     });
+
+    const response = NextResponse.json({ ok: true, user: result.user });
+    clearRegistrationCookie(response);
+    attachAuthSessionCookie(response, result.sessionToken);
+    return response;
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Telegram login failed." },

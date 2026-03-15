@@ -14,13 +14,7 @@ import {
   Send,
   ShieldCheck,
 } from "lucide-react";
-import {
-  clearPendingPasswordSetup,
-  clearTelegramSession,
-  markPendingPasswordSetup,
-  writeTelegramSession,
-} from "@/lib/auth/storage";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { readLastAuthEmail, writeLastAuthEmail } from "@/lib/auth/storage";
 
 interface LoginAccountProps {
   onLogin?: () => void;
@@ -43,27 +37,27 @@ function getFriendlyAuthErrorMessage(error: unknown, fallback: string) {
         : fallback;
   const normalized = raw.toLowerCase();
 
-  if (normalized.includes("email rate limit exceeded") || normalized.includes("security purposes")) {
+  if (normalized.includes("уже было недавно отправлено") || normalized.includes("rate")) {
     return "Письмо уже было недавно отправлено. Попробуйте ещё раз чуть позже.";
   }
 
-  if (normalized.includes("invalid login credentials")) {
+  if (normalized.includes("уже зарегистрирован") || normalized.includes("already registered")) {
+    return "Данный E-Mail уже зарегистрирован. Войдите через пароль.";
+  }
+
+  if (normalized.includes("invalid credentials") || normalized.includes("неверная почта")) {
     return "Неверная почта или пароль.";
   }
 
-  if (normalized.includes("email not confirmed")) {
-    return "Почта ещё не подтверждена. Проверьте письмо с кодом и завершите регистрацию.";
-  }
-
-  if ((normalized.includes("token") || normalized.includes("otp")) && normalized.includes("expired")) {
-    return "Срок действия кода истёк. Запросите новый код.";
-  }
-
-  if (normalized.includes("token") && normalized.includes("invalid")) {
+  if (normalized.includes("код не верный")) {
     return "Код не верный.";
   }
 
-  return fallback;
+  if (normalized.includes("истёк") || normalized.includes("expired")) {
+    return "Срок действия кода истёк. Запросите новый код.";
+  }
+
+  return raw || fallback;
 }
 
 function getLayout(viewportHeight: number, viewportWidth: number) {
@@ -120,7 +114,10 @@ function Hero() {
           </motion.div>
         ))}
 
-        <div className="relative rounded-[28px] border border-white/20 px-4 py-3 shadow-[0_22px_42px_rgba(24,58,53,0.22)] backdrop-blur-md" style={{ backgroundColor: "#183A35" }}>
+        <div
+          className="relative rounded-[28px] border border-white/20 px-4 py-3 shadow-[0_22px_42px_rgba(24,58,53,0.22)] backdrop-blur-md"
+          style={{ backgroundColor: "#183A35" }}
+        >
           <div className="text-center text-[0.56rem] font-medium uppercase tracking-[0.2em] text-white">
             Единый вход
           </div>
@@ -163,7 +160,6 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
   const [authMessage, setAuthMessage] = useState<AuthMessage>(null);
   const [viewportSize, setViewportSize] = useState({ width: 390, height: 844 });
   const emailInputRef = useRef<HTMLInputElement>(null);
-  const supabase = getSupabaseBrowserClient();
   const layout = getLayout(viewportSize.height, viewportSize.width);
 
   useEffect(() => {
@@ -186,6 +182,13 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
   }, []);
 
   useEffect(() => {
+    const rememberedEmail = readLastAuthEmail();
+    if (rememberedEmail) {
+      setEmail(rememberedEmail);
+    }
+  }, []);
+
+  useEffect(() => {
     if (region) return;
     const locale = navigator.language || "";
     const regionFromLocale = locale.includes("-") ? locale.split("-")[1] : "";
@@ -193,56 +196,6 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
       setRegion(regionFromLocale.toUpperCase());
     }
   }, [region]);
-
-  const requireSupabase = () => {
-    if (!supabase) {
-      throw new Error("Для E-Mail авторизации нужно настроить Supabase в .env.local.");
-    }
-
-    return supabase;
-  };
-
-  const getEmailStatus = async (targetEmail: string) => {
-    const response = await fetch("/api/auth/email-status", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: targetEmail.trim().toLowerCase() }),
-    });
-
-    const payload = (await response.json()) as {
-      error?: string;
-      exists?: boolean;
-      passwordReady?: boolean;
-      emailVerified?: boolean;
-    };
-
-    if (!response.ok) {
-      throw new Error(payload.error ?? "Не удалось проверить E-Mail.");
-    }
-
-    return payload;
-  };
-
-  const persistProfile = async (accessToken: string) => {
-    const response = await fetch("/api/auth/profile", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
-        email: email.trim(),
-        region: region.trim() || null,
-      }),
-    });
-
-    const payload = (await response.json()) as { error?: string };
-    if (!response.ok) {
-      throw new Error(payload.error ?? "Не удалось сохранить профиль.");
-    }
-  };
 
   const openEmailMode = () => {
     setEmailModeOpen((current) => !current);
@@ -258,9 +211,6 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
     setVerificationCode("");
     setCodeSent(false);
     setCodeVerified(false);
-    if (mode === "login") {
-      clearPendingPasswordSetup();
-    }
   };
 
   const handleEmailPasswordLogin = async () => {
@@ -273,19 +223,22 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
     setAuthMessage(null);
 
     try {
-      const client = requireSupabase();
-      const { data, error } = await client.auth.signInWithPassword({
-        email: email.trim(),
-        password,
+      const response = await fetch("/api/auth/email/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        }),
       });
 
-      if (error || !data.session) {
-        throw new Error("Неверная почта или пароль.");
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Неверная почта или пароль.");
       }
 
-      clearPendingPasswordSetup();
-      clearTelegramSession();
-      await persistProfile(data.session.access_token);
+      writeLastAuthEmail(email.trim());
       onLogin?.();
     } catch (error) {
       setAuthMessage({
@@ -307,22 +260,22 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
     setAuthMessage(null);
 
     try {
-      const emailStatus = await getEmailStatus(email);
-      if (emailStatus.exists && emailStatus.passwordReady) {
-        throw new Error("EMAIL_ALREADY_REGISTERED");
-      }
-
-      const client = requireSupabase();
-      markPendingPasswordSetup();
-      const { error } = await client.auth.signInWithOtp({
-        email: email.trim(),
-        options: { shouldCreateUser: true },
+      const response = await fetch("/api/auth/email/request-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          email: email.trim(),
+          region: region.trim() || null,
+        }),
       });
 
-      if (error) {
-        throw error;
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Не удалось отправить код на почту.");
       }
 
+      writeLastAuthEmail(email.trim());
       setCodeSent(true);
       setCodeVerified(false);
       setAuthMessage({
@@ -330,14 +283,9 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
         text: "Код отправлен на почту. Введите его ниже и подтвердите адрес.",
       });
     } catch (error) {
-      const message =
-        error instanceof Error && error.message === "EMAIL_ALREADY_REGISTERED"
-          ? "Данный E-Mail уже зарегистрирован. Войдите через пароль."
-          : getFriendlyAuthErrorMessage(error, "Не удалось отправить код на почту.");
-
       setAuthMessage({
         type: "error",
-        text: message,
+        text: getFriendlyAuthErrorMessage(error, "Не удалось отправить код на почту."),
       });
     } finally {
       setIsSubmitting(false);
@@ -354,15 +302,19 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
     setAuthMessage(null);
 
     try {
-      const client = requireSupabase();
-      const { error } = await client.auth.verifyOtp({
-        email: email.trim(),
-        token: verificationCode.trim(),
-        type: "email",
+      const response = await fetch("/api/auth/email/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          email: email.trim(),
+          code: verificationCode.trim(),
+        }),
       });
 
-      if (error) {
-        throw new Error("Код не верный.");
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Код не верный.");
       }
 
       setCodeVerified(true);
@@ -400,20 +352,23 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
     setAuthMessage(null);
 
     try {
-      const client = requireSupabase();
-      const { data: sessionData } = await client.auth.getSession();
-      if (!sessionData.session) {
-        throw new Error("Сессия после подтверждения почты не найдена.");
+      const response = await fetch("/api/auth/email/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          password,
+          confirmPassword,
+          region: region.trim() || null,
+        }),
+      });
+
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Не удалось завершить регистрацию.");
       }
 
-      const { error } = await client.auth.updateUser({ password });
-      if (error) {
-        throw error;
-      }
-
-      clearPendingPasswordSetup();
-      clearTelegramSession();
-      await persistProfile(sessionData.session.access_token);
+      writeLastAuthEmail(email.trim());
       onLogin?.();
     } catch (error) {
       setAuthMessage({
@@ -450,20 +405,15 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
       const response = await fetch("/api/auth/telegram", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ initData: telegram.initData }),
       });
 
-      const payload = (await response.json()) as {
-        error?: string;
-        session?: Parameters<typeof writeTelegramSession>[0];
-      };
-
-      if (!response.ok || !payload.session) {
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) {
         throw new Error(payload.error ?? "Не удалось войти через Telegram.");
       }
 
-      clearPendingPasswordSetup();
-      writeTelegramSession(payload.session);
       onLogin?.();
     } catch (error) {
       setAuthMessage({

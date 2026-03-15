@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createTimestamp, updateDb } from "@/lib/auth/local-db";
+import { findUserBySession, getSessionTokenFromRequest } from "@/lib/auth/server-session";
 
 type ProfilePayload = {
   email?: string;
@@ -15,70 +16,37 @@ type ProfilePayload = {
   xUrl?: string | null;
 };
 
-function getAccessToken(request: Request) {
-  const header = request.headers.get("authorization");
-  if (!header?.startsWith("Bearer ")) {
-    return null;
-  }
-
-  return header.slice("Bearer ".length).trim();
-}
-
 export async function POST(request: Request) {
   try {
-    const accessToken = getAccessToken(request);
-    if (!accessToken) {
-      return NextResponse.json({ error: "Missing access token." }, { status: 401 });
-    }
-
     const body = (await request.json()) as ProfilePayload;
-    const supabase = getSupabaseAdminClient();
-    const { data: userData, error: userError } = await supabase.auth.getUser(accessToken);
+    const sessionToken = getSessionTokenFromRequest(request);
+    const updated = await updateDb((db) => {
+      const user = findUserBySession(db, sessionToken);
+      if (!user) {
+        throw new Error("UNAUTHORIZED");
+      }
 
-    if (userError || !userData.user) {
-      return NextResponse.json(
-        { error: userError?.message ?? "Supabase session is invalid." },
-        { status: 401 },
-      );
-    }
+      user.email = body.email ?? user.email ?? null;
+      user.phone = body.phone ?? user.phone ?? null;
+      user.age = body.age ?? user.age ?? null;
+      user.gender = body.gender ?? user.gender ?? null;
+      user.region = body.region ?? user.region ?? null;
+      user.firstName = body.firstName ?? user.firstName ?? null;
+      user.lastName = body.lastName ?? user.lastName ?? null;
+      user.telegramUrl = body.telegramUrl ?? user.telegramUrl ?? null;
+      user.vkUrl = body.vkUrl ?? user.vkUrl ?? null;
+      user.instagramUrl = body.instagramUrl ?? user.instagramUrl ?? null;
+      user.xUrl = body.xUrl ?? user.xUrl ?? null;
+      user.updatedAt = createTimestamp();
+      return user.id;
+    });
 
-    const user = userData.user;
-    const { data, error } = await supabase
-      .from("app_users")
-      .upsert(
-        {
-          auth_user_id: user.id,
-          email: body.email ?? user.email ?? null,
-          phone: body.phone ?? null,
-          age: body.age ?? null,
-          gender: body.gender ?? null,
-          region: body.region ?? null,
-          first_name: body.firstName ?? (user.user_metadata.first_name as string | undefined) ?? null,
-          last_name: body.lastName ?? (user.user_metadata.last_name as string | undefined) ?? null,
-          telegram_url: body.telegramUrl ?? null,
-          vk_url: body.vkUrl ?? null,
-          instagram_url: body.instagramUrl ?? null,
-          x_url: body.xUrl ?? null,
-          auth_provider: "email",
-          email_verified: Boolean(user.email_confirmed_at),
-          password_ready: true,
-        },
-        {
-          onConflict: "auth_user_id",
-        },
-      )
-      .select("id")
-      .single();
-
-    if (error || !data) {
-      return NextResponse.json(
-        { error: error?.message ?? "Failed to save profile." },
-        { status: 500 },
-      );
-    }
-
-    return NextResponse.json({ ok: true, appUserId: data.id });
+    return NextResponse.json({ ok: true, appUserId: updated });
   } catch (error) {
+    if (error instanceof Error && error.message === "UNAUTHORIZED") {
+      return NextResponse.json({ error: "Необходима авторизация." }, { status: 401 });
+    }
+
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to save profile." },
       { status: 500 },

@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import Onboarding from "../onboarding/Onboarding";
 import MainApp from "../screens/MainApp";
-import { readPendingPasswordSetup, readTelegramSession } from "@/lib/auth/storage";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function Page() {
   const [showOnboarding, setShowOnboarding] = useState(true);
@@ -12,26 +10,18 @@ export default function Page() {
 
   useEffect(() => {
     let cancelled = false;
-    const supabase = getSupabaseBrowserClient();
 
     const bootstrap = async () => {
       try {
-        if (readTelegramSession()) {
-          if (!cancelled) {
-            setShowOnboarding(false);
-            setIsBooting(false);
-          }
-          return;
-        }
+        const response = await fetch("/api/auth/session", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
+        const payload = (await response.json()) as { authenticated?: boolean };
 
-        if (supabase) {
-          const {
-            data: { session },
-          } = await supabase.auth.getSession();
-
-          if (!cancelled && session && !readPendingPasswordSetup()) {
-            setShowOnboarding(false);
-          }
+        if (!cancelled) {
+          setShowOnboarding(!payload.authenticated);
         }
       } finally {
         if (!cancelled) {
@@ -42,15 +32,8 @@ export default function Page() {
 
     bootstrap();
 
-    const subscription = supabase?.auth.onAuthStateChange((_, session) => {
-      if (!cancelled) {
-        setShowOnboarding((!session || readPendingPasswordSetup()) && !readTelegramSession());
-      }
-    });
-
     return () => {
       cancelled = true;
-      subscription?.data.subscription.unsubscribe();
     };
   }, []);
 

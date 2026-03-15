@@ -1,70 +1,25 @@
-export const TELEGRAM_SESSION_KEY = "bon-telegram-session";
-export const PENDING_PASSWORD_SETUP_KEY = "bon-pending-password-setup";
+export const LAST_AUTH_EMAIL_KEY = "bon-last-auth-email";
 
-export type TelegramAppSession = {
-  appUserId: string;
-  telegramId: number;
-  telegramUsername: string | null;
-  telegramUrl: string | null;
-  firstName: string;
-  lastName: string | null;
-  photoUrl: string | null;
-};
-
-export function readTelegramSession() {
+export function readLastAuthEmail() {
   if (typeof window === "undefined") {
-    return null;
+    return "";
   }
 
-  const raw = window.localStorage.getItem(TELEGRAM_SESSION_KEY);
-  if (!raw) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(raw) as TelegramAppSession;
-  } catch {
-    window.localStorage.removeItem(TELEGRAM_SESSION_KEY);
-    return null;
-  }
+  return window.localStorage.getItem(LAST_AUTH_EMAIL_KEY) ?? "";
 }
 
-export function writeTelegramSession(session: TelegramAppSession) {
+export function writeLastAuthEmail(email: string) {
   if (typeof window === "undefined") {
     return;
   }
 
-  window.localStorage.setItem(TELEGRAM_SESSION_KEY, JSON.stringify(session));
+  window.localStorage.setItem(LAST_AUTH_EMAIL_KEY, email);
 }
 
-export function clearTelegramSession() {
+export function clearLastAuthEmail() {
   if (typeof window === "undefined") {
     return;
   }
 
-  window.localStorage.removeItem(TELEGRAM_SESSION_KEY);
-}
-
-export function readPendingPasswordSetup() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  return window.localStorage.getItem(PENDING_PASSWORD_SETUP_KEY) === "1";
-}
-
-export function markPendingPasswordSetup() {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.localStorage.setItem(PENDING_PASSWORD_SETUP_KEY, "1");
-}
-
-export function clearPendingPasswordSetup() {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.localStorage.removeItem(PENDING_PASSWORD_SETUP_KEY);
+  window.localStorage.removeItem(LAST_AUTH_EMAIL_KEY);
 }

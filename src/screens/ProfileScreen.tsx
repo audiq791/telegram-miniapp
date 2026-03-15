@@ -12,8 +12,6 @@ import {
   LogOut,
   Settings,
 } from "lucide-react";
-import { clearTelegramSession } from "@/lib/auth/storage";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const userData = {
   name: "Леван Баазов",
@@ -57,11 +55,10 @@ export default function ProfileScreen({ onLogout }: { onLogout?: () => void }) {
     setIsLoggingOut(true);
 
     try {
-      clearTelegramSession();
-      const supabase = getSupabaseBrowserClient();
-      if (supabase) {
-        await supabase.auth.signOut();
-      }
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
     } finally {
       onLogout?.();
       setIsLoggingOut(false);
