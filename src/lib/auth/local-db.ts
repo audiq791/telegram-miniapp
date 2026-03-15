@@ -1,4 +1,5 @@
 import { promises as fs } from "fs";
+import { tmpdir } from "os";
 import path from "path";
 import { randomUUID } from "crypto";
 
@@ -61,7 +62,9 @@ export type LocalAuthDb = {
   sessions: SessionRecord[];
 };
 
-const DB_DIRECTORY = path.join(process.cwd(), "data");
+const DB_DIRECTORY = process.env.VERCEL
+  ? path.join(tmpdir(), "tg-miniapp-auth")
+  : path.join(process.cwd(), "data");
 const DB_PATH = path.join(DB_DIRECTORY, "auth-db.json");
 
 const EMPTY_DB: LocalAuthDb = {
