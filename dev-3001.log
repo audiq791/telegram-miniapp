@@ -23,3 +23,9 @@ Creating turbopack project { dir: 'C:\\Users\\Levan\\Desktop\\tg-miniapp\\web', 
  POST /api/auth/email/register 200 in 119ms (compile: 82ms, render: 37ms)
  GET / 200 in 51ms (compile: 32ms, render: 19ms)
  GET /api/auth/session 200 in 8ms (compile: 1614µs, render: 6ms)
+✓ Compiled in 173ms
+✓ Compiled in 161ms
+✓ Compiled in 126ms
+✓ Compiled in 156ms
+✓ Compiled in 152ms
+✓ Compiled in 136ms

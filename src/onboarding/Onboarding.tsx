@@ -408,8 +408,8 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
   );
   const orbitWidth = Math.max(...orbits.map((orbit) => orbit.width));
   const orbitHeight = Math.max(...orbits.map((orbit) => orbit.height));
-  const orbitStroke = "rgba(82, 82, 91, 0.34)";
-  const orbitGlow = "rgba(255, 255, 255, 0.28)";
+  const orbitStroke = "rgba(39, 39, 42, 0.5)";
+  const orbitGlow = "rgba(82, 82, 91, 0.16)";
   const coinsPerOrbit = orbitHeroCoins.length / orbits.length;
   const [marketChart] = useState(() => createChartData(18));
   const [marketCandles] = useState(() => createCandles(14));
@@ -460,25 +460,28 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
 
   const renderCoinFace = (coin: (typeof orbitCoins)[number]) => (
     <div
-      className={`grid place-items-center rounded-full border border-white/90 bg-gradient-to-br ${coin.hue}`}
+      className="grid place-items-center rounded-full border-[1.5px] border-zinc-700 bg-[#fff9ef]"
       style={{
         width: coinSize,
         height: coinSize,
-        boxShadow: "0 14px 24px rgba(24,24,27,0.12), inset 0 1px 0 rgba(255,255,255,0.88)",
+        boxShadow: "0 10px 18px rgba(24,24,27,0.08), inset 0 0 0 1px rgba(255,255,255,0.55)",
       }}
     >
-      <div className="grid h-[74%] w-[74%] place-items-center rounded-full bg-white/95 shadow-inner">
+      <div
+        className={`grid h-[74%] w-[74%] place-items-center rounded-full bg-gradient-to-br ${coin.hue}`}
+        style={{ boxShadow: "inset 0 0 0 1px rgba(39,39,42,0.16)" }}
+      >
         {coin.kind === "bonus" ? (
           <Image
             src={coin.src}
             alt={coin.alt}
             width={coinSize * 0.42}
             height={coinSize * 0.42}
-            className="h-auto w-auto max-h-[62%] max-w-[62%] object-contain"
+            className="h-auto w-auto max-h-[62%] max-w-[62%] object-contain saturate-[0.9]"
           />
         ) : (
           <span
-            className={`font-semibold text-red-600 ${
+            className={`font-semibold text-rose-600 ${
               layout.tier === "roomy" ? "text-[1.2rem]" : layout.tier === "compact" ? "text-[0.9rem]" : "text-[1rem]"
             }`}
           >
@@ -558,9 +561,11 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,rgba(255,255,255,0.92),transparent_36%),radial-gradient(circle_at_50%_72%,rgba(251,191,36,0.14),transparent_48%),linear-gradient(180deg,rgba(255,255,255,0.18),transparent_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_28%,rgba(255,255,255,0.95),transparent_34%),linear-gradient(180deg,#fffdf7_0%,#f7efe1_100%)]" />
+      <div className="absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(82,82,91,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(82,82,91,0.06)_1px,transparent_1px)] [background-size:20px_20px]" />
+      <div className="absolute inset-0 opacity-[0.08] [background-image:radial-gradient(rgba(39,39,42,0.7)_0.7px,transparent_0.7px)] [background-size:14px_14px]" />
       <div
-        className="absolute rounded-full bg-amber-200/24 blur-3xl"
+        className="absolute rounded-full bg-amber-200/18 blur-3xl"
         style={{
           width: orbitWidth * 0.92,
           height: orbitHeight * 0.62,
@@ -589,7 +594,19 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
               ry={orbit.height / 2}
               fill="none"
               stroke={orbitStroke}
-              strokeWidth="0.7"
+              strokeWidth="1"
+              strokeDasharray="6 5"
+              strokeLinecap="round"
+            />
+            <ellipse
+              cx={orbit.width / 2}
+              cy={orbit.height / 2}
+              rx={orbit.width / 2 - 1}
+              ry={orbit.height / 2 - 1}
+              fill="none"
+              stroke="rgba(113,113,122,0.14)"
+              strokeWidth="0.8"
+              strokeDasharray="2 8"
             />
           </svg>
         ))}
@@ -647,53 +664,37 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
           style={{ transformStyle: "preserve-3d" }}
         >
           <div
-            className="relative rounded-[34px] border border-white/18 bg-[linear-gradient(180deg,#1e293b_0%,#111827_22%,#0f172a_70%,#020617_100%)] shadow-[0_34px_70px_rgba(15,23,42,0.34)]"
+            className="relative rounded-[34px] border-[2px] border-zinc-800 bg-[#f4ead9]"
             style={{
               width: phoneWidth,
               height: phoneHeight,
               transformStyle: "preserve-3d",
-              boxShadow:
-                "0 34px 70px rgba(15,23,42,0.32), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -10px 28px rgba(0,0,0,0.42)",
+              boxShadow: "0 24px 44px rgba(24,24,27,0.18), 8px 8px 0 rgba(39,39,42,0.08)",
             }}
           >
           <div
-            className="absolute inset-[3px] rounded-[31px] bg-[linear-gradient(180deg,#334155_0%,#111827_18%,#0f172a_55%,#020617_100%)]"
-            style={{
-              transform: "translateZ(-9px)",
-              boxShadow:
-                "inset 0 0 0 1px rgba(255,255,255,0.06), inset 0 10px 18px rgba(255,255,255,0.05), inset 0 -16px 22px rgba(0,0,0,0.34), 0 16px 24px rgba(2,6,23,0.25)",
-            }}
+            className="absolute inset-[2px] rounded-[31px] border border-zinc-700/50 bg-[#efe2cc]"
+            style={{ transform: "translateZ(-8px)" }}
           />
           <div
-            className="absolute inset-[1px] rounded-[33px]"
+            className="absolute inset-0 rounded-[34px]"
             style={{
               background:
-                "linear-gradient(135deg, rgba(255,255,255,0.12), transparent 22%, transparent 74%, rgba(255,255,255,0.06) 100%)",
-              boxShadow:
-                "inset 1px 0 0 rgba(255,255,255,0.08), inset -1px 0 0 rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.25)",
+                "radial-gradient(circle at 18% 14%, rgba(255,255,255,0.18), transparent 22%), linear-gradient(180deg, rgba(255,255,255,0.14), transparent 100%)",
             }}
           />
           <div
-            className="absolute inset-[6px] rounded-[28px] border border-white/8"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01) 28%, rgba(0,0,0,0.12) 100%)",
-              transform: "translateZ(1px)",
-            }}
-          />
-          <div className="absolute inset-0 rounded-[34px] bg-[radial-gradient(circle_at_18%_14%,rgba(255,255,255,0.22),transparent_24%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent_42%,rgba(255,255,255,0.02)_68%,transparent_100%)]" />
-          <div
-            className="absolute inset-[5px] rounded-[29px] border border-white/8 bg-[linear-gradient(180deg,#020617_0%,#000000_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]"
+            className="absolute inset-[5px] rounded-[29px] border-[2px] border-zinc-900 bg-[#171717] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
             style={{ transform: "translateZ(8px)" }}
           >
             <div className="absolute inset-x-0 top-0 z-20 flex justify-center pt-2.5">
-              <div className="h-1.5 w-16 rounded-full bg-black/65 shadow-[0_1px_0_rgba(255,255,255,0.06)]" />
+              <div className="h-1.5 w-16 rounded-full bg-black/65" />
             </div>
-            <div className="absolute left-1/2 top-4 z-20 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-slate-700 shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_0_10px_rgba(14,165,233,0.2)]" />
-            <div className="absolute inset-[7px] overflow-hidden rounded-[25px] bg-white">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_12%,rgba(255,255,255,0.5),transparent_24%),linear-gradient(120deg,rgba(255,255,255,0.2),transparent_30%,rgba(148,163,184,0.08)_68%,transparent_100%)]" />
+            <div className="absolute left-1/2 top-4 z-20 h-2.5 w-2.5 -translate-x-1/2 rounded-full border border-zinc-700 bg-zinc-600" />
+            <div className="absolute inset-[7px] overflow-hidden rounded-[25px] bg-[#fffdf8]">
+              <div className="absolute inset-0 opacity-[0.16] [background-image:linear-gradient(rgba(82,82,91,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(82,82,91,0.08)_1px,transparent_1px)] [background-size:12px_12px]" />
               <div className="absolute inset-x-0 top-0 h-10 bg-[linear-gradient(180deg,rgba(255,255,255,0.75),transparent)]" />
-              <div className="absolute inset-x-[10px] top-[14px] z-10 rounded-[18px] border border-slate-200 bg-white px-3 pb-3 pt-2.5 shadow-[0_10px_24px_rgba(15,23,42,0.08)]">
+              <div className="absolute inset-x-[10px] top-[14px] z-10 rounded-[18px] border-[1.5px] border-zinc-300 bg-[#fffdf9] px-3 pb-3 pt-2.5 shadow-[4px_4px_0_rgba(39,39,42,0.05)]">
                 <div className="mb-2 flex items-center justify-between">
                   <div>
                     <div className="text-[0.42rem] font-medium uppercase tracking-[0.22em] text-slate-500">
@@ -776,13 +777,13 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
                   </div>
                 </div>
               </div>
-              <div className="absolute -left-7 top-10 h-28 w-16 rotate-[14deg] rounded-full bg-slate-100/80 blur-2xl" />
-              <div className="absolute -right-4 bottom-7 h-20 w-20 rounded-full bg-sky-100/70 blur-2xl" />
+              <div className="absolute -left-7 top-10 h-28 w-16 rotate-[14deg] rounded-full bg-amber-100/55 blur-2xl" />
+              <div className="absolute -right-4 bottom-7 h-20 w-20 rounded-full bg-sky-100/55 blur-2xl" />
             </div>
           </div>
-          <div className="absolute left-[1px] top-14 h-9 w-[2px] rounded-full bg-white/12" />
-          <div className="absolute left-[1px] top-24 h-14 w-[2px] rounded-full bg-white/10" />
-          <div className="absolute right-[1px] top-20 h-16 w-[2px] rounded-full bg-white/12" />
+          <div className="absolute left-[1px] top-14 h-9 w-[2px] rounded-full bg-zinc-800/20" />
+          <div className="absolute left-[1px] top-24 h-14 w-[2px] rounded-full bg-zinc-800/16" />
+          <div className="absolute right-[1px] top-20 h-16 w-[2px] rounded-full bg-zinc-800/20" />
         </div>
         </motion.div>
       </motion.div>
@@ -805,13 +806,17 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
               d={getFrontArcPath(orbit)}
               fill="none"
               stroke={orbitGlow}
-              strokeWidth="0.4"
+              strokeWidth="0.8"
+              strokeDasharray="6 5"
+              strokeLinecap="round"
             />
             <path
               d={getFrontArcPath(orbit)}
               fill="none"
               stroke={orbitStroke}
-              strokeWidth="0.7"
+              strokeWidth="1"
+              strokeDasharray="6 5"
+              strokeLinecap="round"
             />
           </svg>
         ))}
@@ -849,7 +854,7 @@ function Scene1({ onNext, layout, isHeroActive }: { onNext: () => void; layout: 
     <FitToViewport contentClassName={`px-5 pb-6 pt-5 sm:px-6 sm:pt-7`}>
       <div className={`mx-auto flex flex-col ${layout.sectionGapClass}`}>
         <div
-          className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-200/50 bg-gradient-to-br from-amber-50/80 to-orange-100/80 shadow-sm ${layout.frameHeightClass}`}
+          className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border border-zinc-300/80 bg-[#fffaf1] shadow-[6px_6px_0_rgba(39,39,42,0.05)] ${layout.frameHeightClass}`}
         >
           <OrbitHero layout={layout} isActive={isHeroActive} />
         </div>
