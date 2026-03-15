@@ -525,7 +525,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
       case "top":
         return `M 0 ${cy} A ${rx} ${ry} 0 0 1 ${orbit.width} ${cy}`;
       case "bottom":
-        return `M 0 ${cy} A ${rx} ${ry} 0 0 0 ${orbit.width} ${cy}`;
+        return `M 0 ${cy} A ${rx} ${ry} 0 0 1 ${orbit.width} ${cy}`;
       case "left":
         return `M ${cx} ${orbit.height} A ${rx} ${ry} 0 0 0 ${cx} 0`;
       case "right":
