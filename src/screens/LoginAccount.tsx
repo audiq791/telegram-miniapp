@@ -70,12 +70,7 @@ function Hero() {
               y: [coin.y, coin.y + 14, coin.y - 8, coin.y],
               opacity: [0.35, 0.75, 0.45, 0.35],
             }}
-            transition={{
-              duration: 8,
-              delay: coin.delay,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
+            transition={{ duration: 8, delay: coin.delay, repeat: Infinity, ease: "easeInOut" }}
           >
             <div
               className={`grid h-12 w-12 place-items-center rounded-full border border-white/90 bg-gradient-to-br shadow-lg ${coin.hue}`}
@@ -123,9 +118,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
-  const [phone, setPhone] = useState("");
-  const [age, setAge] = useState("");
-  const [gender, setGender] = useState("");
+  const [region, setRegion] = useState("");
   const [codeSent, setCodeSent] = useState(false);
   const [codeVerified, setCodeVerified] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -155,6 +148,15 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
     };
   }, []);
 
+  useEffect(() => {
+    if (region) return;
+    const locale = navigator.language || "";
+    const regionFromLocale = locale.includes("-") ? locale.split("-")[1] : "";
+    if (regionFromLocale) {
+      setRegion(regionFromLocale.toUpperCase());
+    }
+  }, [region]);
+
   const requireSupabase = () => {
     if (!supabase) {
       throw new Error("Для E-Mail авторизации нужно настроить Supabase в .env.local.");
@@ -172,9 +174,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
       },
       body: JSON.stringify({
         email: email.trim(),
-        phone: phone.trim() || null,
-        age: age.trim() ? Number(age) : null,
-        gender: gender || null,
+        region: region.trim() || null,
       }),
     });
 
@@ -574,32 +574,6 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
                                     placeholder="Повторите пароль"
                                     className={`w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
                                   />
-                                  <input
-                                    type="tel"
-                                    value={phone}
-                                    onChange={(event) => setPhone(event.target.value)}
-                                    placeholder="Телефон (необязательно)"
-                                    className={`w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
-                                  />
-                                  <div className="grid grid-cols-2 gap-3">
-                                    <input
-                                      type="number"
-                                      value={age}
-                                      onChange={(event) => setAge(event.target.value)}
-                                      placeholder="Возраст"
-                                      className={`w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
-                                    />
-                                    <select
-                                      value={gender}
-                                      onChange={(event) => setGender(event.target.value)}
-                                      className={`w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
-                                    >
-                                      <option value="">Пол</option>
-                                      <option value="male">Мужской</option>
-                                      <option value="female">Женский</option>
-                                      <option value="other">Другой</option>
-                                    </select>
-                                  </div>
                                   <button
                                     type="button"
                                     onClick={handleCompleteRegistration}

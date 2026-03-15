@@ -6,6 +6,13 @@ type ProfilePayload = {
   phone?: string;
   age?: number | null;
   gender?: string | null;
+  region?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  telegramUrl?: string | null;
+  vkUrl?: string | null;
+  instagramUrl?: string | null;
+  xUrl?: string | null;
 };
 
 function getAccessToken(request: Request) {
@@ -45,8 +52,13 @@ export async function POST(request: Request) {
           phone: body.phone ?? null,
           age: body.age ?? null,
           gender: body.gender ?? null,
-          first_name: (user.user_metadata.first_name as string | undefined) ?? null,
-          last_name: (user.user_metadata.last_name as string | undefined) ?? null,
+          region: body.region ?? null,
+          first_name: body.firstName ?? (user.user_metadata.first_name as string | undefined) ?? null,
+          last_name: body.lastName ?? (user.user_metadata.last_name as string | undefined) ?? null,
+          telegram_url: body.telegramUrl ?? null,
+          vk_url: body.vkUrl ?? null,
+          instagram_url: body.instagramUrl ?? null,
+          x_url: body.xUrl ?? null,
           auth_provider: "email",
           email_verified: Boolean(user.email_confirmed_at),
           password_ready: true,
