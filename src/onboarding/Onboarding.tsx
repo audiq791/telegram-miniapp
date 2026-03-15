@@ -377,6 +377,7 @@ const orbitHeroCoins = [
 function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: boolean }) {
   const phoneScale = layout.tier === "roomy" ? 0.95 : layout.tier === "compact" ? 0.78 : 0.86;
   const coinSize = layout.tier === "roomy" ? 54 : layout.tier === "compact" ? 38 : 46;
+  type OrbitFrontHalf = "top" | "bottom" | "left" | "right";
   const orbits = useMemo(
     () => [
       {
@@ -385,7 +386,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         rotate: 0,
         duration: 11.8,
         phase: 0,
-        frontHalf: "right" as const,
+        frontHalf: "right" as OrbitFrontHalf,
       },
       {
         width: layout.tier === "roomy" ? 306 : layout.tier === "compact" ? 224 : 254,
@@ -393,7 +394,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         rotate: 0,
         duration: 12.6,
         phase: Math.PI / 3,
-        frontHalf: "bottom" as const,
+        frontHalf: "top" as OrbitFrontHalf,
       },
       {
         width: layout.tier === "roomy" ? 298 : layout.tier === "compact" ? 214 : 246,
@@ -401,7 +402,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         rotate: -42,
         duration: 10.9,
         phase: Math.PI / 6,
-        frontHalf: "left" as const,
+        frontHalf: "left" as OrbitFrontHalf,
       },
     ],
     [layout.tier],
@@ -502,6 +503,8 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
     const cy = orbit.height / 2;
 
     switch (orbit.frontHalf) {
+      case "top":
+        return `M ${orbit.width} ${cy} A ${rx} ${ry} 0 0 0 0 ${cy}`;
       case "bottom":
         return `M 0 ${cy} A ${rx} ${ry} 0 0 1 ${orbit.width} ${cy}`;
       case "left":
@@ -519,6 +522,8 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
     const cy = orbit.height / 2;
 
     switch (orbit.frontHalf) {
+      case "top":
+        return `M 0 ${cy} A ${rx} ${ry} 0 0 1 ${orbit.width} ${cy}`;
       case "bottom":
         return `M ${orbit.width} ${cy} A ${rx} ${ry} 0 0 1 0 ${cy}`;
       case "left":
