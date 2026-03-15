@@ -394,7 +394,6 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         rotate: 0,
         duration: 12.6,
         phase: Math.PI / 3,
-        // Horizontal orbit: upper arc stays behind the phone, lower arc stays in front.
         frontHalf: "bottom" as OrbitFrontHalf,
       },
       {
