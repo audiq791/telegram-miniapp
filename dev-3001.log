@@ -17,3 +17,9 @@ Creating turbopack project { dir: 'C:\\Users\\Levan\\Desktop\\tg-miniapp\\web', 
  GET / 200 in 96ms (compile: 38ms, render: 58ms)
  GET /api/auth/session 200 in 26ms (compile: 3ms, render: 24ms)
  POST /api/auth/email/request-code 200 in 2.2s (compile: 72ms, render: 2.2s)
+[auth-email-code] { email: 'lev.baazov@gmail.com', code: '42150794' }
+ POST /api/auth/email/request-code 200 in 1883ms (compile: 21ms, render: 1862ms)
+ POST /api/auth/email/verify-code 200 in 71ms (compile: 66ms, render: 5ms)
+ POST /api/auth/email/register 200 in 119ms (compile: 82ms, render: 37ms)
+ GET / 200 in 51ms (compile: 32ms, render: 19ms)
+ GET /api/auth/session 200 in 8ms (compile: 1614µs, render: 6ms)
