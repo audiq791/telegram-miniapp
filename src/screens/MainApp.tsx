@@ -30,7 +30,7 @@ type Route =
   | { name: "blank"; title: string; fromTab: "wallet" | "market" | "services" | "profile" }
   | { name: "partner-site"; url: string; title: string; logo: string; fallbackColor: string };
 
-export default function MainApp() {
+export default function MainApp({ onLogout }: { onLogout?: () => void }) {
   const [tab, setTab] = useState<"wallet" | "market" | "services" | "profile">("wallet");
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
@@ -375,7 +375,7 @@ export default function MainApp() {
 
               {/* Профиль */}
               {tab === "profile" && (
-                <ProfileScreen />
+                <ProfileScreen onLogout={onLogout} />
               )}
             </motion.main>
           ) : route.name === "blank" ? (

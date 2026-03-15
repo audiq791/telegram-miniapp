@@ -58,10 +58,14 @@ export default function Page() {
     return <div className="min-h-dvh bg-zinc-50" />;
   }
 
+  const handleLogout = () => {
+    setShowOnboarding(true);
+  };
+
   return (
     <>
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
-      {!showOnboarding && <MainApp />}
+      {!showOnboarding && <MainApp onLogout={handleLogout} />}
     </>
   );
 }
