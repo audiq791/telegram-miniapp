@@ -461,16 +461,20 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
 
   const renderCoinFace = (coin: (typeof orbitCoins)[number]) => (
     <div
-      className="grid place-items-center rounded-full border-[1.5px] border-zinc-700 bg-[#fff9ef]"
+      className="relative grid place-items-center overflow-hidden rounded-full border-[1.5px] border-zinc-700 bg-[#fff9ef]"
       style={{
         width: coinSize,
         height: coinSize,
         boxShadow: "0 10px 18px rgba(24,24,27,0.08), inset 0 0 0 1px rgba(255,255,255,0.55)",
       }}
     >
+      <div className="absolute inset-0 rounded-full bg-[#fff9ef]" />
       <div
-        className={`grid h-[74%] w-[74%] place-items-center rounded-full bg-gradient-to-br ${coin.hue}`}
-        style={{ boxShadow: "inset 0 0 0 1px rgba(39,39,42,0.16)" }}
+        className={`relative z-[1] grid h-[74%] w-[74%] place-items-center rounded-full bg-gradient-to-br ${coin.hue}`}
+        style={{
+          boxShadow: "inset 0 0 0 1px rgba(39,39,42,0.16)",
+          isolation: "isolate",
+        }}
       >
         {coin.kind === "bonus" ? (
           <Image
