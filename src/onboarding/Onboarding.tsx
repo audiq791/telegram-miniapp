@@ -394,7 +394,7 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
         rotate: 0,
         duration: 12.6,
         phase: Math.PI / 3,
-        frontHalf: "top" as OrbitFrontHalf,
+        frontHalf: "bottom" as OrbitFrontHalf,
       },
       {
         width: layout.tier === "roomy" ? 298 : layout.tier === "compact" ? 214 : 246,
