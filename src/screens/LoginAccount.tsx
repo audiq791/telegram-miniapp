@@ -14,7 +14,12 @@ import {
   Send,
   ShieldCheck,
 } from "lucide-react";
-import { clearTelegramSession, writeTelegramSession } from "@/lib/auth/storage";
+import {
+  clearPendingPasswordSetup,
+  clearTelegramSession,
+  markPendingPasswordSetup,
+  writeTelegramSession,
+} from "@/lib/auth/storage";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 interface LoginAccountProps {
@@ -28,6 +33,38 @@ type AuthMessage = {
   type: "error" | "success";
   text: string;
 } | null;
+
+function getFriendlyAuthErrorMessage(error: unknown, fallback: string) {
+  const raw =
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+        ? error
+        : fallback;
+  const normalized = raw.toLowerCase();
+
+  if (normalized.includes("email rate limit exceeded") || normalized.includes("security purposes")) {
+    return "Письмо уже было недавно отправлено. Попробуйте ещё раз чуть позже.";
+  }
+
+  if (normalized.includes("invalid login credentials")) {
+    return "Неверная почта или пароль.";
+  }
+
+  if (normalized.includes("email not confirmed")) {
+    return "Почта ещё не подтверждена. Проверьте письмо с кодом и завершите регистрацию.";
+  }
+
+  if ((normalized.includes("token") || normalized.includes("otp")) && normalized.includes("expired")) {
+    return "Срок действия кода истёк. Запросите новый код.";
+  }
+
+  if (normalized.includes("token") && normalized.includes("invalid")) {
+    return "Код не верный.";
+  }
+
+  return fallback;
+}
 
 function getLayout(viewportHeight: number, viewportWidth: number) {
   const shortSide = Math.min(viewportHeight, viewportWidth);
@@ -165,6 +202,29 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
     return supabase;
   };
 
+  const getEmailStatus = async (targetEmail: string) => {
+    const response = await fetch("/api/auth/email-status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: targetEmail.trim().toLowerCase() }),
+    });
+
+    const payload = (await response.json()) as {
+      error?: string;
+      exists?: boolean;
+      passwordReady?: boolean;
+      emailVerified?: boolean;
+    };
+
+    if (!response.ok) {
+      throw new Error(payload.error ?? "Не удалось проверить E-Mail.");
+    }
+
+    return payload;
+  };
+
   const persistProfile = async (accessToken: string) => {
     const response = await fetch("/api/auth/profile", {
       method: "POST",
@@ -198,6 +258,9 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
     setVerificationCode("");
     setCodeSent(false);
     setCodeVerified(false);
+    if (mode === "login") {
+      clearPendingPasswordSetup();
+    }
   };
 
   const handleEmailPasswordLogin = async () => {
@@ -220,13 +283,14 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
         throw new Error("Неверная почта или пароль.");
       }
 
+      clearPendingPasswordSetup();
       clearTelegramSession();
       await persistProfile(data.session.access_token);
       onLogin?.();
     } catch (error) {
       setAuthMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "Неверная почта или пароль.",
+        text: getFriendlyAuthErrorMessage(error, "Неверная почта или пароль."),
       });
     } finally {
       setIsSubmitting(false);
@@ -243,7 +307,13 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
     setAuthMessage(null);
 
     try {
+      const emailStatus = await getEmailStatus(email);
+      if (emailStatus.exists && emailStatus.passwordReady) {
+        throw new Error("EMAIL_ALREADY_REGISTERED");
+      }
+
       const client = requireSupabase();
+      markPendingPasswordSetup();
       const { error } = await client.auth.signInWithOtp({
         email: email.trim(),
         options: { shouldCreateUser: true },
@@ -260,9 +330,14 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
         text: "Код отправлен на почту. Введите его ниже и подтвердите адрес.",
       });
     } catch (error) {
+      const message =
+        error instanceof Error && error.message === "EMAIL_ALREADY_REGISTERED"
+          ? "Данный E-Mail уже зарегистрирован. Войдите через пароль."
+          : getFriendlyAuthErrorMessage(error, "Не удалось отправить код на почту.");
+
       setAuthMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "Не удалось отправить код на почту.",
+        text: message,
       });
     } finally {
       setIsSubmitting(false);
@@ -298,7 +373,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
     } catch (error) {
       setAuthMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "Код не верный.",
+        text: getFriendlyAuthErrorMessage(error, "Код не верный."),
       });
     } finally {
       setIsSubmitting(false);
@@ -336,13 +411,14 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
         throw error;
       }
 
+      clearPendingPasswordSetup();
       clearTelegramSession();
       await persistProfile(sessionData.session.access_token);
       onLogin?.();
     } catch (error) {
       setAuthMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "Не удалось завершить регистрацию.",
+        text: getFriendlyAuthErrorMessage(error, "Не удалось завершить регистрацию."),
       });
     } finally {
       setIsSubmitting(false);
@@ -386,6 +462,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
         throw new Error(payload.error ?? "Не удалось войти через Telegram.");
       }
 
+      clearPendingPasswordSetup();
       writeTelegramSession(payload.session);
       onLogin?.();
     } catch (error) {

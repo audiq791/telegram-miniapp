@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Onboarding from "../onboarding/Onboarding";
 import MainApp from "../screens/MainApp";
-import { readTelegramSession } from "@/lib/auth/storage";
+import { readPendingPasswordSetup, readTelegramSession } from "@/lib/auth/storage";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function Page() {
@@ -29,7 +29,7 @@ export default function Page() {
             data: { session },
           } = await supabase.auth.getSession();
 
-          if (!cancelled && session) {
+          if (!cancelled && session && !readPendingPasswordSetup()) {
             setShowOnboarding(false);
           }
         }
@@ -44,7 +44,7 @@ export default function Page() {
 
     const subscription = supabase?.auth.onAuthStateChange((_, session) => {
       if (!cancelled) {
-        setShowOnboarding(!session && !readTelegramSession());
+        setShowOnboarding((!session || readPendingPasswordSetup()) && !readTelegramSession());
       }
     });
 
