@@ -14,7 +14,7 @@ import {
   Send,
   ShieldCheck,
 } from "lucide-react";
-import { readLastAuthEmail, writeAuthFlashMessage, writeLastAuthEmail } from "@/lib/auth/storage";
+import { readLastAuthEmail, writeAuthFlashMessage, writeLastAuthEmail, writeTelegramSession } from "@/lib/auth/storage";
 
 interface LoginAccountProps {
   onLogin?: () => void;
@@ -436,11 +436,27 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
         body: JSON.stringify({ initData: telegram.initData }),
       });
 
-      const payload = (await response.json()) as { error?: string };
+      const payload = (await response.json()) as {
+        error?: string;
+        session?: {
+          appUserId: string;
+          telegramId: number;
+          telegramUsername: string | null;
+          telegramUrl: string | null;
+          firstName: string;
+          lastName: string | null;
+          photoUrl: string | null;
+        };
+      };
       if (!response.ok) {
         throw new Error(payload.error ?? "Не удалось войти через Telegram.");
       }
 
+      if (!payload.session) {
+        throw new Error("Не удалось получить Telegram-сессию.");
+      }
+
+      writeTelegramSession(payload.session);
       writeAuthFlashMessage("Вы авторизовались через Telegram");
       onLogin?.();
     } catch (error) {

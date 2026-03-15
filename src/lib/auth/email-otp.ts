@@ -95,7 +95,11 @@ export async function issueEmailCode(db: LocalAuthDb, email: string) {
       html,
       text,
     });
-  } catch {
+  } catch (error) {
+    console.error("[auth-email-send-failed]", {
+      email: normalizedEmail,
+      message: error instanceof Error ? error.message : String(error),
+    });
     db.verificationCodes = db.verificationCodes.filter((item) => item.id !== record.id);
     throw new Error("EMAIL_SEND_FAILED");
   }

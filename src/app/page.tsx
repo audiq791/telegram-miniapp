@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Onboarding from "../onboarding/Onboarding";
 import MainApp from "../screens/MainApp";
+import { readTelegramSession } from "@/lib/auth/storage";
 
 export default function Page() {
   const [showOnboarding, setShowOnboarding] = useState(true);
@@ -13,6 +14,13 @@ export default function Page() {
 
     const bootstrap = async () => {
       try {
+        if (readTelegramSession()) {
+          if (!cancelled) {
+            setShowOnboarding(false);
+          }
+          return;
+        }
+
         const response = await fetch("/api/auth/session", {
           method: "GET",
           credentials: "include",

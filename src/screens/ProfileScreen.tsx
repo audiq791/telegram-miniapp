@@ -12,6 +12,7 @@ import {
   LogOut,
   Settings,
 } from "lucide-react";
+import { clearTelegramSession } from "@/lib/auth/storage";
 
 const userData = {
   name: "Леван Баазов",
@@ -55,6 +56,7 @@ export default function ProfileScreen({ onLogout }: { onLogout?: () => void }) {
     setIsLoggingOut(true);
 
     try {
+      clearTelegramSession();
       await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",

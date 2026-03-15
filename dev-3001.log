@@ -13,3 +13,4 @@ Creating turbopack project { dir: 'C:\\Users\\Levan\\Desktop\\tg-miniapp\\web', 
  GET / 200 in 642ms (compile: 516ms, render: 126ms)
   Reload env: .env.local
   Reload env: .env.local
+ GET /api/auth/session 200 in 200ms (compile: 182ms, render: 18ms)
