@@ -1,29 +1,12 @@
 
 > web@0.1.0 dev
-> next dev --webpack --port 3001
+> next dev --port 3001
 
-▲ Next.js 16.1.6 (webpack)
+▲ Next.js 16.1.6 (Turbopack)
 - Local:         http://localhost:3001
 - Network:       http://100.65.12.41:3001
 - Environments: .env.local
 
 ✓ Starting...
-✓ Ready in 1292ms
-○ Compiling / ...
- GET / 200 in 3.5s (compile: 3.3s, render: 140ms)
-⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
-▲ Next.js 16.1.6 (webpack)
-- Local:         http://localhost:3001
-- Network:       http://100.65.12.41:3001
-- Environments: .env.local
-
-✓ Starting...
-✓ Ready in 1406ms
-⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
-▲ Next.js 16.1.6 (webpack)
-- Local:         http://localhost:3001
-- Network:       http://100.65.12.41:3001
-- Environments: .env.local
-
-✓ Starting...
-✓ Ready in 1204ms
+Creating turbopack project { dir: 'C:\\Users\\Levan\\Desktop\\tg-miniapp\\web', testMode: true }
+✓ Ready in 594ms
