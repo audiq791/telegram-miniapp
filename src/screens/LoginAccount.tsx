@@ -14,7 +14,7 @@ import {
   Send,
   ShieldCheck,
 } from "lucide-react";
-import { readLastAuthEmail, writeLastAuthEmail } from "@/lib/auth/storage";
+import { readLastAuthEmail, writeAuthFlashMessage, writeLastAuthEmail } from "@/lib/auth/storage";
 
 interface LoginAccountProps {
   onLogin?: () => void;
@@ -441,6 +441,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
         throw new Error(payload.error ?? "Не удалось войти через Telegram.");
       }
 
+      writeAuthFlashMessage("Вы авторизовались через Telegram");
       onLogin?.();
     } catch (error) {
       setAuthMessage({

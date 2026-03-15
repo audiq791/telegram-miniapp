@@ -24,6 +24,7 @@ import SwapModal from "../modals/SwapModal";
 import InfoModal from "../modals/InfoModal";
 import MoreMenu from "../modals/MoreMenu";
 import { partnersSeed, type Partner } from "../data/partners";
+import { clearAuthFlashMessage, readAuthFlashMessage } from "@/lib/auth/storage";
 
 type Route =
   | { name: "home" }
@@ -46,6 +47,7 @@ export default function MainApp({ onLogout }: { onLogout?: () => void }) {
 
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [authToast, setAuthToast] = useState("");
 
   useEffect(() => {
     const handleResize = () => {
@@ -63,6 +65,18 @@ export default function MainApp({ onLogout }: { onLogout?: () => void }) {
       setIsIOS(ios);
     };
     checkPlatform();
+  }, []);
+
+  useEffect(() => {
+    const flashMessage = readAuthFlashMessage();
+    if (!flashMessage) {
+      return;
+    }
+
+    clearAuthFlashMessage();
+    setAuthToast(flashMessage);
+    const timeoutId = window.setTimeout(() => setAuthToast(""), 2600);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const handleImageError = (partnerId: string) => {
@@ -190,6 +204,19 @@ export default function MainApp({ onLogout }: { onLogout?: () => void }) {
 
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
+      <AnimatePresence>
+        {authToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed left-1/2 top-4 z-[80] w-[calc(100%-24px)] max-w-md -translate-x-1/2 rounded-2xl border border-emerald-300/70 bg-emerald-500 px-4 py-3 text-sm font-medium text-white shadow-2xl"
+          >
+            {authToast}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* HEADER */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-zinc-200">
         <div className="mx-auto max-w-md px-4 py-3 flex items-center justify-between">
