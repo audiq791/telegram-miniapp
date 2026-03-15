@@ -512,6 +512,23 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
     }
   }, []);
 
+  const getBackArcPath = useCallback((orbit: (typeof orbits)[number]) => {
+    const rx = orbit.width / 2;
+    const ry = orbit.height / 2;
+    const cx = orbit.width / 2;
+    const cy = orbit.height / 2;
+
+    switch (orbit.frontHalf) {
+      case "bottom":
+        return `M ${orbit.width} ${cy} A ${rx} ${ry} 0 0 1 0 ${cy}`;
+      case "left":
+        return `M ${cx} ${orbit.height} A ${rx} ${ry} 0 0 0 ${cx} 0`;
+      case "right":
+      default:
+        return `M ${cx} ${orbit.height} A ${rx} ${ry} 0 0 1 ${cx} 0`;
+    }
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -587,26 +604,21 @@ function OrbitHero({ layout, isActive }: { layout: SceneLayoutProps; isActive: b
               transform: `rotate(${orbit.rotate}deg)`,
             }}
           >
-            <ellipse
-              cx={orbit.width / 2}
-              cy={orbit.height / 2}
-              rx={orbit.width / 2}
-              ry={orbit.height / 2}
+            <path
+              d={getBackArcPath(orbit)}
               fill="none"
               stroke={orbitStroke}
               strokeWidth="1"
               strokeDasharray="6 5"
               strokeLinecap="round"
             />
-            <ellipse
-              cx={orbit.width / 2}
-              cy={orbit.height / 2}
-              rx={orbit.width / 2 - 1}
-              ry={orbit.height / 2 - 1}
+            <path
+              d={getBackArcPath(orbit)}
               fill="none"
               stroke="rgba(113,113,122,0.14)"
               strokeWidth="0.8"
               strokeDasharray="2 8"
+              strokeLinecap="round"
             />
           </svg>
         ))}
