@@ -88,6 +88,13 @@ export async function issueEmailCode(db: LocalAuthDb, email: string) {
 
   const text = `Регистрация в Бирже Бонусов. Пожалуйста, введите этот код в поле для ввода кода в приложении: ${code}`;
 
+  if (process.env.NODE_ENV !== "production") {
+    console.info("[auth-email-code]", {
+      email: normalizedEmail,
+      code,
+    });
+  }
+
   try {
     await sendEmail({
       to: normalizedEmail,
