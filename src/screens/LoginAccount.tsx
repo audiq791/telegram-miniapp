@@ -541,7 +541,7 @@ export default function LoginAccount({ onLogin, onBack }: LoginAccountProps) {
                                   <input
                                     type="text"
                                     value={verificationCode}
-                                    onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
+                                    onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, "").slice(0, 8))}
                                     placeholder="Код из письма"
                                     className={`w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 ${layout.fieldClass}`}
                                     inputMode="numeric"
